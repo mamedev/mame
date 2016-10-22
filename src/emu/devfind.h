@@ -205,7 +205,7 @@ protected:
 	///   found.
 	/// \return Base pointer of the memeroy region if a matching region
 	///   is found, or nullptr otherwise.
-	void *find_memregion(UINT8 width, size_t &length, bool required) const;
+	void *find_memregion(uint8_t width, size_t &length, bool required) const;
 
 	/// \brief Check that memory region exists
 	///
@@ -240,7 +240,7 @@ protected:
 	///   found.
 	/// \return Pointer to base of memory share if a matching memory
 	///   share is found, or nullptr otherwise.
-	void *find_memshare(UINT8 width, size_t &bytes, bool required) const;
+	void *find_memshare(uint8_t width, size_t &bytes, bool required) const;
 
 	/// \brief Log if object was not found
 	///
@@ -646,12 +646,12 @@ public:
 	/// \brief Get length in units of elements
 	/// \return Length in units of elements or zero if no matching
 	///   memory region has been found.
-	UINT32 length() const { return m_length; }
+	uint32_t length() const { return m_length; }
 
 	/// \brief Get length in units of bytes
 	/// \return Length in units of bytes or zero if no matching memory
 	///   region has been found.
-	UINT32 bytes() const { return m_length * sizeof(PointerType); }
+	uint32_t bytes() const { return m_length * sizeof(PointerType); }
 
 	/// \brief Get index mask
 	///
@@ -659,7 +659,7 @@ public:
 	/// used as a mask for index values if the length is a power of two.
 	/// Result is undefined if no matching memory region has been found.
 	/// \return Length in units of elements minus one.
-	UINT32 mask() const { return m_length - 1; }
+	uint32_t mask() const { return m_length - 1; }
 
 private:
 	/// \brief Find memory region base pointer
@@ -726,7 +726,7 @@ class shared_ptr_finder : public object_finder_base<PointerType, Required>
 {
 public:
 	// construction/destruction
-	shared_ptr_finder(device_t &base, char const *tag, UINT8 width = sizeof(PointerType) * 8)
+	shared_ptr_finder(device_t &base, char const *tag, uint8_t width = sizeof(PointerType) * 8)
 		: object_finder_base<PointerType, Required>(base, tag)
 		, m_width(width)
 		, m_bytes(0)
@@ -738,14 +738,14 @@ public:
 	PointerType &operator[](int index) const { return this->m_target[index]; }
 
 	// getter for explicit fetching
-	UINT32 bytes() const { return m_bytes; }
-	UINT32 mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
+	uint32_t bytes() const { return m_bytes; }
+	uint32_t mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
 
 	// setter for setting the object
 	void set_target(PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }
 
 	// dynamic allocation of a shared pointer
-	void allocate(UINT32 entries)
+	void allocate(uint32_t entries)
 	{
 		assert(m_allocated.empty());
 		m_allocated.resize(entries);
@@ -764,7 +764,7 @@ private:
 	}
 
 	// internal state
-	UINT8 const m_width;
+	uint8_t const m_width;
 	size_t m_bytes;
 	std::vector<PointerType> m_allocated;
 };
@@ -788,23 +788,23 @@ extern template class object_finder_base<memory_bank, true>;
 extern template class object_finder_base<ioport_port, false>;
 extern template class object_finder_base<ioport_port, true>;
 
-extern template class object_finder_base<UINT8, false>;
-extern template class object_finder_base<UINT8, true>;
-extern template class object_finder_base<UINT16, false>;
-extern template class object_finder_base<UINT16, true>;
-extern template class object_finder_base<UINT32, false>;
-extern template class object_finder_base<UINT32, true>;
-extern template class object_finder_base<UINT64, false>;
-extern template class object_finder_base<UINT64, true>;
+extern template class object_finder_base<uint8_t, false>;
+extern template class object_finder_base<uint8_t, true>;
+extern template class object_finder_base<uint16_t, false>;
+extern template class object_finder_base<uint16_t, true>;
+extern template class object_finder_base<uint32_t, false>;
+extern template class object_finder_base<uint32_t, true>;
+extern template class object_finder_base<uint64_t, false>;
+extern template class object_finder_base<uint64_t, true>;
 
-extern template class object_finder_base<INT8, false>;
-extern template class object_finder_base<INT8, true>;
-extern template class object_finder_base<INT16, false>;
-extern template class object_finder_base<INT16, true>;
-extern template class object_finder_base<INT32, false>;
-extern template class object_finder_base<INT32, true>;
-extern template class object_finder_base<INT64, false>;
-extern template class object_finder_base<INT64, true>;
+extern template class object_finder_base<int8_t, false>;
+extern template class object_finder_base<int8_t, true>;
+extern template class object_finder_base<int16_t, false>;
+extern template class object_finder_base<int16_t, true>;
+extern template class object_finder_base<int32_t, false>;
+extern template class object_finder_base<int32_t, true>;
+extern template class object_finder_base<int64_t, false>;
+extern template class object_finder_base<int64_t, true>;
 
 extern template class memory_region_finder<false>;
 extern template class memory_region_finder<true>;
@@ -815,41 +815,41 @@ extern template class memory_bank_finder<true>;
 extern template class ioport_finder<false>;
 extern template class ioport_finder<true>;
 
-extern template class region_ptr_finder<UINT8, false>;
-extern template class region_ptr_finder<UINT8, true>;
-extern template class region_ptr_finder<UINT16, false>;
-extern template class region_ptr_finder<UINT16, true>;
-extern template class region_ptr_finder<UINT32, false>;
-extern template class region_ptr_finder<UINT32, true>;
-extern template class region_ptr_finder<UINT64, false>;
-extern template class region_ptr_finder<UINT64, true>;
+extern template class region_ptr_finder<uint8_t, false>;
+extern template class region_ptr_finder<uint8_t, true>;
+extern template class region_ptr_finder<uint16_t, false>;
+extern template class region_ptr_finder<uint16_t, true>;
+extern template class region_ptr_finder<uint32_t, false>;
+extern template class region_ptr_finder<uint32_t, true>;
+extern template class region_ptr_finder<uint64_t, false>;
+extern template class region_ptr_finder<uint64_t, true>;
 
-extern template class region_ptr_finder<INT8, false>;
-extern template class region_ptr_finder<INT8, true>;
-extern template class region_ptr_finder<INT16, false>;
-extern template class region_ptr_finder<INT16, true>;
-extern template class region_ptr_finder<INT32, false>;
-extern template class region_ptr_finder<INT32, true>;
-extern template class region_ptr_finder<INT64, false>;
-extern template class region_ptr_finder<INT64, true>;
+extern template class region_ptr_finder<int8_t, false>;
+extern template class region_ptr_finder<int8_t, true>;
+extern template class region_ptr_finder<int16_t, false>;
+extern template class region_ptr_finder<int16_t, true>;
+extern template class region_ptr_finder<int32_t, false>;
+extern template class region_ptr_finder<int32_t, true>;
+extern template class region_ptr_finder<int64_t, false>;
+extern template class region_ptr_finder<int64_t, true>;
 
-extern template class shared_ptr_finder<UINT8, false>;
-extern template class shared_ptr_finder<UINT8, true>;
-extern template class shared_ptr_finder<UINT16, false>;
-extern template class shared_ptr_finder<UINT16, true>;
-extern template class shared_ptr_finder<UINT32, false>;
-extern template class shared_ptr_finder<UINT32, true>;
-extern template class shared_ptr_finder<UINT64, false>;
-extern template class shared_ptr_finder<UINT64, true>;
+extern template class shared_ptr_finder<uint8_t, false>;
+extern template class shared_ptr_finder<uint8_t, true>;
+extern template class shared_ptr_finder<uint16_t, false>;
+extern template class shared_ptr_finder<uint16_t, true>;
+extern template class shared_ptr_finder<uint32_t, false>;
+extern template class shared_ptr_finder<uint32_t, true>;
+extern template class shared_ptr_finder<uint64_t, false>;
+extern template class shared_ptr_finder<uint64_t, true>;
 
-extern template class shared_ptr_finder<INT8, false>;
-extern template class shared_ptr_finder<INT8, true>;
-extern template class shared_ptr_finder<INT16, false>;
-extern template class shared_ptr_finder<INT16, true>;
-extern template class shared_ptr_finder<INT32, false>;
-extern template class shared_ptr_finder<INT32, true>;
-extern template class shared_ptr_finder<INT64, false>;
-extern template class shared_ptr_finder<INT64, true>;
+extern template class shared_ptr_finder<int8_t, false>;
+extern template class shared_ptr_finder<int8_t, true>;
+extern template class shared_ptr_finder<int16_t, false>;
+extern template class shared_ptr_finder<int16_t, true>;
+extern template class shared_ptr_finder<int32_t, false>;
+extern template class shared_ptr_finder<int32_t, true>;
+extern template class shared_ptr_finder<int64_t, false>;
+extern template class shared_ptr_finder<int64_t, true>;
 
 #endif // MAME_EMU_DEVFIND_H
 /** \} */

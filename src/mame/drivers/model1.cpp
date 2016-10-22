@@ -810,7 +810,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 
 WRITE16_MEMBER(model1_state::p_w)
 {
-	UINT16 old = m_paletteram16[offset];
+	uint16_t old = m_paletteram16[offset];
 	m_palette->write(space, offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());

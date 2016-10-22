@@ -77,8 +77,8 @@ private:
 	// internal state
 	running_machine &       m_machine;              // reference to our machine
 	bool                    m_in_use;               // is natural keyboard in use?
-	UINT32                  m_bufbegin;             // index of starting character
-	UINT32                  m_bufend;               // index of ending character
+	uint32_t                  m_bufbegin;             // index of starting character
+	uint32_t                  m_bufend;               // index of ending character
 	std::vector<char32_t> m_buffer;           // actual buffer
 	bool                    m_status_keydown;       // current keydown status
 	bool                    m_last_cr;              // was the last char a CR?

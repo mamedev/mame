@@ -22,8 +22,8 @@ int core_stricmp(const char *s1, const char *s2)
 {
 	for (;;)
 	{
-		int c1 = tolower((UINT8)*s1++);
-		int c2 = tolower((UINT8)*s2++);
+		int c1 = tolower((uint8_t)*s1++);
+		int c2 = tolower((uint8_t)*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
 	}
@@ -39,8 +39,8 @@ int core_strnicmp(const char *s1, const char *s2, size_t n)
 	size_t i;
 	for (i = 0; i < n; i++)
 	{
-		int c1 = tolower((UINT8)*s1++);
-		int c2 = tolower((UINT8)*s2++);
+		int c1 = tolower((uint8_t)*s1++);
+		int c2 = tolower((uint8_t)*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
 	}
@@ -166,7 +166,7 @@ std::string strtrimspace(std::string& str)
 	int start = 0;
 	for (auto & elem : str)
 	{
-		if (!isspace(UINT8(elem)))  break;
+		if (!isspace(uint8_t(elem)))  break;
 		start++;
 	}
 	int end = str.length();
@@ -174,7 +174,7 @@ std::string strtrimspace(std::string& str)
 	{
 		for (size_t i = str.length() - 1; i > 0; i--)
 		{
-			if (!isspace(UINT8(str[i]))) break;
+			if (!isspace(uint8_t(str[i]))) break;
 			end--;
 		}
 	}

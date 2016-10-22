@@ -77,27 +77,27 @@ public:
 	DECLARE_DRIVER_INIT(bcs3b);
 	DECLARE_DRIVER_INIT(bcs3c);
 	DECLARE_DRIVER_INIT(bcs3d);
-	UINT32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	bool m_cass_bit;
-	UINT8 s_curs;
-	UINT8 s_init;
-	UINT8 s_rows;
-	UINT8 s_cols;
+	uint8_t s_curs;
+	uint8_t s_init;
+	uint8_t s_rows;
+	uint8_t s_cols;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_memory_region m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<10> m_io_keyboard;
 };
 
 READ8_MEMBER( bcs3_state::keyboard_r )
 {
-	UINT8 i, data = 0;
+	uint8_t i, data = 0;
 
 	if (offset == 0)
 		data = (m_cass->input() > +0.01) ? 0x80 : 0;
@@ -114,7 +114,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 // 00-7F = NUL, 0xE0 = end of line.
 READ8_MEMBER( bcs3_state::video_r )
 {
-	UINT8 data = m_p_videoram[offset];
+	uint8_t data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
 }
 
@@ -215,16 +215,16 @@ static INPUT_PORTS_START( bcs3 )
 INPUT_PORTS_END
 
 // Official version
-UINT32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,rat;
-	UINT16 sy=0,ma=0x50,x;
+	uint8_t y,ra,chr,gfx,rat;
+	uint16_t sy=0,ma=0x50,x;
 
 	for (y = 0; y < 12; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 28; x++)
@@ -257,11 +257,11 @@ UINT32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitma
 
 /* Hacks: When it starts, it has 4 lines of data. Pressing enter causes it to allocate 100 lines.
    I'm assuming that it only shows a portion of this, with the cursor always in sight. */
-UINT32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,rat;
-	UINT16 sy = 0, ma = s_init, x;
-	UINT16 cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
+	uint8_t y,ra,chr,gfx,rat;
+	uint16_t sy = 0, ma = s_init, x;
+	uint16_t cursor = (m_p_videoram[s_curs] | (m_p_videoram[s_curs+1] << 8)) - 0x3c00 - ma;  // get cursor relative position
 	rat = cursor / (s_cols+1);
 	if (rat > (s_rows-1)) ma += (rat-(s_rows-1)) * (s_cols+1);
 
@@ -269,7 +269,7 @@ UINT32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + s_cols; x++)

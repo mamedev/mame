@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 
 READ8_MEMBER(cvs_state::cvs_input_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	/* the upper 4 bits of the address is used to select the character banking attributes */
 	m_character_banking_mode = (offset >> 4) & 0x03;
@@ -316,7 +316,7 @@ void cvs_state::start_393hz_timer()
 
 WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 {
-	UINT8 dac_value;
+	uint8_t dac_value;
 	static int old_data[4] = {0,0,0,0};
 
 	if (data != old_data[offset])
@@ -385,7 +385,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 
 WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 {
-	UINT8 ctl;
+	uint8_t ctl;
 	/*
 	 * offset 0: CS ?
 	 */
@@ -403,7 +403,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 
 WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
 {
-	UINT8 out = ((~data) >> 7) & 1;
+	uint8_t out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
 	m_tms5110->pdc_w(out);
 }
@@ -412,7 +412,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
 READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
 {
 	int bit;
-	UINT8 *ROM = memregion("speechdata")->base();
+	uint8_t *ROM = memregion("speechdata")->base();
 
 	/* before reading the bit, clamp the address to the region length */
 	m_speech_rom_bit_address &= ((memregion("speechdata")->bytes() * 8) - 1);
@@ -1536,7 +1536,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cvs_state,huncholy)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0082] = 0xc0;
@@ -1556,7 +1556,7 @@ DRIVER_INIT_MEMBER(cvs_state,huncholy)
 
 DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	offs_t offs;
 
@@ -1568,7 +1568,7 @@ DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 
 DRIVER_INIT_MEMBER(cvs_state,superbik)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0079] = 0xc0;
@@ -1596,7 +1596,7 @@ DRIVER_INIT_MEMBER(cvs_state,superbik)
 
 DRIVER_INIT_MEMBER(cvs_state,hero)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0087] = 0xc0;
@@ -1618,7 +1618,7 @@ DRIVER_INIT_MEMBER(cvs_state,hero)
 
 DRIVER_INIT_MEMBER(cvs_state,raiders)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	offs_t offs;
 

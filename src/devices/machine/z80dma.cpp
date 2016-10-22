@@ -146,7 +146,7 @@ const device_type Z80DMA = &device_creator<z80dma_device>;
 //  z80dma_device - constructor
 //-------------------------------------------------
 
-z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80DMA, "Z80 DMA", tag, owner, clock, "z80dma", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_out_busreq_cb(*this),
@@ -367,7 +367,7 @@ void z80dma_device::trigger_interrupt(int level)
 
 void z80dma_device::do_read()
 {
-	UINT8 mode;
+	uint8_t mode;
 
 	mode = TRANSFER_MODE;
 	switch(mode) {
@@ -428,7 +428,7 @@ void z80dma_device::do_transfer_write()
 
 void z80dma_device::do_search()
 {
-	UINT8 load_byte,match_byte;
+	uint8_t load_byte,match_byte;
 	load_byte = m_latch | MASK_BYTE;
 	match_byte = MATCH_BYTE | MASK_BYTE;
 	//if (LOG) logerror("%02x %02x\n",load_byte,match_byte));
@@ -444,7 +444,7 @@ void z80dma_device::do_search()
 int z80dma_device::do_write()
 {
 	int done;
-	UINT8 mode;
+	uint8_t mode;
 
 	mode = TRANSFER_MODE;
 	if (m_count == 0x0000)
@@ -551,7 +551,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 
 void z80dma_device::update_status()
 {
-	UINT16 pending_transfer;
+	uint16_t pending_transfer;
 	attotime next;
 
 	// no transfer is active right now; is there a transfer pending right now?
@@ -591,9 +591,9 @@ void z80dma_device::update_status()
 //  read - register read
 //-------------------------------------------------
 
-UINT8 z80dma_device::read()
+uint8_t z80dma_device::read()
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(m_read_num_follow == 0) // special case: Legend of Kage on X1 Turbo
 		res = m_status;
@@ -616,7 +616,7 @@ UINT8 z80dma_device::read()
 //  write - register write
 //-------------------------------------------------
 
-void z80dma_device::write(UINT8 data)
+void z80dma_device::write(uint8_t data)
 {
 	if (m_num_follow == 0)
 	{
@@ -717,7 +717,7 @@ void z80dma_device::write(UINT8 data)
 					interrupt_check();
 					// Needs six reset commands to reset the DMA
 					{
-						UINT8 WRi;
+						uint8_t WRi;
 
 						for(WRi=0;WRi<7;WRi++)
 							REG(WRi,m_reset_pointer) = 0;

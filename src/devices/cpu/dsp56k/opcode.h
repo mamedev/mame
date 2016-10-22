@@ -20,7 +20,7 @@ class ParallelMove;
 class Opcode
 {
 public:
-	Opcode(UINT16 w0, UINT16 w1);
+	Opcode(uint16_t w0, uint16_t w1);
 	virtual ~Opcode();
 
 	std::string disassemble() const;
@@ -37,8 +37,8 @@ private:
 	std::unique_ptr<Instruction> m_instruction;
 	std::unique_ptr<ParallelMove> m_parallelMove;
 
-	UINT16 m_word0;
-	//UINT16 m_word1;
+	uint16_t m_word0;
+	//uint16_t m_word1;
 
 	std::string dcString() const;
 };

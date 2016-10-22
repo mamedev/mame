@@ -70,7 +70,7 @@ extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_s
 //  williams_cvsd_sound_device - constructor
 //-------------------------------------------------
 
-williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", tag, owner, clock, "wmscvsd", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -248,7 +248,7 @@ machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions(
 void williams_cvsd_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -304,7 +304,7 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_narc_sound_device - constructor
 //-------------------------------------------------
 
-williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", tag, owner, clock, "wmsnarc", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu0(*this, "cpu0"),
@@ -586,7 +586,7 @@ machine_config_constructor williams_narc_sound_device::device_mconfig_additions(
 void williams_narc_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = memregion("cpu0")->base();
+	uint8_t *rom = memregion("cpu0")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -677,7 +677,7 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_adpcm_sound_device - constructor
 //-------------------------------------------------
 
-williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", tag, owner, clock, "wmsadpcm", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -856,7 +856,7 @@ machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions
 void williams_adpcm_sound_device::device_start()
 {
 	// configure banks
-	UINT8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	membank("rombank")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 	membank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 

@@ -289,7 +289,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_ctrl_port_w)
 /* triggered by REDC,r opcode */
 READ8_MEMBER(lazercmd_state::lazercmd_ctrl_port_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	return data;
 }
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_data_port_w)
 /* triggered by REDD,r opcode */
 READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
 {
-	UINT8 data = ioport("DSW")->read() & 0x0f;
+	uint8_t data = ioport("DSW")->read() & 0x0f;
 	return data;
 }
 
@@ -369,7 +369,7 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 
 READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -780,7 +780,7 @@ ROM_END
 DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
 {
 	int i, y;
-	UINT8 *gfx = memregion("gfx1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -792,8 +792,8 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
  ******************************************************************/
 	for (i = 0; i < 0x40; i++)
 	{
-		UINT8 *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
-		UINT8 *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
+		uint8_t *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
+		uint8_t *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
 		for (y = 0; y < VERT_CHR; y++)
 		{

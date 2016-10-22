@@ -43,7 +43,7 @@ public:
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source);
 
@@ -61,14 +61,14 @@ protected:
 	required_device<ay8910_device>  m_melodypsg1;
 	required_device<ay8910_device>  m_melodypsg2;
 
-	UINT8   m_melody_command;
+	uint8_t   m_melody_command;
 };
 
 
 class zac1b11107_audio_device : public zac1b111xx_melody_base
 {
 public:
-	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -89,7 +89,7 @@ public:
 	template<class _Object> static devcb_base &static_set_acs_cb(device_t &device, _Object object)
 	{ return downcast<zac1b11142_audio_device &>(device).m_acs_cb.set_callback(object); }
 
-	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
+	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(hs_w);
@@ -123,7 +123,7 @@ protected:
 
 	required_ioport m_inputs;
 
-	UINT8   m_host_command;
+	uint8_t   m_host_command;
 };
 
 #endif // __AUDIO_ZACCARIA_H__

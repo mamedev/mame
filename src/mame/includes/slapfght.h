@@ -37,10 +37,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_fixvideoram;
-	optional_shared_ptr<UINT8> m_fixcolorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_fixvideoram;
+	optional_shared_ptr<uint8_t> m_fixcolorram;
 
 	/* This it the best way to allow game specific kludges until the system is fully understood */
 	enum getstar_id
@@ -54,35 +54,35 @@ public:
 
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
-	UINT8 m_palette_bank;
-	UINT8 m_scrollx_lo;
-	UINT8 m_scrollx_hi;
-	UINT8 m_scrolly;
+	uint8_t m_palette_bank;
+	uint8_t m_scrollx_lo;
+	uint8_t m_scrollx_hi;
+	uint8_t m_scrolly;
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
 
 	bool m_mcu_sent;
 	bool m_main_sent;
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
-	UINT8 m_ddrA;
-	UINT8 m_portB_in;
-	UINT8 m_portB_out;
-	UINT8 m_ddrB;
-	UINT8 m_portC_in;
-	UINT8 m_portC_out;
-	UINT8 m_ddrC;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
+	uint8_t m_ddrA;
+	uint8_t m_portB_in;
+	uint8_t m_portB_out;
+	uint8_t m_ddrB;
+	uint8_t m_portC_in;
+	uint8_t m_portC_out;
+	uint8_t m_ddrC;
 
 	int m_getstar_status;
 	int m_getstar_sequence_index;
 	int m_getstar_status_state;
-	UINT8 m_getstar_cmd;
-	UINT8 m_gs_a;
-	UINT8 m_gs_d;
-	UINT8 m_gs_e;
-	UINT8 m_tigerhb_cmd;
+	uint8_t m_getstar_cmd;
+	uint8_t m_gs_a;
+	uint8_t m_gs_d;
+	uint8_t m_gs_e;
+	uint8_t m_tigerhb_cmd;
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
@@ -148,8 +148,8 @@ public:
 
 	void draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	void draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);

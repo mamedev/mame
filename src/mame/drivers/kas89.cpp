@@ -222,12 +222,12 @@ public:
 		m_unk(*this, "UNK")
 	{ }
 
-	UINT8 m_mux_data;
-	UINT8 m_main_nmi_enable;
+	uint8_t m_mux_data;
+	uint8_t m_main_nmi_enable;
 
-	UINT8 m_leds_mux_selector;
-	UINT8 m_leds_mux_data;
-	UINT8 m_outdata;            /* Muxed with the sound latch. Output to a sign? */
+	uint8_t m_leds_mux_selector;
+	uint8_t m_leds_mux_data;
+	uint8_t m_outdata;            /* Muxed with the sound latch. Output to a sign? */
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -364,7 +364,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 
 		if (m_outdata == 0x3f)
 		{
-			UINT8 i;
+			uint8_t i;
 			for ( i = 0; i < 37; i++ )
 			{
 				output().set_lamp_value(i, 0);    /* All roulette LEDs OFF */
@@ -410,7 +410,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 
 	m_leds_mux_selector = data;
 
-	UINT8 i;
+	uint8_t i;
 	for ( i = 0; i < 37; i++ )
 	{
 		output().set_lamp_value(i, 0);    /* All LEDs OFF */
@@ -832,7 +832,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kas89_state,kas89)
 {
 	int i;
-	UINT8 *mem = memregion("maincpu")->base();
+	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
 
 	/* Unscrambling data lines */
@@ -842,7 +842,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	}
 
 	/* Unscrambling address lines */
-	std::vector<UINT8> buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{

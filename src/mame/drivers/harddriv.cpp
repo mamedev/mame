@@ -339,7 +339,7 @@ Notes:
 
 const device_type HARDDRIV_DEVICE = &device_creator<harddriv_state>;
 
-harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HARDDRIV_DEVICE, "Hard Drivin' PCB Family", tag, owner, clock, "harddriv_pcb", __FILE__),
 /*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
@@ -1745,7 +1745,7 @@ MACHINE_CONFIG_END
 
 const device_type HARDDRIV_BOARD_DEVICE = &device_creator<harddriv_board_device_state>;
 
-harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1771,7 +1771,7 @@ void harddrivc_board_device_state::device_start()
 
 const device_type HARDDRIVC_BOARD_DEVICE = &device_creator<harddrivc_board_device_state>;
 
-harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1799,7 +1799,7 @@ void racedrivb1_board_device_state::device_start()
 const device_type RACEDRIV_BOARD_DEVICE = &device_creator<racedriv_board_device_state>;
 const device_type RACEDRIVB1_BOARD_DEVICE = &device_creator<racedrivb1_board_device_state>;
 
-racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1836,7 +1836,7 @@ const device_type RACEDRIVC_BOARD_DEVICE = &device_creator<racedrivc_board_devic
 const device_type RACEDRIVC1_BOARD_DEVICE = &device_creator<racedrivc1_board_device_state>;
 const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE = &device_creator<racedrivc_panorama_side_board_device_state>;
 
-racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1862,7 +1862,7 @@ void stunrun_board_device_state::device_start()
 
 const device_type STUNRUN_BOARD_DEVICE = &device_creator<stunrun_board_device_state>;
 
-stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1896,7 +1896,7 @@ const device_type STEELTAL_BOARD_DEVICE = &device_creator<steeltal_board_device_
 const device_type STEELTAL1_BOARD_DEVICE = &device_creator<steeltal1_board_device_state>;
 const device_type STEELTALP_BOARD_DEVICE = &device_creator<steeltalp_board_device_state>;
 
-steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1916,7 +1916,7 @@ void strtdriv_board_device_state::device_start()
 
 const device_type STRTDRIV_BOARD_DEVICE = &device_creator<strtdriv_board_device_state>;
 
-strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -1943,7 +1943,7 @@ void hdrivairp_board_device_state::device_start()
 const device_type HDRIVAIR_BOARD_DEVICE = &device_creator<hdrivair_board_device_state>;
 const device_type HDRIVAIRP_BOARD_DEVICE = &device_creator<hdrivairp_board_device_state>;
 
-hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: harddriv_state(mconfig, tag, owner, clock)
 {
 }
@@ -4773,7 +4773,7 @@ void harddriv_state::init_ds3()
 /* COMMON INIT: initialize the DSK add-on board */
 void harddriv_state::init_dsk()
 {
-	UINT8 *usr3 = memregion("user3")->base();
+	uint8_t *usr3 = memregion("user3")->base();
 
 	/* install ASIC61 */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x85c000, 0x85c7ff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_w), this));
@@ -4783,7 +4783,7 @@ void harddriv_state::init_dsk()
 
 	/* install extra RAM */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x900000, 0x90ffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_ram_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_ram_w), this));
-	m_dsk_ram = (UINT16 *)(usr3 + 0x40000);
+	m_dsk_ram = (uint16_t *)(usr3 + 0x40000);
 
 	/* install extra ZRAM */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x910000, 0x910fff, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), m_dsk_10c.target()), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), m_dsk_10c.target()), 0xff00);
@@ -4796,14 +4796,14 @@ void harddriv_state::init_dsk()
 
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x940000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_small_rom_r), this));
-	m_dsk_rom = (UINT16 *)(usr3 + 0x00000);
+	m_dsk_rom = (uint16_t *)(usr3 + 0x00000);
 }
 
 
 /* COMMON INIT: initialize the DSK II add-on board */
 void harddriv_state::init_dsk2()
 {
-	UINT8 *usr3 = memregion("user3")->base();
+	uint8_t *usr3 = memregion("user3")->base();
 
 	/* install ASIC65 */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
@@ -4818,11 +4818,11 @@ void harddriv_state::init_dsk2()
 
 	/* install extra RAM */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x880000, 0x8bffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_ram_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_ram_w), this));
-	m_dsk_ram = (UINT16 *)(usr3 + 0x100000);
+	m_dsk_ram = (uint16_t *)(usr3 + 0x100000);
 
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_rom_r), this));
-	m_dsk_rom = (UINT16 *)(usr3 + 0x000000);
+	m_dsk_rom = (uint16_t *)(usr3 + 0x000000);
 }
 
 
@@ -4869,14 +4869,14 @@ void harddriv_state::init_harddriv(void)
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16_delegate(FUNC(harddriv_state::hdgsp_speedup2_w), this));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16_delegate(FUNC(harddriv_state::hdgsp_speedup_r), this));
 	m_gsp_speedup_pc = 0xffc00f10;
-	m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff9fc00 - 0xff800000) >> 3)); // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (UINT16 *)(m_gsp_vram + ((0xfffcfc00 - 0xff800000) >> 3));
+	m_gsp_speedup_addr[0] = (uint16_t *)(m_gsp_vram + ((0xfff9fc00 - 0xff800000) >> 3)); // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = (uint16_t *)(m_gsp_vram + ((0xfffcfc00 - 0xff800000) >> 3));
 
 	/* set up msp speedup handler */
 	m_msp->space(AS_PROGRAM).install_write_handler(0x00751b00, 0x00751b0f, write16_delegate(FUNC(harddriv_state::hdmsp_speedup_w), this));
 	m_msp->space(AS_PROGRAM).install_read_handler(0x00751b00, 0x00751b0f, read16_delegate(FUNC(harddriv_state::hdmsp_speedup_r), this));
 	m_msp_speedup_pc = 0x00723b00;
-	m_msp_speedup_addr = m_msp_ram + ((0x751b00 - 0x700000) >> 4); // Address in bits, plus UINT16 *
+	m_msp_speedup_addr = m_msp_ram + ((0x751b00 - 0x700000) >> 4); // Address in bits, plus uint16_t *
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -4895,14 +4895,14 @@ void harddriv_state::init_harddrivc(void)
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16_delegate(FUNC(harddriv_state::hdgsp_speedup2_w), this));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16_delegate(FUNC(harddriv_state::hdgsp_speedup_r), this));
 	m_gsp_speedup_pc = 0xfff40ff0;
-	m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff9fc00 - 0xffc00000) >> 3)); // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (UINT16 *)(m_gsp_vram + ((0xfffcfc00 - 0xffc00000) >> 3));
+	m_gsp_speedup_addr[0] = (uint16_t *)(m_gsp_vram + ((0xfff9fc00 - 0xffc00000) >> 3)); // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = (uint16_t *)(m_gsp_vram + ((0xfffcfc00 - 0xffc00000) >> 3));
 
 	/* set up msp speedup handler */
 	m_msp->space(AS_PROGRAM).install_write_handler(0x00751b00, 0x00751b0f, write16_delegate(FUNC(harddriv_state::hdmsp_speedup_w), this));
 	m_msp->space(AS_PROGRAM).install_read_handler(0x00751b00, 0x00751b0f, read16_delegate(FUNC(harddriv_state::hdmsp_speedup_r), this));
 	m_msp_speedup_pc = 0x00723b00;
-	m_msp_speedup_addr = m_msp_ram + ((0x751b00 - 0x700000) >> 4); // Address in bits, plus UINT16 *
+	m_msp_speedup_addr = m_msp_ram + ((0x751b00 - 0x700000) >> 4); // Address in bits, plus uint16_t *
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -4920,8 +4920,8 @@ void harddriv_state::init_stunrun(void)
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16_delegate(FUNC(harddriv_state::hdgsp_speedup2_w), this));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16_delegate(FUNC(harddriv_state::hdgsp_speedup_r), this));
 	m_gsp_speedup_pc = 0xfff41070;
-	m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff9fc00 - 0xffc00000) >> 3)); // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (UINT16 *)(m_gsp_vram + ((0xfffcfc00 - 0xffc00000) >> 3));
+	m_gsp_speedup_addr[0] = (uint16_t *)(m_gsp_vram + ((0xfff9fc00 - 0xffc00000) >> 3)); // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = (uint16_t *)(m_gsp_vram + ((0xfffcfc00 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -4939,7 +4939,7 @@ void harddriv_state::init_racedriv(void)
 	/* set up the slapstic */
 	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
-	m_m68k_slapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32_delegate(FUNC(harddriv_state::rddsp32_sync0_w), this));
@@ -4964,7 +4964,7 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	/* set up the slapstic */
 	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
-	m_m68k_slapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32_delegate(FUNC(harddriv_state::rddsp32_sync0_w), this));
@@ -4974,13 +4974,13 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((gsp_protection - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((gsp_protection - 0xffc00000) >> 3));
 
 	/* set up gsp speedup handler */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
 	m_gsp_speedup_pc = 0xfff43a00;
-	m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
+	m_gsp_speedup_addr[0] = (uint16_t *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -4999,17 +4999,17 @@ void harddriv_state::init_racedrivc_panorama_side()
 	/* set up the slapstic */
 	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
-	m_m68k_slapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((gsp_protection - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((gsp_protection - 0xffc00000) >> 3));
 
 	/* set up gsp speedup handler (todo, work these out) */
 //  m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
 //  m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
 //  m_gsp_speedup_pc = 0xfff43a00;
-//  m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
+//  m_gsp_speedup_addr[0] = (uint16_t *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -5056,12 +5056,12 @@ void harddriv_state::steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloo
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::st68k_protosloop_r), this), write16_delegate(FUNC(harddriv_state::st68k_protosloop_w), this));
 
-	m_m68k_slapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0xe0000);
-	m_m68k_sloop_alt_base = (UINT16 *)(memregion("maincpu")->base() + 0x4e000);
+	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_sloop_alt_base = (uint16_t *)(memregion("maincpu")->base() + 0x4e000);
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff965d0, 0xfff965df, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((0xfff965d0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff965d0 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -5099,7 +5099,7 @@ void harddriv_state::init_strtdriv(void)
 	/* set up the slapstic */
 	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
-	m_m68k_slapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16_delegate(FUNC(harddriv_state::hda68k_port1_r), this));
 
@@ -5111,7 +5111,7 @@ void harddriv_state::init_strtdriv(void)
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -5139,7 +5139,7 @@ void harddriv_state::init_hdrivair(void)
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff960a0 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -5167,7 +5167,7 @@ void harddriv_state::init_hdrivairp(void)
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff916c0, 0xfff916cf, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
-	m_gsp_protection = (UINT16 *)(m_gsp_vram + ((0xfff916c0 - 0xffc00000) >> 3));
+	m_gsp_protection = (uint16_t *)(m_gsp_vram + ((0xfff916c0 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));

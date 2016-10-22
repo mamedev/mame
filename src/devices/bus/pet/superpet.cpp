@@ -174,7 +174,7 @@ inline bool superpet_device::is_ram_writable()
 //  superpet_device - constructor
 //-------------------------------------------------
 
-superpet_device::superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+superpet_device::superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SUPERPET, "SuperPET", tag, owner, clock, "pet_superpet", __FILE__),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, M6809_TAG),
@@ -243,7 +243,7 @@ int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel)
+uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
 {
 	int norom = pet_norom_r(space, offset, sel);
 
@@ -304,7 +304,7 @@ UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data,
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel)
+void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{

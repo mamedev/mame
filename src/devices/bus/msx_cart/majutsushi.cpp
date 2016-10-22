@@ -7,7 +7,7 @@
 const device_type MSX_CART_MAJUTSUSHI = &device_creator<msx_cart_majutsushi>;
 
 
-msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_MAJUTSUSHI, "MSX Cartridge - Majutsushi", tag, owner, clock, "msx_cart_majutsushi", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_dac(*this, "dac")

@@ -27,8 +27,8 @@
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
-	UINT16 sorg;
-	UINT16 slim;
+	uint16_t sorg;
+	uint16_t slim;
 };
 
 /* MMU regs translated into a more efficient format */
@@ -133,8 +133,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 
-	required_shared_ptr<UINT8> m_fdc_rom;
-	required_shared_ptr<UINT8> m_fdc_ram;
+	required_shared_ptr<uint8_t> m_fdc_rom;
+	required_shared_ptr<uint8_t> m_fdc_ram;
 
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -149,23 +149,23 @@ public:
 
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_ram_ptr;
-	UINT8 *m_rom_ptr;
-	UINT8 *m_videoROM_ptr;
+	uint8_t *m_ram_ptr;
+	uint8_t *m_rom_ptr;
+	uint8_t *m_videoROM_ptr;
 	int m_setup;
 	int m_seg;
 	real_mmu_entry m_real_mmu_regs[4][128];
 	mmu_entry m_mmu_regs[4][128];
 	int m_diag2;
 	int m_test_parity;
-	UINT16 m_mem_err_addr_latch;
+	uint16_t m_mem_err_addr_latch;
 	int m_parity_error_pending;
 	int m_bad_parity_count;
-	std::unique_ptr<UINT8[]> m_bad_parity_table;
+	std::unique_ptr<uint8_t[]> m_bad_parity_table;
 	int m_VTMSK;
 	int m_VTIR;
-	UINT16 m_video_address_latch;
-	UINT16 *m_videoram_ptr;
+	uint16_t m_video_address_latch;
+	uint16_t *m_videoram_ptr;
 	int m_KBIR;
 	int m_FDIR;
 	int m_DISK_DIAG;
@@ -204,7 +204,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	UINT32 screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
@@ -222,7 +222,7 @@ public:
 	void reset_COPS();
 	void lisa_fdc_ttl_glue_access(offs_t offset);
 	void COPS_send_data_if_possible();
-	void COPS_queue_data(const UINT8 *data, int len);
+	void COPS_queue_data(const uint8_t *data, int len);
 	void COPS_via_irq_func(int val);
 	void scan_keyboard();
 	void unplug_keyboard();

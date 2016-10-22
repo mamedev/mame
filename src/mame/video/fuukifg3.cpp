@@ -52,8 +52,8 @@
 
 inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
+	uint16_t code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
+	uint16_t attr = (m_vram[_N_][tile_index] & 0x0000ffff);
 	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX(attr >> 6));
 }
 
@@ -62,15 +62,15 @@ TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(tileinfo
 
 inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
+	uint16_t code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
+	uint16_t attr = (m_vram[_N_][tile_index] & 0x0000ffff);
 	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX(attr >> 6));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(tileinfo, tile_index, 3); }
 
-inline void fuuki32_state::vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_)
+inline void fuuki32_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tilemap[_N_]->mark_tile_dirty(offset);
@@ -92,8 +92,8 @@ WRITE32_MEMBER(fuuki32_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
 
 void fuuki32_state::video_start()
 {
-//  m_buf_spriteram = std::make_unique<UINT32[]>(m_spriteram.bytes() / 4);
-//  m_buf_spriteram2 = std::make_unique<UINT32[]>(m_spriteram.bytes() / 4);
+//  m_buf_spriteram = std::make_unique<uint32_t[]>(m_spriteram.bytes() / 4);
+//  m_buf_spriteram2 = std::make_unique<uint32_t[]>(m_spriteram.bytes() / 4);
 
 
 
@@ -163,12 +163,12 @@ void fuuki32_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 layer0_scrollx, layer0_scrolly;
-	UINT16 layer1_scrollx, layer1_scrolly;
-	UINT16 layer2_scrollx, layer2_scrolly;
-	UINT16 scrollx_offs,   scrolly_offs;
+	uint16_t layer0_scrollx, layer0_scrolly;
+	uint16_t layer1_scrollx, layer1_scrolly;
+	uint16_t layer2_scrollx, layer2_scrolly;
+	uint16_t scrollx_offs,   scrolly_offs;
 
 	/*
 	It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.

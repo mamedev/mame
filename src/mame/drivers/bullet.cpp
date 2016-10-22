@@ -103,7 +103,7 @@ enum
 
 READ8_MEMBER( bullet_state::mreq_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_brom && !BIT(offset, 5))
 	{
@@ -329,7 +329,7 @@ READ8_MEMBER( bullet_state::info_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// DIP switches
 	data |= m_sw1->read() & 0x0f;
@@ -360,7 +360,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 
 READ8_MEMBER( bulletf_state::mreq_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_rome && !BIT(offset, 5))
 	{
@@ -531,7 +531,7 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 
 READ8_MEMBER( bulletf_state::scsi_r )
 {
-	UINT8 data = m_scsi_data_in->read();
+	uint8_t data = m_scsi_data_in->read();
 
 	m_scsibus->write_ack(1);
 
@@ -577,7 +577,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics busy
 	data |= m_centronics_busy;
@@ -788,7 +788,7 @@ void bullet_state::update_dma_rdy()
 
 READ8_MEMBER( bullet_state::dma_mreq_r )
 {
-	UINT8 data = m_ram->pointer()[(m_buf << 16) | offset];
+	uint8_t data = m_ram->pointer()[(m_buf << 16) | offset];
 
 	if (BIT(m_exdma, 4))
 	{
@@ -889,7 +889,7 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics
 	data |= m_centronics_busy;
@@ -1050,7 +1050,7 @@ void bullet_state::machine_reset()
 	m_exdsk_sw = false;
 	m_hdcon_sw = false;
 
-	UINT8 sw1 = m_sw1->read();
+	uint8_t sw1 = m_sw1->read();
 	int mini = BIT(sw1, 6);
 	m_fdc->set_unscaled_clock(mini ? XTAL_16MHz/16 : XTAL_16MHz/8);
 	m_fdc->dden_w(BIT(sw1, 7));

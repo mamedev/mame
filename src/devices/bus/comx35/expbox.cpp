@@ -129,7 +129,7 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 //  comx_eb_device - constructor
 //-------------------------------------------------
 
-comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),
@@ -213,9 +213,9 @@ void comx_eb_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
@@ -245,7 +245,7 @@ UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
+void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
@@ -261,9 +261,9 @@ void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
@@ -281,7 +281,7 @@ UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_eb_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_eb_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 1 && !(BIT(data, 0)))
 	{

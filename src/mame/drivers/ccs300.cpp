@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -73,7 +73,7 @@ INPUT_PORTS_END
 //*************************************
 READ8_MEMBER( ccs300_state::port10_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -111,7 +111,7 @@ MACHINE_RESET_MEMBER( ccs300_state, ccs300 )
 
 DRIVER_INIT_MEMBER( ccs300_state, ccs300 )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

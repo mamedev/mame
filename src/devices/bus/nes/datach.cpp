@@ -67,7 +67,7 @@ READ8_MEMBER(datach_cart_interface::read)
 
 const device_type NES_DATACH_SLOT = &device_creator<nes_datach_slot_device>;
 
-nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_DATACH_SLOT, "NES Datach Cartridge Slot", tag, owner, clock, "nes_datach_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -96,7 +96,7 @@ image_init_result nes_datach_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM = m_cart->get_cart_base();
+		uint8_t *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
 			return image_init_result::FAIL;
@@ -108,7 +108,7 @@ image_init_result nes_datach_slot_device::call_load()
 				return image_init_result::FAIL;
 
 			int shift = length() - 0x40000;
-			UINT8 temp[0x40010];
+			uint8_t temp[0x40010];
 			fread(&temp, length());
 			memcpy(ROM, temp + shift, 0x40000);
 
@@ -116,7 +116,7 @@ image_init_result nes_datach_slot_device::call_load()
 			// (or 16, since some older .nes files marked Datach as mapper 16)
 			if (length() == 0x40010)
 			{
-				UINT8 mapper = (temp[6] & 0xf0) >> 4;
+				uint8_t mapper = (temp[6] & 0xf0) >> 4;
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 157 && mapper != 16)
 				{
@@ -162,19 +162,19 @@ ROM_END
 const device_type NES_DATACH_ROM = &device_creator<nes_datach_rom_device>;
 const device_type NES_DATACH_24C01 = &device_creator<nes_datach_24c01_device>;
 
-nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						datach_cart_interface( mconfig, *this )
 {
 }
 
-nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, NES_DATACH_ROM, "NES Datach ROM", tag, owner, clock, "nes_datach_rom", __FILE__),
 						datach_cart_interface( mconfig, *this )
 {
 }
 
-nes_datach_24c01_device::nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_datach_24c01_device::nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_datach_rom_device(mconfig, NES_DATACH_24C01, "NES Datach + 24C01 PCB", tag, owner, clock, "nes_datach_ep1", __FILE__)
 {
 }
@@ -182,7 +182,7 @@ nes_datach_24c01_device::nes_datach_24c01_device(const machine_config &mconfig, 
 
 void nes_datach_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("datachrom")->base();
+	m_rom = (uint8_t*)memregion("datachrom")->base();
 	save_item(NAME(m_bank));
 }
 
@@ -196,7 +196,7 @@ const tiny_rom_entry *nes_datach_rom_device::device_rom_region() const
 	return ROM_NAME( datach_rom );
 }
 
-UINT8 *nes_datach_rom_device::get_cart_base()
+uint8_t *nes_datach_rom_device::get_cart_base()
 {
 	return m_rom;
 }
@@ -221,7 +221,7 @@ machine_config_constructor nes_datach_24c01_device::device_mconfig_additions() c
 const device_type NES_DATACH = &device_creator<nes_datach_device>;
 
 
-nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__), m_datach_latch(0),
 						m_i2cmem(*this, "i2cmem"),
 						m_reader(*this, "datach"),
@@ -289,7 +289,7 @@ void nes_datach_device::pcb_reset()
 READ8_MEMBER(nes_datach_device::read_m)
 {
 	LOG_MMC(("Datach read_m, offset: %04x\n", offset));
-	UINT8 i2c_val = 0;
+	uint8_t i2c_val = 0;
 #if TEST_EEPROM
 	if (m_i2c_dir)
 	{

@@ -52,28 +52,28 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 
 struct ps_ftlb_regs_t
 {
-	UINT32 control;
-	UINT32 stat;
-	UINT32 valid;
-	UINT32 wait1;
-	UINT32 wait2;
-	UINT32 entry[16];
-	UINT32 serial;
+	uint32_t control;
+	uint32_t stat;
+	uint32_t valid;
+	uint32_t wait1;
+	uint32_t wait2;
+	uint32_t entry[16];
+	uint32_t serial;
 };
 
 struct ps_intc_regs_t
 {
-	UINT32 hold;
-	UINT32 status;
-	UINT32 enable;
-	UINT32 mask;
+	uint32_t hold;
+	uint32_t status;
+	uint32_t enable;
+	uint32_t mask;
 };
 
 struct ps_timer_t
 {
-	UINT32 period;
-	UINT32 count;
-	UINT32 control;
+	uint32_t period;
+	uint32_t count;
+	uint32_t control;
 	emu_timer *timer;
 };
 
@@ -84,18 +84,18 @@ struct ps_timer_regs_t
 
 struct ps_clock_regs_t
 {
-	UINT32 mode;
-	UINT32 control;
+	uint32_t mode;
+	uint32_t control;
 };
 
 #define PS_CLOCK_STEADY     0x10
 
 struct ps_rtc_regs_t
 {
-	UINT32 mode;
-	UINT32 control;
-	UINT32 time;
-	UINT32 date;
+	uint32_t mode;
+	uint32_t control;
+	uint32_t time;
+	uint32_t date;
 	emu_timer *timer;
 };
 
@@ -111,7 +111,7 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	required_shared_ptr<UINT32> m_lcd_buffer;
+	required_shared_ptr<uint32_t> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
@@ -121,9 +121,9 @@ public:
 	ps_timer_regs_t m_timer_regs;
 	ps_clock_regs_t m_clock_regs;
 	ps_rtc_regs_t m_rtc_regs;
-	UINT32 m_lcd_control;
-	INT32 m_ps_flash_write_enable_count;
-	INT32 m_ps_flash_write_count;
+	uint32_t m_lcd_control;
+	int32_t m_ps_flash_write_enable_count;
+	int32_t m_ps_flash_write_count;
 	DECLARE_READ32_MEMBER(ps_ftlb_r);
 	DECLARE_WRITE32_MEMBER(ps_ftlb_w);
 	DECLARE_READ32_MEMBER(ps_intc_r);
@@ -143,14 +143,14 @@ public:
 	DECLARE_WRITE32_MEMBER(ps_audio_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	UINT32 ps_intc_get_interrupt_line(UINT32 line);
-	void ps_intc_set_interrupt_line(UINT32 line, int state);
+	uint32_t ps_intc_get_interrupt_line(uint32_t line);
+	void ps_intc_set_interrupt_line(uint32_t line, int state);
 	void ps_timer_start(int index);
 };
 
@@ -314,12 +314,12 @@ WRITE32_MEMBER(pockstat_state::ps_ftlb_w)
 	}
 }
 
-UINT32 pockstat_state::ps_intc_get_interrupt_line(UINT32 line)
+uint32_t pockstat_state::ps_intc_get_interrupt_line(uint32_t line)
 {
 	return m_intc_regs.status & line;
 }
 
-void pockstat_state::ps_intc_set_interrupt_line(UINT32 line, int state)
+void pockstat_state::ps_intc_set_interrupt_line(uint32_t line, int state)
 {
 	//printf( "%08x %d %08x %08x %08x\n", line, state, drvm_intc_regs.hold, drvm_intc_regs.status, drvm_intc_regs.enable );
 	if(line)
@@ -768,7 +768,7 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 
 INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 {
-	UINT32 buttons = ioport("BUTTONS")->read();
+	uint32_t buttons = ioport("BUTTONS")->read();
 
 	ps_intc_set_interrupt_line(PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
 	ps_intc_set_interrupt_line(PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
@@ -779,7 +779,7 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 
 READ32_MEMBER(pockstat_state::ps_rombank_r)
 {
-	INT32 bank = (offset >> 11) & 0x0f;
+	int32_t bank = (offset >> 11) & 0x0f;
 	for (int index = 0; index < 32; index++)
 	{
 		if (m_ftlb_regs.valid & (1 << index))
@@ -817,7 +817,7 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 	if(m_ps_flash_write_count)
 	{
 		m_ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)(m_cart_rom->base()))[offset]);
+		COMBINE_DATA(&((uint32_t*)(m_cart_rom->base()))[offset]);
 	}
 }
 
@@ -926,11 +926,11 @@ void pockstat_state::machine_reset()
 	m_ps_flash_write_count = 0;
 }
 
-UINT32 pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 32; y++)
 	{
-		UINT32 *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix32(y);
 		for (int x = 0; x < 32; x++)
 		{
 			if (m_lcd_control != 0) // Hack
@@ -951,7 +951,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];
-	UINT32 size = image.length();
+	uint32_t size = image.length();
 
 	if (size != 0x20f40)
 		return image_init_result::FAIL;

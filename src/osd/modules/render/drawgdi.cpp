@@ -81,12 +81,12 @@ int renderer_gdi::draw(const int update)
 	{
 		m_bmsize = pitch * height * 4 * 2;
 		global_free_array(m_bmdata);
-		m_bmdata = global_alloc_array(UINT8, m_bmsize);
+		m_bmdata = global_alloc_array(uint8_t, m_bmsize);
 	}
 
 	// draw the primitives to the bitmap
 	win->m_primlist->acquire_lock();
-	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
+	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
 	win->m_primlist->release_lock();
 
 	// fill in bitmap-specific info

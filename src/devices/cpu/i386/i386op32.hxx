@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
-UINT32 i386_device::i386_shift_rotate32(UINT8 modrm, UINT32 value, UINT8 shift)
+uint32_t i386_device::i386_shift_rotate32(uint8_t modrm, uint32_t value, uint8_t shift)
 {
-	UINT32 dst, src;
+	uint32_t dst, src;
 	dst = value;
 	src = value;
 
@@ -51,7 +51,7 @@ UINT32 i386_device::i386_shift_rotate32(UINT8 modrm, UINT32 value, UINT8 shift)
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm32, 1 */
-				dst = (INT32)(src) >> 1;
+				dst = (int32_t)(src) >> 1;
 				m_CF = src & 0x1;
 				m_OF = 0;
 				SetSZPF32(dst);
@@ -64,30 +64,30 @@ UINT32 i386_device::i386_shift_rotate32(UINT8 modrm, UINT32 value, UINT8 shift)
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm32, i8 */
-				dst = ((src & ((UINT32)0xffffffff >> shift)) << shift) |
-						((src & ((UINT32)0xffffffff << (32-shift))) >> (32-shift));
+				dst = ((src & ((uint32_t)0xffffffff >> shift)) << shift) |
+						((src & ((uint32_t)0xffffffff << (32-shift))) >> (32-shift));
 				m_CF = dst & 0x1;
 				m_OF = (dst & 1) ^ (dst >> 31);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 1:         /* ROR rm32, i8 */
-				dst = ((src & ((UINT32)0xffffffff << shift)) >> shift) |
-						((src & ((UINT32)0xffffffff >> (32-shift))) << (32-shift));
+				dst = ((src & ((uint32_t)0xffffffff << shift)) >> shift) |
+						((src & ((uint32_t)0xffffffff >> (32-shift))) << (32-shift));
 				m_CF = (dst >> 31) & 0x1;
 				m_OF = ((dst >> 31) ^ (dst >> 30)) & 1;
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 2:         /* RCL rm32, i8 */
-				dst = ((src & ((UINT32)0xffffffff >> shift)) << shift) |
-						((src & ((UINT32)0xffffffff << (33-shift))) >> (33-shift)) |
+				dst = ((src & ((uint32_t)0xffffffff >> shift)) << shift) |
+						((src & ((uint32_t)0xffffffff << (33-shift))) >> (33-shift)) |
 						(m_CF << (shift-1));
 				m_CF = (src >> (32-shift)) & 0x1;
 				m_OF = m_CF ^ ((dst >> 31) & 1);
 				CYCLES_RM(modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
 			case 3:         /* RCR rm32, i8 */
-				dst = ((src & ((UINT32)0xffffffff << shift)) >> shift) |
-						((src & ((UINT32)0xffffffff >> (32-shift))) << (33-shift)) |
+				dst = ((src & ((uint32_t)0xffffffff << shift)) >> shift) |
+						((src & ((uint32_t)0xffffffff >> (32-shift))) << (33-shift)) |
 						(m_CF << (32-shift));
 				m_CF = (src >> (shift-1)) & 0x1;
 				m_OF = ((dst >> 31) ^ (dst >> 30)) & 1;
@@ -107,7 +107,7 @@ UINT32 i386_device::i386_shift_rotate32(UINT8 modrm, UINT32 value, UINT8 shift)
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm32, i8 */
-				dst = (INT32)src >> shift;
+				dst = (int32_t)src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF32(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
@@ -122,8 +122,8 @@ UINT32 i386_device::i386_shift_rotate32(UINT8 modrm, UINT32 value, UINT8 shift)
 
 void i386_device::i386_adc_rm32_r32()      // Opcode 0x11
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -131,7 +131,7 @@ void i386_device::i386_adc_rm32_r32()      // Opcode 0x11
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = ADC32(dst, src, m_CF);
@@ -142,8 +142,8 @@ void i386_device::i386_adc_rm32_r32()      // Opcode 0x11
 
 void i386_device::i386_adc_r32_rm32()      // Opcode 0x13
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -151,7 +151,7 @@ void i386_device::i386_adc_r32_rm32()      // Opcode 0x13
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = ADC32(dst, src, m_CF);
@@ -162,7 +162,7 @@ void i386_device::i386_adc_r32_rm32()      // Opcode 0x13
 
 void i386_device::i386_adc_eax_i32()       // Opcode 0x15
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = ADC32(dst, src, m_CF);
@@ -172,8 +172,8 @@ void i386_device::i386_adc_eax_i32()       // Opcode 0x15
 
 void i386_device::i386_add_rm32_r32()      // Opcode 0x01
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -181,7 +181,7 @@ void i386_device::i386_add_rm32_r32()      // Opcode 0x01
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = ADD32(dst, src);
@@ -192,8 +192,8 @@ void i386_device::i386_add_rm32_r32()      // Opcode 0x01
 
 void i386_device::i386_add_r32_rm32()      // Opcode 0x03
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -201,7 +201,7 @@ void i386_device::i386_add_r32_rm32()      // Opcode 0x03
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = ADD32(dst, src);
@@ -212,7 +212,7 @@ void i386_device::i386_add_r32_rm32()      // Opcode 0x03
 
 void i386_device::i386_add_eax_i32()       // Opcode 0x05
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = ADD32(dst, src);
@@ -222,8 +222,8 @@ void i386_device::i386_add_eax_i32()       // Opcode 0x05
 
 void i386_device::i386_and_rm32_r32()      // Opcode 0x21
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -231,7 +231,7 @@ void i386_device::i386_and_rm32_r32()      // Opcode 0x21
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = AND32(dst, src);
@@ -242,8 +242,8 @@ void i386_device::i386_and_rm32_r32()      // Opcode 0x21
 
 void i386_device::i386_and_r32_rm32()      // Opcode 0x23
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -251,7 +251,7 @@ void i386_device::i386_and_r32_rm32()      // Opcode 0x23
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = AND32(dst, src);
@@ -262,7 +262,7 @@ void i386_device::i386_and_r32_rm32()      // Opcode 0x23
 
 void i386_device::i386_and_eax_i32()       // Opcode 0x25
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = AND32(dst, src);
@@ -272,13 +272,13 @@ void i386_device::i386_and_eax_i32()       // Opcode 0x25
 
 void i386_device::i386_bsf_r32_rm32()      // Opcode 0x0f bc
 {
-	UINT32 src, dst, temp;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst, temp;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 	}
 
@@ -301,13 +301,13 @@ void i386_device::i386_bsf_r32_rm32()      // Opcode 0x0f bc
 
 void i386_device::i386_bsr_r32_rm32()      // Opcode 0x0f bd
 {
-	UINT32 src, dst, temp;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst, temp;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 	}
 
@@ -330,10 +330,10 @@ void i386_device::i386_bsr_r32_rm32()      // Opcode 0x0f bd
 
 void i386_device::i386_bt_rm32_r32()       // Opcode 0x0f a3
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t bit = LOAD_REG32(modrm);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -342,13 +342,13 @@ void i386_device::i386_bt_rm32_r32()       // Opcode 0x0f a3
 
 		CYCLES(CYCLES_BT_REG_REG);
 	} else {
-		UINT8 segment;
-		UINT32 ea = GetNonTranslatedEA(modrm,&segment);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint8_t segment;
+		uint32_t ea = GetNonTranslatedEA(modrm,&segment);
+		uint32_t bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		ea = i386_translate(segment,(m_address_size)?ea:(ea&0xffff),0);
 		bit %= 32;
-		UINT32 dst = READ32(ea);
+		uint32_t dst = READ32(ea);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -361,10 +361,10 @@ void i386_device::i386_bt_rm32_r32()       // Opcode 0x0f a3
 
 void i386_device::i386_btc_rm32_r32()      // Opcode 0x0f bb
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t bit = LOAD_REG32(modrm);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -375,13 +375,13 @@ void i386_device::i386_btc_rm32_r32()      // Opcode 0x0f bb
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_BTC_REG_REG);
 	} else {
-		UINT8 segment;
-		UINT32 ea = GetNonTranslatedEA(modrm,&segment);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint8_t segment;
+		uint32_t ea = GetNonTranslatedEA(modrm,&segment);
+		uint32_t bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		ea = i386_translate(segment,(m_address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
-		UINT32 dst = READ32(ea);
+		uint32_t dst = READ32(ea);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -396,10 +396,10 @@ void i386_device::i386_btc_rm32_r32()      // Opcode 0x0f bb
 
 void i386_device::i386_btr_rm32_r32()      // Opcode 0x0f b3
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t bit = LOAD_REG32(modrm);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -410,13 +410,13 @@ void i386_device::i386_btr_rm32_r32()      // Opcode 0x0f b3
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_BTR_REG_REG);
 	} else {
-		UINT8 segment;
-		UINT32 ea = GetNonTranslatedEA(modrm,&segment);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint8_t segment;
+		uint32_t ea = GetNonTranslatedEA(modrm,&segment);
+		uint32_t bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		ea = i386_translate(segment,(m_address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
-		UINT32 dst = READ32(ea);
+		uint32_t dst = READ32(ea);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -431,10 +431,10 @@ void i386_device::i386_btr_rm32_r32()      // Opcode 0x0f b3
 
 void i386_device::i386_bts_rm32_r32()      // Opcode 0x0f ab
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t bit = LOAD_REG32(modrm);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -445,13 +445,13 @@ void i386_device::i386_bts_rm32_r32()      // Opcode 0x0f ab
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_BTS_REG_REG);
 	} else {
-		UINT8 segment;
-		UINT32 ea = GetNonTranslatedEA(modrm,&segment);
-		UINT32 bit = LOAD_REG32(modrm);
+		uint8_t segment;
+		uint32_t ea = GetNonTranslatedEA(modrm,&segment);
+		uint32_t bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		ea = i386_translate(segment,(m_address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
-		UINT32 dst = READ32(ea);
+		uint32_t dst = READ32(ea);
 
 		if( dst & (1 << bit) )
 			m_CF = 1;
@@ -466,8 +466,8 @@ void i386_device::i386_bts_rm32_r32()      // Opcode 0x0f ab
 
 void i386_device::i386_call_abs32()        // Opcode 0x9a
 {
-	UINT32 offset = FETCH32();
-	UINT16 ptr = FETCH16();
+	uint32_t offset = FETCH32();
+	uint16_t ptr = FETCH16();
 
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -488,7 +488,7 @@ void i386_device::i386_call_abs32()        // Opcode 0x9a
 
 void i386_device::i386_call_rel32()        // Opcode 0xe8
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	PUSH32(m_eip );
 	m_eip += disp;
 	CHANGE_PC(m_eip);
@@ -507,15 +507,15 @@ void i386_device::i386_cdq()               // Opcode 0x99
 
 void i386_device::i386_cmp_rm32_r32()      // Opcode 0x39
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
 		SUB32(dst, src);
 		CYCLES(CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		SUB32(dst, src);
@@ -525,15 +525,15 @@ void i386_device::i386_cmp_rm32_r32()      // Opcode 0x39
 
 void i386_device::i386_cmp_r32_rm32()      // Opcode 0x3b
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
 		SUB32(dst, src);
 		CYCLES(CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		SUB32(dst, src);
@@ -543,7 +543,7 @@ void i386_device::i386_cmp_r32_rm32()      // Opcode 0x3b
 
 void i386_device::i386_cmp_eax_i32()       // Opcode 0x3d
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	SUB32(dst, src);
@@ -552,7 +552,7 @@ void i386_device::i386_cmp_eax_i32()       // Opcode 0x3d
 
 void i386_device::i386_cmpsd()             // Opcode 0xa7
 {
-	UINT32 eas, ead, src, dst;
+	uint32_t eas, ead, src, dst;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -569,7 +569,7 @@ void i386_device::i386_cmpsd()             // Opcode 0xa7
 
 void i386_device::i386_cwde()              // Opcode 0x98
 {
-	REG32(EAX) = (INT32)((INT16)REG16(AX));
+	REG32(EAX) = (int32_t)((int16_t)REG16(AX));
 	CYCLES(CYCLES_CBW);
 }
 
@@ -623,82 +623,82 @@ void i386_device::i386_dec_edi()           // Opcode 0x4f
 
 void i386_device::i386_imul_r32_rm32()     // Opcode 0x0f af
 {
-	UINT8 modrm = FETCH();
-	INT64 result;
-	INT64 src, dst;
+	uint8_t modrm = FETCH();
+	int64_t result;
+	int64_t src, dst;
 	if( modrm >= 0xc0 ) {
-		src = (INT64)(INT32)LOAD_RM32(modrm);
+		src = (int64_t)(int32_t)LOAD_RM32(modrm);
 		CYCLES(CYCLES_IMUL32_REG_REG);     /* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		src = (INT64)(INT32)READ32(ea);
+		uint32_t ea = GetEA(modrm,0);
+		src = (int64_t)(int32_t)READ32(ea);
 		CYCLES(CYCLES_IMUL32_REG_REG);     /* TODO: Correct multiply timing */
 	}
 
-	dst = (INT64)(INT32)LOAD_REG32(modrm);
+	dst = (int64_t)(int32_t)LOAD_REG32(modrm);
 	result = src * dst;
 
-	STORE_REG32(modrm, (UINT32)result);
+	STORE_REG32(modrm, (uint32_t)result);
 
-	m_CF = m_OF = !(result == (INT64)(INT32)result);
+	m_CF = m_OF = !(result == (int64_t)(int32_t)result);
 }
 
 void i386_device::i386_imul_r32_rm32_i32() // Opcode 0x69
 {
-	UINT8 modrm = FETCH();
-	INT64 result;
-	INT64 src, dst;
+	uint8_t modrm = FETCH();
+	int64_t result;
+	int64_t src, dst;
 	if( modrm >= 0xc0 ) {
-		dst = (INT64)(INT32)LOAD_RM32(modrm);
+		dst = (int64_t)(int32_t)LOAD_RM32(modrm);
 		CYCLES(CYCLES_IMUL32_REG_IMM_REG);     /* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		dst = (INT64)(INT32)READ32(ea);
+		uint32_t ea = GetEA(modrm,0);
+		dst = (int64_t)(int32_t)READ32(ea);
 		CYCLES(CYCLES_IMUL32_MEM_IMM_REG);     /* TODO: Correct multiply timing */
 	}
 
-	src = (INT64)(INT32)FETCH32();
+	src = (int64_t)(int32_t)FETCH32();
 	result = src * dst;
 
-	STORE_REG32(modrm, (UINT32)result);
+	STORE_REG32(modrm, (uint32_t)result);
 
-	m_CF = m_OF = !(result == (INT64)(INT32)result);
+	m_CF = m_OF = !(result == (int64_t)(int32_t)result);
 }
 
 void i386_device::i386_imul_r32_rm32_i8()  // Opcode 0x6b
 {
-	UINT8 modrm = FETCH();
-	INT64 result;
-	INT64 src, dst;
+	uint8_t modrm = FETCH();
+	int64_t result;
+	int64_t src, dst;
 	if( modrm >= 0xc0 ) {
-		dst = (INT64)(INT32)LOAD_RM32(modrm);
+		dst = (int64_t)(int32_t)LOAD_RM32(modrm);
 		CYCLES(CYCLES_IMUL32_REG_IMM_REG);     /* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		dst = (INT64)(INT32)READ32(ea);
+		uint32_t ea = GetEA(modrm,0);
+		dst = (int64_t)(int32_t)READ32(ea);
 		CYCLES(CYCLES_IMUL32_MEM_IMM_REG);     /* TODO: Correct multiply timing */
 	}
 
-	src = (INT64)(INT8)FETCH();
+	src = (int64_t)(int8_t)FETCH();
 	result = src * dst;
 
-	STORE_REG32(modrm, (UINT32)result);
+	STORE_REG32(modrm, (uint32_t)result);
 
-	m_CF = m_OF = !(result == (INT64)(INT32)result);
+	m_CF = m_OF = !(result == (int64_t)(int32_t)result);
 }
 
 void i386_device::i386_in_eax_i8()         // Opcode 0xe5
 {
-	UINT16 port = FETCH();
-	UINT32 data = READPORT32(port);
+	uint16_t port = FETCH();
+	uint32_t data = READPORT32(port);
 	REG32(EAX) = data;
 	CYCLES(CYCLES_IN_VAR);
 }
 
 void i386_device::i386_in_eax_dx()         // Opcode 0xed
 {
-	UINT16 port = REG16(DX);
-	UINT32 data = READPORT32(port);
+	uint16_t port = REG16(DX);
+	uint32_t data = READPORT32(port);
 	REG32(EAX) = data;
 	CYCLES(CYCLES_IN);
 }
@@ -772,7 +772,7 @@ void i386_device::i386_iret32()            // Opcode 0xcf
 
 void i386_device::i386_ja_rel32()          // Opcode 0x0f 87
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_CF == 0 && m_ZF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -784,7 +784,7 @@ void i386_device::i386_ja_rel32()          // Opcode 0x0f 87
 
 void i386_device::i386_jbe_rel32()         // Opcode 0x0f 86
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_CF != 0 || m_ZF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -796,7 +796,7 @@ void i386_device::i386_jbe_rel32()         // Opcode 0x0f 86
 
 void i386_device::i386_jc_rel32()          // Opcode 0x0f 82
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_CF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -808,7 +808,7 @@ void i386_device::i386_jc_rel32()          // Opcode 0x0f 82
 
 void i386_device::i386_jg_rel32()          // Opcode 0x0f 8f
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_ZF == 0 && (m_SF == m_OF) ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -820,7 +820,7 @@ void i386_device::i386_jg_rel32()          // Opcode 0x0f 8f
 
 void i386_device::i386_jge_rel32()         // Opcode 0x0f 8d
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if(m_SF == m_OF) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -832,7 +832,7 @@ void i386_device::i386_jge_rel32()         // Opcode 0x0f 8d
 
 void i386_device::i386_jl_rel32()          // Opcode 0x0f 8c
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( (m_SF != m_OF) ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -844,7 +844,7 @@ void i386_device::i386_jl_rel32()          // Opcode 0x0f 8c
 
 void i386_device::i386_jle_rel32()         // Opcode 0x0f 8e
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_ZF != 0 || (m_SF != m_OF) ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -856,7 +856,7 @@ void i386_device::i386_jle_rel32()         // Opcode 0x0f 8e
 
 void i386_device::i386_jnc_rel32()         // Opcode 0x0f 83
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_CF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -868,7 +868,7 @@ void i386_device::i386_jnc_rel32()         // Opcode 0x0f 83
 
 void i386_device::i386_jno_rel32()         // Opcode 0x0f 81
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_OF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -880,7 +880,7 @@ void i386_device::i386_jno_rel32()         // Opcode 0x0f 81
 
 void i386_device::i386_jnp_rel32()         // Opcode 0x0f 8b
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_PF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -892,7 +892,7 @@ void i386_device::i386_jnp_rel32()         // Opcode 0x0f 8b
 
 void i386_device::i386_jns_rel32()         // Opcode 0x0f 89
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_SF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -904,7 +904,7 @@ void i386_device::i386_jns_rel32()         // Opcode 0x0f 89
 
 void i386_device::i386_jnz_rel32()         // Opcode 0x0f 85
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_ZF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -916,7 +916,7 @@ void i386_device::i386_jnz_rel32()         // Opcode 0x0f 85
 
 void i386_device::i386_jo_rel32()          // Opcode 0x0f 80
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_OF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -928,7 +928,7 @@ void i386_device::i386_jo_rel32()          // Opcode 0x0f 80
 
 void i386_device::i386_jp_rel32()          // Opcode 0x0f 8a
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_PF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -940,7 +940,7 @@ void i386_device::i386_jp_rel32()          // Opcode 0x0f 8a
 
 void i386_device::i386_js_rel32()          // Opcode 0x0f 88
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_SF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -952,7 +952,7 @@ void i386_device::i386_js_rel32()          // Opcode 0x0f 88
 
 void i386_device::i386_jz_rel32()          // Opcode 0x0f 84
 {
-	INT32 disp = FETCH32();
+	int32_t disp = FETCH32();
 	if( m_ZF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -964,7 +964,7 @@ void i386_device::i386_jz_rel32()          // Opcode 0x0f 84
 
 void i386_device::i386_jcxz32()            // Opcode 0xe3
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	int val = (m_address_size)?(REG32(ECX) == 0):(REG16(CX) == 0);
 	if( val ) {
 		m_eip += disp;
@@ -977,7 +977,7 @@ void i386_device::i386_jcxz32()            // Opcode 0xe3
 
 void i386_device::i386_jmp_rel32()         // Opcode 0xe9
 {
-	UINT32 disp = FETCH32();
+	uint32_t disp = FETCH32();
 	/* TODO: Segment limit */
 	m_eip += disp;
 	CHANGE_PC(m_eip);
@@ -986,8 +986,8 @@ void i386_device::i386_jmp_rel32()         // Opcode 0xe9
 
 void i386_device::i386_jmp_abs32()         // Opcode 0xea
 {
-	UINT32 address = FETCH32();
-	UINT16 segment = FETCH16();
+	uint32_t address = FETCH32();
+	uint16_t segment = FETCH16();
 
 	if( PROTECTED_MODE && !V8086_MODE)
 	{
@@ -1006,8 +1006,8 @@ void i386_device::i386_jmp_abs32()         // Opcode 0xea
 
 void i386_device::i386_lea32()             // Opcode 0x8d
 {
-	UINT8 modrm = FETCH();
-	UINT32 ea = GetNonTranslatedEA(modrm,nullptr);
+	uint8_t modrm = FETCH();
+	uint32_t ea = GetNonTranslatedEA(modrm,nullptr);
 	if (!m_address_size)
 	{
 		ea &= 0xffff;
@@ -1018,10 +1018,10 @@ void i386_device::i386_lea32()             // Opcode 0x8d
 
 void i386_device::i386_enter32()           // Opcode 0xc8
 {
-	UINT16 framesize = FETCH16();
-	UINT8 level = FETCH() % 32;
-	UINT8 x;
-	UINT32 frameptr;
+	uint16_t framesize = FETCH16();
+	uint8_t level = FETCH() % 32;
+	uint8_t x;
+	uint32_t frameptr;
 	PUSH32(REG32(EBP));
 	if(!STACK_32BIT)
 		frameptr = REG16(SP);
@@ -1057,7 +1057,7 @@ void i386_device::i386_leave32()           // Opcode 0xc9
 
 void i386_device::i386_lodsd()             // Opcode 0xad
 {
-	UINT32 eas;
+	uint32_t eas;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -1070,8 +1070,8 @@ void i386_device::i386_lodsd()             // Opcode 0xad
 
 void i386_device::i386_loop32()            // Opcode 0xe2
 {
-	INT8 disp = FETCH();
-	INT32 reg = (m_address_size)?--REG32(ECX):--REG16(CX);
+	int8_t disp = FETCH();
+	int32_t reg = (m_address_size)?--REG32(ECX):--REG16(CX);
 	if( reg != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -1081,8 +1081,8 @@ void i386_device::i386_loop32()            // Opcode 0xe2
 
 void i386_device::i386_loopne32()          // Opcode 0xe0
 {
-	INT8 disp = FETCH();
-	INT32 reg = (m_address_size)?--REG32(ECX):--REG16(CX);
+	int8_t disp = FETCH();
+	int32_t reg = (m_address_size)?--REG32(ECX):--REG16(CX);
 	if( reg != 0 && m_ZF == 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -1092,8 +1092,8 @@ void i386_device::i386_loopne32()          // Opcode 0xe0
 
 void i386_device::i386_loopz32()           // Opcode 0xe1
 {
-	INT8 disp = FETCH();
-	INT32 reg = (m_address_size)?--REG32(ECX):--REG16(CX);
+	int8_t disp = FETCH();
+	int32_t reg = (m_address_size)?--REG32(ECX):--REG16(CX);
 	if( reg != 0 && m_ZF != 0 ) {
 		m_eip += disp;
 		CHANGE_PC(m_eip);
@@ -1103,14 +1103,14 @@ void i386_device::i386_loopz32()           // Opcode 0xe1
 
 void i386_device::i386_mov_rm32_r32()      // Opcode 0x89
 {
-	UINT32 src;
-	UINT8 modrm = FETCH();
+	uint32_t src;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		STORE_RM32(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		WRITE32(ea, src);
 		CYCLES(CYCLES_MOV_REG_MEM);
@@ -1119,14 +1119,14 @@ void i386_device::i386_mov_rm32_r32()      // Opcode 0x89
 
 void i386_device::i386_mov_r32_rm32()      // Opcode 0x8b
 {
-	UINT32 src;
-	UINT8 modrm = FETCH();
+	uint32_t src;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOV_MEM_REG);
@@ -1135,14 +1135,14 @@ void i386_device::i386_mov_r32_rm32()      // Opcode 0x8b
 
 void i386_device::i386_mov_rm32_i32()      // Opcode 0xc7
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 value = FETCH32();
+		uint32_t value = FETCH32();
 		STORE_RM32(modrm, value);
 		CYCLES(CYCLES_MOV_IMM_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 value = FETCH32();
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t value = FETCH32();
 		WRITE32(ea, value);
 		CYCLES(CYCLES_MOV_IMM_MEM);
 	}
@@ -1150,7 +1150,7 @@ void i386_device::i386_mov_rm32_i32()      // Opcode 0xc7
 
 void i386_device::i386_mov_eax_m32()       // Opcode 0xa1
 {
-	UINT32 offset, ea;
+	uint32_t offset, ea;
 	if( m_address_size ) {
 		offset = FETCH32();
 	} else {
@@ -1167,7 +1167,7 @@ void i386_device::i386_mov_eax_m32()       // Opcode 0xa1
 
 void i386_device::i386_mov_m32_eax()       // Opcode 0xa3
 {
-	UINT32 offset, ea;
+	uint32_t offset, ea;
 	if( m_address_size ) {
 		offset = FETCH32();
 	} else {
@@ -1232,7 +1232,7 @@ void i386_device::i386_mov_edi_i32()       // Opcode 0xbf
 
 void i386_device::i386_movsd()             // Opcode 0xa5
 {
-	UINT32 eas, ead, v;
+	uint32_t eas, ead, v;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -1248,14 +1248,14 @@ void i386_device::i386_movsd()             // Opcode 0xa5
 
 void i386_device::i386_movsx_r32_rm8()     // Opcode 0x0f be
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		INT32 src = (INT8)LOAD_RM8(modrm);
+		int32_t src = (int8_t)LOAD_RM8(modrm);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		INT32 src = (INT8)READ8(ea);
+		uint32_t ea = GetEA(modrm,0);
+		int32_t src = (int8_t)READ8(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_MEM_REG);
 	}
@@ -1263,14 +1263,14 @@ void i386_device::i386_movsx_r32_rm8()     // Opcode 0x0f be
 
 void i386_device::i386_movsx_r32_rm16()    // Opcode 0x0f bf
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		INT32 src = (INT16)LOAD_RM16(modrm);
+		int32_t src = (int16_t)LOAD_RM16(modrm);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		INT32 src = (INT16)READ16(ea);
+		uint32_t ea = GetEA(modrm,0);
+		int32_t src = (int16_t)READ16(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_MEM_REG);
 	}
@@ -1278,14 +1278,14 @@ void i386_device::i386_movsx_r32_rm16()    // Opcode 0x0f bf
 
 void i386_device::i386_movzx_r32_rm8()     // Opcode 0x0f b6
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 src = (UINT8)LOAD_RM8(modrm);
+		uint32_t src = (uint8_t)LOAD_RM8(modrm);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		UINT32 src = (UINT8)READ8(ea);
+		uint32_t ea = GetEA(modrm,0);
+		uint32_t src = (uint8_t)READ8(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_MEM_REG);
 	}
@@ -1293,14 +1293,14 @@ void i386_device::i386_movzx_r32_rm8()     // Opcode 0x0f b6
 
 void i386_device::i386_movzx_r32_rm16()    // Opcode 0x0f b7
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 src = (UINT16)LOAD_RM16(modrm);
+		uint32_t src = (uint16_t)LOAD_RM16(modrm);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
-		UINT32 src = (UINT16)READ16(ea);
+		uint32_t ea = GetEA(modrm,0);
+		uint32_t src = (uint16_t)READ16(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_MEM_REG);
 	}
@@ -1308,8 +1308,8 @@ void i386_device::i386_movzx_r32_rm16()    // Opcode 0x0f b7
 
 void i386_device::i386_or_rm32_r32()       // Opcode 0x09
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -1317,7 +1317,7 @@ void i386_device::i386_or_rm32_r32()       // Opcode 0x09
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = OR32(dst, src);
@@ -1328,8 +1328,8 @@ void i386_device::i386_or_rm32_r32()       // Opcode 0x09
 
 void i386_device::i386_or_r32_rm32()       // Opcode 0x0b
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -1337,7 +1337,7 @@ void i386_device::i386_or_r32_rm32()       // Opcode 0x0b
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = OR32(dst, src);
@@ -1348,7 +1348,7 @@ void i386_device::i386_or_r32_rm32()       // Opcode 0x0b
 
 void i386_device::i386_or_eax_i32()        // Opcode 0x0d
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = OR32(dst, src);
@@ -1358,23 +1358,23 @@ void i386_device::i386_or_eax_i32()        // Opcode 0x0d
 
 void i386_device::i386_out_eax_i8()        // Opcode 0xe7
 {
-	UINT16 port = FETCH();
-	UINT32 data = REG32(EAX);
+	uint16_t port = FETCH();
+	uint32_t data = REG32(EAX);
 	WRITEPORT32(port, data);
 	CYCLES(CYCLES_OUT_VAR);
 }
 
 void i386_device::i386_out_eax_dx()        // Opcode 0xef
 {
-	UINT16 port = REG16(DX);
-	UINT32 data = REG32(EAX);
+	uint16_t port = REG16(DX);
+	uint32_t data = REG32(EAX);
 	WRITEPORT32(port, data);
 	CYCLES(CYCLES_OUT);
 }
 
 void i386_device::i386_pop_eax()           // Opcode 0x58
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(EAX) = POP32();
 	else
@@ -1384,7 +1384,7 @@ void i386_device::i386_pop_eax()           // Opcode 0x58
 
 void i386_device::i386_pop_ecx()           // Opcode 0x59
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(ECX) = POP32();
 	else
@@ -1394,7 +1394,7 @@ void i386_device::i386_pop_ecx()           // Opcode 0x59
 
 void i386_device::i386_pop_edx()           // Opcode 0x5a
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(EDX) = POP32();
 	else
@@ -1404,7 +1404,7 @@ void i386_device::i386_pop_edx()           // Opcode 0x5a
 
 void i386_device::i386_pop_ebx()           // Opcode 0x5b
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(EBX) = POP32();
 	else
@@ -1414,7 +1414,7 @@ void i386_device::i386_pop_ebx()           // Opcode 0x5b
 
 void i386_device::i386_pop_esp()           // Opcode 0x5c
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(ESP) = POP32();
 	else
@@ -1424,7 +1424,7 @@ void i386_device::i386_pop_esp()           // Opcode 0x5c
 
 void i386_device::i386_pop_ebp()           // Opcode 0x5d
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(EBP) = POP32();
 	else
@@ -1434,7 +1434,7 @@ void i386_device::i386_pop_ebp()           // Opcode 0x5d
 
 void i386_device::i386_pop_esi()           // Opcode 0x5e
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(ESI) = POP32();
 	else
@@ -1444,7 +1444,7 @@ void i386_device::i386_pop_esi()           // Opcode 0x5e
 
 void i386_device::i386_pop_edi()           // Opcode 0x5f
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 		REG32(EDI) = POP32();
 	else
@@ -1454,8 +1454,8 @@ void i386_device::i386_pop_edi()           // Opcode 0x5f
 
 bool i386_device::i386_pop_seg32(int segment)
 {
-	UINT32 ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	UINT32 value;
+	uint32_t ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t value;
 	bool fault;
 	if(i386_limit_check(SS,offset+3) == 0)
 	{
@@ -1510,15 +1510,15 @@ void i386_device::i386_pop_ss32()          // Opcode 0x17
 
 void i386_device::i386_pop_rm32()          // Opcode 0x8f
 {
-	UINT8 modrm = FETCH();
-	UINT32 value;
-	UINT32 ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint8_t modrm = FETCH();
+	uint32_t value;
+	uint32_t ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+3) == 0)
 	{
 		// be careful here, if the write references the esp register
 		// it expects the post-pop value but esp must be wound back
 		// if the write faults
-		UINT32 temp_sp = REG32(ESP);
+		uint32_t temp_sp = REG32(ESP);
 		value = POP32();
 
 		if( modrm >= 0xc0 ) {
@@ -1529,7 +1529,7 @@ void i386_device::i386_pop_rm32()          // Opcode 0x8f
 			{
 				WRITE32(ea, value);
 			}
-			catch(UINT64 e)
+			catch(uint64_t e)
 			{
 				REG32(ESP) = temp_sp;
 				throw e;
@@ -1543,7 +1543,7 @@ void i386_device::i386_pop_rm32()          // Opcode 0x8f
 
 void i386_device::i386_popad()             // Opcode 0x61
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(SS,offset+31) == 0)
 	{
 		REG32(EDI) = POP32();
@@ -1562,11 +1562,11 @@ void i386_device::i386_popad()             // Opcode 0x61
 
 void i386_device::i386_popfd()             // Opcode 0x9d
 {
-	UINT32 value;
-	UINT32 current = get_flags();
-	UINT8 IOPL = (current >> 12) & 0x03;
-	UINT32 mask = 0x00257fd5;  // VM, VIP and VIF cannot be set by POPF/POPFD
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	uint32_t value;
+	uint32_t current = get_flags();
+	uint8_t IOPL = (current >> 12) & 0x03;
+	uint32_t mask = 0x00257fd5;  // VM, VIP and VIF cannot be set by POPF/POPFD
+	uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 
 	// IOPL can only change if CPL is 0
 	if(m_CPL != 0)
@@ -1599,7 +1599,7 @@ void i386_device::i386_popfd()             // Opcode 0x9d
 
 void i386_device::i386_push_eax()          // Opcode 0x50
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1613,7 +1613,7 @@ void i386_device::i386_push_eax()          // Opcode 0x50
 
 void i386_device::i386_push_ecx()          // Opcode 0x51
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1627,7 +1627,7 @@ void i386_device::i386_push_ecx()          // Opcode 0x51
 
 void i386_device::i386_push_edx()          // Opcode 0x52
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1641,7 +1641,7 @@ void i386_device::i386_push_edx()          // Opcode 0x52
 
 void i386_device::i386_push_ebx()          // Opcode 0x53
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1655,7 +1655,7 @@ void i386_device::i386_push_ebx()          // Opcode 0x53
 
 void i386_device::i386_push_esp()          // Opcode 0x54
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1669,7 +1669,7 @@ void i386_device::i386_push_esp()          // Opcode 0x54
 
 void i386_device::i386_push_ebp()          // Opcode 0x55
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1683,7 +1683,7 @@ void i386_device::i386_push_ebp()          // Opcode 0x55
 
 void i386_device::i386_push_esi()          // Opcode 0x56
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1697,7 +1697,7 @@ void i386_device::i386_push_esi()          // Opcode 0x56
 
 void i386_device::i386_push_edi()          // Opcode 0x57
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1711,7 +1711,7 @@ void i386_device::i386_push_edi()          // Opcode 0x57
 
 void i386_device::i386_push_cs32()         // Opcode 0x0e
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1725,7 +1725,7 @@ void i386_device::i386_push_cs32()         // Opcode 0x0e
 
 void i386_device::i386_push_ds32()         // Opcode 0x1e
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1739,7 +1739,7 @@ void i386_device::i386_push_ds32()         // Opcode 0x1e
 
 void i386_device::i386_push_es32()         // Opcode 0x06
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1753,7 +1753,7 @@ void i386_device::i386_push_es32()         // Opcode 0x06
 
 void i386_device::i386_push_fs32()         // Opcode 0x0f a0
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1767,7 +1767,7 @@ void i386_device::i386_push_fs32()         // Opcode 0x0f a0
 
 void i386_device::i386_push_gs32()         // Opcode 0x0f a8
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1781,7 +1781,7 @@ void i386_device::i386_push_gs32()         // Opcode 0x0f a8
 
 void i386_device::i386_push_ss32()         // Opcode 0x16
 {
-	UINT32 offset;
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1795,8 +1795,8 @@ void i386_device::i386_push_ss32()         // Opcode 0x16
 
 void i386_device::i386_push_i32()          // Opcode 0x68
 {
-	UINT32 value = FETCH32();
-	UINT32 offset;
+	uint32_t value = FETCH32();
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 4;
 	else
@@ -1810,8 +1810,8 @@ void i386_device::i386_push_i32()          // Opcode 0x68
 
 void i386_device::i386_pushad()            // Opcode 0x60
 {
-	UINT32 temp = REG32(ESP);
-	UINT32 offset;
+	uint32_t temp = REG32(ESP);
+	uint32_t offset;
 	if(STACK_32BIT)
 		offset = REG32(ESP) - 32;
 	else
@@ -1836,7 +1836,7 @@ void i386_device::i386_pushfd()            // Opcode 0x9c
 {
 	if(!m_IOP1 && !m_IOP2 && V8086_MODE)
 		FAULT(FAULT_GP,0)
-		UINT32 offset;
+		uint32_t offset;
 		if(STACK_32BIT)
 			offset = REG32(ESP) - 4;
 		else
@@ -1850,7 +1850,7 @@ void i386_device::i386_pushfd()            // Opcode 0x9c
 
 void i386_device::i386_ret_near32_i16()    // Opcode 0xc2
 {
-	INT16 disp = FETCH16();
+	int16_t disp = FETCH16();
 	m_eip = POP32();
 	REG32(ESP) += disp;
 	CHANGE_PC(m_eip);
@@ -1866,8 +1866,8 @@ void i386_device::i386_ret_near32()        // Opcode 0xc3
 
 void i386_device::i386_sbb_rm32_r32()      // Opcode 0x19
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -1875,7 +1875,7 @@ void i386_device::i386_sbb_rm32_r32()      // Opcode 0x19
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = SBB32(dst, src, m_CF);
@@ -1886,8 +1886,8 @@ void i386_device::i386_sbb_rm32_r32()      // Opcode 0x19
 
 void i386_device::i386_sbb_r32_rm32()      // Opcode 0x1b
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -1895,7 +1895,7 @@ void i386_device::i386_sbb_r32_rm32()      // Opcode 0x1b
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = SBB32(dst, src, m_CF);
@@ -1906,7 +1906,7 @@ void i386_device::i386_sbb_r32_rm32()      // Opcode 0x1b
 
 void i386_device::i386_sbb_eax_i32()       // Opcode 0x1d
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = SBB32(dst, src, m_CF);
@@ -1916,7 +1916,7 @@ void i386_device::i386_sbb_eax_i32()       // Opcode 0x1d
 
 void i386_device::i386_scasd()             // Opcode 0xaf
 {
-	UINT32 eas, src, dst;
+	uint32_t eas, src, dst;
 	eas = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 0 );
 	src = READ32(eas);
 	dst = REG32(EAX);
@@ -1927,11 +1927,11 @@ void i386_device::i386_scasd()             // Opcode 0xaf
 
 void i386_device::i386_shld32_i8()         // Opcode 0x0f a4
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = FETCH();
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = FETCH();
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -1943,10 +1943,10 @@ void i386_device::i386_shld32_i8()         // Opcode 0x0f a4
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_SHLD_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 dst = READ32(ea);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = FETCH();
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t dst = READ32(ea);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = FETCH();
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -1962,11 +1962,11 @@ void i386_device::i386_shld32_i8()         // Opcode 0x0f a4
 
 void i386_device::i386_shld32_cl()         // Opcode 0x0f a5
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = REG8(CL);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -1978,10 +1978,10 @@ void i386_device::i386_shld32_cl()         // Opcode 0x0f a5
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_SHLD_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 dst = READ32(ea);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = REG8(CL);
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t dst = READ32(ea);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -1997,11 +1997,11 @@ void i386_device::i386_shld32_cl()         // Opcode 0x0f a5
 
 void i386_device::i386_shrd32_i8()         // Opcode 0x0f ac
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = FETCH();
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = FETCH();
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -2013,10 +2013,10 @@ void i386_device::i386_shrd32_i8()         // Opcode 0x0f ac
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_SHRD_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 dst = READ32(ea);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = FETCH();
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t dst = READ32(ea);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = FETCH();
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -2032,11 +2032,11 @@ void i386_device::i386_shrd32_i8()         // Opcode 0x0f ac
 
 void i386_device::i386_shrd32_cl()         // Opcode 0x0f ad
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 dst = LOAD_RM32(modrm);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = REG8(CL);
+		uint32_t dst = LOAD_RM32(modrm);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -2048,10 +2048,10 @@ void i386_device::i386_shrd32_cl()         // Opcode 0x0f ad
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_SHRD_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 dst = READ32(ea);
-		UINT32 upper = LOAD_REG32(modrm);
-		UINT8 shift = REG8(CL);
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t dst = READ32(ea);
+		uint32_t upper = LOAD_REG32(modrm);
+		uint8_t shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
 		} else {
@@ -2067,7 +2067,7 @@ void i386_device::i386_shrd32_cl()         // Opcode 0x0f ad
 
 void i386_device::i386_stosd()             // Opcode 0xab
 {
-	UINT32 eas = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1 );
+	uint32_t eas = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1 );
 	WRITE32(eas, REG32(EAX));
 	BUMP_DI(4);
 	CYCLES(CYCLES_STOS);
@@ -2075,8 +2075,8 @@ void i386_device::i386_stosd()             // Opcode 0xab
 
 void i386_device::i386_sub_rm32_r32()      // Opcode 0x29
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -2084,7 +2084,7 @@ void i386_device::i386_sub_rm32_r32()      // Opcode 0x29
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = SUB32(dst, src);
@@ -2095,8 +2095,8 @@ void i386_device::i386_sub_rm32_r32()      // Opcode 0x29
 
 void i386_device::i386_sub_r32_rm32()      // Opcode 0x2b
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -2104,7 +2104,7 @@ void i386_device::i386_sub_r32_rm32()      // Opcode 0x2b
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = SUB32(dst, src);
@@ -2115,7 +2115,7 @@ void i386_device::i386_sub_r32_rm32()      // Opcode 0x2b
 
 void i386_device::i386_sub_eax_i32()       // Opcode 0x2d
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = SUB32(dst, src);
@@ -2125,8 +2125,8 @@ void i386_device::i386_sub_eax_i32()       // Opcode 0x2d
 
 void i386_device::i386_test_eax_i32()      // Opcode 0xa9
 {
-	UINT32 src = FETCH32();
-	UINT32 dst = REG32(EAX);
+	uint32_t src = FETCH32();
+	uint32_t dst = REG32(EAX);
 	dst = src & dst;
 	SetSZPF32(dst);
 	m_CF = 0;
@@ -2136,8 +2136,8 @@ void i386_device::i386_test_eax_i32()      // Opcode 0xa9
 
 void i386_device::i386_test_rm32_r32()     // Opcode 0x85
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -2147,7 +2147,7 @@ void i386_device::i386_test_rm32_r32()     // Opcode 0x85
 		m_OF = 0;
 		CYCLES(CYCLES_TEST_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = src & dst;
@@ -2160,7 +2160,7 @@ void i386_device::i386_test_rm32_r32()     // Opcode 0x85
 
 void i386_device::i386_xchg_eax_ecx()      // Opcode 0x91
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(ECX);
 	REG32(ECX) = temp;
@@ -2169,7 +2169,7 @@ void i386_device::i386_xchg_eax_ecx()      // Opcode 0x91
 
 void i386_device::i386_xchg_eax_edx()      // Opcode 0x92
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(EDX);
 	REG32(EDX) = temp;
@@ -2178,7 +2178,7 @@ void i386_device::i386_xchg_eax_edx()      // Opcode 0x92
 
 void i386_device::i386_xchg_eax_ebx()      // Opcode 0x93
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(EBX);
 	REG32(EBX) = temp;
@@ -2187,7 +2187,7 @@ void i386_device::i386_xchg_eax_ebx()      // Opcode 0x93
 
 void i386_device::i386_xchg_eax_esp()      // Opcode 0x94
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(ESP);
 	REG32(ESP) = temp;
@@ -2196,7 +2196,7 @@ void i386_device::i386_xchg_eax_esp()      // Opcode 0x94
 
 void i386_device::i386_xchg_eax_ebp()      // Opcode 0x95
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(EBP);
 	REG32(EBP) = temp;
@@ -2205,7 +2205,7 @@ void i386_device::i386_xchg_eax_ebp()      // Opcode 0x95
 
 void i386_device::i386_xchg_eax_esi()      // Opcode 0x96
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(ESI);
 	REG32(ESI) = temp;
@@ -2214,7 +2214,7 @@ void i386_device::i386_xchg_eax_esi()      // Opcode 0x96
 
 void i386_device::i386_xchg_eax_edi()      // Opcode 0x97
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = REG32(EAX);
 	REG32(EAX) = REG32(EDI);
 	REG32(EDI) = temp;
@@ -2223,17 +2223,17 @@ void i386_device::i386_xchg_eax_edi()      // Opcode 0x97
 
 void i386_device::i386_xchg_r32_rm32()     // Opcode 0x87
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT32 src = LOAD_RM32(modrm);
-		UINT32 dst = LOAD_REG32(modrm);
+		uint32_t src = LOAD_RM32(modrm);
+		uint32_t dst = LOAD_REG32(modrm);
 		STORE_REG32(modrm, src);
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_XCHG_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT32 src = READ32(ea);
-		UINT32 dst = LOAD_REG32(modrm);
+		uint32_t ea = GetEA(modrm,1);
+		uint32_t src = READ32(ea);
+		uint32_t dst = LOAD_REG32(modrm);
 		WRITE32(ea, dst);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_XCHG_REG_MEM);
@@ -2242,8 +2242,8 @@ void i386_device::i386_xchg_r32_rm32()     // Opcode 0x87
 
 void i386_device::i386_xor_rm32_r32()      // Opcode 0x31
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
@@ -2251,7 +2251,7 @@ void i386_device::i386_xor_rm32_r32()      // Opcode 0x31
 		STORE_RM32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(ea);
 		dst = XOR32(dst, src);
@@ -2262,8 +2262,8 @@ void i386_device::i386_xor_rm32_r32()      // Opcode 0x31
 
 void i386_device::i386_xor_r32_rm32()      // Opcode 0x33
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
@@ -2271,7 +2271,7 @@ void i386_device::i386_xor_r32_rm32()      // Opcode 0x33
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = XOR32(dst, src);
@@ -2282,7 +2282,7 @@ void i386_device::i386_xor_r32_rm32()      // Opcode 0x33
 
 void i386_device::i386_xor_eax_i32()       // Opcode 0x35
 {
-	UINT32 src, dst;
+	uint32_t src, dst;
 	src = FETCH32();
 	dst = REG32(EAX);
 	dst = XOR32(dst, src);
@@ -2294,9 +2294,9 @@ void i386_device::i386_xor_eax_i32()       // Opcode 0x35
 
 void i386_device::i386_group81_32()        // Opcode 0x81
 {
-	UINT32 ea;
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t ea;
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -2431,23 +2431,23 @@ void i386_device::i386_group81_32()        // Opcode 0x81
 
 void i386_device::i386_group83_32()        // Opcode 0x83
 {
-	UINT32 ea;
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t ea;
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 0:     // ADD Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = ADD32(dst, src);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = ADD32(dst, src);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2456,14 +2456,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 1:     // OR Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = OR32(dst, src);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = OR32(dst, src);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2472,14 +2472,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 2:     // ADC Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = ADC32(dst, src, m_CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = ADC32(dst, src, m_CF);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2488,14 +2488,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 3:     // SBB Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = ((UINT32)(INT32)(INT8)FETCH());
+				src = ((uint32_t)(int32_t)(int8_t)FETCH());
 				dst = SBB32(dst, src, m_CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = ((UINT32)(INT32)(INT8)FETCH());
+				src = ((uint32_t)(int32_t)(int8_t)FETCH());
 				dst = SBB32(dst, src, m_CF);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2504,14 +2504,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 4:     // AND Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = AND32(dst, src);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = AND32(dst, src);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2520,14 +2520,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 5:     // SUB Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = SUB32(dst, src);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = SUB32(dst, src);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2536,14 +2536,14 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 6:     // XOR Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = XOR32(dst, src);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(modrm,1);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				dst = XOR32(dst, src);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_ALU_REG_MEM);
@@ -2552,13 +2552,13 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 		case 7:     // CMP Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				SUB32(dst, src);
 				CYCLES(CYCLES_CMP_REG_REG);
 			} else {
 				ea = GetEA(modrm,0);
 				dst = READ32(ea);
-				src = (UINT32)(INT32)(INT8)FETCH();
+				src = (uint32_t)(int32_t)(int8_t)FETCH();
 				SUB32(dst, src);
 				CYCLES(CYCLES_CMP_REG_MEM);
 			}
@@ -2568,9 +2568,9 @@ void i386_device::i386_group83_32()        // Opcode 0x83
 
 void i386_device::i386_groupC1_32()        // Opcode 0xc1
 {
-	UINT32 dst;
-	UINT8 modrm = FETCH();
-	UINT8 shift;
+	uint32_t dst;
+	uint8_t modrm = FETCH();
+	uint8_t shift;
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM32(modrm);
@@ -2578,7 +2578,7 @@ void i386_device::i386_groupC1_32()        // Opcode 0xc1
 		dst = i386_shift_rotate32(modrm, dst, shift);
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ32(ea);
 		shift = FETCH() & 0x1f;
 		dst = i386_shift_rotate32(modrm, dst, shift);
@@ -2588,15 +2588,15 @@ void i386_device::i386_groupC1_32()        // Opcode 0xc1
 
 void i386_device::i386_groupD1_32()        // Opcode 0xd1
 {
-	UINT32 dst;
-	UINT8 modrm = FETCH();
+	uint32_t dst;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM32(modrm);
 		dst = i386_shift_rotate32(modrm, dst, 1);
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ32(ea);
 		dst = i386_shift_rotate32(modrm, dst, 1);
 		WRITE32(ea, dst);
@@ -2605,15 +2605,15 @@ void i386_device::i386_groupD1_32()        // Opcode 0xd1
 
 void i386_device::i386_groupD3_32()        // Opcode 0xd3
 {
-	UINT32 dst;
-	UINT8 modrm = FETCH();
+	uint32_t dst;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM32(modrm);
 		dst = i386_shift_rotate32(modrm, dst, REG8(CL));
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ32(ea);
 		dst = i386_shift_rotate32(modrm, dst, REG8(CL));
 		WRITE32(ea, dst);
@@ -2622,22 +2622,22 @@ void i386_device::i386_groupD3_32()        // Opcode 0xd3
 
 void i386_device::i386_groupF7_32()        // Opcode 0xf7
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 0:         /* TEST Rm32, i32 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
-				UINT32 src = FETCH32();
+				uint32_t dst = LOAD_RM32(modrm);
+				uint32_t src = FETCH32();
 				dst &= src;
 				m_CF = m_OF = m_AF = 0;
 				SetSZPF32(dst);
 				CYCLES(CYCLES_TEST_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,0);
-				UINT32 dst = READ32(ea);
-				UINT32 src = FETCH32();
+				uint32_t ea = GetEA(modrm,0);
+				uint32_t dst = READ32(ea);
+				uint32_t src = FETCH32();
 				dst &= src;
 				m_CF = m_OF = m_AF = 0;
 				SetSZPF32(dst);
@@ -2646,13 +2646,13 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 			break;
 		case 2:         /* NOT Rm32 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
+				uint32_t dst = LOAD_RM32(modrm);
 				dst = ~dst;
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_NOT_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
 				dst = ~dst;
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_NOT_MEM);
@@ -2660,13 +2660,13 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 			break;
 		case 3:         /* NEG Rm32 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
+				uint32_t dst = LOAD_RM32(modrm);
 				dst = SUB32(0, dst );
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_NEG_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
 				dst = SUB32(0, dst );
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_NEG_MEM);
@@ -2674,69 +2674,69 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 			break;
 		case 4:         /* MUL EAX, Rm32 */
 			{
-				UINT64 result;
-				UINT32 src, dst;
+				uint64_t result;
+				uint32_t src, dst;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM32(modrm);
 					CYCLES(CYCLES_MUL32_ACC_REG);      /* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ32(ea);
 					CYCLES(CYCLES_MUL32_ACC_MEM);      /* TODO: Correct multiply timing */
 				}
 
 				dst = REG32(EAX);
-				result = (UINT64)src * (UINT64)dst;
-				REG32(EDX) = (UINT32)(result >> 32);
-				REG32(EAX) = (UINT32)result;
+				result = (uint64_t)src * (uint64_t)dst;
+				REG32(EDX) = (uint32_t)(result >> 32);
+				REG32(EAX) = (uint32_t)result;
 
 				m_CF = m_OF = (REG32(EDX) != 0);
 			}
 			break;
 		case 5:         /* IMUL EAX, Rm32 */
 			{
-				INT64 result;
-				INT64 src, dst;
+				int64_t result;
+				int64_t src, dst;
 				if( modrm >= 0xc0 ) {
-					src = (INT64)(INT32)LOAD_RM32(modrm);
+					src = (int64_t)(int32_t)LOAD_RM32(modrm);
 					CYCLES(CYCLES_IMUL32_ACC_REG);     /* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
-					src = (INT64)(INT32)READ32(ea);
+					uint32_t ea = GetEA(modrm,0);
+					src = (int64_t)(int32_t)READ32(ea);
 					CYCLES(CYCLES_IMUL32_ACC_MEM);     /* TODO: Correct multiply timing */
 				}
 
-				dst = (INT64)(INT32)REG32(EAX);
+				dst = (int64_t)(int32_t)REG32(EAX);
 				result = src * dst;
 
-				REG32(EDX) = (UINT32)(result >> 32);
-				REG32(EAX) = (UINT32)result;
+				REG32(EDX) = (uint32_t)(result >> 32);
+				REG32(EAX) = (uint32_t)result;
 
-				m_CF = m_OF = !(result == (INT64)(INT32)result);
+				m_CF = m_OF = !(result == (int64_t)(int32_t)result);
 			}
 			break;
 		case 6:         /* DIV EAX, Rm32 */
 			{
-				UINT64 quotient, remainder, result;
-				UINT32 src;
+				uint64_t quotient, remainder, result;
+				uint32_t src;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM32(modrm);
 					CYCLES(CYCLES_DIV32_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ32(ea);
 					CYCLES(CYCLES_DIV32_ACC_MEM);
 				}
 
-				quotient = ((UINT64)(REG32(EDX)) << 32) | (UINT64)(REG32(EAX));
+				quotient = ((uint64_t)(REG32(EDX)) << 32) | (uint64_t)(REG32(EAX));
 				if( src ) {
-					remainder = quotient % (UINT64)src;
-					result = quotient / (UINT64)src;
+					remainder = quotient % (uint64_t)src;
+					result = quotient / (uint64_t)src;
 					if( result > 0xffffffff ) {
 						/* TODO: Divide error */
 					} else {
-						REG32(EDX) = (UINT32)remainder;
-						REG32(EAX) = (UINT32)result;
+						REG32(EDX) = (uint32_t)remainder;
+						REG32(EAX) = (uint32_t)result;
 					}
 				} else {
 					i386_trap(0, 0, 0);
@@ -2745,26 +2745,26 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 			break;
 		case 7:         /* IDIV EAX, Rm32 */
 			{
-				INT64 quotient, remainder, result;
-				UINT32 src;
+				int64_t quotient, remainder, result;
+				uint32_t src;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM32(modrm);
 					CYCLES(CYCLES_IDIV32_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ32(ea);
 					CYCLES(CYCLES_IDIV32_ACC_MEM);
 				}
 
-				quotient = (((INT64)REG32(EDX)) << 32) | ((UINT64)REG32(EAX));
+				quotient = (((int64_t)REG32(EDX)) << 32) | ((uint64_t)REG32(EAX));
 				if( src ) {
-					remainder = quotient % (INT64)(INT32)src;
-					result = quotient / (INT64)(INT32)src;
+					remainder = quotient % (int64_t)(int32_t)src;
+					result = quotient / (int64_t)(int32_t)src;
 					if( result > 0xffffffff ) {
 						/* TODO: Divide error */
 					} else {
-						REG32(EDX) = (UINT32)remainder;
-						REG32(EAX) = (UINT32)result;
+						REG32(EDX) = (uint32_t)remainder;
+						REG32(EAX) = (uint32_t)result;
 					}
 				} else {
 					i386_trap(0, 0, 0);
@@ -2776,19 +2776,19 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 
 void i386_device::i386_groupFF_32()        // Opcode 0xff
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 0:         /* INC Rm32 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
+				uint32_t dst = LOAD_RM32(modrm);
 				dst = INC32(dst);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_INC_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
 				dst = INC32(dst);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_INC_MEM);
@@ -2796,13 +2796,13 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 1:         /* DEC Rm32 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
+				uint32_t dst = LOAD_RM32(modrm);
 				dst = DEC32(dst);
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_DEC_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
 				dst = DEC32(dst);
 				WRITE32(ea, dst);
 				CYCLES(CYCLES_DEC_MEM);
@@ -2810,12 +2810,12 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 2:         /* CALL Rm32 */
 			{
-				UINT32 address;
+				uint32_t address;
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					CYCLES(CYCLES_CALL_REG);       /* TODO: Timing = 7 + m */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					address = READ32(ea);
 					CYCLES(CYCLES_CALL_MEM);       /* TODO: Timing = 10 + m */
 				}
@@ -2826,8 +2826,8 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 3:         /* CALL FAR Rm32 */
 			{
-				UINT16 selector;
-				UINT32 address;
+				uint16_t selector;
+				uint32_t address;
 
 				if( modrm >= 0xc0 )
 				{
@@ -2835,7 +2835,7 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 				}
 				else
 				{
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					address = READ32(ea + 0);
 					selector = READ16(ea + 4);
 					CYCLES(CYCLES_CALL_MEM_INTERSEG);      /* TODO: Timing = 10 + m */
@@ -2858,12 +2858,12 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 4:         /* JMP Rm32 */
 			{
-				UINT32 address;
+				uint32_t address;
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					CYCLES(CYCLES_JMP_REG);        /* TODO: Timing = 7 + m */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					address = READ32(ea);
 					CYCLES(CYCLES_JMP_MEM);        /* TODO: Timing = 10 + m */
 				}
@@ -2873,8 +2873,8 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 5:         /* JMP FAR Rm32 */
 			{
-				UINT16 selector;
-				UINT32 address;
+				uint16_t selector;
+				uint32_t address;
 
 				if( modrm >= 0xc0 )
 				{
@@ -2882,7 +2882,7 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 				}
 				else
 				{
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					address = READ32(ea + 0);
 					selector = READ16(ea + 4);
 					CYCLES(CYCLES_JMP_MEM_INTERSEG);       /* TODO: Timing = 10 + m */
@@ -2903,11 +2903,11 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 			break;
 		case 6:         /* PUSH Rm32 */
 			{
-				UINT32 value;
+				uint32_t value;
 				if( modrm >= 0xc0 ) {
 					value = LOAD_RM32(modrm);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					value = READ32(ea);
 				}
 				PUSH32(value);
@@ -2922,10 +2922,10 @@ void i386_device::i386_groupFF_32()        // Opcode 0xff
 
 void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 {
-	UINT32 address, ea;
-	UINT8 modrm = FETCH();
+	uint32_t address, ea;
+	uint8_t modrm = FETCH();
 	I386_SREG seg;
-	UINT8 result;
+	uint8_t result;
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -3008,7 +3008,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 				seg.selector = m_task.segment;
 				i386_load_protected_mode_segment(&seg,nullptr);
 
-				UINT32 addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
+				uint32_t addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
 				i386_translate_address(TRANSLATE_READ, &addr, nullptr);
 				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
 
@@ -3119,8 +3119,8 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 
 void i386_device::i386_group0F01_32()      // Opcode 0x0f 01
 {
-	UINT8 modrm = FETCH();
-	UINT32 address, ea;
+	uint8_t modrm = FETCH();
+	uint32_t address, ea;
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -3201,7 +3201,7 @@ void i386_device::i386_group0F01_32()      // Opcode 0x0f 01
 			{
 				if(PROTECTED_MODE && m_CPL)
 					FAULT(FAULT_GP,0)
-				UINT16 b;
+				uint16_t b;
 				if( modrm >= 0xc0 ) {
 					b = LOAD_RM16(modrm);
 					CYCLES(CYCLES_LMSW_REG);
@@ -3224,14 +3224,14 @@ void i386_device::i386_group0F01_32()      // Opcode 0x0f 01
 
 void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 4:         /* BT Rm32, i8 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
-				UINT8 bit = FETCH();
+				uint32_t dst = LOAD_RM32(modrm);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3240,9 +3240,9 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 
 				CYCLES(CYCLES_BT_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,0);
-				UINT32 dst = READ32(ea);
-				UINT8 bit = FETCH();
+				uint32_t ea = GetEA(modrm,0);
+				uint32_t dst = READ32(ea);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3254,8 +3254,8 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 			break;
 		case 5:         /* BTS Rm32, i8 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
-				UINT8 bit = FETCH();
+				uint32_t dst = LOAD_RM32(modrm);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3266,9 +3266,9 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_BTS_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
-				UINT8 bit = FETCH();
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3282,8 +3282,8 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 			break;
 		case 6:         /* BTR Rm32, i8 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
-				UINT8 bit = FETCH();
+				uint32_t dst = LOAD_RM32(modrm);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3294,9 +3294,9 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_BTR_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
-				UINT8 bit = FETCH();
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3310,8 +3310,8 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 			break;
 		case 7:         /* BTC Rm32, i8 */
 			if( modrm >= 0xc0 ) {
-				UINT32 dst = LOAD_RM32(modrm);
-				UINT8 bit = FETCH();
+				uint32_t dst = LOAD_RM32(modrm);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3322,9 +3322,9 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(CYCLES_BTC_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT32 dst = READ32(ea);
-				UINT8 bit = FETCH();
+				uint32_t ea = GetEA(modrm,1);
+				uint32_t dst = READ32(ea);
+				uint8_t bit = FETCH();
 
 				if( dst & (1 << bit) )
 					m_CF = 1;
@@ -3344,9 +3344,9 @@ void i386_device::i386_group0FBA_32()      // Opcode 0x0f ba
 
 void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	I386_SREG seg;
-	UINT8 type;
+	uint8_t type;
 
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -3358,7 +3358,7 @@ void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 		}
 		else
 		{
-			UINT32 ea = GetEA(modrm,0);
+			uint32_t ea = GetEA(modrm,0);
 			seg.selector = READ32(ea);
 			CYCLES(CYCLES_LAR_MEM);
 		}
@@ -3368,13 +3368,13 @@ void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 		}
 		else
 		{
-			UINT64 desc;
+			uint64_t desc;
 			if(!i386_load_protected_mode_segment(&seg,&desc))
 			{
 				SetZF(0);
 				return;
 			}
-			UINT8 DPL = (seg.flags >> 5) & 3;
+			uint8_t DPL = (seg.flags >> 5) & 3;
 			if(((DPL < m_CPL) || (DPL < (seg.selector & 3))) && ((seg.flags & 0x1c) != 0x1c))
 			{
 				SetZF(0);
@@ -3411,8 +3411,8 @@ void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 
 void i386_device::i386_lsl_r32_rm32()  // Opcode 0x0f 0x03
 {
-	UINT8 modrm = FETCH();
-	UINT32 limit;
+	uint8_t modrm = FETCH();
+	uint32_t limit;
 	I386_SREG seg;
 
 	if(PROTECTED_MODE && !V8086_MODE)
@@ -3424,7 +3424,7 @@ void i386_device::i386_lsl_r32_rm32()  // Opcode 0x0f 0x03
 		}
 		else
 		{
-			UINT32 ea = GetEA(modrm,0);
+			uint32_t ea = GetEA(modrm,0);
 			seg.selector = READ32(ea);
 		}
 		if(seg.selector == 0)
@@ -3433,13 +3433,13 @@ void i386_device::i386_lsl_r32_rm32()  // Opcode 0x0f 0x03
 		}
 		else
 		{
-			UINT8 type;
+			uint8_t type;
 			if(!i386_load_protected_mode_segment(&seg,nullptr))
 			{
 				SetZF(0);
 				return;
 			}
-			UINT8 DPL = (seg.flags >> 5) & 3;
+			uint8_t DPL = (seg.flags >> 5) & 3;
 			if(((DPL < m_CPL) || (DPL < (seg.selector & 3))) && ((seg.flags & 0x1c) != 0x1c))
 			{
 				SetZF(0);
@@ -3474,8 +3474,8 @@ void i386_device::i386_lsl_r32_rm32()  // Opcode 0x0f 0x03
 
 void i386_device::i386_bound_r32_m32_m32() // Opcode 0x62
 {
-	UINT8 modrm;
-	INT32 val, low, high;
+	uint8_t modrm;
+	int32_t val, low, high;
 
 	modrm = FETCH();
 
@@ -3485,7 +3485,7 @@ void i386_device::i386_bound_r32_m32_m32() // Opcode 0x62
 	}
 	else
 	{
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		low = READ32(ea + 0);
 		high = READ32(ea + 4);
 	}
@@ -3521,7 +3521,7 @@ void i386_device::i386_retf32()            // Opcode 0xcb
 
 void i386_device::i386_retf_i32()          // Opcode 0xca
 {
-	UINT16 count = FETCH16();
+	uint16_t count = FETCH16();
 
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -3541,13 +3541,13 @@ void i386_device::i386_retf_i32()          // Opcode 0xca
 
 void i386_device::i386_load_far_pointer32(int s)
 {
-	UINT8 modrm = FETCH();
-	UINT16 selector;
+	uint8_t modrm = FETCH();
+	uint16_t selector;
 
 	if( modrm >= 0xc0 ) {
 		report_invalid_modrm("load_far_pointer32", modrm);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		STORE_REG32(modrm, READ32(ea + 0));
 		selector = READ16(ea + 4);
 		i386_sreg_load(selector,s,nullptr);

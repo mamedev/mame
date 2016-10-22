@@ -12,28 +12,28 @@
 
     typedef struct picfileformatheader_
     {
-       UINT8 HEADERSIGNATURE[8];        // 0: "HXCPICFE"
-       UINT8 formatrevision;            // 8: Revision 0
-       UINT8 number_of_track;           // 9: Number of track in the file
-       UINT8 number_of_side;            // 10: Number of valid side (Not used by the emulator)
-       UINT8 track_encoding;            // 11: Track Encoding mode
+       uint8_t HEADERSIGNATURE[8];        // 0: "HXCPICFE"
+       uint8_t formatrevision;            // 8: Revision 0
+       uint8_t number_of_track;           // 9: Number of track in the file
+       uint8_t number_of_side;            // 10: Number of valid side (Not used by the emulator)
+       uint8_t track_encoding;            // 11: Track Encoding mode
                                         // (Used for the write support - Please see the list above)
-       UINT16 bitRate;                  // 12: Bitrate in Kbit/s. Ex : 250=250000bits/s
+       uint16_t bitRate;                  // 12: Bitrate in Kbit/s. Ex : 250=250000bits/s
                                         // Max value : 500
-       UINT16 floppyRPM;                // 14: Rotation per minute (Not used by the emulator)
-       UINT8 floppyinterfacemode;       // 16: Floppy interface mode. (Please see the list above.)
-       UINT8 dnu;                       // 17: Free
-       UINT16 track_list_offset;        // 18: Offset of the track list LUT in block of 512 bytes
+       uint16_t floppyRPM;                // 14: Rotation per minute (Not used by the emulator)
+       uint8_t floppyinterfacemode;       // 16: Floppy interface mode. (Please see the list above.)
+       uint8_t dnu;                       // 17: Free
+       uint16_t track_list_offset;        // 18: Offset of the track list LUT in block of 512 bytes
                                         // (Ex: 1=0x200)
-       UINT8 write_allowed;             // 20: The Floppy image is write protected ?
-       UINT8 single_step;               // 21: 0xFF : Single Step – 0x00 Double Step mode
-       UINT8 track0s0_altencoding;      // 22: 0x00 : Use an alternate track_encoding for track 0 Side 0
-       UINT8 track0s0_encoding;         // 23: alternate track_encoding for track 0 Side 0
-       UINT8 track0s1_altencoding;      // 24: 0x00 : Use an alternate track_encoding for track 0 Side 1
-       UINT8 track0s1_encoding;         // 25: alternate track_encoding for track 0 Side 1
+       uint8_t write_allowed;             // 20: The Floppy image is write protected ?
+       uint8_t single_step;               // 21: 0xFF : Single Step – 0x00 Double Step mode
+       uint8_t track0s0_altencoding;      // 22: 0x00 : Use an alternate track_encoding for track 0 Side 0
+       uint8_t track0s0_encoding;         // 23: alternate track_encoding for track 0 Side 0
+       uint8_t track0s1_altencoding;      // 24: 0x00 : Use an alternate track_encoding for track 0 Side 1
+       uint8_t track0s1_encoding;         // 25: alternate track_encoding for track 0 Side 1
     } picfileformatheader;
 
-    Byte order for UINT16 is little endian.
+    Byte order for uint16_t is little endian.
 
     floppyintefacemode values are defined in the header file as floppymode_t,
     track_encodings are defined as encoding_t
@@ -46,8 +46,8 @@
 
     typedef struct pictrack_
     {
-        UINT16 offset;     // Offset of the track data in blocks of 512 bytes (Ex: 2=0x400)
-        UINT16 track_len;  // Length of the track data in byte.
+        uint16_t offset;     // Offset of the track data in blocks of 512 bytes (Ex: 2=0x400)
+        uint16_t track_len;  // Length of the track data in byte.
     } pictrack;
 
     This table has a size of  number_of_track*4 bytes.
@@ -142,9 +142,9 @@ bool hfe_format::supports_save() const
 	return true;
 }
 
-int hfe_format::identify(io_generic *io, UINT32 form_factor)
+int hfe_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 header[8];
+	uint8_t header[8];
 
 	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, HFE_FORMAT_HEADER, 8 ) ==0) {
@@ -153,10 +153,10 @@ int hfe_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool hfe_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool hfe_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT8 header[HEADER_LENGTH];
-	UINT8 track_table[TRACK_TABLE_LENGTH];
+	uint8_t header[HEADER_LENGTH];
+	uint8_t track_table[TRACK_TABLE_LENGTH];
 
 	int drivecyl, driveheads;
 	image->get_maximal_geometry(drivecyl, driveheads);
@@ -233,7 +233,7 @@ bool hfe_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 
 	// Load the tracks
-	std::vector<UINT8> cylinder_buffer;
+	std::vector<uint8_t> cylinder_buffer;
 	for(int cyl=0; cyl < m_cylinders; cyl++)
 	{
 		// actual data read
@@ -288,7 +288,7 @@ bool hfe_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	return success;
 }
 
-void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int samplelength, const UINT8 *trackbuf, int track_end, floppy_image *image)
+void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int samplelength, const uint8_t *trackbuf, int track_end, floppy_image *image)
 {
 	// HFE has a minor issue: The track images do not sum up to 200 ms.
 	// Tracks are samples at 250 kbit/s for both FM and MFM, which yields
@@ -315,11 +315,11 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	// Cell: | AAAABBBB | = MG_1 = | BBBBAAAA |
 	//       | AAAAAAAA | = MG_0 = | BBBBBBBB |
 
-	std::vector<UINT32> &dest = image->get_buffer(cyl, head, 0);
+	std::vector<uint32_t> &dest = image->get_buffer(cyl, head, 0);
 	dest.clear();
 
 	// Start with MG_A
-	UINT32 cbit = floppy_image::MG_A;
+	uint32_t cbit = floppy_image::MG_A;
 
 	int offset = 0x100;
 
@@ -329,7 +329,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 		track_end -= 0x0100;
 	}
 
-	UINT8 current = 0;
+	uint8_t current = 0;
 	int time  = 0;
 
 	dest.push_back(cbit | time);
@@ -402,11 +402,11 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 
 bool hfe_format::save(io_generic *io, floppy_image *image)
 {
-	std::vector<UINT8> cylbuf;
+	std::vector<uint8_t> cylbuf;
 	cylbuf.resize(0x6200);
 
-	UINT8 header[HEADER_LENGTH];
-	UINT8 track_table[TRACK_TABLE_LENGTH];
+	uint8_t header[HEADER_LENGTH];
+	uint8_t track_table[TRACK_TABLE_LENGTH];
 
 	int track_end = 0x61c0;
 	int samplelength = 2000;
@@ -498,7 +498,7 @@ bool hfe_format::save(io_generic *io, floppy_image *image)
 	return true;
 }
 
-void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& samplelength, encoding_t& encoding, UINT8 *cylinder_buffer, int track_end, floppy_image *image)
+void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& samplelength, encoding_t& encoding, uint8_t *cylinder_buffer, int track_end, floppy_image *image)
 {
 	// We are using an own implementation here because the result of the
 	// parent class method would require some post-processing that we
@@ -508,7 +508,7 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 	// as the original code
 
 	// No subtracks definded
-	std::vector<UINT32> &tbuf = image->get_buffer(cyl, head, 0);
+	std::vector<uint32_t> &tbuf = image->get_buffer(cyl, head, 0);
 	if (tbuf.size() <= 1)
 	{
 		// Unformatted track
@@ -563,7 +563,7 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 	}
 
 	// Start at the write splice
-	UINT32 splice = image->get_write_splice_position(cyl, head, 0);
+	uint32_t splice = image->get_write_splice_position(cyl, head, 0);
 
 	int cur_pos = splice;
 	int cur_entry = 0;
@@ -579,7 +579,7 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 	int max_period = int(samplelength*1.25);
 	int phase_adjust = 0;
 	int freq_hist = 0;
-	UINT32 next = 0;
+	uint32_t next = 0;
 
 	int offset = 0x100;
 
@@ -590,8 +590,8 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 		track_end -= 0x0100;
 	}
 
-	UINT8 bit = 0x01;
-	UINT8 current = 0;
+	uint8_t bit = 0x01;
+	uint8_t current = 0;
 
 	while (next < 200000000) {
 		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;

@@ -27,39 +27,39 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers (used by pipedrm) */
-	optional_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
 
 	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	std::unique_ptr<UINT8[]>   m_local_videoram[2];
-	std::unique_ptr<UINT8[]>  m_local_paletteram;
-	UINT8    m_selected_videoram;
-	UINT8    m_selected_paletteram;
-	UINT32   m_scrollx[2];
-	UINT32   m_scrolly[2];
-	UINT8    m_gfxreg;
-	UINT8    m_flipscreen;
-	UINT8    m_flipscreen_old;
-	UINT32   m_scrolly_ofs;
-	UINT32   m_scrollx_ofs;
+	std::unique_ptr<uint8_t[]>   m_local_videoram[2];
+	std::unique_ptr<uint8_t[]>  m_local_paletteram;
+	uint8_t    m_selected_videoram;
+	uint8_t    m_selected_paletteram;
+	uint32_t   m_scrollx[2];
+	uint32_t   m_scrolly[2];
+	uint8_t    m_gfxreg;
+	uint8_t    m_flipscreen;
+	uint8_t    m_flipscreen_old;
+	uint32_t   m_scrolly_ofs;
+	uint32_t   m_scrollx_ofs;
 
-	UINT8    m_crtc_register;
-	UINT8    m_crtc_data[0x10];
+	uint8_t    m_crtc_register;
+	uint8_t    m_crtc_data[0x10];
 	emu_timer *m_crtc_timer;
 
 	/* misc */
-	UINT8    m_directionflag;
-	UINT8    m_commanddata;
-	UINT8    m_portselect;
-	UINT8    m_adpcm_reset;
-	UINT8    m_adpcm_data;
-	UINT8    m_vclk_left;
-	UINT8    m_pending_command;
-	UINT8    m_sound_command;
+	uint8_t    m_directionflag;
+	uint8_t    m_commanddata;
+	uint8_t    m_portselect;
+	uint8_t    m_adpcm_reset;
+	uint8_t    m_adpcm_data;
+	uint8_t    m_vclk_left;
+	uint8_t    m_pending_command;
+	uint8_t    m_sound_command;
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
@@ -92,8 +92,8 @@ public:
 	DECLARE_VIDEO_START(fromance);
 	DECLARE_VIDEO_START(pipedrm);
 	DECLARE_VIDEO_START(hatris);
-	UINT32 screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(deferred_commanddata_w);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	inline void get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer );

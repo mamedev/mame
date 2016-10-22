@@ -93,16 +93,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
-	required_shared_ptr<UINT8> m_question_offset;
+	required_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT8 m_question_offset_low;
-	UINT8 m_question_offset_mid;
-	UINT8 m_question_offset_high;
-	UINT8 m_latched_coin;
-	UINT8 m_last_coin;
+	uint8_t m_question_offset_low;
+	uint8_t m_question_offset_mid;
+	uint8_t m_question_offset_high;
+	uint8_t m_latched_coin;
+	uint8_t m_last_coin;
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
 	DECLARE_READ8_MEMBER(laserdisc_io_r);
@@ -120,7 +120,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
 	DECLARE_VIDEO_START(vertical);
-	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 };
 
@@ -136,7 +136,7 @@ public:
 
 TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -191,7 +191,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
 
 WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
@@ -204,7 +204,7 @@ WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
  *
  *************************************/
 
-UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_tms->screen_reset())
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -223,7 +223,7 @@ UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind1
 
 INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 {
-	UINT8 new_coin = ioport("COIN")->read();
+	uint8_t new_coin = ioport("COIN")->read();
 
 	/* check the coin inputs once per frame */
 	m_latched_coin |= new_coin & (new_coin ^ m_last_coin);
@@ -243,9 +243,9 @@ INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 
 READ8_MEMBER(statriv2_state::question_data_r)
 {
-	const UINT8 *qrom = memregion("questions")->base();
-	UINT32 qromsize = memregion("questions")->bytes();
-	UINT32 address;
+	const uint8_t *qrom = memregion("questions")->base();
+	uint32_t qromsize = memregion("questions")->bytes();
+	uint32_t address;
 
 	if (m_question_offset_high == 0xff)
 		m_question_offset[m_question_offset_low]++;
@@ -1131,9 +1131,9 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	*                                                   *
 	\***************************************************/
 
-	UINT8 *qrom = memregion("questions")->base();
-	UINT32 length = memregion("questions")->bytes();
-	UINT32 address;
+	uint8_t *qrom = memregion("questions")->base();
+	uint32_t length = memregion("questions")->bytes();
+	uint32_t address;
 
 	for (address = 0; address < length; address++)
 		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
@@ -1144,7 +1144,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 
 READ8_MEMBER(statriv2_state::laserdisc_io_r)
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 	if (offset == 1)
 		result = 0x18;
 	osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);

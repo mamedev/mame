@@ -25,7 +25,7 @@ public:
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_region_ptr<UINT8> m_clut_ptr;
+	optional_region_ptr<uint8_t> m_clut_ptr;
 
 	int m_scrolly;
 	int m_blitter_destx;
@@ -44,10 +44,10 @@ public:
 	int m_gfxdraw_mode;
 	bitmap_ind16 m_tmpbitmap0;
 	bitmap_ind16 m_tmpbitmap1;
-	std::unique_ptr<UINT8[]> m_videoram0;
-	std::unique_ptr<UINT8[]> m_videoram1;
-	std::unique_ptr<UINT8[]> m_palette_ptr;
-	std::unique_ptr<UINT8[]> m_clut;
+	std::unique_ptr<uint8_t[]> m_videoram0;
+	std::unique_ptr<uint8_t[]> m_videoram1;
+	std::unique_ptr<uint8_t[]> m_palette_ptr;
+	std::unique_ptr<uint8_t[]> m_clut;
 	int m_param_old[0x10];
 	int m_param_cnt;
 	int m_flipscreen_old;
@@ -89,7 +89,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(_1layer);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip(int vram);
 	void update_pixel0(int x, int y);
 	void update_pixel1(int x, int y);

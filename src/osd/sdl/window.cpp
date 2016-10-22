@@ -256,7 +256,7 @@ void sdl_window_info::show_pointer()
 //  sdlwindow_resize
 //============================================================
 
-void sdl_window_info::resize(INT32 width, INT32 height)
+void sdl_window_info::resize(int32_t width, int32_t height)
 {
 	osd_dim cd = get_size();
 
@@ -518,7 +518,7 @@ osd_dim sdl_window_info::pick_best_mode()
 			SDL_GetDisplayMode(m_monitor->oshandle(), i, &mode);
 
 			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + abs((INT32)mode.w - target_width) + abs((INT32)mode.h - target_height));
+			size_score = 1.0f / (1.0f + abs((int32_t)mode.w - target_width) + abs((int32_t)mode.h - target_height));
 
 			// if the mode is too small, give a big penalty
 			if (mode.w < minimum_width || mode.h < minimum_height)
@@ -903,13 +903,13 @@ int sdl_window_info::wnd_extra_height()
 
 osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
-	INT32 extrawidth = wnd_extra_width();
-	INT32 extraheight = wnd_extra_height();
-	INT32 propwidth, propheight;
-	INT32 minwidth, minheight;
-	INT32 maxwidth, maxheight;
-	INT32 viswidth, visheight;
-	INT32 adjwidth, adjheight;
+	int32_t extrawidth = wnd_extra_width();
+	int32_t extraheight = wnd_extra_height();
+	int32_t propwidth, propheight;
+	int32_t minwidth, minheight;
+	int32_t maxwidth, maxheight;
+	int32_t viswidth, visheight;
+	int32_t adjwidth, adjheight;
 	float pixel_aspect;
 	std::shared_ptr<osd_monitor_info> monitor = m_monitor;
 
@@ -1020,7 +1020,7 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 
 osd_dim sdl_window_info::get_min_bounds(int constrain)
 {
-	INT32 minwidth, minheight;
+	int32_t minwidth, minheight;
 
 	//assert(GetCurrentThreadId() == window_threadid);
 

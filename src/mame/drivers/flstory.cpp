@@ -186,7 +186,7 @@ READ8_MEMBER(flstory_state::rumba_mcu_r)
 			According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
 			game-play speed and who is playing between player 1 and 2.
 			*/
-			//static UINT8 level_val;
+			//static uint8_t level_val;
 
 			//level_val = read_byte(0xe247);
 

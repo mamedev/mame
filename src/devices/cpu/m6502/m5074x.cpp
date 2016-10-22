@@ -39,7 +39,7 @@ const device_type M50741 = &device_creator<m50741_device>;
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
 	read_p0(*this),
@@ -189,7 +189,7 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 
 void m5074x_device::recalc_irqs()
 {
-	UINT8 all_ints = 0;
+	uint8_t all_ints = 0;
 
 	if ((m_intctrl & (IRQ_CNTRREQ|IRQ_CNTRENA)) == (IRQ_CNTRREQ|IRQ_CNTRENA))
 	{
@@ -280,7 +280,7 @@ void m5074x_device::recalc_timer(int timer)
 	}
 }
 
-void m5074x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void m5074x_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -302,9 +302,9 @@ void m5074x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 	}
 }
 
-UINT8 m5074x_device::read_port(UINT8 offset)
+uint8_t m5074x_device::read_port(uint8_t offset)
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -489,12 +489,12 @@ static ADDRESS_MAP_START( m50740_map, AS_PROGRAM, 8, m50740_device )
 	AM_RANGE(0x1400, 0x1fff) AM_ROM AM_REGION(M5074X_INTERNAL_ROM_REGION, 0)
 ADDRESS_MAP_END
 
-m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m5074x_device(mconfig, M50740, "Mitsubishi M50740", tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), "m50740", __FILE__)
 {
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), shortname, source)
 {
 }
@@ -507,12 +507,12 @@ static ADDRESS_MAP_START( m50741_map, AS_PROGRAM, 8, m50741_device )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("internal", 0)
 ADDRESS_MAP_END
 
-m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m5074x_device(mconfig, M50740, "Mitsubishi M50741", tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), "m50741", __FILE__)
 {
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), shortname, source)
 {
 }

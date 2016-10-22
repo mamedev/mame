@@ -23,7 +23,7 @@
 
 PALETTE_INIT_MEMBER(redclash_state,redclash)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -79,14 +79,14 @@ PALETTE_INIT_MEMBER(redclash_state,redclash)
 	/* characters */
 	for (i = 0; i < 0x20; i++)
 	{
-		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		uint8_t ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x20; i < 0x40; i++)
 	{
-		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
+		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x00, ctabentry);
@@ -102,7 +102,7 @@ PALETTE_INIT_MEMBER(redclash_state,redclash)
 
 PALETTE_INIT_MEMBER(redclash_state,sraider)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* the resistor net may be probably different than Lady Bug */
@@ -209,7 +209,7 @@ VIDEO_START_MEMBER(redclash_state,redclash)
 
 void redclash_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int i, offs;
 
 	for (offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
@@ -324,7 +324,7 @@ void redclash_state::redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangl
  */
 
 /* This line can reset the LFSR to zero and disables the star generator */
-void redclash_state::redclash_set_stars_enable(UINT8 on)
+void redclash_state::redclash_set_stars_enable(uint8_t on)
 {
 	if ((m_stars_enable == 0) && (on == 1))
 	{
@@ -368,7 +368,7 @@ void redclash_state::redclash_update_stars_state()
  * 7 right/up fast     (+5/2 pix per frame)
  */
 
-void redclash_state::redclash_set_stars_speed(UINT8 speed )
+void redclash_state::redclash_set_stars_speed(uint8_t speed )
 {
 	m_stars_speed = speed;
 }
@@ -378,12 +378,12 @@ void redclash_state::redclash_set_stars_speed(UINT8 speed )
 /* Space Raider doesn't use the Va bit, and it is also set up to */
 /* window the stars to a certain x range */
 
-void redclash_state::redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
+void redclash_state::redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t palette_offset, uint8_t sraider, uint8_t firstx, uint8_t lastx )
 {
 	int i;
-	UINT8 tempbit, feedback, star_color, xloc, yloc;
-	UINT32 state;
-	UINT8 hcond, vcond;
+	uint8_t tempbit, feedback, star_color, xloc, yloc;
+	uint32_t state;
+	uint8_t hcond, vcond;
 
 	if (m_stars_enable == 0)
 		return;
@@ -442,7 +442,7 @@ void redclash_state::screen_eof_redclash(screen_device &screen, bool state)
 		redclash_update_stars_state();
 }
 
-UINT32 redclash_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t redclash_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
@@ -498,7 +498,7 @@ void redclash_state::screen_eof_sraider(screen_device &screen, bool state)/* upd
 		redclash_update_stars_state();
 }
 
-UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// this part is boilerplate from ladybug, not sure if hardware does this,
 	// since it's not used
@@ -536,7 +536,7 @@ UINT32 redclash_state::screen_update_sraider(screen_device &screen, bitmap_ind16
 	{
 		if (m_grid_data[i] != 0)
 		{
-			UINT8 x = i;
+			uint8_t x = i;
 			int height = cliprect.max_y - cliprect.min_y + 1;
 
 			if (flip_screen())

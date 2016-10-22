@@ -281,7 +281,7 @@ const address_space_config *driver_device::memory_space_config(address_spacenum 
 //  irq_pulse_clear - clear a "pulsed" IRQ line
 //-------------------------------------------------
 
-void driver_device::irq_pulse_clear(void *ptr, INT32 param)
+void driver_device::irq_pulse_clear(void *ptr, int32_t param)
 {
 	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
 	int irqline = param;
@@ -390,7 +390,7 @@ void driver_device::updateflip()
 //  flip_screen_set - set global flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_set(UINT32 on)
+void driver_device::flip_screen_set(uint32_t on)
 {
 	// normalize to all 1
 	if (on)
@@ -410,7 +410,7 @@ void driver_device::flip_screen_set(UINT32 on)
 //  do not call updateflip.
 //-------------------------------------------------
 
-void driver_device::flip_screen_set_no_update(UINT32 on)
+void driver_device::flip_screen_set_no_update(uint32_t on)
 {
 	// flip_screen_y is not updated on purpose
 	// this function is for drivers which
@@ -426,7 +426,7 @@ void driver_device::flip_screen_set_no_update(UINT32 on)
 //  flip_screen_x_set - set global horizontal flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_x_set(UINT32 on)
+void driver_device::flip_screen_x_set(uint32_t on)
 {
 	// normalize to all 1
 	if (on)
@@ -445,7 +445,7 @@ void driver_device::flip_screen_x_set(UINT32 on)
 //  flip_screen_y_set - set global vertical flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_y_set(UINT32 on)
+void driver_device::flip_screen_y_set(uint32_t on)
 {
 	// normalize to all 1
 	if (on)

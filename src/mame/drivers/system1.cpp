@@ -250,7 +250,7 @@ seem to have access to.
     each opcode fetch (since the M1 line is low for 2 cycles per byte).
 */
 
-static const UINT8 cc_op[0x100] = {
+static const uint8_t cc_op[0x100] = {
 	4*5+1*2,10*5+3*2, 7*5+1*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2, 4*5+1*2,11*5+1*2, 7*5+1*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2,
 	8*5+2*2,10*5+3*2, 7*5+1*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2,12*5+2*2,11*5+1*2, 7*5+1*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2,
 	7*5+2*2,10*5+3*2,16*5+3*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2, 7*5+2*2,11*5+1*2,16*5+3*2, 6*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+2*2, 4*5+1*2,
@@ -269,7 +269,7 @@ static const UINT8 cc_op[0x100] = {
 	5*5+1*2,10*5+1*2,10*5+3*2, 4*5+1*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2, 6*5+1*2,10*5+3*2, 4*5+1*2,10*5+3*2, 0*5    , 7*5+2*2,11*5+1*2
 };
 
-static const UINT8 cc_cb[0x100] = {
+static const uint8_t cc_cb[0x100] = {
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2,
@@ -288,7 +288,7 @@ static const UINT8 cc_cb[0x100] = {
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,15*5+2*2, 8*5+2*2
 };
 
-static const UINT8 cc_ed[0x100] = {
+static const uint8_t cc_ed[0x100] = {
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2,
@@ -307,7 +307,7 @@ static const UINT8 cc_ed[0x100] = {
 	8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2, 8*5+2*2
 };
 
-static const UINT8 cc_xy[0x100] = {
+static const uint8_t cc_xy[0x100] = {
 ( 4+4)*5+2*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 4+4)*5+2*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
 ( 8+4)*5+3*2,(10+4)*5+4*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,(12+4)*5+3*2,(11+4)*5+2*2,( 7+4)*5+2*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
 ( 7+4)*5+3*2,(10+4)*5+4*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,(16+4)*5+4*2,( 6+4)*5+2*2,( 4+4)*5+2*2,( 4+4)*5+2*2,( 7+4)*5+3*2,( 4+4)*5+2*2,
@@ -326,7 +326,7 @@ static const UINT8 cc_xy[0x100] = {
 ( 5+4)*5+2*2,(10+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,(11+4)*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2,( 5+4)*5+2*2,( 6+4)*5+2*2,(10+4)*5+4*2,( 4+4)*5+2*2,(10+4)*5+4*2,( 4  )*5+2*2,( 7+4)*5+3*2,(11+4)*5+2*2
 };
 
-static const UINT8 cc_xycb[0x100] = {
+static const uint8_t cc_xycb[0x100] = {
 23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
 23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
 23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,23*5+4*2,
@@ -346,7 +346,7 @@ static const UINT8 cc_xycb[0x100] = {
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
-static const UINT8 cc_ex[0x100] = {
+static const uint8_t cc_ex[0x100] = {
 	0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5,
 	5*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, /* DJNZ */
 	5*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 5*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, 0*5, /* JR NZ/JR Z */
@@ -368,7 +368,7 @@ static const UINT8 cc_ex[0x100] = {
 
 void system1_state::machine_start()
 {
-	UINT32 numbanks = (m_maincpu_region->bytes() - 0x10000) / 0x4000;
+	uint32_t numbanks = (m_maincpu_region->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
 		m_bank1->configure_entries(0, numbanks, m_maincpu_region->base() + 0x10000, 0x4000);
@@ -414,14 +414,14 @@ void system1_state::machine_reset()
  *
  *************************************/
 
-void system1_state::bank44_custom_w(UINT8 data, UINT8 prevdata)
+void system1_state::bank44_custom_w(uint8_t data, uint8_t prevdata)
 {
 	/* bank bits are bits 6 and 2 */
 	m_bank1->set_entry(((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
-void system1_state::bank0c_custom_w(UINT8 data, UINT8 prevdata)
+void system1_state::bank0c_custom_w(uint8_t data, uint8_t prevdata)
 {
 	/* bank bits are bits 3 and 2 */
 	m_bank1->set_entry((data & 0x0c) >> 2);
@@ -470,7 +470,7 @@ CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_status_r)
 }
 
 
-void system1_state::dakkochn_custom_w(UINT8 data, UINT8 prevdata)
+void system1_state::dakkochn_custom_w(uint8_t data, uint8_t prevdata)
 {
 	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
 	if ((data & 0x02) && !(prevdata & 0x02))
@@ -491,7 +491,7 @@ void system1_state::dakkochn_custom_w(UINT8 data, UINT8 prevdata)
 READ8_MEMBER(system1_state::shtngmst_gunx_r)
 {
 	// x is slightly offset, and has a range of 00-fe
-	UINT8 x = ioport("GUNX")->read() - 0x12;
+	uint8_t x = ioport("GUNX")->read() - 0x12;
 	return (x == 0xff) ? 0xfe : x;
 }
 
@@ -533,7 +533,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
 	else if (pio != nullptr)
 	{
-		UINT8 data = pio->port_read(z80pio_device::PORT_A);
+		uint8_t data = pio->port_read(z80pio_device::PORT_A);
 		pio->strobe(z80pio_device::PORT_A, false);
 		pio->strobe(z80pio_device::PORT_A, true);
 		return data;
@@ -5159,7 +5159,7 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 	// probably bootleg?
 
 	int A;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
@@ -5186,7 +5186,7 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 	for (A = 0;A < 0xc000;A++)
 	{
 		int A1;
-		UINT8 temp;
+		uint8_t temp;
 
 		A1 = (A & 0xffcf) | ((A & 0x0010) << 1) | ((A & 0x0020) >> 1);
 		if (A < A1)
@@ -5220,14 +5220,14 @@ DRIVER_INIT_MEMBER(system1_state,blockgal)
 DRIVER_INIT_MEMBER(system1_state,wbml)
 {
 	DRIVER_INIT_CALL(bank0c);
-	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
 DRIVER_INIT_MEMBER(system1_state,ufosensi)
 {
 	DRIVER_INIT_CALL(bank0c);
-	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
@@ -5236,7 +5236,7 @@ DRIVER_INIT_MEMBER(system1_state,ufosensi)
 DRIVER_INIT_MEMBER(system1_state,dakkochn)
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
-	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
@@ -5270,7 +5270,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = m_maincpu_region->base();
+//  uint8_t *ROM = m_maincpu_region->base();
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -5283,7 +5283,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
 	address_space &iospace = m_maincpu->space(AS_IO);
-	UINT8 *ROM2 = memregion("soundcpu")->base();
+	uint8_t *ROM2 = memregion("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
@@ -5320,7 +5320,7 @@ DRIVER_INIT_MEMBER(system1_state,bootsys2d)
 
 DRIVER_INIT_MEMBER(system1_state,choplift)
 {
-	UINT8 *mcurom = memregion("mcu")->base();
+	uint8_t *mcurom = memregion("mcu")->base();
 
 	/* the ROM dump we have is bad; the following patches make it work */
 	mcurom[0x100] = 0x55;       /* D5 in current dump */

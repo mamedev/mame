@@ -28,11 +28,11 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
-	UINT16 m_nixie[16];
-	UINT8 m_timer;
+	uint16_t m_nixie[16];
+	uint8_t m_timer;
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
-	UINT8 nixie_to_num(UINT16 val);
+	uint8_t nixie_to_num(uint16_t val);
 	inline void output_set_nixie_value(int index, int value);
 	inline void output_set_neon_value(int index, int value);
 };
@@ -42,7 +42,7 @@ READ8_MEMBER(nixieclock_state::data_r)
 	return m_input->read() & 0x0f;
 }
 
-UINT8 nixieclock_state::nixie_to_num(UINT16 val)
+uint8_t nixieclock_state::nixie_to_num(uint16_t val)
 {
 	if (BIT(val,0)) return 0;
 	if (BIT(val,1)) return 1;

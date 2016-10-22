@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
-	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	const uint8_t *m_p_chargen;
+	const uint8_t *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -74,8 +74,8 @@ public:
 	DECLARE_VIDEO_START(homelab3);
 	DECLARE_MACHINE_RESET(brailab4);
 	DECLARE_VIDEO_START(brailab4);
-	UINT32 screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
 };
@@ -94,7 +94,7 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 		return 0;
 	}
 
-	UINT8 i,data = 0xff;
+	uint8_t i,data = 0xff;
 	char kbdrow[8];
 
 	for (i=0; i<8; i++)
@@ -182,7 +182,7 @@ READ8_MEMBER( homelab_state::exxx_r )
 	}
 
 	char kbdrow[8];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (offset < 0x10)
 	{
 		sprintf(kbdrow,"X%X", offset);
@@ -561,16 +561,16 @@ VIDEO_START_MEMBER(homelab_state,brailab4)
 	m_p_videoram = memregion("maincpu")->base()+0x17800;
 }
 
-UINT32 homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for(y = 0; y < 25; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{
@@ -593,16 +593,16 @@ UINT32 homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 homelab_state::screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homelab_state::screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for(y = 0; y < 32; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
@@ -647,13 +647,13 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
-	UINT8 ch;
-	UINT16 quick_addr;
-	UINT16 quick_length;
-	UINT16 quick_end;
-	std::vector<UINT8> quick_data;
+	uint8_t ch;
+	uint16_t quick_addr;
+	uint16_t quick_length;
+	uint16_t quick_end;
+	std::vector<uint8_t> quick_data;
 	char pgmname[256];
-	UINT16 args[2];
+	uint16_t args[2];
 	int read_;
 
 	quick_length = image.length();
@@ -833,7 +833,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(homelab_state,brailab4)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
 }
 

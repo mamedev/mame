@@ -26,7 +26,7 @@ const device_type SMS_CTRL_ADAPTOR = &device_creator<sms_ctrl_adaptor_device>;
 //  sms_ctrl_adaptor_device - constructor
 //-------------------------------------------------
 
-sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_CTRL_ADAPTOR, "SMS Controller Adaptor", tag, owner, clock, "sms_ctrl_adaptor", __FILE__),
 	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")
@@ -48,7 +48,7 @@ void sms_ctrl_adaptor_device::device_start()
 //  sms_peripheral_r - sms_ctrl_adaptor read
 //-------------------------------------------------
 
-UINT8 sms_ctrl_adaptor_device::peripheral_r()
+uint8_t sms_ctrl_adaptor_device::peripheral_r()
 {
 	return m_subctrl_port->port_r();
 }
@@ -58,7 +58,7 @@ UINT8 sms_ctrl_adaptor_device::peripheral_r()
 //  sms_peripheral_w - sms_ctrl_adaptor write
 //-------------------------------------------------
 
-void sms_ctrl_adaptor_device::peripheral_w(UINT8 data)
+void sms_ctrl_adaptor_device::peripheral_w(uint8_t data)
 {
 	m_subctrl_port->port_w(data);
 }

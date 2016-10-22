@@ -50,7 +50,7 @@ const device_type IQ151_VIDEO64 = &device_creator<iq151_video64_device>;
 //  iq151_video64_device - constructor
 //-------------------------------------------------
 
-iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, IQ151_VIDEO64, "IQ151 video64", tag, owner, clock, "iq151_video64", __FILE__),
 		device_gfx_interface(mconfig, *this, nullptr, "^^palette"),
 		device_iq151cart_interface( mconfig, *this ), m_videoram(nullptr), m_chargen(nullptr)
@@ -63,8 +63,8 @@ iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const 
 
 void iq151_video64_device::device_start()
 {
-	m_videoram = (UINT8*)memregion("videoram")->base();
-	m_chargen = (UINT8*)memregion("chargen")->base();
+	m_videoram = (uint8_t*)memregion("videoram")->base();
+	m_chargen = (uint8_t*)memregion("chargen")->base();
 
 	set_gfx(0,std::make_unique<gfx_element>(palette(), iq151_video64_charlayout, m_chargen, 0, 1, 0));
 }
@@ -95,7 +95,7 @@ const tiny_rom_entry *iq151_video64_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-void iq151_video64_device::read(offs_t offset, UINT8 &data)
+void iq151_video64_device::read(offs_t offset, uint8_t &data)
 {
 	// videoram is mapped at 0xe800-0xefff
 	if (offset >= 0xe800 && offset < 0xf000)
@@ -106,7 +106,7 @@ void iq151_video64_device::read(offs_t offset, UINT8 &data)
 //  write
 //-------------------------------------------------
 
-void iq151_video64_device::write(offs_t offset, UINT8 data)
+void iq151_video64_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xe800 && offset < 0xf000)
 		m_videoram[offset & 0x7ff] = data;
@@ -116,7 +116,7 @@ void iq151_video64_device::write(offs_t offset, UINT8 data)
 //  IO read
 //-------------------------------------------------
 
-void iq151_video64_device::io_read(offs_t offset, UINT8 &data)
+void iq151_video64_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xfc && offset < 0x100)
 	{
@@ -132,18 +132,18 @@ void iq151_video64_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_video64_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 ma = 0, sy = 0;
+	uint16_t ma = 0, sy = 0;
 
 	for (int y = 0; y < 32; y++)
 	{
 		for (int ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (int x = ma; x < ma + 64; x++)
 			{
-				UINT8 chr = m_videoram[x];
-				UINT8 gfx = m_chargen[(chr<<3) | ra ];
+				uint8_t chr = m_videoram[x];
+				uint8_t gfx = m_chargen[(chr<<3) | ra ];
 
 				/* Display a scanline of a character */
 				*p++ |= BIT(gfx, 5);

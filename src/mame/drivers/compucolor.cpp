@@ -58,14 +58,14 @@ public:
 	required_device<compucolor_floppy_port_device> m_floppy0;
 	required_device<compucolor_floppy_port_device> m_floppy1;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<16> m_y;
 	required_ioport m_y128;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( xi_r );
 	DECLARE_WRITE8_MEMBER( xo_w );
@@ -73,7 +73,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER( int_ack );
 
-	UINT8 m_xo;
+	uint8_t m_xo;
 };
 
 static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
@@ -258,7 +258,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 INPUT_PORTS_END
 
-UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 32*8; y++)
 	{
@@ -266,13 +266,13 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 code = m_video_ram[offset++];
-			UINT8 attr = m_video_ram[offset++];
+			uint8_t code = m_video_ram[offset++];
+			uint8_t attr = m_video_ram[offset++];
 
 			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
 			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
 
-			UINT8 data = m_char_rom->base()[char_offs];
+			uint8_t data = m_char_rom->base()[char_offs];
 
 			rgb_t fg = m_palette->pen_color(attr & 0x07);
 			rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
@@ -291,7 +291,7 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 READ8_MEMBER( compucolor2_state::xi_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch ((m_xo >> 4) & 0x03)
 	{

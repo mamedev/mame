@@ -46,10 +46,10 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_paddle_select;
-	UINT8 m_paddle_enable;
-	UINT8 m_cassette_motor[2];
-	UINT8 m_keyboard_scan_mask;
+	uint8_t m_paddle_select;
+	uint8_t m_paddle_enable;
+	uint8_t m_cassette_motor[2];
+	uint8_t m_keyboard_scan_mask;
 	unsigned short m_4_colours_palette[4];
 	DECLARE_WRITE8_MEMBER(dai_stack_interrupt_circuit_w);
 	DECLARE_READ8_MEMBER(dai_io_discrete_devices_r);
@@ -64,7 +64,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dai);
-	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 

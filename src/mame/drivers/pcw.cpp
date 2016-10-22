@@ -112,8 +112,8 @@
 #define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
-static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
+static const uint8_t half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
+static const uint8_t full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
 
 void pcw_state::pcw_update_interrupt_counter()
 {
@@ -562,7 +562,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 READ8_MEMBER(pcw_state::pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	UINT8 ret = pcw_get_sys_status();
+	uint8_t ret = pcw_get_sys_status();
 
 	return ret;
 }
@@ -623,16 +623,16 @@ WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
 }
 
-void pcw_state::pcw_printer_fire_pins(UINT16 pins)
+void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 {
 	int x,line;
-	INT32 feed = (m_paper_feed / 2);
+	int32_t feed = (m_paper_feed / 2);
 
 	for(x=feed+PCW_PRINTER_HEIGHT-16;x<feed+PCW_PRINTER_HEIGHT-7;x++)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
 		if((pins & 0x01) == 0)
-			m_prn_output->pix16(line, m_printer_headpos) = (UINT16)(pins & 0x01);
+			m_prn_output->pix16(line, m_printer_headpos) = (uint16_t)(pins & 0x01);
 		pins >>= 1;
 	}
 //  if(m_printer_headpos < PCW_PRINTER_WIDTH)
@@ -701,7 +701,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
-		UINT8 stepper_state = (m_printer_shift_output >> 4) & 0x0f;
+		uint8_t stepper_state = (m_printer_shift_output >> 4) & 0x0f;
 		if(stepper_state == full_step_table[(m_head_motor_state + 1) & 0x03])
 		{
 			m_printer_headpos += 2;
@@ -735,7 +735,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 	}
 	if((m_printer_p2 & 0x20) == 0)  // line feed motor active
 	{
-		UINT8 stepper_state = m_printer_shift_output & 0x0f;
+		uint8_t stepper_state = m_printer_shift_output & 0x0f;
 		if(stepper_state == full_step_table[(m_linefeed_motor_state + 1) & 0x03])
 		{
 			m_paper_feed++;
@@ -776,7 +776,7 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
 
 READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 //  logerror("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
 	ret |= (m_printer_p2 & 0x70);
@@ -839,7 +839,7 @@ READ8_MEMBER(pcw_state::mcu_printer_t0_r)
  *       bit 1: keyboard serial clock
  *       bit 0: keyboard serial data
  */
-void pcw_state::mcu_transmit_serial(UINT8 bit)
+void pcw_state::mcu_transmit_serial(uint8_t bit)
 {
 	int seq;
 
@@ -906,7 +906,7 @@ WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 
 READ8_MEMBER(pcw_state::mcu_kb_data_r)
 {
-	UINT16 scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
+	uint16_t scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
 
 	for(x=0;x<12;x++)
@@ -1006,7 +1006,7 @@ void pcw_state::machine_start()
 
 void pcw_state::machine_reset()
 {
-	UINT8* code = memregion("printer_mcu")->base();
+	uint8_t* code = memregion("printer_mcu")->base();
 	int x;
 	/* ram paging is actually undefined at power-on */
 

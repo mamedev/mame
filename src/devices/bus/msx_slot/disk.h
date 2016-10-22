@@ -73,7 +73,7 @@ extern const device_type MSX_SLOT_DISK6;
 class msx_slot_disk_device : public msx_slot_rom_device
 {
 public:
-	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual void device_start() override;
 
@@ -102,7 +102,7 @@ protected:
 class msx_slot_wd_disk_device : public msx_slot_disk_device
 {
 public:
-	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual void device_start() override;
 
@@ -114,7 +114,7 @@ protected:
 class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 {
 public:
-	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual void device_start() override;
 
@@ -126,7 +126,7 @@ protected:
 class msx_slot_disk1_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -137,18 +137,18 @@ public:
 	void post_load();
 
 private:
-	UINT8 m_side_control;
-	UINT8 m_control;
+	uint8_t m_side_control;
+	uint8_t m_control;
 
-	void set_control(UINT8 data);
-	void set_side_control(UINT8 data);
+	void set_control(uint8_t data);
+	void set_side_control(uint8_t data);
 };
 
 
 class msx_slot_disk2_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -159,16 +159,16 @@ public:
 	void post_load();
 
 private:
-	UINT8 m_control;
+	uint8_t m_control;
 
-	void set_control(UINT8 data);
+	void set_control(uint8_t data);
 };
 
 
 class msx_slot_disk3_device : public msx_slot_tc8566_disk_device
 {
 public:
-	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -178,7 +178,7 @@ public:
 class msx_slot_disk4_device : public msx_slot_tc8566_disk_device
 {
 public:
-	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -188,7 +188,7 @@ public:
 class msx_slot_disk5_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -199,16 +199,16 @@ public:
 	void post_load();
 
 private:
-	UINT8 m_control;
+	uint8_t m_control;
 
-	void set_control(UINT8 control);
+	void set_control(uint8_t control);
 };
 
 
 class msx_slot_disk6_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -219,9 +219,9 @@ public:
 	void post_load();
 
 private:
-	UINT8 m_side_motor;
-	UINT8 m_drive_select0;
-	UINT8 m_drive_select1;
+	uint8_t m_side_motor;
+	uint8_t m_drive_select0;
+	uint8_t m_drive_select1;
 
 	void set_side_motor();
 	void select_drive();

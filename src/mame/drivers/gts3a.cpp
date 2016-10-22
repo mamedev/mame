@@ -51,11 +51,11 @@ public:
 private:
 	bool m_dispclk;
 	bool m_lampclk;
-	UINT8 m_digit;
-	UINT8 m_row; // for lamps and switches
-	UINT8 m_segment[4];
-	UINT8 m_u4b;
-	UINT8 m_dmd;
+	uint8_t m_digit;
+	uint8_t m_row; // for lamps and switches
+	uint8_t m_segment[4];
+	uint8_t m_u4b;
+	uint8_t m_dmd;
 	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( gts3a_state::nmi_w )
 
 WRITE8_MEMBER( gts3a_state::segbank_w )
 { // this is all wrong
-	UINT32 seg1,seg2;
+	uint32_t seg1,seg2;
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
@@ -280,7 +280,7 @@ void gts3a_state::machine_reset()
 
 DRIVER_INIT_MEMBER( gts3a_state, gts3a )
 {
-	UINT8 *dmd = memregion("dmdcpu")->base();
+	uint8_t *dmd = memregion("dmdcpu")->base();
 
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
@@ -305,9 +305,9 @@ PALETTE_INIT_MEMBER( gts3a_state, gts3a )
 MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx=0;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t gfx=0;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{

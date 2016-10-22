@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 ***************************************************************************/
 
 
-UINT32 crshrace_state::crshrace_tile_callback( UINT32 code )
+uint32_t crshrace_state::crshrace_tile_callback( uint32_t code )
 {
 	return m_spriteram2->buffer()[code&0x7fff];
 }
@@ -109,7 +109,7 @@ void crshrace_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 
-UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_gfxctrl & 0x04)   /* display disable? */
 	{

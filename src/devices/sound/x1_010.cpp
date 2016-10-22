@@ -85,7 +85,7 @@ struct X1_010_CHANNEL {
 
 const device_type X1_010 = &device_creator<x1_010_device>;
 
-x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
@@ -168,7 +168,7 @@ WRITE8_MEMBER( x1_010_device::write )
 
 READ16_MEMBER( x1_010_device::word_r )
 {
-	UINT16  ret;
+	uint16_t  ret;
 
 	ret = m_HI_WORD_BUF[offset]<<8;
 	ret += (read( space, offset )&0xff);
@@ -192,9 +192,9 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 {
 	X1_010_CHANNEL  *reg;
 	int     ch, i, volL, volR, freq, div;
-	INT8   *start, *end, data;
-	UINT8  *env;
-	UINT32 smp_offs, smp_step, env_offs, env_step, delta;
+	int8_t   *start, *end, data;
+	uint8_t  *env;
+	uint32_t smp_offs, smp_step, env_offs, env_step, delta;
 
 	// mixer buffer zero clear
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
@@ -218,7 +218,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				// Meta Fox does write the frequency register, but this is a hack to make it "work" with the current setup
 				// This is broken for Arbalester (it writes 8), but that'll be fixed later.
 				if( freq == 0 ) freq = 4;
-				smp_step = (UINT32)((float)m_base_clock/8192.0f
+				smp_step = (uint32_t)((float)m_base_clock/8192.0f
 							*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 				if( smp_offs == 0 ) {
 					LOG_SOUND(( "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
@@ -238,14 +238,14 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 				m_smp_offset[ch] = smp_offs;
 			} else {                                            // Wave form
-				start    = (INT8 *)&(m_reg[reg->volume*128+0x1000]);
+				start    = (int8_t *)&(m_reg[reg->volume*128+0x1000]);
 				smp_offs = m_smp_offset[ch];
 				freq     = ((reg->pitch_hi<<8)+reg->frequency)>>div;
-				smp_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
+				smp_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 
-				env      = (UINT8 *)&(m_reg[reg->end*128]);
+				env      = (uint8_t *)&(m_reg[reg->end*128]);
 				env_offs = m_env_offset[ch];
-				env_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
+				env_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
 				/* Print some more debug info */
 				if( smp_offs == 0 ) {
 					LOG_SOUND(( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",

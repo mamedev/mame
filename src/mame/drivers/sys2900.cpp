@@ -54,7 +54,7 @@ public:
 	DECLARE_DRIVER_INIT(sys2900);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 
 protected:
@@ -101,7 +101,7 @@ void sys2900_state::machine_reset()
 
 DRIVER_INIT_MEMBER(sys2900_state,sys2900)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
 }
 
@@ -109,7 +109,7 @@ void sys2900_state::video_start()
 {
 }
 
-UINT32 sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

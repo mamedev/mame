@@ -47,7 +47,7 @@ machine_config_constructor a2bus_sam_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_sam_device::a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_sam_device::a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_SAM, "Don't Ask Software SAM", tag, owner, clock, "a2sam", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dac(*this, "dac")
@@ -68,7 +68,7 @@ void a2bus_sam_device::device_reset()
 {
 }
 
-void a2bus_sam_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_sam_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	m_dac->write(data);
 }

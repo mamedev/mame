@@ -217,7 +217,7 @@ ioport_constructor pc1512_keyboard_t::device_input_ports() const
 //  pc1512_keyboard_t - constructor
 //-------------------------------------------------
 
-pc1512_keyboard_t::pc1512_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pc1512_keyboard_t::pc1512_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock, "pc1512kb", __FILE__),
 	m_maincpu(*this, I8048_TAG),
 	m_joy(*this, "joy"),
@@ -353,7 +353,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_kb_y, 0)) data &= m_y[0]->read();
 	if (!BIT(m_kb_y, 1)) data &= m_y[1]->read();
@@ -421,7 +421,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_p2_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_data_in;
 	data |= m_clock_in << 1;

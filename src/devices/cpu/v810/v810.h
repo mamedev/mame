@@ -83,7 +83,7 @@ class v810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -91,9 +91,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 3; }
-	virtual UINT32 execute_max_cycles() const override { return 6; }
-	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual uint32_t execute_min_cycles() const override { return 3; }
+	virtual uint32_t execute_max_cycles() const override { return 6; }
+	virtual uint32_t execute_input_lines() const override { return 16; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -104,95 +104,95 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
-	typedef UINT32 (v810_device::*opcode_func)(UINT32 op);
+	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
 	static const opcode_func s_OpCodeTable[64];
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	UINT32 m_reg[65];
-	UINT8 m_irq_line;
-	UINT8 m_irq_state;
-	UINT8 m_nmi_line;
+	uint32_t m_reg[65];
+	uint8_t m_irq_line;
+	uint8_t m_irq_state;
+	uint8_t m_nmi_line;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
-	UINT32 m_PPC;
+	uint32_t m_PPC;
 	int m_icount;
 
-	inline void SETREG(UINT32 reg,UINT32 val);
-	inline UINT32 GETREG(UINT32 reg);
-	UINT32 opUNDEF(UINT32 op);
-	UINT32 opMOVr(UINT32 op);
-	UINT32 opMOVEA(UINT32 op);
-	UINT32 opMOVHI(UINT32 op);
-	UINT32 opMOVi(UINT32 op);
-	UINT32 opADDr(UINT32 op);
-	UINT32 opADDi(UINT32 op);
-	UINT32 opADDI(UINT32 op);
-	UINT32 opSUBr(UINT32 op);
-	UINT32 opCMPr(UINT32 op);
-	UINT32 opCMPi(UINT32 op);
-	UINT32 opSETFi(UINT32 op);
-	UINT32 opANDr(UINT32 op);
-	UINT32 opANDI(UINT32 op);
-	UINT32 opORr(UINT32 op);
-	UINT32 opORI(UINT32 op);
-	UINT32 opXORr(UINT32 op);
-	UINT32 opLDSR(UINT32 op);
-	UINT32 opSTSR(UINT32 op);
-	UINT32 opXORI(UINT32 op);
-	UINT32 opNOTr(UINT32 op);
-	UINT32 opSHLr(UINT32 op);
-	UINT32 opSHLi(UINT32 op);
-	UINT32 opSHRr(UINT32 op);
-	UINT32 opSHRi(UINT32 op);
-	UINT32 opSARr(UINT32 op);
-	UINT32 opSARi(UINT32 op);
-	UINT32 opJMPr(UINT32 op);
-	UINT32 opJR(UINT32 op);
-	UINT32 opJAL(UINT32 op);
-	UINT32 opEI(UINT32 op);
-	UINT32 opDI(UINT32 op);
-	UINT32 opTRAP(UINT32 op);
-	UINT32 opRETI(UINT32 op);
-	UINT32 opHALT(UINT32 op);
-	UINT32 opB(UINT32 op);
-	UINT32 opLDB(UINT32 op);
-	UINT32 opLDH(UINT32 op);
-	UINT32 opLDW(UINT32 op);
-	UINT32 opINB(UINT32 op);
-	UINT32 opCAXI(UINT32 op);
-	UINT32 opINH(UINT32 op);
-	UINT32 opINW(UINT32 op);
-	UINT32 opSTB(UINT32 op);
-	UINT32 opSTH(UINT32 op);
-	UINT32 opSTW(UINT32 op);
-	UINT32 opOUTB(UINT32 op);
-	UINT32 opOUTH(UINT32 op);
-	UINT32 opOUTW(UINT32 op);
-	UINT32 opMULr(UINT32 op);
-	UINT32 opMULUr(UINT32 op);
-	UINT32 opDIVr(UINT32 op);
-	UINT32 opDIVUr(UINT32 op);
-	void opADDF(UINT32 op);
-	void opSUBF(UINT32 op);
-	void opMULF(UINT32 op);
-	void opDIVF(UINT32 op);
-	void opTRNC(UINT32 op);
-	void opCMPF(UINT32 op);
-	void opCVTS(UINT32 op);
-	void opCVTW(UINT32 op);
-	void opMPYHW(UINT32 op);
-	void opXB(UINT32 op);
-	void opXH(UINT32 op);
-	UINT32 opFpoint(UINT32 op);
-	UINT32 opBSU(UINT32 op);
+	inline void SETREG(uint32_t reg,uint32_t val);
+	inline uint32_t GETREG(uint32_t reg);
+	uint32_t opUNDEF(uint32_t op);
+	uint32_t opMOVr(uint32_t op);
+	uint32_t opMOVEA(uint32_t op);
+	uint32_t opMOVHI(uint32_t op);
+	uint32_t opMOVi(uint32_t op);
+	uint32_t opADDr(uint32_t op);
+	uint32_t opADDi(uint32_t op);
+	uint32_t opADDI(uint32_t op);
+	uint32_t opSUBr(uint32_t op);
+	uint32_t opCMPr(uint32_t op);
+	uint32_t opCMPi(uint32_t op);
+	uint32_t opSETFi(uint32_t op);
+	uint32_t opANDr(uint32_t op);
+	uint32_t opANDI(uint32_t op);
+	uint32_t opORr(uint32_t op);
+	uint32_t opORI(uint32_t op);
+	uint32_t opXORr(uint32_t op);
+	uint32_t opLDSR(uint32_t op);
+	uint32_t opSTSR(uint32_t op);
+	uint32_t opXORI(uint32_t op);
+	uint32_t opNOTr(uint32_t op);
+	uint32_t opSHLr(uint32_t op);
+	uint32_t opSHLi(uint32_t op);
+	uint32_t opSHRr(uint32_t op);
+	uint32_t opSHRi(uint32_t op);
+	uint32_t opSARr(uint32_t op);
+	uint32_t opSARi(uint32_t op);
+	uint32_t opJMPr(uint32_t op);
+	uint32_t opJR(uint32_t op);
+	uint32_t opJAL(uint32_t op);
+	uint32_t opEI(uint32_t op);
+	uint32_t opDI(uint32_t op);
+	uint32_t opTRAP(uint32_t op);
+	uint32_t opRETI(uint32_t op);
+	uint32_t opHALT(uint32_t op);
+	uint32_t opB(uint32_t op);
+	uint32_t opLDB(uint32_t op);
+	uint32_t opLDH(uint32_t op);
+	uint32_t opLDW(uint32_t op);
+	uint32_t opINB(uint32_t op);
+	uint32_t opCAXI(uint32_t op);
+	uint32_t opINH(uint32_t op);
+	uint32_t opINW(uint32_t op);
+	uint32_t opSTB(uint32_t op);
+	uint32_t opSTH(uint32_t op);
+	uint32_t opSTW(uint32_t op);
+	uint32_t opOUTB(uint32_t op);
+	uint32_t opOUTH(uint32_t op);
+	uint32_t opOUTW(uint32_t op);
+	uint32_t opMULr(uint32_t op);
+	uint32_t opMULUr(uint32_t op);
+	uint32_t opDIVr(uint32_t op);
+	uint32_t opDIVUr(uint32_t op);
+	void opADDF(uint32_t op);
+	void opSUBF(uint32_t op);
+	void opMULF(uint32_t op);
+	void opDIVF(uint32_t op);
+	void opTRNC(uint32_t op);
+	void opCMPF(uint32_t op);
+	void opCVTS(uint32_t op);
+	void opCVTW(uint32_t op);
+	void opMPYHW(uint32_t op);
+	void opXB(uint32_t op);
+	void opXH(uint32_t op);
+	uint32_t opFpoint(uint32_t op);
+	uint32_t opBSU(uint32_t op);
 	void take_interrupt();
 
 };

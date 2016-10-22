@@ -107,8 +107,8 @@ class pit68230_device :  public device_t//, public device_execute_interface
 {
 	public:
 	// construction/destruction
-	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template<class _Object> static devcb_base &set_pa_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_in_cb.set_callback (object); }
 	template<class _Object> static devcb_base &set_pa_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_out_cb.set_callback (object); }
 	template<class _Object> static devcb_base &set_pb_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pb_in_cb.set_callback (object); }
@@ -123,53 +123,53 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
 
-	void h1_set (UINT8 state);
-	void portb_setbit (UINT8 bit, UINT8 state);
+	void h1_set (uint8_t state);
+	void portb_setbit (uint8_t bit, uint8_t state);
 
-	void wr_pitreg_pgcr(UINT8 data);
-	void wr_pitreg_psrr(UINT8 data);
-	void wr_pitreg_paddr(UINT8 data);
-	void wr_pitreg_pbddr(UINT8 data);
-	void wr_pitreg_pcddr(UINT8 data);
-	void wr_pitreg_pivr(UINT8 data);
-	void wr_pitreg_pacr(UINT8 data);
-	void wr_pitreg_pbcr(UINT8 data);
-	void wr_pitreg_padr(UINT8 data);
-	void wr_pitreg_pbdr(UINT8 data);
-	void wr_pitreg_paar(UINT8 data);
-	void wr_pitreg_pbar(UINT8 data);
-	void wr_pitreg_pcdr(UINT8 data);
-	void wr_pitreg_psr(UINT8 data);
-	void wr_pitreg_tcr(UINT8 data);
-	void wr_pitreg_tivr(UINT8 data);
-	void wr_pitreg_cprh(UINT8 data);
-	void wr_pitreg_cprm(UINT8 data);
-	void wr_pitreg_cprl(UINT8 data);
-	void wr_pitreg_tsr(UINT8 data);
+	void wr_pitreg_pgcr(uint8_t data);
+	void wr_pitreg_psrr(uint8_t data);
+	void wr_pitreg_paddr(uint8_t data);
+	void wr_pitreg_pbddr(uint8_t data);
+	void wr_pitreg_pcddr(uint8_t data);
+	void wr_pitreg_pivr(uint8_t data);
+	void wr_pitreg_pacr(uint8_t data);
+	void wr_pitreg_pbcr(uint8_t data);
+	void wr_pitreg_padr(uint8_t data);
+	void wr_pitreg_pbdr(uint8_t data);
+	void wr_pitreg_paar(uint8_t data);
+	void wr_pitreg_pbar(uint8_t data);
+	void wr_pitreg_pcdr(uint8_t data);
+	void wr_pitreg_psr(uint8_t data);
+	void wr_pitreg_tcr(uint8_t data);
+	void wr_pitreg_tivr(uint8_t data);
+	void wr_pitreg_cprh(uint8_t data);
+	void wr_pitreg_cprm(uint8_t data);
+	void wr_pitreg_cprl(uint8_t data);
+	void wr_pitreg_tsr(uint8_t data);
 
-	UINT8 rr_pitreg_pgcr();
-	UINT8 rr_pitreg_psrr();
-	UINT8 rr_pitreg_paddr();
-	UINT8 rr_pitreg_pbddr();
-	UINT8 rr_pitreg_pcddr();
-	UINT8 rr_pitreg_pivr();
-	UINT8 rr_pitreg_pacr();
-	UINT8 rr_pitreg_pbcr();
-	UINT8 rr_pitreg_padr();
-	UINT8 rr_pitreg_pbdr();
-	UINT8 rr_pitreg_paar();
-	UINT8 rr_pitreg_pbar();
-	UINT8 rr_pitreg_pcdr();
-	UINT8 rr_pitreg_psr();
-	UINT8 rr_pitreg_tcr();
-	UINT8 rr_pitreg_tivr();
-	UINT8 rr_pitreg_cprh();
-	UINT8 rr_pitreg_cprm();
-	UINT8 rr_pitreg_cprl();
-	UINT8 rr_pitreg_cntrh();
-	UINT8 rr_pitreg_cntrm();
-	UINT8 rr_pitreg_cntrl();
-	UINT8 rr_pitreg_tsr();
+	uint8_t rr_pitreg_pgcr();
+	uint8_t rr_pitreg_psrr();
+	uint8_t rr_pitreg_paddr();
+	uint8_t rr_pitreg_pbddr();
+	uint8_t rr_pitreg_pcddr();
+	uint8_t rr_pitreg_pivr();
+	uint8_t rr_pitreg_pacr();
+	uint8_t rr_pitreg_pbcr();
+	uint8_t rr_pitreg_padr();
+	uint8_t rr_pitreg_pbdr();
+	uint8_t rr_pitreg_paar();
+	uint8_t rr_pitreg_pbar();
+	uint8_t rr_pitreg_pcdr();
+	uint8_t rr_pitreg_psr();
+	uint8_t rr_pitreg_tcr();
+	uint8_t rr_pitreg_tivr();
+	uint8_t rr_pitreg_cprh();
+	uint8_t rr_pitreg_cprm();
+	uint8_t rr_pitreg_cprl();
+	uint8_t rr_pitreg_cntrh();
+	uint8_t rr_pitreg_cntrm();
+	uint8_t rr_pitreg_cntrl();
+	uint8_t rr_pitreg_tsr();
 
 protected:
 
@@ -212,23 +212,23 @@ protected:
 	devcb_write_line    m_h4_out_cb;
 
 	// peripheral ports
-	UINT8 m_pgcr;           // Port General Control register
-	UINT8 m_psrr;           // Port Service Request register
-	UINT8 m_paddr;          // Port A Data Direction register
-	UINT8 m_pbddr;          // Port B Data Direction register
-	UINT8 m_pcddr;          // Port C Data Direction register
-	UINT8 m_pivr;           // Ports Interrupt vector
-	UINT8 m_pacr;           // Port A Control register
-	UINT8 m_pbcr;           // Port B Control register
-	UINT8 m_padr;           // Port A Data register
-	UINT8 m_pbdr;           // Port B Data register
-	UINT8 m_pcdr;           // Port C Data register
-	UINT8 m_psr;            // Port Status Register
-	UINT8 m_tcr;        // Timer Control Register
-	UINT8 m_tivr;       // Timer Interrupt Vector register
+	uint8_t m_pgcr;           // Port General Control register
+	uint8_t m_psrr;           // Port Service Request register
+	uint8_t m_paddr;          // Port A Data Direction register
+	uint8_t m_pbddr;          // Port B Data Direction register
+	uint8_t m_pcddr;          // Port C Data Direction register
+	uint8_t m_pivr;           // Ports Interrupt vector
+	uint8_t m_pacr;           // Port A Control register
+	uint8_t m_pbcr;           // Port B Control register
+	uint8_t m_padr;           // Port A Data register
+	uint8_t m_pbdr;           // Port B Data register
+	uint8_t m_pcdr;           // Port C Data register
+	uint8_t m_psr;            // Port Status Register
+	uint8_t m_tcr;        // Timer Control Register
+	uint8_t m_tivr;       // Timer Interrupt Vector register
 	int m_cpr;          // Counter Preload Registers (3 x 8 = 24 bits)
 	int   m_cntr;       // - The 24 bit Counter
-	UINT8 m_tsr;        // Timer Status Register
+	uint8_t m_tsr;        // Timer Status Register
 
 	// Timers
 	emu_timer *pit_timer;

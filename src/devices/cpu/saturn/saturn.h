@@ -76,7 +76,7 @@ class saturn_device : public cpu_device
 {
 public:
 	// construction/destruction
-	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
@@ -94,9 +94,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 2; }
-	virtual UINT32 execute_max_cycles() const override { return 21; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_max_cycles() const override { return 21; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -109,9 +109,9 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -126,60 +126,60 @@ private:
 	devcb_write_line  m_rsi_func;
 
 // 64 bit, unpacked (one nibble per byte)
-typedef UINT8 Saturn64[16];
+typedef uint8_t Saturn64[16];
 
 	Saturn64 m_reg[9]; //r0,r1,r2,r3,r4,a,b,c,d
 
-	UINT32 m_d[2], m_pc, m_oldpc, m_rstk[8]; // 20 bit, packed addresses
+	uint32_t m_d[2], m_pc, m_oldpc, m_rstk[8]; // 20 bit, packed addresses
 
-	UINT8 m_p; // 4 bit pointer
+	uint8_t m_p; // 4 bit pointer
 
-		UINT16 m_out; // 12 bit (packed)
-	UINT8  m_carry, m_decimal;
-	UINT16 m_st; // status 16 bit
+		uint16_t m_out; // 12 bit (packed)
+	uint8_t  m_carry, m_decimal;
+	uint16_t m_st; // status 16 bit
 
-	UINT8 m_hst; // hardware status 4 bit
+	uint8_t m_hst; // hardware status 4 bit
 
-	UINT8   m_nmi_state;
-	UINT8   m_irq_state;
-	UINT8   m_irq_enable;     /* INTON / INTOFF */
-	UINT8   m_in_irq;         /* already servicing IRQ */
-	UINT8   m_pending_irq;    /* IRQ is pending */
-	UINT8   m_sleeping;       /* low-consumption state */
+	uint8_t   m_nmi_state;
+	uint8_t   m_irq_state;
+	uint8_t   m_irq_enable;     /* INTON / INTOFF */
+	uint8_t   m_in_irq;         /* already servicing IRQ */
+	uint8_t   m_pending_irq;    /* IRQ is pending */
+	uint8_t   m_sleeping;       /* low-consumption state */
 	int     m_monitor_id;
 	int     m_monitor_in;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	int m_icount;
-	INT64 m_debugger_temp;
+	int64_t m_debugger_temp;
 
 	void saturn_take_irq();
-	void IntReg64(Saturn64 r, INT64 d);
-	INT64 Reg64Int(Saturn64 r);
+	void IntReg64(Saturn64 r, int64_t d);
+	int64_t Reg64Int(Saturn64 r);
 
 	inline int READ_OP();
 	inline int READ_OP_ARG();
 	inline int READ_OP_ARG8();
-	inline INT8 READ_OP_DIS8();
+	inline int8_t READ_OP_DIS8();
 	inline int READ_OP_ARG12();
 	inline int READ_OP_DIS12();
 	inline int READ_OP_ARG16();
-	inline INT16 READ_OP_DIS16();
+	inline int16_t READ_OP_DIS16();
 	inline int READ_OP_ARG20();
-	inline int READ_NIBBLE(UINT32 adr);
-	inline int READ_8(UINT32 adr);
-	inline int READ_12(UINT32 adr);
-	inline int READ_16(UINT32 adr);
-	inline int READ_20(UINT32 adr);
-	inline void WRITE_NIBBLE(UINT32 adr, UINT8 nib);
+	inline int READ_NIBBLE(uint32_t adr);
+	inline int READ_8(uint32_t adr);
+	inline int READ_12(uint32_t adr);
+	inline int READ_16(uint32_t adr);
+	inline int READ_20(uint32_t adr);
+	inline void WRITE_NIBBLE(uint32_t adr, uint8_t nib);
 	inline int S64_READ_X(int r);
 	inline int S64_READ_WORD(int r);
 	inline int S64_READ_A(int r);
 	inline void S64_WRITE_X(int r, int v);
 	inline void S64_WRITE_WORD(int r, int v);
 	inline void S64_WRITE_A(int r, int v);
-	inline UINT32 saturn_pop();
-	inline void saturn_push(UINT32 adr);
+	inline uint32_t saturn_pop();
+	inline void saturn_push(uint32_t adr);
 	inline void saturn_interrupt_on();
 	inline void saturn_interrupt_off();
 	inline void saturn_reset_interrupt();
@@ -258,7 +258,7 @@ typedef UINT8 Saturn64[16];
 	inline void saturn_exchange(int left, int begin, int count, int right);
 	inline void saturn_copy(int dest, int begin, int count, int src);
 	inline void saturn_add(int reg, int begin, int count, int right);
-	inline void saturn_add_const(int reg, int begin, int count, UINT8 right);
+	inline void saturn_add_const(int reg, int begin, int count, uint8_t right);
 	inline void saturn_sub(int reg, int begin, int count, int right);
 	inline void saturn_sub_const(int reg, int begin, int count, int right);
 	inline void saturn_sub2(int reg, int begin, int count, int right);

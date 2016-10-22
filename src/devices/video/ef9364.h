@@ -40,7 +40,7 @@ class ef9364_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -48,12 +48,12 @@ public:
 
 	// device interface
 
-	void update_scanline(UINT16 scanline);
-	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
+	void update_scanline(uint16_t scanline);
+	void set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void char_latch_w(UINT8 data);
-	void command_w(UINT8 cmd);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void char_latch_w(uint8_t data);
+	void command_w(uint8_t cmd);
 
 protected:
 	// device-level overrides
@@ -70,18 +70,18 @@ protected:
 
 private:
 	void set_video_mode(void);
-	void draw_border(UINT16 line);
+	void draw_border(uint16_t line);
 
 	// internal state
 
-	required_region_ptr<UINT8> m_charset;
+	required_region_ptr<uint8_t> m_charset;
 	address_space *m_textram;
 
-	UINT8 x_curs_pos;
-	UINT8 y_curs_pos;
-	UINT8 char_latch;
+	uint8_t x_curs_pos;
+	uint8_t y_curs_pos;
+	uint8_t char_latch;
 
-	UINT8 m_border[80];                     //border color
+	uint8_t m_border[80];                     //border color
 
 	rgb_t palette[2];
 	int   nb_of_pages;
@@ -91,7 +91,7 @@ private:
 	int   cursor_cnt;
 	int   cursor_state;
 
-	UINT32 clock_freq;
+	uint32_t clock_freq;
 	bitmap_rgb32 m_screen_out;
 
 	required_device<palette_device> m_palette;

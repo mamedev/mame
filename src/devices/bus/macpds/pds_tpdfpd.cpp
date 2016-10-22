@@ -86,7 +86,7 @@ const tiny_rom_entry *macpds_sedisplay_device::device_rom_region() const
 //  macpds_sedisplay_device - constructor
 //-------------------------------------------------
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PDS_SEDISPLAY, "Radius SE Full Page Display", tag, owner, clock, "pds_sefp", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
@@ -95,7 +95,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
@@ -115,7 +115,7 @@ void macpds_sedisplay_device::device_start()
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xc00000);
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xf80000);
 
-	m_vram = std::make_unique<UINT8[]>(VRAM_SIZE);
+	m_vram = std::make_unique<uint8_t[]>(VRAM_SIZE);
 
 	static const char bankname[] = { "radpds_ram" };
 	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, bankname, m_vram.get());
@@ -160,11 +160,11 @@ void macpds_sedisplay_device::device_timer(emu_timer &timer, device_timer_id tid
 
 ***************************************************************************/
 
-UINT32 macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	vram = m_vram.get();
 

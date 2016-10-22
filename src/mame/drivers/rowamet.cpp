@@ -45,13 +45,13 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
-	UINT8 m_out_offs;
-	UINT8 m_sndcmd;
-	UINT8 m_io[16];
+	uint8_t m_out_offs;
+	uint8_t m_sndcmd;
+	uint8_t m_io[16];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 
 	if (offset == 2)
 	{
-		UINT8 cmd = (m_io[2]>>4) | (m_io[3] & 0xf0);
+		uint8_t cmd = (m_io[2]>>4) | (m_io[3] & 0xf0);
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
@@ -188,7 +188,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 
 void rowamet_state::machine_reset()
 {
-	UINT8 i;
+	uint8_t i;
 	m_out_offs = 0;
 	m_sndcmd = 0;
 	for (i = 0; i < 16; i++)
@@ -197,10 +197,10 @@ void rowamet_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446
 	m_out_offs &= 15;
 
-	UINT8 digit = m_out_offs << 1;
+	uint8_t digit = m_out_offs << 1;
 	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
 	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }

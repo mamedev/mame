@@ -36,10 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
 private:
-	UINT8 m_port2;
-	UINT8 m_segment;
-	UINT8 m_lamprow;
-	UINT8 m_swrow;
+	uint8_t m_port2;
+	uint8_t m_segment;
+	uint8_t m_lamprow;
+	uint8_t m_swrow;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
@@ -250,7 +250,7 @@ INPUT_PORTS_END
 READ8_MEMBER( gts80a_state::port1a_r )
 {
 	char kbdrow[8];
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if ((m_lamprow < 4) && (m_segment==0x80))
 	{
 		sprintf(kbdrow,"DSW.%d",m_lamprow);
@@ -280,9 +280,9 @@ WRITE8_MEMBER( gts80a_state::port1b_w )
 WRITE8_MEMBER( gts80a_state::port2a_w )
 {
 	m_port2 = data;
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
-	UINT16 seg1 = (UINT16)patterns[m_segment & 15];
-	UINT16 seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
+	uint16_t seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2
@@ -314,7 +314,7 @@ WRITE8_MEMBER( gts80a_state::port3a_w )
 //pb0-3 = sound; pb4-7 = lamprow
 WRITE8_MEMBER( gts80a_state::port3b_w )
 {
-	UINT8 sndcmd = data & 15;
+	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
@@ -390,21 +390,21 @@ public:
 	{ }
 
 
-	UINT32 screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_videocpu;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 };
 
-UINT32 caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
 		for (int x = 0; x < 256; x += 4)
 		{
-			UINT8 pix = m_vram[count];
+			uint8_t pix = m_vram[count];
 
 			bitmap.pix16(y, x+0) = (pix >> 6)&0x3;
 			bitmap.pix16(y, x+1) = (pix >> 4)&0x3;

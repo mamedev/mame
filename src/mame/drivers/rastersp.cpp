@@ -98,7 +98,7 @@ public:
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_dsp;
-	required_shared_ptr<UINT32>     m_dram;
+	required_shared_ptr<uint32_t>     m_dram;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device>   m_tms_timer1;
@@ -128,18 +128,18 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	std::unique_ptr<UINT8[]>   m_nvram8;
-	UINT8   m_io_reg;
-	UINT8   m_irq_status;
-	UINT32  m_dpyaddr;
-	std::unique_ptr<UINT16[]> m_paletteram;
-	UINT32  m_speedup_count;
-	UINT32  m_tms_io_regs[0x80];
+	std::unique_ptr<uint8_t[]>   m_nvram8;
+	uint8_t   m_io_reg;
+	uint8_t   m_irq_status;
+	uint32_t  m_dpyaddr;
+	std::unique_ptr<uint16_t[]> m_paletteram;
+	uint32_t  m_speedup_count;
+	uint32_t  m_tms_io_regs[0x80];
 	bitmap_ind16 m_update_bitmap;
 
-	UINT32  screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void    update_irq(UINT32 which, UINT32 state);
-	void    upload_palette(UINT32 word1, UINT32 word2);
+	uint32_t  screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void    update_irq(uint32_t which, uint32_t state);
+	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:
 	// driver_device overrides
@@ -158,9 +158,9 @@ protected:
 
 void rastersp_state::machine_start()
 {
-	m_nvram8 = std::make_unique<UINT8[]>(NVRAM_SIZE);
+	m_nvram8 = std::make_unique<uint8_t[]>(NVRAM_SIZE);
 	m_nvram->set_base(m_nvram8.get(),NVRAM_SIZE);
-	m_paletteram = std::make_unique<UINT16[]>(0x8000);
+	m_paletteram = std::make_unique<uint16_t[]>(0x8000);
 
 	membank("bank1")->set_base(m_dram);
 	membank("bank2")->set_base(&m_dram[0x10000/4]);
@@ -215,18 +215,18 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 		return;
 	}
 
-	UINT32 dpladdr = (m_dpyaddr & ~0xff) >> 6;
+	uint32_t dpladdr = (m_dpyaddr & ~0xff) >> 6;
 
 	if ((m_dpyaddr & 0xff) != 0xb2 && (m_dpyaddr & 0xff) != 0xf2)
 		logerror("Unusual display list data: %x\n", m_dpyaddr);
 
 	int y = 0;
 	int x = 0;
-	UINT16 *bmpptr = &m_update_bitmap.pix16(0, 0);
+	uint16_t *bmpptr = &m_update_bitmap.pix16(0, 0);
 
 	while (y < 240)
 	{
-		UINT32 word1 = m_dram[dpladdr/4];
+		uint32_t word1 = m_dram[dpladdr/4];
 
 		if (word1 & 0x80000000)
 		{
@@ -235,7 +235,7 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 		}
 		else
 		{
-			UINT32 word2 = m_dram[(dpladdr + 4)/4];
+			uint32_t word2 = m_dram[(dpladdr + 4)/4];
 
 			dpladdr += 8;
 
@@ -244,16 +244,16 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 				if ((word2 & 0xfe000000) != 0x94000000)
 					logerror("Unusual display list entry: %x %x\n", word1, word2);
 
-				UINT32 srcaddr = word1 >> 8;
-				UINT32 pixels = (word2 >> 16) & 0x1ff;
-				UINT32 palbase = (word2 >> 4) & 0xf00;
+				uint32_t srcaddr = word1 >> 8;
+				uint32_t pixels = (word2 >> 16) & 0x1ff;
+				uint32_t palbase = (word2 >> 4) & 0xf00;
 
-				UINT16* palptr = &m_paletteram[palbase];
-				UINT8* srcptr = reinterpret_cast<UINT8*>(&m_dram[0]);
+				uint16_t* palptr = &m_paletteram[palbase];
+				uint8_t* srcptr = reinterpret_cast<uint8_t*>(&m_dram[0]);
 
-				UINT32 acc = srcaddr << 8;
+				uint32_t acc = srcaddr << 8;
 
-				INT32 incr = word2 & 0xfff;
+				int32_t incr = word2 & 0xfff;
 
 				// Sign extend for our convenience
 				incr |= ~((incr & 0x800) - 1) & ~0xff;
@@ -290,20 +290,20 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 }
 
 
-void rastersp_state::upload_palette(UINT32 word1, UINT32 word2)
+void rastersp_state::upload_palette(uint32_t word1, uint32_t word2)
 {
 	if (word1 & 3)
 		fatalerror("Unalligned palette address! (%x, %x)\n", word1, word2);
 
-	UINT32 addr = word1 >> 8;
-	UINT32 entries = (word2 >> 16) & 0x1ff;
-	UINT32 index = ((word2 >> 12) & 0x1f) * 256;
+	uint32_t addr = word1 >> 8;
+	uint32_t entries = (word2 >> 16) & 0x1ff;
+	uint32_t index = ((word2 >> 12) & 0x1f) * 256;
 
 	// The third byte of each entry in RAM appears to contain an index
 	// but appears to be discared when written to palette RAM
 	while (entries--)
 	{
-		UINT32 data = m_dram[addr / 4];
+		uint32_t data = m_dram[addr / 4];
 		m_paletteram[index++] = data & 0xffff;
 		addr += 4;
 	}
@@ -349,7 +349,7 @@ Unknown: (D4000100) - Present at start of a list
 
 *******************************************************************************/
 
-UINT32 rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_update_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -365,7 +365,7 @@ UINT32 rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 IRQ_CALLBACK_MEMBER(rastersp_state::irq_callback)
 {
-	UINT8 vector = 0;
+	uint8_t vector = 0;
 
 	if (m_irq_status & (1 << IRQ_SCSI))
 	{
@@ -390,9 +390,9 @@ IRQ_CALLBACK_MEMBER(rastersp_state::irq_callback)
 }
 
 
-void rastersp_state::update_irq(UINT32 which, UINT32 state)
+void rastersp_state::update_irq(uint32_t which, uint32_t state)
 {
-	UINT32 mask = 1 << which;
+	uint32_t mask = 1 << which;
 
 	if (state)
 		m_irq_status |= mask;
@@ -467,7 +467,7 @@ WRITE8_MEMBER( rastersp_state::nvram_w )
 
 	offset &= ~0x2000;
 
-	UINT32 addr = ((offset & 0x00f0000) >> 5) | ((offset & 0x1fff) / 4);
+	uint32_t addr = ((offset & 0x00f0000) >> 5) | ((offset & 0x1fff) / 4);
 
 	m_nvram8[addr] = data & 0xff;
 }
@@ -484,7 +484,7 @@ READ8_MEMBER( rastersp_state::nvram_r )
 
 	offset &= ~0x2000;
 
-	UINT32 addr = ((offset & 0x00f0000) >> 5) | ((offset & 0x1fff) / 4);
+	uint32_t addr = ((offset & 0x00f0000) >> 5) | ((offset & 0x1fff) / 4);
 
 	return m_nvram8[addr];
 }
@@ -508,7 +508,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_tx_timer )
 	// Is the transmit shifter full?
 	if (m_tms_io_regs[SPORT_GLOBAL_CTL] & (1 << 3))
 	{
-		UINT32 data = m_tms_io_regs[SPORT_DATA_TX];
+		uint32_t data = m_tms_io_regs[SPORT_DATA_TX];
 
 		m_ldac->write(data & 0xffff);
 		m_rdac->write(data >> 16);
@@ -536,7 +536,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_timer1 )
 
 READ32_MEMBER( rastersp_state::tms32031_control_r )
 {
-	UINT32 val = m_tms_io_regs[offset];
+	uint32_t val = m_tms_io_regs[offset];
 
 	switch (offset)
 	{
@@ -559,7 +559,7 @@ READ32_MEMBER( rastersp_state::tms32031_control_r )
 
 WRITE32_MEMBER( rastersp_state::tms32031_control_w )
 {
-	UINT32 old = m_tms_io_regs[offset];
+	uint32_t old = m_tms_io_regs[offset];
 
 	m_tms_io_regs[offset] = data;
 
@@ -644,7 +644,7 @@ WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 	// 809e90  48fd, 48d5
 	if (space.device().safe_pc() == 0x809c23)
 	{
-		INT32 cycles_left = space.device().execute().cycles_remaining();
+		int32_t cycles_left = space.device().execute().cycles_remaining();
 		data += cycles_left / 6;
 		space.device().execute().spin();
 	}

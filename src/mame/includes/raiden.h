@@ -32,21 +32,21 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
-	required_shared_ptr<UINT16> m_shared_ram;
-	required_shared_ptr<UINT16> m_videoram;
-	optional_shared_ptr<UINT16> m_scroll_ram;
-	required_shared_ptr<UINT16> m_back_data;
-	required_shared_ptr<UINT16> m_fore_data;
+	required_shared_ptr<uint16_t> m_shared_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	optional_shared_ptr<uint16_t> m_scroll_ram;
+	required_shared_ptr<uint16_t> m_back_data;
+	required_shared_ptr<uint16_t> m_fore_data;
 
 	tilemap_t *m_bg_layer;
 	tilemap_t *m_fg_layer;
 	tilemap_t *m_tx_layer;
-	UINT8 m_bg_layer_enabled;
-	UINT8 m_fg_layer_enabled;
-	UINT8 m_tx_layer_enabled;
-	UINT8 m_sp_layer_enabled;
-	UINT8 m_flipscreen;
-	UINT16 m_raidenb_scroll_ram[6];
+	uint8_t m_bg_layer_enabled;
+	uint8_t m_fg_layer_enabled;
+	uint8_t m_tx_layer_enabled;
+	uint8_t m_sp_layer_enabled;
+	uint8_t m_flipscreen;
+	uint16_t m_raidenb_scroll_ram[6];
 
 	DECLARE_WRITE16_MEMBER(raiden_background_w);
 	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
@@ -66,9 +66,9 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(raidenb);
 
-	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *scrollregs);
-	UINT32 screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *scrollregs);
+	uint32_t screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(raiden_interrupt);
 

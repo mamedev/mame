@@ -95,7 +95,7 @@ READ8_MEMBER(esripsys_state::g_status_r)
 WRITE8_MEMBER(esripsys_state::g_status_w)
 {
 	int bankaddress;
-	UINT8 *rom = memregion("game_cpu")->base();
+	uint8_t *rom = memregion("game_cpu")->base();
 
 	m_g_status = data;
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 READ8_MEMBER(esripsys_state::f_status_r)
 {
 	int vblank = m_screen->vblank();
-	UINT8 rip_status = m_videocpu->get_rip_status();
+	uint8_t rip_status = m_videocpu->get_rip_status();
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -229,8 +229,8 @@ WRITE16_MEMBER( esripsys_state::fdt_rip_w )
 READ8_MEMBER(esripsys_state::rip_status_in)
 {
 	int vpos =  m_screen->vpos();
-	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
-//  UINT8 _hblank = !m_screen->hblank();
+	uint8_t _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
+//  uint8_t _hblank = !m_screen->hblank();
 
 	return  _vblank
 			| (m_hblank << 1)
@@ -478,7 +478,7 @@ WRITE8_MEMBER(esripsys_state::s_200e_w)
 
 WRITE8_MEMBER(esripsys_state::s_200f_w)
 {
-	UINT8 *rom = memregion("sound_data")->base();
+	uint8_t *rom = memregion("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -510,7 +510,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		UINT8 status = m_tms->status_r(space, 0);
+		uint8_t status = m_tms->status_r(space, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (m_tms->readyq_r() << 7) | (m_tms->intq_r() << 6) | status;
@@ -551,7 +551,7 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 	}
 	else
 	{
-		UINT16 dac_data = (m_dac_msb << 8) | data;
+		uint16_t dac_data = (m_dac_msb << 8) | data;
 		m_dac->write(dac_data);
 	}
 }
@@ -616,11 +616,11 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 {
-	UINT8 *rom = memregion("sound_data")->base();
+	uint8_t *rom = memregion("sound_data")->base();
 
-	m_fdt_a = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
-	m_fdt_b = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
-	m_cmos_ram = std::make_unique<UINT8[]>(CMOS_RAM_SIZE);
+	m_fdt_a = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
+	m_fdt_b = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
+	m_cmos_ram = std::make_unique<uint8_t[]>(CMOS_RAM_SIZE);
 
 	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 

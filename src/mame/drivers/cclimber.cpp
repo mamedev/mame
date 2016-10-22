@@ -2584,7 +2584,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
-	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
+	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
 	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
 
@@ -2610,7 +2610,7 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 
 DRIVER_INIT_MEMBER(cclimber_state,dking)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	int i;
 	int j;
 
@@ -2624,7 +2624,7 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 
 DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 	/* Bits are inverted */
 	for (int i = 0x0000; i < 0x5000; i++)

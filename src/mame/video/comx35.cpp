@@ -10,7 +10,7 @@
 
 WRITE8_MEMBER( comx35_state::cdp1869_w )
 {
-	UINT16 ma = m_maincpu->get_memory_address();
+	uint16_t ma = m_maincpu->get_memory_address();
 
 	switch (offset)
 	{
@@ -44,16 +44,16 @@ ADDRESS_MAP_END
 
 CDP1869_CHAR_RAM_READ_MEMBER( comx35_state::comx35_charram_r )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	return m_char_ram[charaddr];
 }
 
 CDP1869_CHAR_RAM_WRITE_MEMBER( comx35_state::comx35_charram_w )
 {
-	UINT8 column = pmd & 0x7f;
-	UINT16 charaddr = (column << 4) | cma;
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
 
 	m_char_ram[charaddr] = data;
 }

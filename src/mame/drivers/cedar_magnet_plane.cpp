@@ -9,7 +9,7 @@
 extern const device_type CEDAR_MAGNET_PLANE = &device_creator<cedar_magnet_plane_device>;
 
 
-cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cedar_magnet_board_device(mconfig, CEDAR_MAGNET_PLANE, "Cedar Plane", tag, owner, clock, "cedmag_plane", __FILE__)
 {
 }
@@ -134,11 +134,11 @@ machine_config_constructor cedar_magnet_plane_device::device_mconfig_additions()
 void cedar_magnet_plane_device::device_start()
 {
 	m_cpu = subdevice<z80_device>("planecpu");
-	m_ram = (UINT8*)memshare("ram")->ptr();
+	m_ram = (uint8_t*)memshare("ram")->ptr();
 	save_item(NAME(m_framebuffer));
 }
 
-UINT32 cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
+uint32_t cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
 {
 	int count = 0;
 
@@ -147,11 +147,11 @@ UINT32 cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int y = 0;y < 256;y++)
 	{
-		UINT16 *dst = &bitmap.pix16((y-m_scrolly)&0xff);
+		uint16_t *dst = &bitmap.pix16((y-m_scrolly)&0xff);
 
 		for (int x = 0; x < 256;x++)
 		{
-			UINT8 pix = m_framebuffer[count];
+			uint8_t pix = m_framebuffer[count];
 			count++;
 
 			if (pix) dst[(x-m_scrollx)&0xff] = pix + palbase*0x100;

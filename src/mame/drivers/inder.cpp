@@ -78,14 +78,14 @@ public:
 	DECLARE_DRIVER_INIT(inder1);
 private:
 	bool m_pc0;
-	UINT8 m_game;
-	UINT8 m_portc;
-	UINT8 m_row;
-	UINT8 m_segment[8];
-	UINT8 m_sndcmd;
-	UINT8 m_sndbank;
-	UINT32 m_sound_addr;
-	UINT8 *m_p_speech;
+	uint8_t m_game;
+	uint8_t m_portc;
+	uint8_t m_row;
+	uint8_t m_segment[8];
+	uint8_t m_sndcmd;
+	uint8_t m_sndbank;
+	uint32_t m_sound_addr;
+	uint8_t *m_p_speech;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -1178,7 +1178,7 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 
 WRITE8_MEMBER( inder_state::disp_w )
 {
-	UINT8 i;
+	uint8_t i;
 	if (offset < 8)
 		m_segment[offset] = data;
 	else
@@ -1194,7 +1194,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 WRITE8_MEMBER( inder_state::ppi60a_w )
 {
 	if (data)
-		for (UINT8 i = 0; i < 8; i++)
+		for (uint8_t i = 0; i < 8; i++)
 			if (BIT(data, i))
 				m_row = i;
 }
@@ -1203,14 +1203,14 @@ WRITE8_MEMBER( inder_state::ppi60a_w )
 WRITE8_MEMBER( inder_state::ppi60b_w )
 {
 	if (data & 7)
-		for (UINT8 i = 0; i < 3; i++)
+		for (uint8_t i = 0; i < 3; i++)
 			if (BIT(data, i))
 				m_row = i+8;
 }
 
 WRITE8_MEMBER( inder_state::ppi64c_w )
 {
-	UINT8 i;
+	uint8_t i;
 	data &= 15;
 	if (BIT(data, 3)) // 8 to 15)
 	{
@@ -1227,7 +1227,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 WRITE8_MEMBER( inder_state::sndbank_w )
 {
 	m_sndbank = data;
-	UINT8 i;
+	uint8_t i;
 	// look for last rom enabled
 	for (i = 0; i < 4; i++)
 		if (!(BIT(data, i)))

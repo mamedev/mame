@@ -102,7 +102,7 @@ public:
 		m_screen(*this, "screen")
 		{ }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
@@ -129,9 +129,9 @@ public:
 	required_device<msm5832_device> m_rtc;
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
-	UINT8 m_mc6845_address;
-	UINT16 m_video_update_address;
-	UINT8 m_rtc_data;
+	uint8_t m_mc6845_address;
+	uint16_t m_video_update_address;
+	uint8_t m_rtc_data;
 };
 
 

@@ -113,22 +113,22 @@ public:
 
 	int m_segac2_enable_display;
 
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram;
 	optional_memory_region m_upd_region;
 
 	/* protection-related tracking */
 	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
-	UINT8       m_prot_write_buf;       /* remembers what was written */
-	UINT8       m_prot_read_buf;        /* remembers what was returned */
+	uint8_t       m_prot_write_buf;       /* remembers what was written */
+	uint8_t       m_prot_read_buf;        /* remembers what was returned */
 
 	/* palette-related variables */
-	UINT8       m_segac2_alt_palette_mode;
-	UINT8       m_palbank;
-	UINT8       m_bg_palbase;
-	UINT8       m_sp_palbase;
+	uint8_t       m_segac2_alt_palette_mode;
+	uint8_t       m_palbank;
+	uint8_t       m_bg_palbase;
+	uint8_t       m_sp_palbase;
 
 	/* sound-related variables */
-	UINT8       m_sound_banks;      /* number of sound banks */
+	uint8_t       m_sound_banks;      /* number of sound banks */
 
 	DECLARE_DRIVER_INIT(c2boot);
 	DECLARE_DRIVER_INIT(bloxeedc);
@@ -160,7 +160,7 @@ public:
 	DECLARE_MACHINE_START(segac2);
 	DECLARE_MACHINE_RESET(segac2);
 
-	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
@@ -1421,7 +1421,7 @@ VIDEO_START_MEMBER(segac2_state,segac2_new)
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
 //  and applies it's own external colour circuity
-UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
 	if (!m_segac2_enable_display)
@@ -1433,14 +1433,14 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32* desty = &bitmap.pix32(y, 0);
-		UINT16* srcy;
+		uint32_t* desty = &bitmap.pix32(y, 0);
+		uint16_t* srcy;
 
 		srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 src = srcy[x];
+			uint16_t src = srcy[x];
 			switch (src & 0x1c0)
 			{
 				case 0x000:

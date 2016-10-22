@@ -98,25 +98,25 @@ protected:
 	optional_device<s11c_bg_device> m_bg;
 
 	// getters/setters
-	UINT8 get_strobe() { return m_strobe; }
-	void set_strobe(UINT8 s) { m_strobe = s; }
-	UINT8 get_diag() { return m_diag; }
-	void set_diag(UINT8 d) { m_diag = d; }
-	UINT32 get_segment1() { return m_segment1; }
-	void set_segment1(UINT32 s) { m_segment1 = s; }
-	UINT32 get_segment2() { return m_segment2; }
-	void set_segment2(UINT32 s) { m_segment2 = s; }
+	uint8_t get_strobe() { return m_strobe; }
+	void set_strobe(uint8_t s) { m_strobe = s; }
+	uint8_t get_diag() { return m_diag; }
+	void set_diag(uint8_t d) { m_diag = d; }
+	uint32_t get_segment1() { return m_segment1; }
+	void set_segment1(uint32_t s) { m_segment1 = s; }
+	uint32_t get_segment2() { return m_segment2; }
+	void set_segment2(uint32_t s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 private:
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	UINT8 m_diag;
-	UINT32 m_segment1;
-	UINT32 m_segment2;
+	uint8_t m_sound_data;
+	uint8_t m_strobe;
+	uint8_t m_kbdrow;
+	uint8_t m_diag;
+	uint32_t m_segment1;
+	uint32_t m_segment2;
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
 };

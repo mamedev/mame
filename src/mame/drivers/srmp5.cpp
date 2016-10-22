@@ -82,23 +82,23 @@ public:
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 
-	required_region_ptr<UINT16> m_chrrom;
+	required_region_ptr<uint16_t> m_chrrom;
 
 	required_ioport_array<4> m_keys;
 
-	UINT32 m_chrbank;
-	std::unique_ptr<UINT16[]> m_tileram;
-	std::unique_ptr<UINT16[]> m_sprram;
+	uint32_t m_chrbank;
+	std::unique_ptr<uint16_t[]> m_tileram;
+	std::unique_ptr<uint16_t[]> m_sprram;
 
-	UINT8 m_input_select;
+	uint8_t m_input_select;
 
-	UINT8 m_cmd1;
-	UINT8 m_cmd2;
-	UINT8 m_cmd_stat;
+	uint8_t m_cmd1;
+	uint8_t m_cmd2;
+	uint8_t m_cmd_stat;
 
-	UINT32 m_vidregs[0x120 / 4];
+	uint32_t m_vidregs[0x120 / 4];
 #ifdef DEBUG_CHAR
-	UINT8 m_tileduty[0x2000];
+	uint8_t m_tileduty[0x2000];
 #endif
 	DECLARE_WRITE32_MEMBER(bank_w);
 	DECLARE_READ32_MEMBER(tileram_r);
@@ -119,35 +119,35 @@ public:
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(srmp5);
-	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 };
 
 
-UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
-	UINT16 *sprite_list=m_sprram.get();
-	UINT16 *sprite_list_end=&m_sprram[0x4000]; //guess
-	UINT8 *pixels=(UINT8 *)m_tileram.get();
+	uint16_t *sprite_list=m_sprram.get();
+	uint16_t *sprite_list_end=&m_sprram[0x4000]; //guess
+	uint8_t *pixels=(uint8_t *)m_tileram.get();
 	const pen_t * const pens = m_palette->pens();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
 #ifdef BG_ENABLE
-	UINT8 tile_width  = (m_vidregs[2] >> 0) & 0xFF;
-	UINT8 tile_height = (m_vidregs[2] >> 8) & 0xFF;
+	uint8_t tile_width  = (m_vidregs[2] >> 0) & 0xFF;
+	uint8_t tile_height = (m_vidregs[2] >> 8) & 0xFF;
 	if(tile_width && tile_height)
 	{
 		// 16x16 tile
-		UINT16 *map = &sprram[0x2000];
+		uint16_t *map = &sprram[0x2000];
 		for(yw = 0; yw < tile_height; yw++)
 		{
 			for(xw = 0; xw < tile_width; xw++)
 			{
-				UINT16 tile = map[yw * 128 + xw * 2];
+				uint16_t tile = map[yw * 128 + xw * 2];
 				if(tile >= 0x2000) continue;
 
 				address = tile * SPRITE_DATA_GRANULARITY;
@@ -155,7 +155,7 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 				{
 					for(x = 0; x < 16; x++)
 					{
-						UINT8 pen = pixels[BYTE_XOR_LE(address)];
+						uint8_t pen = pixels[BYTE_XOR_LE(address)];
 						if(pen)
 						{
 							bitmap.pix32(yw * 16 + y, xw * 16 + x) = pens[pen];
@@ -172,18 +172,18 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{
-		UINT16 *sprite_sublist=&m_sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
-		UINT16 sublist_length=sprite_list[SUBLIST_LENGTH];
-		INT16 global_x,global_y;
+		uint16_t *sprite_sublist=&m_sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
+		uint16_t sublist_length=sprite_list[SUBLIST_LENGTH];
+		int16_t global_x,global_y;
 
 		if(0!=sprite_list[SUBLIST_OFFSET])
 		{
-			global_x=(INT16)sprite_list[SPRITE_GLOBAL_X];
-			global_y=(INT16)sprite_list[SPRITE_GLOBAL_Y];
+			global_x=(int16_t)sprite_list[SPRITE_GLOBAL_X];
+			global_y=(int16_t)sprite_list[SPRITE_GLOBAL_Y];
 			while(sublist_length)
 			{
-				x=(INT16)sprite_sublist[SPRITE_LOCAL_X]+global_x;
-				y=(INT16)sprite_sublist[SPRITE_LOCAL_Y]+global_y;
+				x=(int16_t)sprite_sublist[SPRITE_LOCAL_X]+global_x;
+				y=(int16_t)sprite_sublist[SPRITE_LOCAL_Y]+global_y;
 				width =(sprite_sublist[SPRITE_SIZE]>> 4)&0xf;
 				height=(sprite_sublist[SPRITE_SIZE]>>12)&0xf;
 
@@ -203,7 +203,7 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 							ys2 = (sprite_sublist[SPRITE_PALETTE] & 0x4000) ? ys : (sizey - ys);
 							for(xs=0;xs<=sizex;xs++)
 							{
-								UINT8 pen=pixels[BYTE_XOR_LE(address)&(0x100000-1)];
+								uint8_t pen=pixels[BYTE_XOR_LE(address)&(0x100000-1)];
 								xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
 								if(pen)
 								{
@@ -257,7 +257,7 @@ void srmp5_state::machine_start()
 
 WRITE32_MEMBER(srmp5_state::bank_w)
 {
-	m_chrbank = ((data & 0xf0) >> 4) * (0x100000 / sizeof(UINT16));
+	m_chrbank = ((data & 0xf0) >> 4) * (0x100000 / sizeof(uint16_t));
 }
 
 READ32_MEMBER(srmp5_state::tileram_r)
@@ -295,7 +295,7 @@ WRITE32_MEMBER(srmp5_state::input_select_w)
 
 READ32_MEMBER(srmp5_state::srmp5_inputs_r)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (m_input_select)
 	{
@@ -612,8 +612,8 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 {
 	m_maincpu->set_st0016_game_flag(9);
 
-	m_tileram = std::make_unique<UINT16[]>(0x100000/2);
-	m_sprram  = std::make_unique<UINT16[]>(0x080000/2);
+	m_tileram = std::make_unique<uint16_t[]>(0x100000/2);
+	m_sprram  = std::make_unique<uint16_t[]>(0x080000/2);
 #ifdef DEBUG_CHAR
 	memset(m_tileduty, 1, 0x2000);
 #endif

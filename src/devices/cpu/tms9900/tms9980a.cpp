@@ -74,7 +74,7 @@
     Constructor
 ****************************************************************************/
 
-tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms99xx_device(mconfig, TMS9980A, "TMS9980A", tag, 8, 14, 11, owner, clock, "tms9980a", __FILE__)
 {
 }
@@ -92,16 +92,16 @@ void tms9980a_device::resolve_lines()
 	m_dbin_line.resolve();
 }
 
-UINT16 tms9980a_device::read_workspace_register_debug(int reg)
+uint16_t tms9980a_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
 	int addr = (WP+(reg<<1)) & 0xfffe & m_prgaddr_mask;
-	UINT16 value = (m_prgspace->read_byte(addr) << 8) | (m_prgspace->read_byte(addr+1) & 0xff);
+	uint16_t value = (m_prgspace->read_byte(addr) << 8) | (m_prgspace->read_byte(addr+1) & 0xff);
 	m_icount = temp;
 	return value;
 }
 
-void tms9980a_device::write_workspace_register_debug(int reg, UINT16 data)
+void tms9980a_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
 	int addr = (WP+(reg<<1)) & 0xfffe & m_prgaddr_mask;
@@ -175,7 +175,7 @@ void tms9980a_device::execute_set_input(int irqline, int state)
 */
 void tms9980a_device::mem_read()
 {
-	UINT8 value;
+	uint8_t value;
 	switch (m_mem_phase)
 	{
 	case 1:
@@ -260,18 +260,18 @@ void tms9980a_device::acquire_instruction()
 
 
 /**************************************************************************/
-UINT32 tms9980a_device::execute_min_cycles() const
+uint32_t tms9980a_device::execute_min_cycles() const
 {
 	return 2;
 }
 
 // TODO: Compute this value, just a wild guess for the average
-UINT32 tms9980a_device::execute_max_cycles() const
+uint32_t tms9980a_device::execute_max_cycles() const
 {
 	return 10;
 }
 
-UINT32 tms9980a_device::execute_input_lines() const
+uint32_t tms9980a_device::execute_input_lines() const
 {
 	return 8;
 }
@@ -281,17 +281,17 @@ UINT32 tms9980a_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-UINT32 tms9980a_device::disasm_min_opcode_bytes() const
+uint32_t tms9980a_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
 
-UINT32 tms9980a_device::disasm_max_opcode_bytes() const
+uint32_t tms9980a_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
 
-offs_t tms9980a_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms9980a_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9980 );
 	return CPU_DISASSEMBLE_NAME(tms9980)(this, buffer, pc, oprom, opram, options);

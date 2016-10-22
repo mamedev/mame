@@ -19,8 +19,8 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<dac_bit_interface> m_dac;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_battery_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_battery_ram;
 
 	int m_trigger;
 
@@ -34,7 +34,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(truco);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };

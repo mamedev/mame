@@ -18,7 +18,7 @@ class mb_vcu_device : public device_t,
 {
 public:
 	// construction/destruction
-	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
 	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
 
 protected:
@@ -47,25 +47,25 @@ protected:
 	virtual void device_reset() override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 private:
-	inline UINT8 read_byte(offs_t address);
-	inline void write_byte(offs_t address, UINT8 data);
-	inline UINT8 read_io(offs_t address);
-	inline void write_io(offs_t address, UINT8 data);
+	inline uint8_t read_byte(offs_t address);
+	inline void write_byte(offs_t address, uint8_t data);
+	inline uint8_t read_io(offs_t address);
+	inline void write_io(offs_t address, uint8_t data);
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;
-	UINT8 m_status;
-	std::unique_ptr<UINT8[]> m_ram;
-	std::unique_ptr<UINT8[]> m_palram;
-	UINT16 m_param_offset_latch;
+	uint8_t m_status;
+	std::unique_ptr<uint8_t[]> m_ram;
+	std::unique_ptr<uint8_t[]> m_palram;
+	uint16_t m_param_offset_latch;
 
-	INT16 m_xpos, m_ypos;
-	UINT8 m_color1, m_color2;
-	UINT8 m_mode;
-	UINT16 m_pix_xsize, m_pix_ysize;
-	UINT8 m_vregs[4];
-	UINT8 m_bk_color;
-	UINT8 m_vbank;
+	int16_t m_xpos, m_ypos;
+	uint8_t m_color1, m_color2;
+	uint8_t m_mode;
+	uint16_t m_pix_xsize, m_pix_ysize;
+	uint8_t m_vregs[4];
+	uint8_t m_bk_color;
+	uint8_t m_vbank;
 
 	double m_weights_r[2];
 	double m_weights_g[3];

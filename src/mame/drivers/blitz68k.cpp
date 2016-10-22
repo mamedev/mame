@@ -71,19 +71,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	optional_shared_ptr<UINT16> m_nvram;
-	std::unique_ptr<UINT8[]> m_blit_buffer;
-	optional_shared_ptr<UINT16> m_frame_buffer;
-	optional_shared_ptr<UINT16> m_blit_romaddr;
-	optional_shared_ptr<UINT16> m_blit_attr1_ram;
-	optional_shared_ptr<UINT16> m_blit_dst_ram_loword;
-	optional_shared_ptr<UINT16> m_blit_attr2_ram;
-	optional_shared_ptr<UINT16> m_blit_dst_ram_hiword;
-	optional_shared_ptr<UINT16> m_blit_vregs;
-	optional_shared_ptr<UINT16> m_blit_transpen;
-	optional_shared_ptr<UINT16> m_leds0;
-	optional_shared_ptr<UINT16> m_leds1;
-	optional_shared_ptr<UINT16> m_leds2;
+	optional_shared_ptr<uint16_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_blit_buffer;
+	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_shared_ptr<uint16_t> m_blit_romaddr;
+	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
+	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
+	optional_shared_ptr<uint16_t> m_blit_vregs;
+	optional_shared_ptr<uint16_t> m_blit_transpen;
+	optional_shared_ptr<uint16_t> m_leds0;
+	optional_shared_ptr<uint16_t> m_leds1;
+	optional_shared_ptr<uint16_t> m_leds2;
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -174,8 +174,8 @@ public:
 	DECLARE_DRIVER_INIT(dualgame);
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
-	UINT32 screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	required_device<cpu_device> m_maincpu;
@@ -190,20 +190,20 @@ public:
 
 struct blit_t
 {
-	UINT8 x, y;
-	UINT8 w, h;
-	UINT8 addr[3];
-	UINT8 pen[4];
-	UINT8 flag[8];
-	UINT8 flipx, flipy;
-	UINT8 solid;
-	UINT8 trans;
+	uint8_t x, y;
+	uint8_t w, h;
+	uint8_t addr[3];
+	uint8_t pen[4];
+	uint8_t flag[8];
+	uint8_t flipx, flipy;
+	uint8_t solid;
+	uint8_t trans;
 	int addr_factor;
 } blit;
 
 VIDEO_START_MEMBER(blitz68k_state,blitz68k)
 {
-	m_blit_buffer = std::make_unique<UINT8[]>(512*256);
+	m_blit_buffer = std::make_unique<uint8_t[]>(512*256);
 	blit.addr_factor = 2;
 }
 
@@ -213,11 +213,11 @@ VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 	blit.addr_factor = 1;
 }
 
-UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
-	UINT8 *src = m_blit_buffer.get();
+	uint8_t *src = m_blit_buffer.get();
 
 	for(y = 0; y < 256; y++)
 	{
@@ -233,17 +233,17 @@ UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb3
 // Blitter-less board (SPI-68K)
 
 
-UINT32 blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
-	UINT16 *src = m_frame_buffer;
+	uint16_t *src = m_frame_buffer;
 
 	for(y = 0; y < 256; y++)
 	{
 		for(x = 0; x < 512; )
 		{
-			UINT16 pen = *src++;
+			uint16_t pen = *src++;
 			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
 			bitmap.pix32(y, x++) = m_palette->pen((pen >> 12) & 0xf);
 			bitmap.pix32(y, x++) = m_palette->pen((pen >>  0) & 0xf);
@@ -274,11 +274,11 @@ UINT32 blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitm
 
 WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 {
-	UINT8 *blit_rom = memregion("blitter")->base();
-	UINT32 blit_dst_xpos;
-	UINT32 blit_dst_ypos;
+	uint8_t *blit_rom = memregion("blitter")->base();
+	uint32_t blit_dst_xpos;
+	uint32_t blit_dst_ypos;
 	int x,y,x_size,y_size;
-	UINT32 src;
+	uint32_t src;
 
 	logerror("blit copy %04x %04x %04x %04x %04x\n", m_blit_romaddr[0], m_blit_attr1_ram[0], m_blit_dst_ram_loword[0], m_blit_attr2_ram[0], m_blit_dst_ram_hiword[0] );
 	logerror("blit vregs %04x %04x %04x %04x\n",m_blit_vregs[0/2],m_blit_vregs[2/2],m_blit_vregs[4/2],m_blit_vregs[6/2]);
@@ -310,7 +310,7 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 				m_blit_buffer[drawy*512+drawx] = ((m_blit_vregs[0] & 0xf00)>>8);
 			else
 			{
-				UINT8 pen_helper;
+				uint8_t pen_helper;
 
 				pen_helper = blit_rom[src] & 0xff;
 				if(m_blit_transpen[0xa/2] & 0x100) //pen is opaque register
@@ -462,12 +462,12 @@ WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 {
-	UINT8 *blit_rom  = memregion("blitter")->base();
+	uint8_t *blit_rom  = memregion("blitter")->base();
 	int blit_romsize = memregion("blitter")->bytes();
-	UINT32 blit_dst_xpos;
-	UINT32 blit_dst_ypos;
+	uint32_t blit_dst_xpos;
+	uint32_t blit_dst_ypos;
 	int x, y, x_size, y_size;
-	UINT32 src;
+	uint32_t src;
 
 	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", machine().describe_context(),
 				blit.x,  blit.y, blit.w, blit.h,
@@ -486,7 +486,7 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 
 	src = (blit.addr[2] << 16) | (blit.addr[1] << 8) | blit.addr[0];
 
-	UINT8 pen = 0;
+	uint8_t pen = 0;
 	if (blit.solid)
 	{
 		pen = src & 0xff;
@@ -664,13 +664,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::bankrob_mcu1_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::bankrob_mcu2_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -750,13 +750,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::bankroba_mcu1_r)
 {
-	UINT8 ret = machine().rand();   // machine().rand() gives "interesting" results
+	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::bankroba_mcu2_r)
 {
-	UINT8 ret = machine().rand();   // machine().rand() gives "interesting" results
+	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -912,7 +912,7 @@ WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::cjffruit_mcu_r)
 {
-	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
+	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -966,7 +966,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::deucesw2_mcu_r)
 {
-	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
+	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -1065,13 +1065,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::dualgame_mcu1_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::dualgame_mcu2_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1156,7 +1156,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::hermit_mcu_r)
 {
-	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
+	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -1241,13 +1241,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::maxidbl_mcu1_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::maxidbl_mcu2_r)
 {
-	UINT8 ret = 0;  // machine().rand() gives "interesting" results
+	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -2737,7 +2737,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb5e0/2] = 0x6028;
@@ -2752,7 +2752,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 
 DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x11e4e/2] = 0x6028;
@@ -2767,7 +2767,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 
 DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x7064/2] = 0x6028;
@@ -2783,7 +2783,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 
 DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xf564/2] = 0x6028;
@@ -2794,7 +2794,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 
 DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x8fe4/2] = 0x6020;
@@ -2805,7 +2805,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 
 DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xa518/2] = 0x6024;
@@ -2816,7 +2816,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 
 DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xdeba/2] = 0x602e;
@@ -2833,7 +2833,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 
 DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb384/2] = 0x6036;
@@ -2844,7 +2844,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 
 DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xe21c/2] = 0x6040;
@@ -2855,7 +2855,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 
 DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xcfc2/2] = 0x4e71;

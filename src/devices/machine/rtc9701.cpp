@@ -34,7 +34,7 @@ const device_type rtc9701 = &device_creator<rtc9701_device>;
 //  rtc9701_device - constructor
 //-------------------------------------------------
 
-rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, rtc9701, "RTC-9701", tag, owner, clock, "rtc9701", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_latch(0),
@@ -45,7 +45,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 
 TIMER_CALLBACK_MEMBER(rtc9701_device::timer_callback)
 {
-	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
 	m_rtc.sec++;
@@ -177,9 +177,9 @@ void rtc9701_device::nvram_write(emu_file &file)
 //  rtc_read - used to route RTC reading registers
 //-------------------------------------------------
 
-inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
+inline uint8_t rtc9701_device::rtc_read(uint8_t offset)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -198,7 +198,7 @@ inline UINT8 rtc9701_device::rtc_read(UINT8 offset)
 	return res;
 }
 
-inline void rtc9701_device::rtc_write(UINT8 offset,UINT8 data)
+inline void rtc9701_device::rtc_write(uint8_t offset,uint8_t data)
 {
 	switch(offset)
 	{

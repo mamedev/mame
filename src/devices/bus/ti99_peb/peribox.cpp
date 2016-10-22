@@ -216,7 +216,7 @@ CRUCLK*  51||52  DBIN
 #define PEBSLOT7 "slot7"
 #define PEBSLOT8 "slot8"
 
-peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
 	m_console_inta(*this),
 	m_console_intb(*this),
@@ -233,7 +233,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 /*
     Constructor called from subclasses.
 */
-peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_console_inta(*this),
 	m_console_intb(*this),
@@ -482,7 +482,7 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
     A variant of the box used for the Geneve.
 *****************************************************************************/
 
-peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Geneve", tag, owner, clock, "peribox_gen", __FILE__)
 {
 	// The Geneve sits in slot 1; there is no prefix here - it can control
@@ -524,7 +524,7 @@ machine_config_constructor peribox_gen_device::device_mconfig_additions() const
     A variant of the box used for the TI-99/8
 *****************************************************************************/
 
-peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -562,7 +562,7 @@ machine_config_constructor peribox_998_device::device_mconfig_additions() const
     A variant of the box used for the SGCPU (aka TI-99/4P).
 *****************************************************************************/
 
-peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_SG, "Peripheral expansion box SGCPU", tag, owner, clock, "peribox_sg", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -610,7 +610,7 @@ machine_config_constructor peribox_sg_device::device_mconfig_additions() const
     obviously required.
 *****************************************************************************/
 
-peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_EV, "Peripheral expansion box EVPC", tag, owner, clock, "peribox_ev", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -646,7 +646,7 @@ int peribox_slot_device::get_index_from_tagname()
 	return atoi(mytag+i+1);
 }
 
-peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock, "peribox_slot", __FILE__), device_slot_interface(mconfig, *this), m_card(nullptr), m_slotnumber(0)
 {
 }

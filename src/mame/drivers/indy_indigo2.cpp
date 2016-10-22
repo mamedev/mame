@@ -74,7 +74,7 @@
 class ioc2_device : public device_t
 {
 public:
-	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 id);
+	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id);
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -83,10 +83,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
 
-	void lower_local0_irq(UINT8 source_mask);
-	void raise_local0_irq(UINT8 source_mask);
-	void lower_local1_irq(UINT8 source_mask);
-	void raise_local1_irq(UINT8 source_mask);
+	void lower_local0_irq(uint8_t source_mask);
+	void raise_local0_irq(uint8_t source_mask);
+	void lower_local1_irq(uint8_t source_mask);
+	void raise_local1_irq(uint8_t source_mask);
 
 protected:
 	virtual void device_start() override;
@@ -101,58 +101,58 @@ protected:
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<pit8254_device> m_pit;
 
-	virtual void handle_reset_reg_write(UINT8 data);
+	virtual void handle_reset_reg_write(uint8_t data);
 
-	UINT8 m_gen_ctrl_select_reg;
-	UINT8 m_gen_ctrl_reg;
-	UINT8 m_front_panel_reg;
+	uint8_t m_gen_ctrl_select_reg;
+	uint8_t m_gen_ctrl_reg;
+	uint8_t m_front_panel_reg;
 
-	UINT8 m_read_reg;
-	UINT8 m_dma_sel;
-	UINT8 m_reset_reg;
-	UINT8 m_write_reg;
+	uint8_t m_read_reg;
+	uint8_t m_dma_sel;
+	uint8_t m_reset_reg;
+	uint8_t m_write_reg;
 
-	UINT8 m_int3_local0_status_reg;
-	UINT8 m_int3_local0_mask_reg;
-	UINT8 m_int3_local1_status_reg;
-	UINT8 m_int3_local1_mask_reg;
-	UINT8 m_int3_map_status_reg;
-	UINT8 m_int3_map_mask0_reg;
-	UINT8 m_int3_map_mask1_reg;
-	UINT8 m_int3_map_pol_reg;
-	UINT8 m_int3_timer_clear_reg;
-	UINT8 m_int3_err_status_reg;
+	uint8_t m_int3_local0_status_reg;
+	uint8_t m_int3_local0_mask_reg;
+	uint8_t m_int3_local1_status_reg;
+	uint8_t m_int3_local1_mask_reg;
+	uint8_t m_int3_map_status_reg;
+	uint8_t m_int3_map_mask0_reg;
+	uint8_t m_int3_map_mask1_reg;
+	uint8_t m_int3_map_pol_reg;
+	uint8_t m_int3_timer_clear_reg;
+	uint8_t m_int3_err_status_reg;
 
-	UINT32	m_par_read_cnt;
-	UINT32	m_par_cntl;
-	UINT8	m_system_id;
+	uint32_t	m_par_read_cnt;
+	uint32_t	m_par_cntl;
+	uint8_t	m_system_id;
 };
 
 class ioc2_guinness_device : public ioc2_device
 {
 public:
-	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x01) { }
 };
 
 class ioc2_full_house_device : public ioc2_device
 {
 public:
-	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x20) { }
 };
 
 const device_type SGI_IOC2_GUINNESS = &device_creator<ioc2_guinness_device>;
 const device_type SGI_IOC2_FULL_HOUSE = &device_creator<ioc2_full_house_device>;
 
-ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, "SGI IOC2 (Guinness)", tag, owner, clock, "ioc2g", __FILE__)
 {
 }
 
-ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, "SGI IOC2 (Full House)", tag, owner, clock, "ioc2f", __FILE__)
 {
 }
@@ -190,7 +190,7 @@ machine_config_constructor ioc2_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(ioc2_device);
 }
 
-ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 id)
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_maincpu(*this, "^maincpu")
 	, m_scc(*this, SCC_TAG)
@@ -276,24 +276,24 @@ void ioc2_device::device_reset()
 #define INT3_LOCAL1_VSYNC   (0x40)
 #define INT3_LOCAL1_RETRACE (0x80)
 
-void ioc2_device::raise_local0_irq(UINT8 source_mask)
+void ioc2_device::raise_local0_irq(uint8_t source_mask)
 {
 	m_int3_local0_status_reg |= source_mask;
 	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void ioc2_device::lower_local0_irq(UINT8 source_mask)
+void ioc2_device::lower_local0_irq(uint8_t source_mask)
 {
 	m_int3_local0_status_reg &= ~source_mask;
 }
 
-void ioc2_device::raise_local1_irq(UINT8 source_mask)
+void ioc2_device::raise_local1_irq(uint8_t source_mask)
 {
 	m_int3_local1_status_reg |= source_mask;
 	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void ioc2_device::lower_local1_irq(UINT8 source_mask)
+void ioc2_device::lower_local1_irq(uint8_t source_mask)
 {
 	m_int3_local1_status_reg &= ~source_mask;
 }
@@ -444,9 +444,9 @@ WRITE32_MEMBER( ioc2_device::write )
 			// 2	RW		Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
 			// 1	RW		ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
 			// 0	RW		[same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
-			UINT8 old = m_dma_sel;
+			uint8_t old = m_dma_sel;
 			m_dma_sel = data;
-			UINT8 diff = old ^ m_dma_sel;
+			uint8_t diff = old ^ m_dma_sel;
 			if (diff & DMA_SEL_CLOCK_SEL_MASK)
 			{
 				if (diff & DMA_SEL_CLOCK_SEL_EXT)
@@ -475,7 +475,7 @@ WRITE32_MEMBER( ioc2_device::write )
 
 		case 0x84/4: // INT3 Local0 Mask Register
 		{
-			UINT8 old = m_int3_local0_mask_reg;
+			uint8_t old = m_int3_local0_mask_reg;
 			m_int3_local0_mask_reg = data;
 			bool old_line = (old & m_int3_local0_status_reg) != 0;
 			bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
@@ -486,7 +486,7 @@ WRITE32_MEMBER( ioc2_device::write )
 
 		case 0x8c/4: // INT3 Local1 Mask Register
 		{
-			UINT8 old = m_int3_local0_mask_reg;
+			uint8_t old = m_int3_local0_mask_reg;
 			m_int3_local0_mask_reg = data;
 			bool old_line = (old & m_int3_local0_status_reg) != 0;
 			bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
@@ -519,7 +519,7 @@ WRITE32_MEMBER( ioc2_device::write )
 	}
 }
 
-void ioc2_device::handle_reset_reg_write(UINT8 data)
+void ioc2_device::handle_reset_reg_write(uint8_t data)
 {
 	// guinness/fullhouse-specific implementations can handle bit 3 being used for ISDN reset on Indy only and bit 2 for EISA reset on Indigo 2 only, but for now we do nothing with it
 	m_reset_reg = data;
@@ -564,28 +564,28 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 
 struct hpc3_t
 {
-	UINT32 m_enetr_nbdp;
-	UINT32 m_enetr_cbp;
-	UINT32 m_unk0;
-	UINT32 m_unk1;
-	UINT32 m_ic_unk0;
-	UINT32 m_scsi0_desc;
-	UINT32 m_scsi0_dma_ctrl;
+	uint32_t m_enetr_nbdp;
+	uint32_t m_enetr_cbp;
+	uint32_t m_unk0;
+	uint32_t m_unk1;
+	uint32_t m_ic_unk0;
+	uint32_t m_scsi0_desc;
+	uint32_t m_scsi0_dma_ctrl;
 };
 
 struct hal2
 {
-	UINT32 m_iar;
-	UINT32 m_idr[4];
+	uint32_t m_iar;
+	uint32_t m_idr[4];
 };
 
 struct pbus_dma_t
 {
-	UINT8 m_active;
-	UINT32 m_cur_ptr;
-	UINT32 m_desc_ptr;
-	UINT32 m_next_ptr;
-	UINT32 m_words_left;
+	uint8_t m_active;
+	uint32_t m_cur_ptr;
+	uint32_t m_desc_ptr;
+	uint32_t m_next_ptr;
+	uint32_t m_words_left;
 };
 
 class ip22_state : public driver_device
@@ -640,22 +640,22 @@ protected:
 
 	required_device<mips3_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
-	required_shared_ptr<UINT32> m_unkpbus0;
-	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<uint32_t> m_unkpbus0;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_device<sgi_mc_device> m_sgi_mc;
 	required_device<newport_video_device> m_newport;
 	required_device<dac_word_interface> m_dac;
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
 
-	void dump_chain(address_space &space, UINT32 ch_base);
+	void dump_chain(address_space &space, uint32_t ch_base);
 
 	hpc3_t m_hpc3;
 
 	hal2 m_hal2;
 
 	pbus_dma_t m_pbus_dma;
-	UINT8 m_dma_buffer[4096];
+	uint8_t m_dma_buffer[4096];
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
@@ -1021,8 +1021,8 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 #if 0
 	if( m_pbus_dma.m_active )
 	{
-		UINT16 temp16 = ( m_mainram[(m_pbus_dma.m_cur_ptr - 0x08000000)/4] & 0xffff0000 ) >> 16;
-		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
+		uint16_t temp16 = ( m_mainram[(m_pbus_dma.m_cur_ptr - 0x08000000)/4] & 0xffff0000 ) >> 16;
+		int16_t stemp16 = (int16_t)((temp16 >> 8) | (temp16 << 8));
 
 		m_dac->write_signed16(stemp16);
 
@@ -1051,14 +1051,14 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 
 READ32_MEMBER(ip22_state::hpc3_pbusdma_r)
 {
-	//UINT32 channel = offset / (0x2000/4);
+	//uint32_t channel = offset / (0x2000/4);
 	//verboselog((machine(), 0, "PBUS DMA Channel %d Read: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, mem_mask );
 	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
 {
-	UINT32 channel = offset / (0x2000/4);
+	uint32_t channel = offset / (0x2000/4);
 
 	switch( offset & 0x07ff )
 	{
@@ -1170,7 +1170,7 @@ void ip22_state::machine_reset()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-void ip22_state::dump_chain(address_space &space, UINT32 ch_base)
+void ip22_state::dump_chain(address_space &space, uint32_t ch_base)
 {
 	printf("node: %08x %08x %08x (len = %x)\n", space.read_dword(ch_base), space.read_dword(ch_base+4), space.read_dword(ch_base+8), space.read_dword(ch_base+4) & 0x3fff);
 
@@ -1204,7 +1204,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 			// HPC3 DMA: host to device
 			if ((m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && (m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
 			{
-				UINT32 wptr, tmpword;
+				uint32_t wptr, tmpword;
 				int words, dptr, twords;
 
 				words = m_wd33c93->get_dma_count();
@@ -1292,9 +1292,9 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 				// clear DMA on the controller too
 				m_wd33c93->clear_dma();
 #if 0
-				UINT32 dptr, tmpword;
-				UINT32 bc = space.read_dword(m_hpc3.m_scsi0_desc + 4);
-				UINT32 rptr = space.read_dword(m_hpc3.m_scsi0_desc);
+				uint32_t dptr, tmpword;
+				uint32_t bc = space.read_dword(m_hpc3.m_scsi0_desc + 4);
+				uint32_t rptr = space.read_dword(m_hpc3.m_scsi0_desc);
 				int length = bc & 0x3fff;
 				int xie = (bc & 0x20000000) ? 1 : 0;
 				int eox = (bc & 0x80000000) ? 1 : 0;
@@ -1346,7 +1346,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 			// HPC3 DMA: device to host
 			if ((m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && !(m_hpc3.m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
 			{
-				UINT32 wptr, tmpword;
+				uint32_t wptr, tmpword;
 				int words, sptr, twords;
 
 				words = m_wd33c93->get_dma_count();

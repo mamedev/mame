@@ -26,7 +26,7 @@ ADDRESS_MAP_END
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
-st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
 		device_gfx_interface(mconfig, *this, nullptr, "palette"),
 		st0016_spr_bank(0),
@@ -295,13 +295,13 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 	st0016_vregs[offset]=data;
 	if(offset==0xa8 && (data&0x20))
 	{
-		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
-		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
-		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
+		uint32_t srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
+		uint32_t dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
+		uint32_t length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
 
 
-		UINT32 srclen = (memregion(":maincpu")->bytes());
-		UINT8 *mem = memregion(":maincpu")->base();
+		uint32_t srclen = (memregion(":maincpu")->bytes());
+		uint8_t *mem = memregion(":maincpu")->base();
 
 		int xfer_offs = m_dma_offset;
 		if (!m_dma_offs_cb.isnull())
@@ -486,11 +486,11 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 						for (y0 = (flipy ? ((1 << ly) - 1) : 0); y0 != (flipy ? -1 : (1 << ly)); y0 += (flipy ? -1 : 1))
 						{
 						/* custom draw */
-						UINT16 *destline;
+						uint16_t *destline;
 						int yloop, xloop;
 						int ypos, xpos;
 						int tileno;
-						const UINT8 *srcgfx;
+						const uint8_t *srcgfx;
 						int gfxoffs;
 						ypos = sy + y0 * 8 + spr_dy;
 						xpos = sx + x0 * 8 + spr_dx;
@@ -501,7 +501,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 						for (yloop = 0; yloop < 8; yloop++)
 						{
-							UINT16 drawypos;
+							uint16_t drawypos;
 
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
@@ -509,7 +509,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 							for (xloop = 0; xloop<8; xloop++)
 							{
-								UINT16 drawxpos;
+								uint16_t drawxpos;
 								int pixdata;
 								pixdata = srcgfx[gfxoffs];
 
@@ -578,9 +578,9 @@ void st0016_cpu_device::startup()
 	int gfx_index=0;
 
 	m_dma_offset = 0;
-	m_charram=make_unique_clear<UINT8[]>(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	st0016_spriteram=make_unique_clear<UINT8[]>(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	st0016_paletteram=make_unique_clear<UINT8[]>(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	m_charram=make_unique_clear<uint8_t[]>(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	st0016_spriteram=make_unique_clear<uint8_t[]>(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	st0016_paletteram=make_unique_clear<uint8_t[]>(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -632,10 +632,10 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 					}
 					else
 					{
-						UINT16 *destline;
+						uint16_t *destline;
 						int yloop, xloop;
 						int ypos, xpos;
-						const UINT8 *srcgfx;
+						const uint8_t *srcgfx;
 						int gfxoffs;
 						ypos = y * 8 + spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
 						xpos = x * 8 + spr_dx;
@@ -644,7 +644,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 
 						for (yloop = 0; yloop < 8; yloop++)
 						{
-							UINT16 drawypos;
+							uint16_t drawypos;
 
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
@@ -652,7 +652,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 
 							for (xloop = 0; xloop<8; xloop++)
 							{
-								UINT16 drawxpos;
+								uint16_t drawxpos;
 								int pixdata;
 								pixdata = srcgfx[gfxoffs];
 
@@ -706,7 +706,7 @@ void st0016_cpu_device::st0016_draw_screen(screen_device &screen, bitmap_ind16 &
 	draw_bgmap(bitmap,cliprect,1);
 }
 
-UINT32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	if(machine().input().code_pressed_once(KEYCODE_Z))

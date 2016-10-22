@@ -39,7 +39,7 @@ const device_type AT28C16 = &device_creator<at28c16_device>;
 //  at28c16_device - constructor
 //-------------------------------------------------
 
-at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, AT28C16, "AT28C16", tag, owner, clock, "at28c16", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -114,7 +114,7 @@ void at28c16_device::device_reset()
 
 void at28c16_device::nvram_default()
 {
-	UINT16 default_value = 0xff;
+	uint16_t default_value = 0xff;
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
 		space(AS_PROGRAM).write_byte( offs, default_value );
@@ -136,7 +136,7 @@ void at28c16_device::nvram_default()
 
 void at28c16_device::nvram_read( emu_file &file )
 {
-	std::vector<UINT8> buffer( AT28C16_TOTAL_BYTES );
+	std::vector<uint8_t> buffer( AT28C16_TOTAL_BYTES );
 
 	file.read( &buffer[0], AT28C16_TOTAL_BYTES );
 
@@ -153,7 +153,7 @@ void at28c16_device::nvram_read( emu_file &file )
 
 void at28c16_device::nvram_write( emu_file &file )
 {
-	std::vector<UINT8> buffer ( AT28C16_TOTAL_BYTES );
+	std::vector<uint8_t> buffer ( AT28C16_TOTAL_BYTES );
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
@@ -211,7 +211,7 @@ READ8_MEMBER( at28c16_device::read )
 {
 	if( m_last_write >= 0 )
 	{
-		UINT8 data = m_last_write ^ 0x80;
+		uint8_t data = m_last_write ^ 0x80;
 //      logerror( "%s: AT28C16: read( %04x ) write status %02x\n", machine.describe_context(), offset, data );
 		return data;
 	}
@@ -222,7 +222,7 @@ READ8_MEMBER( at28c16_device::read )
 			offset += AT28C16_ID_BYTES;
 		}
 
-		UINT8 data = this->space(AS_PROGRAM).read_byte( offset );
+		uint8_t data = this->space(AS_PROGRAM).read_byte( offset );
 //      logerror( "%s: AT28C16: read( %04x ) data %02x\n", machine.describe_context(), offset, data );
 		return data;
 	}

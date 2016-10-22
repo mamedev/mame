@@ -13,8 +13,8 @@ class astrocade_blueram_4k_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override { m_ram.resize(0x1000); save_item(NAME(m_ram)); }
@@ -26,7 +26,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -36,7 +36,7 @@ class astrocade_blueram_16k_device : public astrocade_blueram_4k_device
 {
 public:
 	// construction/destruction
-	astrocade_blueram_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_blueram_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override { m_ram.resize(0x4000); save_item(NAME(m_ram)); }
 };
@@ -47,7 +47,7 @@ class astrocade_blueram_32k_device : public astrocade_blueram_4k_device
 {
 public:
 	// construction/destruction
-	astrocade_blueram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_blueram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override { m_ram.resize(0x8000); save_item(NAME(m_ram)); }
 };
@@ -59,7 +59,7 @@ class astrocade_viper_sys1_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override { m_ram.resize(0x4000); save_item(NAME(m_ram)); }
@@ -71,7 +71,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -82,7 +82,7 @@ class astrocade_whiteram_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override { m_ram.resize(0x8000); save_item(NAME(m_ram)); }
@@ -94,7 +94,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
 };
 
@@ -105,7 +105,7 @@ class astrocade_rl64ram_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override { m_ram.resize(0xb000); save_item(NAME(m_ram)); }
@@ -117,7 +117,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 	required_ioport m_write_prot;
 };
 

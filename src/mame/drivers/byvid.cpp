@@ -103,17 +103,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
-	UINT32 screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_mpu_to_vid;
-	UINT8 m_vid_to_mpu;
-	UINT8 m_u7_a;
-	UINT8 m_u7_b;
-	UINT8 m_u10_a;
-	UINT8 m_u10_b;
+	uint8_t m_mpu_to_vid;
+	uint8_t m_vid_to_mpu;
+	uint8_t m_u7_a;
+	uint8_t m_u7_b;
+	uint8_t m_u10_a;
+	uint8_t m_u10_b;
 	bool m_u10_cb2;
-	UINT8 m_u11_a;
-	UINT8 m_u11_b;
+	uint8_t m_u11_a;
+	uint8_t m_u11_b;
 	bool m_u10_timer;
 	bool m_u11_timer;
 	virtual void machine_reset() override;
@@ -644,7 +644,7 @@ READ8_MEMBER( by133_state::u10_b_r )
 	if (BIT(m_u11_a, 1) == 0)
 		return m_vid_to_mpu;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10_a, 0))
 		data |= m_io_x0->read();
@@ -731,7 +731,7 @@ void by133_state::machine_reset()
 	m_beep->set_state(0);
 }
 
-UINT32 by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//bitmap.fill(0xff000000, cliprect);
 	copybitmap(bitmap, m_crtc->get_bitmap(), 0, 0, 0, 0, cliprect);

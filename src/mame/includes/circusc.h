@@ -30,18 +30,18 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spritebank;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_spritebank;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;
 
 	/* sound-related */
-	UINT8          m_sn_latch;
+	uint8_t          m_sn_latch;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -50,7 +50,7 @@ public:
 	required_device<dac_byte_interface> m_dac;
 	required_device<discrete_device> m_discrete;
 
-	UINT8          m_irq_mask;
+	uint8_t          m_irq_mask;
 	DECLARE_READ8_MEMBER(circusc_sh_timer_r);
 	DECLARE_WRITE8_MEMBER(circusc_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(circusc_coin_counter_w);
@@ -65,7 +65,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(circusc);
-	UINT32 screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

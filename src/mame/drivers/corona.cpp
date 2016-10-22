@@ -328,13 +328,13 @@ public:
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	UINT8 m_blitter_x_reg;
-	UINT8 m_blitter_y_reg;
-	UINT8 m_blitter_aux_reg;
-	UINT8 m_blitter_unk_reg;
-	std::unique_ptr<UINT8[]> m_videobuf;
-	UINT8 m_lamp;
-	UINT8 m_lamp_old;
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
 	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
@@ -351,8 +351,8 @@ public:
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(corona);
-	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -366,7 +366,7 @@ public:
 
 PALETTE_INIT_MEMBER(corona_state, corona)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -465,10 +465,10 @@ WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
 
 void corona_state::video_start()
 {
-	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 }
 
-UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -479,7 +479,7 @@ UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 

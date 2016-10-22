@@ -38,7 +38,7 @@ const int mb86901_device::NWINDOWS = 7;
 //  mb86901_device - constructor
 //-------------------------------------------------
 
-mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_dasm(this, 7)
@@ -58,7 +58,7 @@ void mb86901_device::device_start()
 		size_t filesize = ftell(input);
 		fseek(input, 0, SEEK_SET);
 
-		UINT8 *buf = new UINT8[filesize];
+		uint8_t *buf = new uint8_t[filesize];
 		fread(buf, 1, filesize, input);
 		fclose(input);
 
@@ -73,10 +73,10 @@ void mb86901_device::device_start()
 				break;
 
 			// get opcode
-			UINT16 opcode = 0;
+			uint16_t opcode = 0;
 			for (int shift = 12; shift >= 0 && pos < filesize; shift -= 4)
 			{
-				UINT8 digit = buf[pos];
+				uint8_t digit = buf[pos];
 				if (digit >= 'a' && digit <= 'z')
 				{
 					digit &= ~0x20;
@@ -139,7 +139,7 @@ void mb86901_device::device_start()
 	m_bp_irl = 0;
 	m_irq_state = 0;
 
-	memset(m_dbgregs, 0, 24 * sizeof(UINT32));
+	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
 
 	memset(m_illegal_instruction_asr, 0, 32 * sizeof(bool));
 	memset(m_privileged_asr, 1, 32 * sizeof(bool));
@@ -400,8 +400,8 @@ void mb86901_device::device_reset()
 
 	PC = 0;
 	nPC = 4;
-	memset(m_r, 0, sizeof(UINT32) * 120);
-	memset(m_fpr, 0, sizeof(UINT32) * 32);
+	memset(m_r, 0, sizeof(uint32_t) * 120);
+	memset(m_fpr, 0, sizeof(uint32_t) * 32);
 
 	WIM = 0;
 	TBR = 0;
@@ -450,7 +450,7 @@ const address_space_config *mb86901_device::memory_space_config(address_spacenum
 //  a 32-bit word in a big-endian system.
 //-------------------------------------------------
 
-UINT32 mb86901_device::read_sized_word(UINT8 asi, UINT32 address, int size)
+uint32_t mb86901_device::read_sized_word(uint8_t asi, uint32_t address, int size)
 {
 	m_asi = asi;
 	if (size == 1)
@@ -477,7 +477,7 @@ UINT32 mb86901_device::read_sized_word(UINT8 asi, UINT32 address, int size)
 //  size handlers
 //-------------------------------------------------
 
-void mb86901_device::write_sized_word(UINT8 asi, UINT32 address, UINT32 data, int size)
+void mb86901_device::write_sized_word(uint8_t asi, uint32_t address, uint32_t data, int size)
 {
 	m_asi = asi;
 	if (size == 1)
@@ -526,7 +526,7 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 mb86901_device::disasm_min_opcode_bytes() const
+uint32_t mb86901_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -537,7 +537,7 @@ UINT32 mb86901_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 mb86901_device::disasm_max_opcode_bytes() const
+uint32_t mb86901_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -548,9 +548,9 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
+	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
 	return m_dasm.dasm(buffer, pc, big_endianize_int32(op));
 }
 
@@ -564,7 +564,7 @@ offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_min_cycles() const
+uint32_t mb86901_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -575,7 +575,7 @@ UINT32 mb86901_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_max_cycles() const
+uint32_t mb86901_device::execute_max_cycles() const
 {
 	return 4;
 }
@@ -586,7 +586,7 @@ UINT32 mb86901_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_input_lines() const
+uint32_t mb86901_device::execute_input_lines() const
 {
 	return 16;
 }
@@ -654,7 +654,7 @@ void mb86901_device::execute_set_input(int inputnum, int state)
 //  execute_add - execute an add-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_add(UINT32 op)
+void mb86901_device::execute_add(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -678,10 +678,10 @@ void mb86901_device::execute_add(UINT32 op)
 	        ((not result<31>) and (r[rs1]<31> or operand2<31>))
 	);
 	*/
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ADD || ADDCC)
 		result = rs1 + operand2;
 	else if (ADDX || ADDXCC)
@@ -708,7 +708,7 @@ void mb86901_device::execute_add(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_taddcc(UINT32 op)
+void mb86901_device::execute_taddcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Tagged Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -735,10 +735,10 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	        r[rd] <- result;
 	);
 	*/
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = rs1 + operand2;
+	uint32_t result = rs1 + operand2;
 
 	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
 					(!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
@@ -769,7 +769,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_sub(UINT32 op)
+void mb86901_device::execute_sub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -793,10 +793,10 @@ void mb86901_device::execute_sub(UINT32 op)
 	         (result<31> and ((not r[rs1]<31>) or operand2<31>))
 	);
 	*/
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (SUB || SUBCC)
 		result = rs1 - operand2;
 	else if (SUBX || SUBXCC)
@@ -823,7 +823,7 @@ void mb86901_device::execute_sub(UINT32 op)
 //  opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_tsubcc(UINT32 op)
+void mb86901_device::execute_tsubcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Tagged Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -851,10 +851,10 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	);
 	*/
 
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = rs1 - operand2;
+	uint32_t result = rs1 - operand2;
 
 	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
 					(!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
@@ -885,7 +885,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 //  opcode, and/or/xor/andn/orn/xnor
 //-------------------------------------------------
 
-void mb86901_device::execute_logical(UINT32 op)
+void mb86901_device::execute_logical(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
 
@@ -909,9 +909,9 @@ void mb86901_device::execute_logical(UINT32 op)
 	);
 	*/
 
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	switch (OP3)
 	{
 		case OP3_AND:
@@ -957,7 +957,7 @@ void mb86901_device::execute_logical(UINT32 op)
 //  sll/srl/sra
 //-------------------------------------------------
 
-void mb86901_device::execute_shift(UINT32 op)
+void mb86901_device::execute_shift(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Shift Instructions" (SPARCv8.pdf, pg. 169)
 
@@ -970,14 +970,14 @@ void mb86901_device::execute_shift(UINT32 op)
 	else if (SRA and (rd != 0) ) then
 	    r[rd] <- shift_right_arithmetic(r[rs1], shift_count)
 	*/
-	UINT32 shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
+	uint32_t shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
 
 	if (SLL && RD != 0)
 		RDREG = RS1REG << shift_count;
 	else if (SRL && RD != 0)
-		RDREG = UINT32(RS1REG) >> shift_count;
+		RDREG = uint32_t(RS1REG) >> shift_count;
 	else if (SRA && RD != 0)
-		RDREG = INT32(RS1REG) >> shift_count;
+		RDREG = int32_t(RS1REG) >> shift_count;
 }
 
 
@@ -985,7 +985,7 @@ void mb86901_device::execute_shift(UINT32 op)
 //  execute_mulscc - execute a multiply step opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_mulscc(UINT32 op)
+void mb86901_device::execute_mulscc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Step Instruction" (SPARCv8.pdf, pg. 172)
 
@@ -1010,11 +1010,11 @@ void mb86901_device::execute_mulscc(UINT32 op)
 	C <- (operand1<31> and operand2<31>) or
 	     ((not result<31>) and (operand1<31> or operand2<31>))
 	*/
-	UINT32 operand1 = ((ICC_N != ICC_V) ? 0x80000000 : 0) | (RS1REG >> 1);
+	uint32_t operand1 = ((ICC_N != ICC_V) ? 0x80000000 : 0) | (RS1REG >> 1);
 
-	UINT32 operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
+	uint32_t operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
 
-	UINT32 result = operand1 + operand2;
+	uint32_t result = operand1 + operand2;
 	Y = ((RS1REG & 1) ? 0x80000000 : 0) | (Y >> 1);
 
 	if (RD != 0)
@@ -1035,7 +1035,7 @@ void mb86901_device::execute_mulscc(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rdsr(UINT32 op)
+void mb86901_device::execute_rdsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -1091,7 +1091,7 @@ void mb86901_device::execute_rdsr(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_wrsr(UINT32 op)
+void mb86901_device::execute_wrsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 183, "Appendix C - ISP Descriptions - Write State Register Instructions" (SPARCv8.pdf, pg. 180)
 
@@ -1136,9 +1136,9 @@ void mb86901_device::execute_wrsr(UINT32 op)
 	    )
 	);
 	*/
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG ^ operand2;
+	uint32_t result = RS1REG ^ operand2;
 
 	if (WRASR && RD == 0)
 	{
@@ -1211,7 +1211,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rett(UINT32 op)
+void mb86901_device::execute_rett(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 181, "Appendix C - ISP Descriptions - Return from Trap Instructions" (SPARCv8.pdf, pg. 178)
 
@@ -1249,8 +1249,8 @@ void mb86901_device::execute_rett(UINT32 op)
 	)
 	*/
 
-	UINT8 new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
-	UINT32 address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+	uint8_t new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
+	uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 	if (PSR & PSR_ET_MASK)
 	{
 		m_trap = 1;
@@ -1312,7 +1312,7 @@ void mb86901_device::execute_rett(UINT32 op)
 // opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_saverestore(UINT32 op)
+void mb86901_device::execute_saverestore(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 177, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 174)
 
@@ -1344,13 +1344,13 @@ void mb86901_device::execute_saverestore(UINT32 op)
 	    r[rd] <- result { destination in new window }
 	*/
 
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (SAVE)
 	{
-		UINT8 new_cwp = (((PSR & PSR_CWP_MASK) + NWINDOWS) - 1) % NWINDOWS;
+		uint8_t new_cwp = (((PSR & PSR_CWP_MASK) + NWINDOWS) - 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1365,7 +1365,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 	}
 	else if (RESTORE)
 	{
-		UINT8 new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
+		uint8_t new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1390,7 +1390,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 //  execute_jmpl - execute a jump and link opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_jmpl(UINT32 op)
+void mb86901_device::execute_jmpl(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 180, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 177)
 
@@ -1406,7 +1406,7 @@ void mb86901_device::execute_jmpl(UINT32 op)
 	)
 	*/
 
-	UINT32 jump_address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+	uint32_t jump_address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
 	if (jump_address & 3)
 	{
@@ -1428,7 +1428,7 @@ void mb86901_device::execute_jmpl(UINT32 op)
 //  mostly ALU ops
 //-------------------------------------------------
 
-void mb86901_device::execute_group2(UINT32 op)
+void mb86901_device::execute_group2(uint32_t op)
 {
 	switch (OP3)
 	{
@@ -1569,7 +1569,7 @@ void mb86901_device::update_gpr_pointers()
 //  execute_store - execute a store-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_store(UINT32 op)
+void mb86901_device::execute_store(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 165, "Appendix C - ISP Descriptions - Store Instructions" (SPARCv8.pdf, pg. 162)
 
@@ -1701,8 +1701,8 @@ void mb86901_device::execute_store(UINT32 op)
 		m_illegal_instruction = 1;
 	}
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (!m_trap)
 	{
 		if (STD || ST || STH || STB || STF || STDF || STFSR || STDFQ || STCSR || STC || STDC || STDCQ)
@@ -1769,10 +1769,10 @@ void mb86901_device::execute_store(UINT32 op)
 		}
 	}
 
-	UINT32 data0 = 0;
+	uint32_t data0 = 0;
 	if (!m_trap)
 	{
-		//UINT8 byte_mask;
+		//uint8_t byte_mask;
 		if (STF)
 		{
 			//byte_mask = 15;
@@ -1877,7 +1877,7 @@ void mb86901_device::execute_store(UINT32 op)
 	}
 	if (!m_trap && (STD || STDA || STDF || STDC || STDFQ || STDCQ))
 	{
-		UINT32 data1 = 0;
+		uint32_t data1 = 0;
 		if (STD || STDA)
 		{
 			data1 = REG(RD | 1);
@@ -1912,7 +1912,7 @@ void mb86901_device::execute_store(UINT32 op)
 //  execute_load - execute a load-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_load(UINT32 op)
+void mb86901_device::execute_load(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
 
@@ -2014,8 +2014,8 @@ void mb86901_device::execute_load(UINT32 op)
 	);
 	*/
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (LDD || LD || LDSH || LDUH || LDSB || LDUB || LDDF || LDF || LDFSR || LDDC || LDC || LDCSR)
 	{
 		address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -2079,10 +2079,10 @@ void mb86901_device::execute_load(UINT32 op)
 		}
 	}
 
-	UINT32 word0(0);
+	uint32_t word0(0);
 	if (!m_trap)
 	{
-		UINT32 data = read_sized_word(addr_space, address, (LD || LDD || LDA || LDDA) ? 4 : ((LDUH || LDSH || LDUHA || LDSHA) ? 2 : 1));
+		uint32_t data = read_sized_word(addr_space, address, (LD || LDD || LDA || LDDA) ? 4 : ((LDUH || LDSH || LDUHA || LDSHA) ? 2 : 1));
 
 		if (m_mae)
 		{
@@ -2093,26 +2093,26 @@ void mb86901_device::execute_load(UINT32 op)
 		{
 			if (LDSB || LDSBA || LDUB || LDUBA)
 			{
-				UINT8 byte = 0;
+				uint8_t byte = 0;
 				if ((address & 3) == 0) byte = (data >> 24) & 0xff;
 				else if ((address & 3) == 1) byte = (data >> 16) & 0xff;
 				else if ((address & 3) == 2) byte = (data >> 8) & 0xff;
 				else if ((address & 3) == 3) byte = data & 0xff;
 
 				if (LDSB || LDSBA)
-					word0 = (((INT32)byte) << 24) >> 24;
+					word0 = (((int32_t)byte) << 24) >> 24;
 				else
 					word0 = byte;
 			}
 			else if (LDSH || LDSHA || LDUH || LDUHA)
 			{
-				UINT16 halfword = 0;
+				uint16_t halfword = 0;
 				if ((address & 3) == 0) halfword = (data >> 16) & 0xffff;
 				else if ((address & 3) == 2) halfword = data & 0xffff;
 
 				if (LDSH || LDSHA)
 				{
-					word0 = (((INT32)halfword) << 16) >> 16;
+					word0 = (((int32_t)halfword) << 16) >> 16;
 				}
 				else
 				{
@@ -2140,7 +2140,7 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap && (LDD || LDDA || LDDF || LDDC))
 	{
-		UINT32 word1 = read_sized_word(addr_space, address + 4, 4);
+		uint32_t word1 = read_sized_word(addr_space, address + 4, 4);
 		if (MAE)
 		{
 			m_trap = 1;
@@ -2158,7 +2158,7 @@ void mb86901_device::execute_load(UINT32 op)
 //  instruction
 //-------------------------------------------------
 
-void mb86901_device::execute_ldstub(UINT32 op)
+void mb86901_device::execute_ldstub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
@@ -2219,8 +2219,8 @@ void mb86901_device::execute_ldstub(UINT32 op)
 	);
 	*/
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (LDSTUB)
 	{
 		address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -2245,7 +2245,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 		}
 	}
 
-	UINT32 data(0);
+	uint32_t data(0);
 	if (!m_trap)
 	{
 		while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
@@ -2268,7 +2268,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 
 	if (!m_trap)
 	{
-		//UINT8 byte_mask;
+		//uint8_t byte_mask;
 		if ((address & 3) == 0)
 		{
 			//byte_mask = 8;
@@ -2296,7 +2296,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 		}
 		else
 		{
-			UINT32 word;
+			uint32_t word;
 			if ((address & 3) == 0)
 			{
 				word = (data >> 24) & 0xff;
@@ -2325,7 +2325,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 //  (load/store)
 //-------------------------------------------------
 
-void mb86901_device::execute_group3(UINT32 op)
+void mb86901_device::execute_group3(uint32_t op)
 {
 	static const int ldst_cycles[64] = {
 		1, 1, 1, 2, 2, 2, 2, 3,
@@ -2405,7 +2405,7 @@ void mb86901_device::execute_group3(UINT32 op)
 //  condition code
 //-------------------------------------------------
 
-bool mb86901_device::evaluate_condition(UINT32 op)
+bool mb86901_device::evaluate_condition(uint32_t op)
 {
 	bool take = false;
 	bool n = ICC_N_SET;
@@ -2436,7 +2436,7 @@ bool mb86901_device::evaluate_condition(UINT32 op)
 //  execute_bicc - execute a branch opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_bicc(UINT32 op)
+void mb86901_device::execute_bicc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 178, "Appendix C - ISP Descriptions - Branch on Integer Condition Instructions" (SPARCv8.pdf, pg. 175)
 
@@ -2471,7 +2471,7 @@ void mb86901_device::execute_bicc(UINT32 op)
 	*/
 
 	bool branch_taken = evaluate_condition(op);
-	UINT32 pc = PC;
+	uint32_t pc = PC;
 	PC = nPC;
 	if (branch_taken)
 	{
@@ -2492,7 +2492,7 @@ void mb86901_device::execute_bicc(UINT32 op)
 //  execute_ticc - execute a conditional trap
 //-------------------------------------------------
 
-void mb86901_device::execute_ticc(UINT32 op)
+void mb86901_device::execute_ticc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Trap on Integer Condition Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -2531,7 +2531,7 @@ void mb86901_device::execute_ticc(UINT32 op)
 
 	bool trap_eval_icc = evaluate_condition(op);
 
-	UINT8 trap_number = RS1REG + (USEIMM ? SIMM7 : RS2REG);
+	uint8_t trap_number = RS1REG + (USEIMM ? SIMM7 : RS2REG);
 
 	if (COND)
 	{
@@ -2780,7 +2780,7 @@ void mb86901_device::execute_trap()
 //  validity.
 //-------------------------------------------------
 
-void mb86901_device::complete_instruction_execution(UINT32 op)
+void mb86901_device::complete_instruction_execution(uint32_t op)
 {
 	switch (OP)
 	{
@@ -2811,8 +2811,8 @@ void mb86901_device::complete_instruction_execution(UINT32 op)
 
 	case OP_CALL: // call
 	{
-		UINT32 pc = PC;
-		UINT32 callpc = PC + DISP30;
+		uint32_t pc = PC;
+		uint32_t callpc = PC + DISP30;
 		PC = nPC;
 		nPC = callpc;
 
@@ -2838,7 +2838,7 @@ void mb86901_device::complete_instruction_execution(UINT32 op)
 //  fetched instruction
 //-------------------------------------------------
 
-void mb86901_device::dispatch_instruction(UINT32 op)
+void mb86901_device::dispatch_instruction(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 159, "Appendix C - ISP Descriptions - C.6. Instruction Dispatch" (SPARCv8.pdf, pg. 156)
 
@@ -2896,7 +2896,7 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 //  of a floating-point operation
 //-------------------------------------------------
 
-void mb86901_device::complete_fp_execution(UINT32 /*op*/)
+void mb86901_device::complete_fp_execution(uint32_t /*op*/)
 {
 }
 
@@ -2984,8 +2984,8 @@ void mb86901_device::execute_step()
 	{
 		// write-state-register delay not yet implemented
 
-		UINT32 addr_space = (IS_USER ? 8 : 9);
-		UINT32 op = read_sized_word(addr_space, PC, 4);
+		uint32_t addr_space = (IS_USER ? 8 : 9);
+		uint32_t op = read_sized_word(addr_space, PC, 4);
 
 #if LOG_FCODES
 		//if (m_log_fcodes)
@@ -3134,7 +3134,7 @@ void mb86901_device::execute_run()
 //  disassembler
 //-------------------------------------------------
 
-UINT64 mb86901_device::get_reg_r(unsigned index) const
+uint64_t mb86901_device::get_reg_r(unsigned index) const
 {
 	return REG(index & 31);
 }
@@ -3145,7 +3145,7 @@ UINT64 mb86901_device::get_reg_r(unsigned index) const
 //  disassembler
 //-------------------------------------------------
 
-UINT64 mb86901_device::get_translated_pc() const
+uint64_t mb86901_device::get_translated_pc() const
 {
 	// FIXME: how do we apply translation to the address so it's in the same space the disassembler sees?
 	return m_pc;
@@ -3157,7 +3157,7 @@ UINT64 mb86901_device::get_translated_pc() const
 //  disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_icc() const
+uint8_t mb86901_device::get_icc() const
 {
 	return (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT;
 }
@@ -3168,7 +3168,7 @@ UINT8 mb86901_device::get_icc() const
 //  for disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_xcc() const
+uint8_t mb86901_device::get_xcc() const
 {
 	// not present before SPARCv9
 	return 0;
@@ -3180,7 +3180,7 @@ UINT8 mb86901_device::get_xcc() const
 //  for disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_fcc(unsigned index) const
+uint8_t mb86901_device::get_fcc(unsigned index) const
 {
 	// only one fcc instance before SPARCv9
 	return (m_fsr >> 10) & 3;

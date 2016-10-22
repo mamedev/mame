@@ -75,8 +75,8 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_device<ptm6840_device> m_ptm;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_videoram;
-	UINT8 m_term_data;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint8_t m_term_data;
 };
 
 
@@ -116,7 +116,7 @@ void poly_state::machine_reset()
 READ8_MEMBER( poly_state::pia1_b_in )
 {
 // return ascii key value, bit 7 is the strobe value
-	UINT8 data = m_term_data;
+	uint8_t data = m_term_data;
 	m_term_data &= 0x7f;
 	return data;
 }

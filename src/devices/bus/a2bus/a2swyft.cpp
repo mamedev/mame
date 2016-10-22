@@ -45,13 +45,13 @@ const tiny_rom_entry *a2bus_swyft_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2BUS_SWYFT, "IAI SwyftCard", tag, owner, clock, "a2swyft", __FILE__),
 		device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_rombank(0), m_inh_state(0)
 {
 }
 
-a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_rombank(0), m_inh_state(0)
 {
@@ -79,7 +79,7 @@ void a2bus_swyft_device::device_reset()
 	recalc_slot_inh();
 }
 
-UINT8 a2bus_swyft_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_swyft_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -105,7 +105,7 @@ UINT8 a2bus_swyft_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_swyft_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_swyft_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -129,7 +129,7 @@ void a2bus_swyft_device::write_c0nx(address_space &space, UINT8 offset, UINT8 da
 	}
 }
 
-UINT8 a2bus_swyft_device::read_inh_rom(address_space &space, UINT16 offset)
+uint8_t a2bus_swyft_device::read_inh_rom(address_space &space, uint16_t offset)
 {
 	offset -= 0xd000;
 

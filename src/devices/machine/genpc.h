@@ -29,7 +29,7 @@ class ibm5160_mb_device : public device_t
 {
 public:
 	// construction/destruction
-	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
@@ -55,25 +55,25 @@ public:
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
-	UINT8   m_u73_q2;
-	UINT8   m_out1;
+	uint8_t   m_u73_q2;
+	uint8_t   m_out1;
 	int m_dma_channel;
-	UINT8 m_dma_offset[4];
-	UINT8 m_pc_spkrdata;
-	UINT8 m_pit_out2;
+	uint8_t m_dma_offset[4];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
 	bool m_cur_eop;
 
-	UINT8 m_nmi_enabled;
+	uint8_t m_nmi_enabled;
 
 	int                     m_ppi_portc_switch_high;
 	int                     m_ppi_speaker;
 	int                     m_ppi_keyboard_clear;
-	UINT8                   m_ppi_keyb_clock;
-	UINT8                   m_ppi_portb;
-	UINT8                   m_ppi_clock_signal;
-	UINT8                   m_ppi_data_signal;
-	UINT8                   m_ppi_shift_register;
-	UINT8                   m_ppi_shift_enable;
+	uint8_t                   m_ppi_keyb_clock;
+	uint8_t                   m_ppi_portb;
+	uint8_t                   m_ppi_clock_signal;
+	uint8_t                   m_ppi_data_signal;
+	uint8_t                   m_ppi_shift_register;
+	uint8_t                   m_ppi_shift_enable;
 
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
@@ -127,7 +127,7 @@ class ibm5150_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -157,7 +157,7 @@ class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -181,8 +181,8 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	UINT8 pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
+	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
 	DECLARE_ADDRESS_MAP(map, 8);
 

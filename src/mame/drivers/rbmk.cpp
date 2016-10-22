@@ -72,10 +72,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_gms_vidram2;
-	required_shared_ptr<UINT16> m_gms_vidram;
-	UINT16 m_tilebank;
-	UINT8 m_mux_data;
+	required_shared_ptr<uint16_t> m_gms_vidram2;
+	required_shared_ptr<uint16_t> m_gms_vidram;
+	uint16_t m_tilebank;
+	uint8_t m_mux_data;
 	DECLARE_READ16_MEMBER(gms_read);
 	DECLARE_WRITE16_MEMBER(gms_write1);
 	DECLARE_WRITE16_MEMBER(gms_write2);
@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	virtual void video_start() override;
-	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -509,7 +509,7 @@ void rbmk_state::video_start()
 {
 }
 
-UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;

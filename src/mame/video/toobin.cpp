@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 10) & 1);
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
 {
-	UINT32 data = tilemap.basemem_read(tile_index);
+	uint32_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3fff;
 	int color = (data >> 16) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 14));
@@ -143,8 +143,8 @@ WRITE16_MEMBER( toobin_state::intensity_w )
 
 WRITE16_MEMBER( toobin_state::xscroll_w )
 {
-	UINT16 oldscroll = *m_xscroll;
-	UINT16 newscroll = oldscroll;
+	uint16_t oldscroll = *m_xscroll;
+	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
@@ -162,8 +162,8 @@ WRITE16_MEMBER( toobin_state::xscroll_w )
 
 WRITE16_MEMBER( toobin_state::yscroll_w )
 {
-	UINT16 oldscroll = *m_yscroll;
-	UINT16 newscroll = oldscroll;
+	uint16_t oldscroll = *m_yscroll;
+	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
 	/* if anything has changed, force a partial update */
@@ -188,8 +188,8 @@ WRITE16_MEMBER( toobin_state::yscroll_w )
 
 WRITE16_MEMBER( toobin_state::slip_w )
 {
-	UINT16 oldslip = m_mob->slipram(offset);
-	UINT16 newslip = oldslip;
+	uint16_t oldslip = m_mob->slipram(offset);
+	uint16_t newslip = oldslip;
 	COMBINE_DATA(&newslip);
 
 	/* if the SLIP is changing, force a partial update first */
@@ -208,7 +208,7 @@ WRITE16_MEMBER( toobin_state::slip_w )
  *
  *************************************/
 
-UINT32 toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -226,13 +226,13 @@ UINT32 toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	const pen_t *palette = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *dest = &bitmap.pix32(y);
-		UINT16 *mo = &mobitmap.pix16(y);
-		UINT16 *pf = &m_pfbitmap.pix16(y);
-		UINT8 *pri = &priority_bitmap.pix8(y);
+		uint32_t *dest = &bitmap.pix32(y);
+		uint16_t *mo = &mobitmap.pix16(y);
+		uint16_t *pf = &m_pfbitmap.pix16(y);
+		uint8_t *pri = &priority_bitmap.pix8(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pix = pf[x];
+			uint16_t pix = pf[x];
 			if (mo[x] != 0xffff)
 			{
 				/* not verified: logic is all controlled in a PAL

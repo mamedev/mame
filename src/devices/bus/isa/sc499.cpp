@@ -314,7 +314,7 @@ const device_type SC499 = &device_creator<sc499_device>;
 // sc499_device - constructor
 //-------------------------------------------------
 
-sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
@@ -441,7 +441,7 @@ void sc499_device::logerror(Format &&fmt, Params &&... args) const
  tape_status_clear - clear bits in tape status
  -------------------------------------------------*/
 
-void sc499_device::tape_status_clear(UINT16 value)
+void sc499_device::tape_status_clear(uint16_t value)
 {
 	m_tape_status &= ~value;
 	tape_status_set(0);
@@ -451,7 +451,7 @@ void sc499_device::tape_status_clear(UINT16 value)
  tape_status_set - set bits in tape status
  -------------------------------------------------*/
 
-void sc499_device::tape_status_set(UINT16 value)
+void sc499_device::tape_status_set(uint16_t value)
 {
 	m_tape_status |= value;
 	m_tape_status &= ~(SC499_ST0 | SC499_ST1);
@@ -487,7 +487,7 @@ void sc499_device::check_tape()
 		{
 			// tape has changed, get new size
 			m_image_length = m_image->tapelen();
-			m_ctape_block_count = (UINT32)((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
+			m_ctape_block_count = (uint32_t)((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
 		}
 
 		LOG1(("check_tape: tape image is %s with %d blocks", m_image->filename(), m_ctape_block_count));
@@ -695,7 +695,7 @@ void sc499_device::set_dma_drq(enum line_state state)
 
 // -------------------------------------
 
-void sc499_device::log_command(UINT8 data)
+void sc499_device::log_command(uint8_t data)
 {
 	switch (data)
 	{
@@ -738,7 +738,7 @@ void sc499_device::log_command(UINT8 data)
 	}
 }
 
-void sc499_device::do_command(UINT8 data)
+void sc499_device::do_command(uint8_t data)
 {
 	m_status |= SC499_STAT_RDY;
 	m_status &= ~SC499_STAT_DON;
@@ -866,15 +866,15 @@ void sc499_device::do_reset()
 
 // -------------------------------------
 
-void sc499_device::write_command_port(UINT8 data)
+void sc499_device::write_command_port(uint8_t data)
 {
 	m_command = data;
 	log_command(data);
 }
 
-UINT8 sc499_device::read_data_port()
+uint8_t sc499_device::read_data_port()
 {
-	static UINT8 m_last_data = 0xff;
+	static uint8_t m_last_data = 0xff;
 
 	// omit excessive logging
 	if (m_last_data != m_data)
@@ -892,7 +892,7 @@ UINT8 sc499_device::read_data_port()
 	return m_data;
 }
 
-void sc499_device::write_control_port( UINT8 data)
+void sc499_device::write_control_port( uint8_t data)
 {
 	LOG2(("write_control_port: %02x", data));
 
@@ -959,9 +959,9 @@ void sc499_device::write_control_port( UINT8 data)
 	m_control = data;
 }
 
-UINT8 sc499_device::read_status_port()
+uint8_t sc499_device::read_status_port()
 {
-	static UINT8 m_last_status = 0xff;
+	static uint8_t m_last_status = 0xff;
 
 	// omit excessive logging
 	if (m_last_status != m_status)
@@ -979,7 +979,7 @@ UINT8 sc499_device::read_status_port()
 
 // Start DMA (DMAGO). Any write to this register will cause DMAGO to be active.
 
-void sc499_device::write_dma_go( UINT8 data)
+void sc499_device::write_dma_go( uint8_t data)
 {
 	LOG2(("write_dma_go: %02x", data));
 
@@ -1024,7 +1024,7 @@ void sc499_device::write_dma_go( UINT8 data)
 
 // Reset DMA (RSTDMA). Any write to this register will cause RSTDMA to be active.
 
-void sc499_device::write_dma_reset( UINT8 data)
+void sc499_device::write_dma_reset( uint8_t data)
 {
 	LOG2(("write_dma_reset: %02x", data));
 
@@ -1056,7 +1056,7 @@ WRITE8_MEMBER(sc499_device::write)
 
 READ8_MEMBER(sc499_device::read)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -1101,9 +1101,9 @@ void sc499_device::eop_w(int state)
 	}
 }
 
-UINT8 sc499_device::dack_r(int line)
+uint8_t sc499_device::dack_r(int line)
 {
-	UINT8 data;
+	uint8_t data;
 
 //  set_dma_drq(CLEAR_LINE);
 
@@ -1135,7 +1135,7 @@ UINT8 sc499_device::dack_r(int line)
 	return data;
 }
 
-void sc499_device::dack_w(int line, UINT8 data)
+void sc499_device::dack_w(int line, uint8_t data)
 {
 	LOG3(("dack_write: data=%x", data));
 
@@ -1185,7 +1185,7 @@ void sc499_device::log_block(const char *text)
 
 void sc499_device::read_block()
 {
-	UINT8 *tape;
+	uint8_t *tape;
 
 	if (m_tape_pos == 0)
 	{
@@ -1272,7 +1272,7 @@ void sc499_device::write_block()
 
 int sc499_device::block_is_filemark()
 {
-	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
+	static const uint8_t fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
 
 	int is_filemark = memcmp(&m_ctape_block_buffer[0], fm_pattern, 4) == 0 &&
 			memcmp(&m_ctape_block_buffer[0], &m_ctape_block_buffer[4], SC499_CTAPE_BLOCK_SIZE-4) == 0;
@@ -1287,7 +1287,7 @@ int sc499_device::block_is_filemark()
 
 void sc499_device::block_set_filemark()
 {
-	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
+	static const uint8_t fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
 	for (int i = 0; i < SC499_CTAPE_BLOCK_SIZE; i += 4)
 	{
 		memcpy(&m_ctape_block_buffer[i], fm_pattern, 4);
@@ -1298,7 +1298,7 @@ void sc499_device::block_set_filemark()
 
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
-sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock, "sc499_ctape", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -1310,7 +1310,7 @@ void sc499_ctape_image_device::device_config_complete()
 }
 
 
-UINT8 *sc499_ctape_image_device::read_block(int block_num)
+uint8_t *sc499_ctape_image_device::read_block(int block_num)
 {
 	// access beyond end of tape cart
 	if (m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
@@ -1319,7 +1319,7 @@ UINT8 *sc499_ctape_image_device::read_block(int block_num)
 		return &m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE];
 }
 
-void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
+void sc499_ctape_image_device::write_block(int block_num, uint8_t *ptr)
 {
 	if (!(m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
 		memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
@@ -1327,7 +1327,7 @@ void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
 
 image_init_result sc499_ctape_image_device::call_load()
 {
-	UINT32 size;
+	uint32_t size;
 	io_generic io;
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;

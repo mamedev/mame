@@ -99,7 +99,7 @@ private:
 	bool parse_sym_line(const char *line, uintptr_t &address, std::string &symbol);
 	bool parse_map_line(const char *line, uintptr_t &address, std::string &symbol);
 	void scan_cache_for_address(uintptr_t address);
-	void format_symbol(const char *name, UINT32 displacement, const char *filename = nullptr, int linenumber = 0);
+	void format_symbol(const char *name, uint32_t displacement, const char *filename = nullptr, int linenumber = 0);
 
 	static uintptr_t get_text_section_base();
 
@@ -129,7 +129,7 @@ private:
 class sampling_profiler
 {
 public:
-	sampling_profiler(UINT32 max_seconds, UINT8 stack_depth);
+	sampling_profiler(uint32_t max_seconds, uint8_t stack_depth);
 	~sampling_profiler();
 
 	void start();
@@ -151,8 +151,8 @@ private:
 	DWORD           m_thread_id;
 	volatile bool   m_thread_exit;
 
-	UINT8           m_stack_depth;
-	UINT8           m_entry_stride;
+	uint8_t           m_stack_depth;
+	uint8_t           m_entry_stride;
 	std::vector<uintptr_t>    m_buffer;
 	uintptr_t *          m_buffer_ptr;
 	uintptr_t *          m_buffer_end;
@@ -583,12 +583,12 @@ bool symbol_manager::parse_map_line(const char *line, uintptr_t &address, std::s
 //  format_symbol - common symbol formatting
 //-------------------------------------------------
 
-void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
+void symbol_manager::format_symbol(const char *name, uint32_t displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
 	m_buffer = string_format(" (%s", name);
 	if (displacement != 0)
-		m_buffer.append(string_format("+0x%04x", (UINT32)displacement));
+		m_buffer.append(string_format("+0x%04x", (uint32_t)displacement));
 
 	// append file/line if present
 	if (filename != nullptr)
@@ -642,7 +642,7 @@ uintptr_t symbol_manager::get_text_section_base()
 //  sampling_profiler - constructor
 //-------------------------------------------------
 
-sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
+sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0)
 	: m_target_thread(nullptr),
 	m_thread(nullptr),
 	m_thread_id(0),
@@ -764,7 +764,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(uintptr_t), compare_address);
 
 	// step 3: count and collapse unique entries
-	UINT32 total_count = 0;
+	uint32_t total_count = 0;
 	for (uintptr_t *current = &m_buffer[0]; current < m_buffer_ptr; )
 	{
 		int count = 1;
@@ -785,7 +785,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(uintptr_t), compare_frequency);
 
 	// step 5: print the results
-	UINT32 num_printed = 0;
+	uint32_t num_printed = 0;
 	for (uintptr_t *current = &m_buffer[0]; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
 	{
 		// once we hit 0 frequency, we're done
@@ -793,7 +793,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 			break;
 
 		// output the result
-		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
+		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (uint32_t)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
 		for (int index = 2; index < m_entry_stride; index++)
 		{
 			if (current[index] == 0)

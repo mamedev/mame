@@ -35,25 +35,25 @@ PALETTE_INIT_MEMBER(exterm_state, exterm)
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_master)
 {
-	memcpy(shiftreg, &m_master_videoram[TOWORD(address)], 256 * sizeof(UINT16));
+	memcpy(shiftreg, &m_master_videoram[TOWORD(address)], 256 * sizeof(uint16_t));
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_master)
 {
-	memcpy(&m_master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(UINT16));
+	memcpy(&m_master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(uint16_t));
 }
 
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(exterm_state::to_shiftreg_slave)
 {
-	memcpy(shiftreg, &m_slave_videoram[TOWORD(address)], 256 * 2 * sizeof(UINT8));
+	memcpy(shiftreg, &m_slave_videoram[TOWORD(address)], 256 * 2 * sizeof(uint8_t));
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_slave)
 {
-	memcpy(&m_slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(UINT8));
+	memcpy(&m_slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(uint8_t));
 }
 
 
@@ -66,9 +66,9 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(exterm_state::from_shiftreg_slave)
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 {
-	UINT16 *bgsrc = &m_master_videoram[(params->rowaddr << 8) & 0xff00];
-	UINT16 *fgsrc = nullptr;
-	UINT16 *dest = &bitmap.pix16(scanline);
+	uint16_t *bgsrc = &m_master_videoram[(params->rowaddr << 8) & 0xff00];
+	uint16_t *fgsrc = nullptr;
+	uint16_t *dest = &bitmap.pix16(scanline);
 	tms34010_display_params fgparams;
 	int coladdr = params->coladdr;
 	int fgcoladdr = 0;
@@ -87,7 +87,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(exterm_state::scanline_update)
 	/* copy the non-blanked portions of this scanline */
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 bgdata, fgdata = 0;
+		uint16_t bgdata, fgdata = 0;
 
 		if (fgsrc != nullptr)
 			fgdata = fgsrc[fgcoladdr++ & 0x7f];

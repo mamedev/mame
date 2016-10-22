@@ -9,8 +9,8 @@
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 {
-	UINT16 tilenum = m_tilemapram[0 + tile_index * 2];
-	UINT16 attr    = m_tilemapram[1 + tile_index * 2];
+	uint16_t tilenum = m_tilemapram[0 + tile_index * 2];
+	uint16_t attr    = m_tilemapram[1 + tile_index * 2];
 
 	SET_TILE_INFO_MEMBER(1,
 			(tilenum & 0xfff) + m_bg0_gfxset,
@@ -20,8 +20,8 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 {
-	UINT16 tilenum = m_tilemapram[0x800 + tile_index * 2];
-	UINT16 attr    = m_tilemapram[0x801 + tile_index * 2];
+	uint16_t tilenum = m_tilemapram[0x800 + tile_index * 2];
+	uint16_t attr    = m_tilemapram[0x801 + tile_index * 2];
 
 	SET_TILE_INFO_MEMBER(1,
 			(tilenum & 0xfff) + 0x2000 + m_bg1_gfxset,
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
 {
-	UINT16 tilenum = m_tilemapram[0x1000 + tile_index];
+	uint16_t tilenum = m_tilemapram[0x1000 + tile_index];
 
 	SET_TILE_INFO_MEMBER(2,
 			(tilenum & 0xfff),
@@ -94,11 +94,11 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
                         SCREEN REFRESH
 **************************************************************/
 
-UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	UINT16 tile_sets = 0;
-	UINT8 layer[3];
+	uint16_t tile_sets = 0;
+	uint8_t layer[3];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once(KEYCODE_V))

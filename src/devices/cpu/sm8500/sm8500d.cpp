@@ -54,7 +54,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] = {
+static const uint32_t s_flags[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, _OVER, _OVER, 0,
 	0, 0, 0, 0, 0, 0, _OVER, 0,
@@ -69,8 +69,8 @@ static const UINT32 s_flags[] = {
 
 struct sm8500dasm
 {
-	UINT8   mnemonic;
-	UINT8   arguments;
+	uint8_t   mnemonic;
+	uint8_t   arguments;
 };
 
 static const char *const sm8500_cond[16] = {
@@ -78,7 +78,7 @@ static const char *const sm8500_cond[16] = {
 	"T", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
 };
 
-static const UINT8 sm8500_b2w[8] = {
+static const uint8_t sm8500_b2w[8] = {
 	0, 8, 2, 10, 4, 12, 6, 14
 };
 
@@ -177,10 +177,10 @@ CPU_DISASSEMBLE( sm8500 )
 {
 	const sm8500dasm *instr;
 	char *dst;
-	UINT8 op;
-	INT8 offset;
-	UINT16 ea;
-	UINT16 ea2;
+	uint8_t op;
+	int8_t offset;
+	uint16_t ea;
+	uint16_t ea2;
 	int pos = 0;
 
 	dst = buffer;
@@ -347,11 +347,11 @@ CPU_DISASSEMBLE( sm8500 )
 			dst += sprintf( dst, ",rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07] );
 			break;
 		case AM_cbr:
-			offset = (INT8) oprom[pos++];
+			offset = (int8_t) oprom[pos++];
 			dst += sprintf( dst, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset );
 			break;
 		case AM_rbr:
-			offset = (INT8) oprom[pos++];
+			offset = (int8_t) oprom[pos++];
 			dst += sprintf( dst, "r%02Xh,$%04X", op & 0x07, pc + pos + offset );
 			break;
 		case AM_cjp:
@@ -466,7 +466,7 @@ CPU_DISASSEMBLE( sm8500 )
 			break;
 		case AM_Rbr:
 			ea = oprom[pos++];
-			offset = (INT8) oprom[pos++];
+			offset = (int8_t) oprom[pos++];
 			dst += sprintf( dst, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset );
 			break;
 		case AM_Rb:
@@ -525,7 +525,7 @@ CPU_DISASSEMBLE( sm8500 )
 				dst += sprintf( dst, "$%04X", 0xFF00 + ea2 );
 			}
 			dst += sprintf( dst, ",#%d,", ea & 0x07 );
-			offset = (INT8) oprom[pos++];
+			offset = (int8_t) oprom[pos++];
 			dst += sprintf( dst, "$%04X", pc + pos + offset );
 			break;
 		case AM_1A:

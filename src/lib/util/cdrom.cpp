@@ -130,7 +130,7 @@ struct cdrom_file
 -------------------------------------------------*/
 
 /**
- * @fn  static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
+ * @fn  static inline uint32_t physical_to_chd_lba(cdrom_file *file, uint32_t physlba, uint32_t &tracknum)
  *
  * @brief   Physical to chd lba.
  *
@@ -138,12 +138,12 @@ struct cdrom_file
  * @param   physlba             The physlba.
  * @param [in,out]  tracknum    The tracknum.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
+static inline uint32_t physical_to_chd_lba(cdrom_file *file, uint32_t physlba, uint32_t &tracknum)
 {
-	UINT32 chdlba;
+	uint32_t chdlba;
 	int track;
 
 	/* loop until our current LBA is less than the start LBA of the next track */
@@ -164,7 +164,7 @@ static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT3
 -------------------------------------------------*/
 
 /**
- * @fn  static inline UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
+ * @fn  static inline uint32_t logical_to_chd_lba(cdrom_file *file, uint32_t loglba, uint32_t &tracknum)
  *
  * @brief   Logical to chd lba.
  *
@@ -172,12 +172,12 @@ static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT3
  * @param   loglba              The loglba.
  * @param [in,out]  tracknum    The tracknum.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-static inline UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
+static inline uint32_t logical_to_chd_lba(cdrom_file *file, uint32_t loglba, uint32_t &tracknum)
 {
-	UINT32 chdlba, physlba;
+	uint32_t chdlba, physlba;
 	int track;
 
 	/* loop until our current LBA is less than the start LBA of the next track */
@@ -221,7 +221,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 {
 	int i;
 	cdrom_file *file;
-	UINT32 physofs, logofs;
+	uint32_t physofs, logofs;
 
 	/* allocate memory for the CD-ROM file */
 	file = new (std::nothrow) cdrom_file();
@@ -317,7 +317,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 {
 	int i;
 	cdrom_file *file;
-	UINT32 physofs, chdofs, logofs;
+	uint32_t physofs, chdofs, logofs;
 	chd_error err;
 
 	/* punt if no CHD */
@@ -432,7 +432,7 @@ void cdrom_close(cdrom_file *file)
 ***************************************************************************/
 
 /**
- * @fn  chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
+ * @fn  chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length)
  *
  * @brief   Reads partial sector.
  *
@@ -447,7 +447,7 @@ void cdrom_close(cdrom_file *file)
  * @return  The partial sector.
  */
 
-chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length, bool phys=false)
+chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys=false)
 {
 	chd_error result = CHDERR_NONE;
 	bool needswap = false;
@@ -466,7 +466,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 	// if a CHD, just read
 	if (file->chd != nullptr)
 	{
-		result = file->chd->read_bytes(UINT64(chdsector) * UINT64(CD_FRAME_SIZE) + startoffs, dest, length);
+		result = file->chd->read_bytes(uint64_t(chdsector) * uint64_t(CD_FRAME_SIZE) + startoffs, dest, length);
 		/* swap CDDA in the case of LE GDROMs */
 		if ((file->cdtoc.flags & CD_FLAG_GDROMLE) && (file->cdtoc.tracks[tracknum].trktype == CD_TRACK_AUDIO))
 			needswap = true;
@@ -476,7 +476,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 		// else read from the appropriate file
 		util::core_file &srcfile = *file->fhandle[tracknum];
 
-		UINT64 sourcefileoffset = file->track_info.track[tracknum].offset;
+		uint64_t sourcefileoffset = file->track_info.track[tracknum].offset;
 		int bytespersector = file->cdtoc.tracks[tracknum].datasize + file->cdtoc.tracks[tracknum].subsize;
 
 		sourcefileoffset += chdsector * bytespersector + startoffs;
@@ -491,7 +491,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 
 	if (needswap)
 	{
-		UINT8 *buffer = (UINT8 *)dest - startoffs;
+		uint8_t *buffer = (uint8_t *)dest - startoffs;
 		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2 )
 		{
 			int swaptemp = buffer[ swapindex ];
@@ -509,7 +509,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
+ * @fn  uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uint32_t datatype, bool phys)
  *
  * @brief   Cdrom read data.
  *
@@ -519,17 +519,17 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
  * @param   datatype        The datatype.
  * @param   phys            true to physical.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
+uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uint32_t datatype, bool phys)
 {
 	if (file == nullptr)
 		return 0;
 
 	// compute CHD sector and tracknumber
-	UINT32 tracknum = 0;
-	UINT32 chdsector;
+	uint32_t tracknum = 0;
+	uint32_t chdsector;
 
 	if (phys)
 	{
@@ -541,7 +541,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 	}
 
 	/* copy out the requested sector */
-	UINT32 tracktype = file->cdtoc.tracks[tracknum].trktype;
+	uint32_t tracktype = file->cdtoc.tracks[tracknum].trktype;
 
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
@@ -558,10 +558,10 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
 		if ((datatype == CD_TRACK_MODE1_RAW) && (tracktype == CD_TRACK_MODE1))
 		{
-			UINT8 *bufptr = (UINT8 *)buffer;
-			UINT32 msf = lba_to_msf(lbasector);
+			uint8_t *bufptr = (uint8_t *)buffer;
+			uint32_t msf = lba_to_msf(lbasector);
 
-			static const UINT8 syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
+			static const uint8_t syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 			memcpy(bufptr, syncbytes, 12);
 			bufptr[12] = msf>>16;
 			bufptr[13] = msf>>8;
@@ -595,7 +595,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
+ * @fn  uint32_t cdrom_read_subcode(cdrom_file *file, uint32_t lbasector, void *buffer, bool phys)
  *
  * @brief   Cdrom read subcode.
  *
@@ -604,17 +604,17 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
  * @param [in,out]  buffer  If non-null, the buffer.
  * @param   phys            true to physical.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
+uint32_t cdrom_read_subcode(cdrom_file *file, uint32_t lbasector, void *buffer, bool phys)
 {
 	if (file == nullptr)
 		return ~0;
 
 	// compute CHD sector and tracknumber
-	UINT32 tracknum = 0;
-	UINT32 chdsector;
+	uint32_t tracknum = 0;
+	uint32_t chdsector;
 
 	if (phys)
 	{
@@ -645,19 +645,19 @@ UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
+ * @fn  uint32_t cdrom_get_track(cdrom_file *file, uint32_t frame)
  *
  * @brief   Cdrom get track.
  *
  * @param [in,out]  file    If non-null, the file.
  * @param   frame           The frame.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
+uint32_t cdrom_get_track(cdrom_file *file, uint32_t frame)
 {
-	UINT32 track = 0;
+	uint32_t track = 0;
 
 	if (file == nullptr)
 		return ~0;
@@ -675,17 +675,17 @@ UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
+ * @fn  uint32_t cdrom_get_track_start(cdrom_file *file, uint32_t track)
  *
  * @brief   Cdrom get track start.
  *
  * @param [in,out]  file    If non-null, the file.
  * @param   track           The track.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
+uint32_t cdrom_get_track_start(cdrom_file *file, uint32_t track)
 {
 	if (file == nullptr)
 		return ~0;
@@ -703,17 +703,17 @@ UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
+ * @fn  uint32_t cdrom_get_track_start_phys(cdrom_file *file, uint32_t track)
  *
  * @brief   Cdrom get track start physical.
  *
  * @param [in,out]  file    If non-null, the file.
  * @param   track           The track.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
+uint32_t cdrom_get_track_start_phys(cdrom_file *file, uint32_t track)
 {
 	if (file == nullptr)
 		return ~0;
@@ -843,7 +843,7 @@ const cdrom_toc *cdrom_get_toc(cdrom_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
+ * @fn  static void cdrom_get_info_from_type_string(const char *typestring, uint32_t *trktype, uint32_t *datasize)
  *
  * @brief   Cdrom get information from type string.
  *
@@ -852,7 +852,7 @@ const cdrom_toc *cdrom_get_toc(cdrom_file *file)
  * @param [in,out]  datasize    If non-null, the datasize.
  */
 
-static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
+static void cdrom_get_info_from_type_string(const char *typestring, uint32_t *trktype, uint32_t *datasize)
 {
 	if (!strcmp(typestring, "MODE1"))
 	{
@@ -1035,7 +1035,7 @@ void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_t
 -------------------------------------------------*/
 
 /**
- * @fn  const char *cdrom_get_type_string(UINT32 trktype)
+ * @fn  const char *cdrom_get_type_string(uint32_t trktype)
  *
  * @brief   Cdrom get type string.
  *
@@ -1044,7 +1044,7 @@ void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_t
  * @return  null if it fails, else a char*.
  */
 
-const char *cdrom_get_type_string(UINT32 trktype)
+const char *cdrom_get_type_string(uint32_t trktype)
 {
 	switch (trktype)
 	{
@@ -1067,7 +1067,7 @@ const char *cdrom_get_type_string(UINT32 trktype)
 -------------------------------------------------*/
 
 /**
- * @fn  const char *cdrom_get_subtype_string(UINT32 subtype)
+ * @fn  const char *cdrom_get_subtype_string(uint32_t subtype)
  *
  * @brief   Cdrom get subtype string.
  *
@@ -1076,7 +1076,7 @@ const char *cdrom_get_type_string(UINT32 trktype)
  * @return  null if it fails, else a char*.
  */
 
-const char *cdrom_get_subtype_string(UINT32 subtype)
+const char *cdrom_get_subtype_string(uint32_t subtype)
 {
 	switch (subtype)
 	{
@@ -1225,13 +1225,13 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	printf("toc->numtrks = %u?!\n", toc->numtrks);
 
 	/* look for old-style metadata */
-	std::vector<UINT8> oldmetadata;
+	std::vector<uint8_t> oldmetadata;
 	err = chd->read_metadata(CDROM_OLD_METADATA_TAG, 0, oldmetadata);
 	if (err != CHDERR_NONE)
 		return err;
 
 	/* reconstruct the TOC from it */
-	UINT32 *mrp = reinterpret_cast<UINT32 *>(&oldmetadata[0]);
+	uint32_t *mrp = reinterpret_cast<uint32_t *>(&oldmetadata[0]);
 	toc->numtrks = *mrp++;
 
 	for (i = 0; i < CD_MAX_TRACKS; i++)
@@ -1334,7 +1334,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
  *          -------------------------------------------------.
  */
 
-static const UINT8 ecclow[256] =
+static const uint8_t ecclow[256] =
 {
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,
 	0x20, 0x22, 0x24, 0x26, 0x28, 0x2a, 0x2c, 0x2e, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e,
@@ -1355,7 +1355,7 @@ static const UINT8 ecclow[256] =
 };
 
 /** @brief  The ecchigh[ 256]. */
-static const UINT8 ecchigh[256] =
+static const uint8_t ecchigh[256] =
 {
 	0x00, 0xf4, 0xf5, 0x01, 0xf7, 0x03, 0x02, 0xf6, 0xf3, 0x07, 0x06, 0xf2, 0x04, 0xf0, 0xf1, 0x05,
 	0xfb, 0x0f, 0x0e, 0xfa, 0x0c, 0xf8, 0xf9, 0x0d, 0x08, 0xfc, 0xfd, 0x09, 0xff, 0x0b, 0x0a, 0xfe,
@@ -1382,7 +1382,7 @@ static const UINT8 ecchigh[256] =
  *          -------------------------------------------------.
  */
 
-static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
+static const uint16_t poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
 {
 	{ 0x000,0x056,0x0ac,0x102,0x158,0x1ae,0x204,0x25a,0x2b0,0x306,0x35c,0x3b2,0x408,0x45e,0x4b4,0x50a,0x560,0x5b6,0x60c,0x662,0x6b8,0x70e,0x764,0x7ba },
 	{ 0x001,0x057,0x0ad,0x103,0x159,0x1af,0x205,0x25b,0x2b1,0x307,0x35d,0x3b3,0x409,0x45f,0x4b5,0x50b,0x561,0x5b7,0x60d,0x663,0x6b9,0x70f,0x765,0x7bb },
@@ -1479,7 +1479,7 @@ static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
  *          -------------------------------------------------.
  */
 
-static const UINT16 qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
+static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
 {
 	{ 0x000,0x058,0x0b0,0x108,0x160,0x1b8,0x210,0x268,0x2c0,0x318,0x370,0x3c8,0x420,0x478,0x4d0,0x528,0x580,0x5d8,0x630,0x688,0x6e0,0x738,0x790,0x7e8,0x840,0x898,0x034,0x08c,0x0e4,0x13c,0x194,0x1ec,0x244,0x29c,0x2f4,0x34c,0x3a4,0x3fc,0x454,0x4ac,0x504,0x55c,0x5b4 },
 	{ 0x001,0x059,0x0b1,0x109,0x161,0x1b9,0x211,0x269,0x2c1,0x319,0x371,0x3c9,0x421,0x479,0x4d1,0x529,0x581,0x5d9,0x631,0x689,0x6e1,0x739,0x791,0x7e9,0x841,0x899,0x035,0x08d,0x0e5,0x13d,0x195,0x1ed,0x245,0x29d,0x2f5,0x34d,0x3a5,0x3fd,0x455,0x4ad,0x505,0x55d,0x5b5 },
@@ -1542,14 +1542,14 @@ static const UINT16 qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
 //  particular to a mode
 //-------------------------------------------------
 
-inline UINT8 ecc_source_byte(const UINT8 *sector, UINT32 offset)
+inline uint8_t ecc_source_byte(const uint8_t *sector, uint32_t offset)
 {
 	// in mode 2 always treat these as 0 bytes
 	return (sector[MODE_OFFSET] == 2 && offset < 4) ? 0x00 : sector[SYNC_OFFSET + SYNC_NUM_BYTES + offset];
 }
 
 /**
- * @fn  void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8 &val1, UINT8 &val2)
+ * @fn  void ecc_compute_bytes(const uint8_t *sector, const uint16_t *row, int rowlen, uint8_t &val1, uint8_t &val2)
  *
  * @brief   -------------------------------------------------
  *            ecc_compute_bytes - calculate an ECC value (P or Q)
@@ -1562,7 +1562,7 @@ inline UINT8 ecc_source_byte(const UINT8 *sector, UINT32 offset)
  * @param [in,out]  val2    The second value.
  */
 
-void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8 &val1, UINT8 &val2)
+void ecc_compute_bytes(const uint8_t *sector, const uint16_t *row, int rowlen, uint8_t &val1, uint8_t &val2)
 {
 	val1 = val2 = 0;
 	for (int component = 0; component < rowlen; component++)
@@ -1576,7 +1576,7 @@ void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8
 }
 
 /**
- * @fn  bool ecc_verify(const UINT8 *sector)
+ * @fn  bool ecc_verify(const uint8_t *sector)
  *
  * @brief   -------------------------------------------------
  *            ecc_verify - verify the P and Q ECC codes in a sector
@@ -1587,12 +1587,12 @@ void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8
  * @return  true if it succeeds, false if it fails.
  */
 
-bool ecc_verify(const UINT8 *sector)
+bool ecc_verify(const uint8_t *sector)
 {
 	// first verify P bytes
 	for (int byte = 0; byte < ECC_P_NUM_BYTES; byte++)
 	{
-		UINT8 val1, val2;
+		uint8_t val1, val2;
 		ecc_compute_bytes(sector, poffsets[byte], ECC_P_COMP, val1, val2);
 		if (sector[ECC_P_OFFSET + byte] != val1 || sector[ECC_P_OFFSET + ECC_P_NUM_BYTES + byte] != val2)
 			return false;
@@ -1601,7 +1601,7 @@ bool ecc_verify(const UINT8 *sector)
 	// then verify Q bytes
 	for (int byte = 0; byte < ECC_Q_NUM_BYTES; byte++)
 	{
-		UINT8 val1, val2;
+		uint8_t val1, val2;
 		ecc_compute_bytes(sector, qoffsets[byte], ECC_Q_COMP, val1, val2);
 		if (sector[ECC_Q_OFFSET + byte] != val1 || sector[ECC_Q_OFFSET + ECC_Q_NUM_BYTES + byte] != val2)
 			return false;
@@ -1610,7 +1610,7 @@ bool ecc_verify(const UINT8 *sector)
 }
 
 /**
- * @fn  void ecc_generate(UINT8 *sector)
+ * @fn  void ecc_generate(uint8_t *sector)
  *
  * @brief   -------------------------------------------------
  *            ecc_generate - generate the P and Q ECC codes for a sector, overwriting any
@@ -1620,7 +1620,7 @@ bool ecc_verify(const UINT8 *sector)
  * @param [in,out]  sector  If non-null, the sector.
  */
 
-void ecc_generate(UINT8 *sector)
+void ecc_generate(uint8_t *sector)
 {
 	// first verify P bytes
 	for (int byte = 0; byte < ECC_P_NUM_BYTES; byte++)
@@ -1632,7 +1632,7 @@ void ecc_generate(UINT8 *sector)
 }
 
 /**
- * @fn  void ecc_clear(UINT8 *sector)
+ * @fn  void ecc_clear(uint8_t *sector)
  *
  * @brief   -------------------------------------------------
  *            ecc_clear - erase the ECC P and Q cods to 0 within a sector
@@ -1641,7 +1641,7 @@ void ecc_generate(UINT8 *sector)
  * @param [in,out]  sector  If non-null, the sector.
  */
 
-void ecc_clear(UINT8 *sector)
+void ecc_clear(uint8_t *sector)
 {
 	memset(&sector[ECC_P_OFFSET], 0, 2 * ECC_P_NUM_BYTES);
 	memset(&sector[ECC_Q_OFFSET], 0, 2 * ECC_Q_NUM_BYTES);

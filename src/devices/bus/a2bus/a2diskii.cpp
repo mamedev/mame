@@ -90,19 +90,19 @@ const tiny_rom_entry *a2bus_floppy_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_fdc(*this, FDC_TAG), m_rom(nullptr)
 {
 }
 
-a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_floppy_device(mconfig, A2BUS_DISKII, "Apple Disk II controller", tag, owner, clock, "a2diskii", __FILE__)
 {
 }
 
-a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2iwm_flop", __FILE__)
 {
 }
@@ -128,7 +128,7 @@ void a2bus_floppy_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return m_fdc->read(offset);
 }
@@ -138,7 +138,7 @@ UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data);
 }
@@ -147,7 +147,7 @@ void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     read_cnxx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_floppy_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_floppy_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset];
 }

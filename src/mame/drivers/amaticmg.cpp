@@ -437,14 +437,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_attr;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
+	required_shared_ptr<uint8_t> m_vram;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
 	DECLARE_DRIVER_INIT(ama8000_3_o);
@@ -456,10 +456,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(amaticmg);
 	DECLARE_PALETTE_INIT(amaticmg2);
-	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
-	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
+	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -475,7 +475,7 @@ void amaticmg_state::video_start()
 {
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -485,8 +485,8 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0x0f)<<8);
 			/* TODO: this looks so out of place ... */
@@ -500,7 +500,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -510,8 +510,8 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
@@ -526,7 +526,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 
 PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -553,7 +553,7 @@ PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 
 PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int r, g, b;
 	int i;
 
@@ -801,7 +801,7 @@ GFXDECODE_END
 
 void amaticmg_state::machine_start()
 {
-	UINT8 *rombank = memregion("maincpu")->base();
+	uint8_t *rombank = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 }
@@ -1048,12 +1048,12 @@ ROM_END
 *       Driver Initialization       *
 ************************************/
 
-void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
+void amaticmg_state::encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
 	aux = ((aux<<6) | (aux>>6)) & 0xfff;
-	UINT8 aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
+	uint8_t aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
 	aux2 ^= aux2>>4;
 	aux2 = (aux2<<4) | (aux2>>4);
 	ciphertext ^= ciphertext<<4;
@@ -1064,11 +1064,11 @@ void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &
 
 void amaticmg_state::decrypt(int key1, int key2)
 {
-	UINT8 plaintext;
+	uint8_t plaintext;
 	int newaddress;
 
-	UINT8 *src = memregion("mainprg")->base();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *src = memregion("mainprg")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 	int len = memregion("mainprg")->bytes();
 
 	for (int i = 0; i < len; i++)

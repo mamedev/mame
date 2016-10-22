@@ -1663,8 +1663,8 @@ GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Ni
 
 DRIVER_INIT_MEMBER(playch10_state,virus)
 {
-	UINT8 *ROM = memregion("rp5h01")->base();
-	UINT32 len = memregion("rp5h01")->bytes();
+	uint8_t *ROM = memregion("rp5h01")->base();
+	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
@@ -1677,8 +1677,8 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 
 DRIVER_INIT_MEMBER(playch10_state,ttoon)
 {
-	UINT8 *ROM = memregion("rp5h01")->base();
-	UINT32 len = memregion("rp5h01")->bytes();
+	uint8_t *ROM = memregion("rp5h01")->base();
+	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);

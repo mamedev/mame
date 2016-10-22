@@ -193,14 +193,14 @@ public:
 	DECLARE_READ16_MEMBER(e90_prot_r);
 	DECLARE_WRITE16_MEMBER(e90_prot_w);
 
-	UINT32 screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	optional_shared_ptr<UINT32> m_e90_vram;
-	optional_shared_ptr<UINT32> m_e90_pal;
+	optional_shared_ptr<uint32_t> m_e90_vram;
+	optional_shared_ptr<uint32_t> m_e90_pal;
 
 private:
-	UINT32 m_dip_read_offset;
+	uint32_t m_dip_read_offset;
 };
 
 
@@ -236,7 +236,7 @@ READ32_MEMBER(aleck64_state::aleck_dips_r)
 		return (ioport("IN1")->read());
 	case 2:
 		{
-			UINT32 const val = ioport("INMJ")->read();
+			uint32_t const val = ioport("INMJ")->read();
 
 			switch( m_dip_read_offset >> 8 & 0xff )
 			{
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_N64_PERIPHS_ADD("rcp");
 MACHINE_CONFIG_END
 
-UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen_update_n64(screen,bitmap,cliprect);
@@ -890,10 +890,10 @@ UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bit
 		int r,g,b;
 		int pal_offs;
 		int pal_shift;
-		//UINT16 tile = m_e90_vram[offs] >> 16;
-		UINT16 pal = m_e90_vram[offs] & 0xff; // guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below (TODO: why?)
-		INT16 x = m_e90_vram[offs+1] >> 16;
-		INT16 y = m_e90_vram[offs+1] & 0xffff;
+		//uint16_t tile = m_e90_vram[offs] >> 16;
+		uint16_t pal = m_e90_vram[offs] & 0xff; // guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below (TODO: why?)
+		int16_t x = m_e90_vram[offs+1] >> 16;
+		int16_t y = m_e90_vram[offs+1] & 0xffff;
 		pal>>=1;
 		x>>=1;
 		pal_offs = (pal*0x20);
@@ -932,7 +932,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(aleck64_state,aleck64)
 {
-	UINT8 *rom = memregion("user2")->base();
+	uint8_t *rom = memregion("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

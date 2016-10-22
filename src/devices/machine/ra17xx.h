@@ -32,7 +32,7 @@
 class ra17xx_device : public device_t
 {
 public:
-	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ra17xx_device() {}
 
 	DECLARE_READ8_MEMBER ( io_r );
@@ -46,8 +46,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8           m_line[16];   //!< input/output flip-flops for 16 I/O lines
-	UINT8           m_bl;         //!< value of BL during the most recent output
+	uint8_t           m_line[16];   //!< input/output flip-flops for 16 I/O lines
+	uint8_t           m_bl;         //!< value of BL during the most recent output
 	bool            m_enable;     //!< true if outputs are enabled
 	devcb_read8     m_iord;       //!< input line (read, offset = line, data = 0/1)
 	devcb_write8    m_iowr;       //!< output line (write, offset = line, data = 0/1)

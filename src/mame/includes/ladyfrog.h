@@ -24,11 +24,11 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	std::unique_ptr<UINT8[]>    m_spriteram;
-	required_shared_ptr<UINT8> m_scrlram;
-	std::vector<UINT8> m_paletteram;
-	std::vector<UINT8> m_paletteram_ext;
+	required_shared_ptr<uint8_t> m_videoram;
+	std::unique_ptr<uint8_t[]>    m_spriteram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	std::vector<uint8_t> m_paletteram;
+	std::vector<uint8_t> m_paletteram_ext;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -40,7 +40,7 @@ public:
 	int        m_sound_nmi_enable;
 	int        m_pending_nmi;
 	int        m_snd_flag;
-	UINT8      m_snd_data;
+	uint8_t      m_snd_data;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(toucheme);
 	DECLARE_VIDEO_START(ladyfrog_common);
-	UINT32 screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

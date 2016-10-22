@@ -30,9 +30,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK_25MHz = 25174800;
-const UINT32 MASTER_CLOCK_10MHz = 10000000;
-const UINT32 MASTER_CLOCK_8MHz = 8000000;
+const uint32_t MASTER_CLOCK_25MHz = 25174800;
+const uint32_t MASTER_CLOCK_10MHz = 10000000;
+const uint32_t MASTER_CLOCK_8MHz = 8000000;
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -1949,7 +1949,7 @@ ROM_END
 DRIVER_INIT_MEMBER(segahang_state,generic)
 {
 	// point globals to allocated memory regions
-	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	// save states
 	save_item(NAME(m_adc_select));
@@ -1978,7 +1978,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurobl)
 {
 	DRIVER_INIT_CALL(enduror);
 	// assemble decrypted half of ROM and register it
-	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("maincpu")->base());
+	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
 	memcpy(m_decrypted_opcodes + 0x00000/2, rom + 0x30000/2, 0x10000);
 	memcpy(m_decrypted_opcodes + 0x10000/2, rom + 0x10000/2, 0x20000);
 }
@@ -1988,7 +1988,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 	DRIVER_INIT_CALL(enduror);
 
 	// assemble decrypted half of ROM and register it
-	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("maincpu")->base());
+	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
 	memcpy(m_decrypted_opcodes, rom, 0x30000);
 }
 

@@ -26,7 +26,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 	}
 }
 
-#define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
+#define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
 
 #define GF4500_FRAMEBUF_OFFSET 0x20000
 
@@ -34,7 +34,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 const device_type GF4500 = &device_creator<gf4500_device>;
 
 
-gf4500_device::gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gf4500_device::gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, GF4500, "NVIDIA GoForce 4500", tag, owner, clock, "gf4500", __FILE__), m_data(nullptr), m_screen_x(0), m_screen_y(0), m_screen_x_max(0), m_screen_y_max(0), m_screen_x_min(0), m_screen_y_min(0)
 			{
 }
@@ -56,7 +56,7 @@ void gf4500_device::device_config_complete()
 
 void gf4500_device::device_start()
 {
-	m_data = make_unique_clear<UINT32[]>(0x140000/4);
+	m_data = make_unique_clear<uint32_t[]>(0x140000/4);
 
 	save_pointer(NAME(m_data.get()), 0x140000/4);
 	save_item(NAME(m_screen_x));
@@ -78,32 +78,32 @@ void gf4500_device::device_reset()
 }
 
 
-void gf4500_device::vram_write16( UINT16 data )
+void gf4500_device::vram_write16( uint16_t data )
 {
 	if ((m_screen_x < m_screen_x_max) && (m_screen_y < m_screen_y_max))
 	{
-		UINT16 *vram = (UINT16 *)((UINT8 *)m_data.get() + GF4500_FRAMEBUF_OFFSET + (((m_screen_y_min + m_screen_y) * (320 + 1)) + (m_screen_x_min + m_screen_x)) * 2);
+		uint16_t *vram = (uint16_t *)((uint8_t *)m_data.get() + GF4500_FRAMEBUF_OFFSET + (((m_screen_y_min + m_screen_y) * (320 + 1)) + (m_screen_x_min + m_screen_x)) * 2);
 		*vram = data;
 		m_screen_x++;
 	}
 }
 
-static rgb_t gf4500_get_color_16( UINT16 data )
+static rgb_t gf4500_get_color_16( uint16_t data )
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = BITS(data, 15, 11) << 3;
 	g = BITS(data, 10, 5) << 2;
 	b = BITS(data, 4, 0) << 3;
 	return rgb_t(r, g, b);
 }
 
-UINT32 gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *vram = (UINT16 *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
+	uint16_t *vram = (uint16_t *)(m_data.get() + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
 	for (y = 0; y < 240; y++)
 	{
-		UINT32 *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix32(y);
 		for (x = 0; x < 320; x++)
 		{
 			*scanline++ = gf4500_get_color_16(*vram++);
@@ -115,7 +115,7 @@ UINT32 gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap,
 
 READ32_MEMBER( gf4500_device::read )
 {
-	UINT32 data = m_data[offset];
+	uint32_t data = m_data[offset];
 	switch (offset)
 	{
 		case 0x4c / 4:

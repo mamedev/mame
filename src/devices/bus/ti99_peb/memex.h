@@ -22,7 +22,7 @@ extern const device_type TI99_MEMEX;
 class geneve_memex_device : public ti_expansion_card_device
 {
 public:
-	geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -38,7 +38,7 @@ protected:
 private:
 	bool    access_enabled(offs_t offset);
 	required_device<ram_device> m_ram;
-	UINT8   m_switches;
+	uint8_t   m_switches;
 };
 
 #endif

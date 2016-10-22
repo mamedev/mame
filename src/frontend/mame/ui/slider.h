@@ -21,17 +21,17 @@
 
 #define SLIDER_NOCHANGE     0x12345678
 
-typedef std::function<INT32(running_machine&, void*, int, std::string*, INT32)> slider_update;
+typedef std::function<int32_t(running_machine&, void*, int, std::string*, int32_t)> slider_update;
 
 struct slider_state
 {
 	slider_state *  next;               /* pointer to next slider */
 	slider_update   update;             /* callback */
 	void *          arg;                /* argument */
-	INT32           minval;             /* minimum value */
-	INT32           defval;             /* default value */
-	INT32           maxval;             /* maximum value */
-	INT32           incval;             /* increment value */
+	int32_t           minval;             /* minimum value */
+	int32_t           defval;             /* default value */
+	int32_t           maxval;             /* maximum value */
+	int32_t           incval;             /* increment value */
 	int             id;
 	char            description[1];     /* textual description */
 };

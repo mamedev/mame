@@ -71,7 +71,7 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(okibank_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
@@ -97,12 +97,12 @@ void diverboy_state::video_start()
 
 void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *source = m_spriteram;
-	UINT16 *finish = source + (m_spriteram.bytes() / 2);
+	uint16_t *source = m_spriteram;
+	uint16_t *finish = source + (m_spriteram.bytes() / 2);
 
 	while (source < finish)
 	{
-		INT16 xpos, ypos, number, colr, bank, flash;
+		int16_t xpos, ypos, number, colr, bank, flash;
 
 		ypos = source[4];
 		xpos = source[0];
@@ -130,7 +130,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-UINT32 diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_sprites(bitmap, cliprect);

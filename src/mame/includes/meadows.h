@@ -35,21 +35,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	int m_channel;
 	int m_freq1;
 	int m_freq2;
-	UINT8 m_latched_0c01;
-	UINT8 m_latched_0c02;
-	UINT8 m_latched_0c03;
-	UINT8 m_main_sense_state;
-	UINT8 m_audio_sense_state;
-	UINT8 m_0c00;
-	UINT8 m_0c01;
-	UINT8 m_0c02;
-	UINT8 m_0c03;
+	uint8_t m_latched_0c01;
+	uint8_t m_latched_0c02;
+	uint8_t m_latched_0c03;
+	uint8_t m_main_sense_state;
+	uint8_t m_audio_sense_state;
+	uint8_t m_0c00;
+	uint8_t m_0c01;
+	uint8_t m_0c02;
+	uint8_t m_0c03;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(hsync_chain_r);
 	DECLARE_READ8_MEMBER(vsync_chain_hi_r);
@@ -64,7 +64,7 @@ public:
 	DECLARE_DRIVER_INIT(gypsyjug);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(meadows_interrupt);
 	INTERRUPT_GEN_MEMBER(minferno_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);

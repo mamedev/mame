@@ -40,7 +40,7 @@ class southbridge_device :
 {
 public:
 		// construction/destruction
-		southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		southbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -110,19 +110,19 @@ public:
 		DECLARE_READ8_MEMBER(pc_dma_read_word);
 		DECLARE_WRITE8_MEMBER(pc_dma_write_word);
 protected:
-		UINT8 m_at_spkrdata;
-		UINT8 m_pit_out2;
+		uint8_t m_at_spkrdata;
+		uint8_t m_pit_out2;
 		int m_dma_channel;
 		bool m_cur_eop;
-		UINT8 m_dma_offset[2][4];
-		UINT8 m_at_pages[0x10];
-		UINT16 m_dma_high_byte;
-		UINT8 m_at_speaker;
+		uint8_t m_dma_offset[2][4];
+		uint8_t m_at_pages[0x10];
+		uint16_t m_dma_high_byte;
+		uint8_t m_at_speaker;
 		bool m_refresh;
-		void at_speaker_set_spkrdata(UINT8 data);
+		void at_speaker_set_spkrdata(uint8_t data);
 
-		UINT8 m_channel_check;
-		UINT8 m_nmi_enabled;
+		uint8_t m_channel_check;
+		uint8_t m_nmi_enabled;
 
 		void pc_select_dma_channel(int channel, bool state);
 };

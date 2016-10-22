@@ -327,11 +327,11 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 {
-	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst;
+	uint32_t oldaddr, newaddr, length;
+	uint8_t *src, *dst;
 
 	/* allocate some temporary space */
-	std::vector<UINT8> temp(0x10000);
+	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];

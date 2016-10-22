@@ -282,7 +282,7 @@ WRITE16_MEMBER(x68k_state::x68k_scc_w )
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(UINT8)data);
+		m_scc->reg_w(space, 0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -295,13 +295,13 @@ WRITE16_MEMBER(x68k_state::x68k_scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(UINT8)data);
+		m_scc->reg_w(space, 2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(UINT8)data);
+		m_scc->reg_w(space, 1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(UINT8)data);
+		m_scc->reg_w(space, 3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
@@ -333,7 +333,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 
 void x68k_state::x68k_set_adpcm()
 {
-	UINT32 rate = 0;
+	uint32_t rate = 0;
 
 	switch(m_adpcm.rate & 0x0c)
 	{
@@ -361,12 +361,12 @@ void x68k_state::x68k_set_adpcm()
 // Button inputs (Start, A, B and C) are read in bits 5 and 6 (rather than 4
 // and 5 like on a Megadrive)
 
-UINT8 x68k_state::md_3button_r(int port)
+uint8_t x68k_state::md_3button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_md3b->read() & 0xff;
-		UINT8 portb = (m_md3b->read() >> 8) & 0xff;
+		uint8_t porta = m_md3b->read() & 0xff;
+		uint8_t portb = (m_md3b->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
@@ -378,8 +378,8 @@ UINT8 x68k_state::md_3button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_md3b->read() >> 16) & 0xff;
-		UINT8 portb = (m_md3b->read() >> 24) & 0xff;
+		uint8_t porta = (m_md3b->read() >> 16) & 0xff;
+		uint8_t portb = (m_md3b->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -409,13 +409,13 @@ void x68k_state::md_6button_init()
 	m_mdctrl.io_timeout2 = timer_alloc(TIMER_MD_6BUTTON_PORT2_TIMEOUT);
 }
 
-UINT8 x68k_state::md_6button_r(int port)
+uint8_t x68k_state::md_6button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_md6b->read() & 0xff;
-		UINT8 portb = (m_md6b->read() >> 8) & 0xff;
-		UINT8 extra = m_md6b_extra->read() & 0x0f;
+		uint8_t porta = m_md6b->read() & 0xff;
+		uint8_t portb = (m_md6b->read() >> 8) & 0xff;
+		uint8_t extra = m_md6b_extra->read() & 0x0f;
 
 		switch(m_mdctrl.seq1)
 		{
@@ -451,9 +451,9 @@ UINT8 x68k_state::md_6button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_md6b->read() >> 16) & 0xff;
-		UINT8 portb = (m_md6b->read() >> 24) & 0xff;
-		UINT8 extra = (m_md6b_extra->read() >> 4) & 0x0f;
+		uint8_t porta = (m_md6b->read() >> 16) & 0xff;
+		uint8_t portb = (m_md6b->read() >> 24) & 0xff;
+		uint8_t extra = (m_md6b_extra->read() >> 4) & 0x0f;
 
 		switch(m_mdctrl.seq2)
 		{
@@ -497,12 +497,12 @@ UINT8 x68k_state::md_6button_r(int port)
 // Output is the same as for standard controllers, but when ctl is high,
 // the directions refer to the right D-pad, and when low, the left D-pad
 // The buttons are read the same as normal, regardless of ctl.
-UINT8 x68k_state::xpd1lr_r(int port)
+uint8_t x68k_state::xpd1lr_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = m_xpd1lr->read() & 0xff;
-		UINT8 portb = (m_xpd1lr->read() >> 8) & 0xff;
+		uint8_t porta = m_xpd1lr->read() & 0xff;
+		uint8_t portb = (m_xpd1lr->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta;
@@ -514,8 +514,8 @@ UINT8 x68k_state::xpd1lr_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (m_xpd1lr->read() >> 16) & 0xff;
-		UINT8 portb = (m_xpd1lr->read() >> 24) & 0xff;
+		uint8_t porta = (m_xpd1lr->read() >> 16) & 0xff;
+		uint8_t portb = (m_xpd1lr->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -958,7 +958,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 	m_bus_error = false;
 }
 
-void x68k_state::set_bus_error(UINT32 address, bool write, UINT16 mem_mask)
+void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
@@ -1484,7 +1484,7 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	   more or less do the same job */
 
 	int drive;
-	UINT8* romdata = memregion("user2")->base();
+	uint8_t* romdata = memregion("user2")->base();
 	attotime irq_time;
 
 	memset(m_ram->pointer(),0,m_ram->size());
@@ -1545,7 +1545,7 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
-	m_spriteram = (UINT16*)(memregion("user1")->base());
+	m_spriteram = (uint16_t*)(memregion("user1")->base());
 	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 

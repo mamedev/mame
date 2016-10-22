@@ -456,7 +456,7 @@ struct spu_device::voiceinfo
 				inloopcache,
 				forceloop,
 				_pad;
-	INT64 keyontime;
+	int64_t keyontime;
 };
 
 //
@@ -475,7 +475,7 @@ public:
 									*prev;
 	};
 
-	std::vector<UINT8> buffer;
+	std::vector<uint8_t> buffer;
 	unsigned int head,
 								tail,
 								in,
@@ -954,7 +954,7 @@ static int shift_register15(int &shift)
 //  spu_device - constructor
 //-------------------------------------------------
 
-spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPU, "SPU", tag, owner, clock, "spu", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_irq_handler(*this),
@@ -1455,14 +1455,14 @@ void spu_device::update_voice_events(voiceinfo *vi)
 	{
 		// Calculate time until end of sample in output samples
 
-		vi->samplestoend=(unsigned int)((((INT64)(vi->play.cache->dend-vi->play.ptr)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch;
+		vi->samplestoend=(unsigned int)((((int64_t)(vi->play.cache->dend-vi->play.ptr)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch;
 		if (vi->inloopcache)
 		{
 			// Voice is inside loop cache, return time until end of that if lower
 
 			assert(vi->lcptr<vi->loop_cache->len);
 			vi->samplestoend=min(vi->samplestoend,
-														(unsigned int)((((INT64)(vi->loop_cache->len-vi->lcptr)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch);
+														(unsigned int)((((int64_t)(vi->loop_cache->len-vi->lcptr)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch);
 		}
 
 		// Calculate time until next IRQ in output samples
@@ -1472,7 +1472,7 @@ void spu_device::update_voice_events(voiceinfo *vi)
 		{
 			// Convert IRQ input sample distance to output samples
 
-			vi->samplestoirq=(unsigned int)(((((INT64)irqdist)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch;
+			vi->samplestoirq=(unsigned int)(((((int64_t)irqdist)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch;
 		} else
 		{
 			vi->samplestoirq=spu_infinity;
@@ -1894,7 +1894,7 @@ void spu_device::generate_voice(const unsigned int v,
 
 	if (noiseptr)
 	{
-		INT64 dptr=((INT64)n*vi->pitch)+vi->dptr;
+		int64_t dptr=((int64_t)n*vi->pitch)+vi->dptr;
 		unsigned int d=(unsigned int)(dptr>>12);
 		vi->dptr=(unsigned int)(dptr&0xfff);
 		vi->play.ptr+=d;
@@ -1950,7 +1950,7 @@ void spu_device::generate_voice(const unsigned int v,
 			// Linear interpolation enabled, calculate how many samples we will
 			// read from input data
 
-			INT64 fracend=(((INT64)(n-1))*vi->pitch)+dptr;
+			int64_t fracend=(((int64_t)(n-1))*vi->pitch)+dptr;
 			unsigned int end=(unsigned int)(fracend>>12);
 
 			// Get pointer to last sample of input data
@@ -2470,8 +2470,8 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 
 		while ((cdda_buffer->get_bytes_in()) && (n--))
 		{
-			INT16 vl = ((sp[0]*voll)>>15);
-			INT16 vr = ((sp[1]*volr)>>15);
+			int16_t vl = ((sp[0]*voll)>>15);
+			int16_t vr = ((sp[1]*volr)>>15);
 
 			// if the volume adjusted samples are stored here, vibribbon does nothing
 			*(signed short *)(spu_ram+m_cd_out_ptr)=sp[0];
@@ -2507,8 +2507,8 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 	}
 	else if(((spureg.irq_addr << 3) < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
 	{
-		UINT16 irq_addr = (spureg.irq_addr << 3) & ~0x400;
-		UINT32 end = m_cd_out_ptr + (sz >> 1);
+		uint16_t irq_addr = (spureg.irq_addr << 3) & ~0x400;
+		uint32_t end = m_cd_out_ptr + (sz >> 1);
 		if(((m_cd_out_ptr < irq_addr) && (end > irq_addr)) || ((m_cd_out_ptr > (end & 0x3ff)) && ((end & 0x3ff) > irq_addr)))
 			m_irq_handler(1);
 		m_cd_out_ptr =  end & 0x3fe;
@@ -2773,12 +2773,12 @@ void spu_device::update_timing()
 void spu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
-	INT16 temp[44100], *src;
+	int16_t temp[44100], *src;
 
 	outL = outputs[0];
 	outR = outputs[1];
 
-	generate(temp, samples*4);  // second parameter is bytes, * 2 (size of INT16) * 2 (stereo)
+	generate(temp, samples*4);  // second parameter is bytes, * 2 (size of int16_t) * 2 (stereo)
 
 	src = &temp[0];
 	for (int i = 0; i < samples; i++)
@@ -2792,9 +2792,9 @@ void spu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //
 //
 
-void spu_device::start_dma(UINT8 *mainram, bool to_spu, UINT32 size)
+void spu_device::start_dma(uint8_t *mainram, bool to_spu, uint32_t size)
 {
-	UINT32 st=spureg.trans_addr<<3, en=st+size;
+	uint32_t st=spureg.trans_addr<<3, en=st+size;
 
 	if (en>(512*1024))
 	{
@@ -3064,16 +3064,16 @@ void spu_device::flush_cdda(const unsigned int sector)
 	}
 }
 
-void spu_device::dma_read( UINT32 *p_n_ram, UINT32 n_address, INT32 n_size )
+void spu_device::dma_read( uint32_t *p_n_ram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *psxram = (UINT8 *)p_n_ram;
+	uint8_t *psxram = (uint8_t *)p_n_ram;
 
 	start_dma(psxram + n_address, false, n_size*4);
 }
 
-void spu_device::dma_write( UINT32 *p_n_ram, UINT32 n_address, INT32 n_size )
+void spu_device::dma_write( uint32_t *p_n_ram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *psxram = (UINT8 *)p_n_ram;
+	uint8_t *psxram = (uint8_t *)p_n_ram;
 
 //  printf("SPU DMA write from %x, size %x\n", n_address, n_size);
 

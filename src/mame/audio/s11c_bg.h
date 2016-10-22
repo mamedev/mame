@@ -25,7 +25,7 @@ class s11c_bg_device : public device_t,
 {
 public:
 	// construction/destruction
-	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -41,8 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	void ctrl_w(UINT8 data);
-	void data_w(UINT8 data);
+	void ctrl_w(uint8_t data);
+	void data_w(uint8_t data);
 
 	static void static_set_romregion(device_t &device, const char *tag);
 

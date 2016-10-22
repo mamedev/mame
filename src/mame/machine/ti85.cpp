@@ -134,7 +134,7 @@ void ti85_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-inline void ti8x_update_bank(address_space &space, UINT8 bank, UINT8 *base, UINT8 page, bool is_ram)
+inline void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram)
 {
 	ti85_state *state = space.machine().driver_data<ti85_state>();
 	static const char *const tag[] = {"bank1", "bank2", "bank3", "bank4"};
@@ -438,8 +438,8 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	m_interrupt_speed = 0;
 	m_port4_bit0 = 0;
 
-	m_ti8x_ram = std::make_unique<UINT8[]>(128*1024);
-	memset(m_ti8x_ram.get(), 0, sizeof(UINT8)*128*1024);
+	m_ti8x_ram = std::make_unique<uint8_t[]>(128*1024);
+	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*128*1024);
 
 	space.unmap_write(0x0000, 0x3fff);
 
@@ -447,7 +447,7 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank2")->set_base(m_bios + 0x04000);
 
 	membank("bank4")->set_base(m_ti8x_ram.get());
-	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(UINT8)*128*1024);
+	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 }
@@ -864,7 +864,7 @@ READ8_MEMBER(ti85_state::ti84pse_port_0056_r)
 
 //timer ports
 
-void ti85_state::ti83pse_count( UINT8 timer, UINT8 data)
+void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 {
 	m_ctimer[timer].max = m_ctimer[timer].count = data;
 
@@ -1026,7 +1026,7 @@ WRITE8_MEMBER(ti85_state::ti83pse_ctimer3_count_w)
   TI calculators snapshot files (SAV)
 ***************************************************************************/
 
-void ti85_state::ti8x_snapshot_setup_registers (UINT8 * data)
+void ti85_state::ti8x_snapshot_setup_registers (uint8_t * data)
 {
 	unsigned char lo,hi;
 	unsigned char * reg = data + 0x40;
@@ -1081,7 +1081,7 @@ void ti85_state::ti8x_snapshot_setup_registers (UINT8 * data)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, 0);
 }
 
-void ti85_state::ti85_setup_snapshot (UINT8 * data)
+void ti85_state::ti85_setup_snapshot (uint8_t * data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -1121,7 +1121,7 @@ void ti85_state::ti85_setup_snapshot (UINT8 * data)
 	m_interrupt_speed = 0x03;
 }
 
-void ti85_state::ti86_setup_snapshot (UINT8 * data)
+void ti85_state::ti86_setup_snapshot (uint8_t * data)
 {
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x20000 + 0x94;
@@ -1164,7 +1164,7 @@ void ti85_state::ti86_setup_snapshot (UINT8 * data)
 SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 {
 	int expected_snapshot_size = 0;
-	std::vector<UINT8> ti8x_snapshot_data;
+	std::vector<uint8_t> ti8x_snapshot_data;
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;

@@ -15,7 +15,7 @@
 class ad1848_device : public device_t
 {
 public:
-	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(dack_r);
@@ -30,30 +30,30 @@ protected:
 private:
 	union {
 		struct {
-			UINT8 linp;
-			UINT8 rinp;
-			UINT8 laux1;
-			UINT8 raux1;
-			UINT8 laux2;
-			UINT8 raux2;
-			UINT8 lout;
-			UINT8 rout;
-			UINT8 dform;
-			UINT8 iface;
-			UINT8 pinc;
-			UINT8 init;
-			UINT8 misc;
-			UINT8 mix;
-			UINT8 ubase;
-			UINT8 lbase;
+			uint8_t linp;
+			uint8_t rinp;
+			uint8_t laux1;
+			uint8_t raux1;
+			uint8_t laux2;
+			uint8_t raux2;
+			uint8_t lout;
+			uint8_t rout;
+			uint8_t dform;
+			uint8_t iface;
+			uint8_t pinc;
+			uint8_t init;
+			uint8_t misc;
+			uint8_t mix;
+			uint8_t ubase;
+			uint8_t lbase;
 		};
-		UINT8 idx[15];
+		uint8_t idx[15];
 	} m_regs;
-	UINT8 m_addr;
-	UINT8 m_stat;
-	UINT16 m_count;
-	UINT32 m_samples;
-	UINT8 m_sam_cnt;
+	uint8_t m_addr;
+	uint8_t m_stat;
+	uint16_t m_count;
+	uint32_t m_samples;
+	uint8_t m_sam_cnt;
 	bool m_play, m_mce, m_trd;
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_drq_cb;

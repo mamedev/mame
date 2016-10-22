@@ -32,7 +32,7 @@ struct xml_parse_info
 	XML_Parser          parser;
 	xml_data_node *     rootnode;
 	xml_data_node *     curnode;
-	UINT32              flags;
+	uint32_t              flags;
 };
 
 
@@ -103,7 +103,7 @@ static const char *copystring_lower(const char *input)
 	if (newstr != nullptr)
 	{
 		for (i = 0; input[i] != 0; i++)
-			newstr[i] = tolower((UINT8)input[i]);
+			newstr[i] = tolower((uint8_t)input[i]);
 		newstr[i] = 0;
 	}
 
@@ -635,7 +635,7 @@ const char *xml_normalize_string(const char *string)
 
 static void *expat_malloc(size_t size)
 {
-	UINT32 *result = (UINT32 *)malloc(size + 4 * sizeof(UINT32));
+	uint32_t *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
 	*result = size;
 	return &result[4];
 }
@@ -651,7 +651,7 @@ static void *expat_malloc(size_t size)
 static void expat_free(void *ptr)
 {
 	if (ptr != nullptr)
-		free(&((UINT32 *)ptr)[-4]);
+		free(&((uint32_t *)ptr)[-4]);
 }
 
 /**
@@ -672,7 +672,7 @@ static void *expat_realloc(void *ptr, size_t size)
 		return nullptr;
 	if (ptr != nullptr)
 	{
-		UINT32 oldsize = ((UINT32 *)ptr)[-4];
+		uint32_t oldsize = ((uint32_t *)ptr)[-4];
 		memcpy(newptr, ptr, oldsize);
 		expat_free(ptr);
 	}
@@ -856,11 +856,11 @@ static void expat_element_end(void *data, const XML_Char *name)
 		char *end = start + strlen(start);
 
 		/* first strip leading spaces */
-		while (*start && isspace((UINT8)*start))
+		while (*start && isspace((uint8_t)*start))
 			start++;
 
 		/* then strip trailing spaces */
-		while (end > start && isspace((UINT8)end[-1]))
+		while (end > start && isspace((uint8_t)end[-1]))
 			end--;
 
 		/* if nothing left, just free it */

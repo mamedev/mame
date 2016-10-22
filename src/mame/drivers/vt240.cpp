@@ -59,8 +59,8 @@ public:
 	required_device<address_map_bank_device> m_bank;
 	required_device<x2212_device> m_nvram;
 	required_device<palette_device> m_palette;
-	required_region_ptr<UINT16> m_rom;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_region_ptr<uint16_t> m_rom;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_ioport m_monitor;
 	optional_device<lk201_device> m_lk201;
 
@@ -108,16 +108,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq9_w);
 	DECLARE_WRITE_LINE_MEMBER(irq13_w);
 
-	UINT8 m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
-	UINT8 m_mem_map[16];
-	UINT8 m_mem_map_sel;
-	UINT8 m_char_buf[16];
-	UINT8 m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
-	UINT8 m_vom[16];
-	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
-	UINT16 m_irqs;
+	uint8_t m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
+	uint8_t m_mem_map[16];
+	uint8_t m_mem_map_sel;
+	uint8_t m_char_buf[16];
+	uint8_t m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
+	uint8_t m_vom[16];
+	uint8_t m_vpat, m_patmult, m_patcnt, m_patidx;
+	uint16_t m_irqs;
 	bool m_lb;
-	UINT16 m_scrl;
+	uint16_t m_scrl;
 };
 
 void vt240_state::irq_encoder(int irq, int state)
@@ -200,7 +200,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi, gfx1, gfx2;
-	UINT8 vom;
+	uint8_t vom;
 
 	if(!BIT(m_reg0, 7))
 	{
@@ -384,7 +384,7 @@ READ16_MEMBER(vt240_state::vram_r)
 
 WRITE16_MEMBER(vt240_state::vram_w)
 {
-	UINT8 *video_ram = (UINT8 *)(&m_video_ram[0]);
+	uint8_t *video_ram = (uint8_t *)(&m_video_ram[0]);
 	offset <<= 1;
 	offset = ((offset & 0x30000) >> 1) | (offset & 0x7fff);
 	if(!BIT(m_reg0, 3))
@@ -400,7 +400,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 			data &= 0xff;
 	}
 	offset &= 0xffff;
-	UINT8 chr = data;
+	uint8_t chr = data;
 
 	if(BIT(m_reg0, 4))
 	{
@@ -424,8 +424,8 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		{
 			if(ps == 0)
 				i++;
-			UINT8 mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
-			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
+			uint8_t mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
+			uint8_t out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
 			for(int j = 0; j < 8; j++)
 				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
 			switch(m_lu >> 6)
@@ -448,7 +448,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 				out = (out & data) | (mem & ~data);
 			if(BIT(m_reg1, 3))
 			{
-				UINT8 out2 = out;
+				uint8_t out2 = out;
 				if(BIT(m_reg1, 2))
 				{
 					out = video_ram[((offset & 0x7ffe) | 0) + (0x8000 * i)];
@@ -473,7 +473,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		data = (chr & data) | (video_ram[offset] & ~data);
 	if(BIT(m_reg1, 3))
 	{
-		UINT8 data2 = data;
+		uint8_t data2 = data;
 		if(BIT(m_reg1, 2))
 		{
 			data = video_ram[(offset & ~1) | 0];

@@ -373,14 +373,14 @@ private:
 	std::unique_ptr<key_trans_entry[]>  m_custom_table;
 
 	key_trans_entry *                   m_table;
-	UINT32                              m_table_size;
+	uint32_t                              m_table_size;
 
 public:
 	// constructor
 	keyboard_trans_table(std::unique_ptr<key_trans_entry[]> table, unsigned int size);
 
 	// getters/setters
-	UINT32 size() const { return m_table_size; }
+	uint32_t size() const { return m_table_size; }
 
 	// public methods
 	input_item_id lookup_mame_code(const char * scode) const;
@@ -558,9 +558,9 @@ const char *const default_axis_name[] =
 	"RY", "RZ", "SL1", "SL2"
 };
 
-inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
+inline static int32_t normalize_absolute_axis(int32_t raw, int32_t rawmin, int32_t rawmax)
 {
-	INT32 center = (rawmax + rawmin) / 2;
+	int32_t center = (rawmax + rawmin) / 2;
 
 	// make sure we have valid data
 	if (rawmin >= rawmax)
@@ -569,14 +569,14 @@ inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawma
 	// above center
 	if (raw >= center)
 	{
-		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
+		int32_t result = (int64_t)(raw - center) * (int64_t)INPUT_ABSOLUTE_MAX / (int64_t)(rawmax - center);
 		return std::min(result, INPUT_ABSOLUTE_MAX);
 	}
 
 	// below center
 	else
 	{
-		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
+		int32_t result = -((int64_t)(center - raw) * (int64_t)-INPUT_ABSOLUTE_MIN / (int64_t)(center - rawmin));
 		return std::max(result, INPUT_ABSOLUTE_MIN);
 	}
 }

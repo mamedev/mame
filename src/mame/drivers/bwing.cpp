@@ -550,7 +550,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(bwing_state,bwing)
 {
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();
 
 	// swap nibbles

@@ -41,10 +41,10 @@ class epson_lx810l_t : public device_t,
 public:
 	// construction/destruction
 	epson_lx810l_t(const machine_config &mconfig, const char *tag,
-					device_t *owner, UINT32 clock);
+					device_t *owner, uint32_t clock);
 	epson_lx810l_t(const machine_config &mconfig, device_type type,
 					const char *name, const char *tag, device_t *owner,
-					UINT32 clock, const char *shortname, const char *source);
+					uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -101,7 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
 
 	/* Video hardware (simulates paper) */
-	UINT32 screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 #define uabs(x) ((x) > 0 ? (x) : -(x))
 	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
@@ -121,13 +121,13 @@ private:
 
 	int m_93c06_clk;
 	int m_93c06_cs;
-	UINT16 m_printhead;
+	uint16_t m_printhead;
 	int m_pf_pos_abs;
 	int m_cr_pos_abs;
 	int m_real_cr_pos;
 	int m_real_cr_steps;
 	int m_real_cr_dir; /* 1 is going right, -1 is going left */
-	UINT8 m_fakemem;
+	uint8_t m_fakemem;
 	bitmap_rgb32 m_bitmap;
 
 	enum {
@@ -142,7 +142,7 @@ class epson_ap2000_t : public epson_lx810l_t
 public:
 	// construction/destruction
 	epson_ap2000_t(const machine_config &mconfig, const char *tag,
-					device_t *owner, UINT32 clock);
+					device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

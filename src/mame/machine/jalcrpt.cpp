@@ -6,13 +6,13 @@
 
 void phantasm_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16  *RAM    =   (UINT16 *) machine.root_device().memregion(region)->base();
+	uint16_t  *RAM    =   (uint16_t *) machine.root_device().memregion(region)->base();
 	int i,      size    =   machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		UINT16 x,y;
+		uint16_t x,y;
 
 		x = RAM[i];
 
@@ -40,13 +40,13 @@ void phantasm_rom_decode(running_machine &machine, const char *region)
 
 void astyanax_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16  *RAM    =   (UINT16 *) machine.root_device().memregion(region)->base();
+	uint16_t  *RAM    =   (uint16_t *) machine.root_device().memregion(region)->base();
 	int i,      size    =   machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		UINT16 x,y;
+		uint16_t x,y;
 
 		x = RAM[i];
 
@@ -74,13 +74,13 @@ void astyanax_rom_decode(running_machine &machine, const char *region)
 
 void rodland_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16  *RAM    =   (UINT16 *) machine.root_device().memregion(region)->base();
+	uint16_t  *RAM    =   (uint16_t *) machine.root_device().memregion(region)->base();
 	int i,      size    =   machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		UINT16 x,y;
+		uint16_t x,y;
 
 		x = RAM[i];
 
@@ -122,13 +122,13 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 {
 	/* sprites are not encrypted, but we need to move the data around to handle them as 256x256 tiles */
 	int i;
-	UINT8 *source_data;
+	uint8_t *source_data;
 	int source_size;
 
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	std::vector<UINT8> result_data(source_size);
+	std::vector<uint8_t> result_data(source_size);
 
 	for(i=0; i<source_size; i++)
 	{
@@ -144,13 +144,13 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const char *region)
 {
 	int i;
-	UINT8 *source_data;
+	uint8_t *source_data;
 	int source_size;
 
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	std::vector<UINT8> result_data(source_size);
+	std::vector<uint8_t> result_data(source_size);
 
 	addr_xor ^= 0x1005d;
 
@@ -195,13 +195,13 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const char *region)
 {
 	int i;
-	UINT8 *source_data;
+	uint8_t *source_data;
 	int source_size;
 
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	std::vector<UINT8> result_data(source_size);
+	std::vector<uint8_t> result_data(source_size);
 
 	addr_xor ^= 0xc1c5b;
 

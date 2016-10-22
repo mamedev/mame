@@ -69,9 +69,9 @@ static const struct CassetteModulation atom_tap_modulation =
     cassette_image_read_uint8 - read tape data
 -------------------------------------------------*/
 
-static UINT8 cassette_image_read_uint8(cassette_image *cassette, UINT64 offset)
+static uint8_t cassette_image_read_uint8(cassette_image *cassette, uint64_t offset)
 {
-	UINT8 data;
+	uint8_t data;
 	cassette_image_read(cassette, &data, offset, 1);
 	return data;
 }
@@ -101,14 +101,14 @@ static cassette_image::error atom_tap_identify(cassette_image *cassette, struct 
 static cassette_image::error atom_tap_load(cassette_image *cassette)
 {
 	cassette_image::error err;
-	UINT64 image_size = cassette_image_size(cassette);
-	UINT64 image_pos = 0;
+	uint64_t image_size = cassette_image_size(cassette);
+	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
 
 	while (image_pos < image_size)
 	{
-		UINT8 data = cassette_image_read_uint8(cassette, image_pos);
+		uint8_t data = cassette_image_read_uint8(cassette, image_pos);
 
 		/* start bit */
 		MODULATE(0);

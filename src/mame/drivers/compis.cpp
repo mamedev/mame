@@ -631,7 +631,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* DIP switch - Test mode */
 	data = m_s8->read();

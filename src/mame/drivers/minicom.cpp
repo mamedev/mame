@@ -56,8 +56,8 @@ public:
 	DECLARE_READ8_MEMBER(minicom_io_r);
 	DECLARE_DRIVER_INIT(minicom);
 private:
-	UINT8 m_p[4];
-	UINT16 m_display_data;
+	uint8_t m_p[4];
+	uint16_t m_display_data;
 	int m_digit_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,7 +111,7 @@ READ8_MEMBER(minicom_state::minicom_io_r)
 }
 
 #if LOG_IO_PORTS
-static void printbits(UINT8 v) {
+static void printbits(uint8_t v) {
 	int i;
 	for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
@@ -150,7 +150,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 			if (data != m_p[offset])
 			{
 #if LOG_IO_PORTS
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 				if (changed ^ P1_UNKNOWN_BITS)
 				{
 					printf("Write to P1: %02X changed: (        ) (", data);
@@ -172,7 +172,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 			if (data != m_p[offset])
 			{
 #if LOG_IO_PORTS
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 				if (changed ^ P2_UNKNOWN_BITS)
 				{
 					printf("Write to P2: %02X changed: (        ) (        ) (", data);
@@ -188,7 +188,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 		{
 			if (data != m_p[offset])
 			{
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 #if LOG_IO_PORTS
 				if (changed ^ P3_UNKNOWN_BITS)
 				{

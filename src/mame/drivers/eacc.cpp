@@ -76,12 +76,12 @@ public:
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
-	required_shared_ptr<UINT8> m_p_nvram;
+	required_shared_ptr<uint8_t> m_p_nvram;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 private:
-	UINT8 m_digit;
+	uint8_t m_digit;
 };
 
 
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 
 READ8_MEMBER( eacc_state::eacc_keyboard_r )
 {
-	UINT8 data = m_digit;
+	uint8_t data = m_digit;
 
 	if (BIT(m_digit, 3))
 		data |= ioport("X0")->read();
@@ -201,7 +201,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 
 	if (!m_nmi)
 	{
-		UINT8 i;
+		uint8_t i;
 		if (BIT(m_digit, 7))
 		{
 			char lednum[6];

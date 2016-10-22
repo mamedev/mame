@@ -36,12 +36,12 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // not shocking
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_vram_1;
-	required_shared_ptr<UINT16> m_scrollram_0;
-	required_shared_ptr<UINT16> m_scrollram_1;
-	required_shared_ptr<UINT16> m_priorityram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_scrollram_0;
+	required_shared_ptr<uint16_t> m_scrollram_1;
+	required_shared_ptr<uint16_t> m_priorityram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* other video-related elements */
 	tilemap_t     *m_tilemap_0;
@@ -62,6 +62,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

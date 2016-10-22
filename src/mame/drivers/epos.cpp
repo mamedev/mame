@@ -387,7 +387,7 @@ void epos_state::machine_reset()
 
 MACHINE_START_MEMBER(epos_state,dealer)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
 	membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
 
@@ -628,7 +628,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int A;
 
 	/* Key 0 */

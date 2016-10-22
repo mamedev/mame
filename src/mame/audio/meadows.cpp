@@ -24,7 +24,7 @@
 #define ENABLE_DAC      0x04
 #define ENABLE_CTR1     0x08
 
-static const INT16 waveform[2] = { -120*256, 120*256 };
+static const int16_t waveform[2] = { -120*256, 120*256 };
 
 /************************************/
 /* Sound handler start              */

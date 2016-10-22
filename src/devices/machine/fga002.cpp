@@ -69,27 +69,27 @@ const device_type FGA002   = &device_creator<fga002_device>;
 //  fga002_device - constructor
 //-------------------------------------------------
 
-fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_out_int_cb(*this)
 	, m_liack4_cb(*this)
 	, m_liack5_cb(*this)
 	, m_liack6_cb(*this)
 	, m_liack7_cb(*this)
-	, m_irq_level((UINT8)0)
+	, m_irq_level((uint8_t)0)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
 }
 
-fga002_device::fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fga002_device::fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FGA002, "FGA-002", tag, owner, clock, "fga002", __FILE__)
 	, m_out_int_cb(*this)
 	, m_liack4_cb(*this)
 	, m_liack5_cb(*this)
 	, m_liack6_cb(*this)
 	, m_liack7_cb(*this)
-	, m_irq_level((UINT8)0)
+	, m_irq_level((uint8_t)0)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -148,7 +148,7 @@ void fga002_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void fga002_device::device_timer (emu_timer &timer, device_timer_id id, INT32 param, void *ptr)
+void fga002_device::device_timer (emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
 {
 	switch(id)
 	{
@@ -224,9 +224,9 @@ const fga_irq_t fga002_device::m_irq_sources[] = {
 };
 
 
-void fga002_device::trigger_interrupt(UINT8 data)
+void fga002_device::trigger_interrupt(uint8_t data)
 {
-	UINT8 icr = 0;
+	uint8_t icr = 0;
 
 	LOGINT(("%s(%02x)\n", FUNCNAME, data));
 
@@ -353,13 +353,13 @@ int fga002_device::get_irq_level()
     Also, if a write access to the TIM0COUNT register is performed, the counter is loaded with the value
     stored in the Timer Preload Register.
 */
-void fga002_device::do_fga002reg_tim0preload_w(UINT8 data)
+void fga002_device::do_fga002reg_tim0preload_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_fga002[FGA_TIM0PRELOAD] = data;
 }
 
-UINT8 fga002_device::do_fga002reg_tim0preload_r()
+uint8_t fga002_device::do_fga002reg_tim0preload_r()
 {
 	LOG(("%s() %02x\n", FUNCNAME, m_fga002[FGA_TIM0PRELOAD]));
 	return m_fga002[FGA_TIM0PRELOAD];
@@ -405,7 +405,7 @@ UINT8 fga002_device::do_fga002reg_tim0preload_r()
     1111   2 seconds
 */
 
-void fga002_device::do_fga002reg_tim0ctl_w(UINT8 data)
+void fga002_device::do_fga002reg_tim0ctl_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	if ((data  & REG_TIM0CTL_START_STOP) != (m_fga002[FGA_TIM0CTL] & REG_TIM0CTL_START_STOP))
@@ -440,7 +440,7 @@ void fga002_device::do_fga002reg_tim0ctl_w(UINT8 data)
 	m_fga002[FGA_TIM0CTL] = data;
 }
 
-UINT8 fga002_device::do_fga002reg_tim0ctl_r()
+uint8_t fga002_device::do_fga002reg_tim0ctl_r()
 {
 	LOG(("%s() %02x\n", FUNCNAME, m_fga002[FGA_TIM0CTL]));
 	return m_fga002[FGA_TIM0CTL];
@@ -453,13 +453,13 @@ UINT8 fga002_device::do_fga002reg_tim0ctl_r()
     The Timer Count Register is initialized to the value $FF after reset.
     [7:0] Timer Count Value
 */
-void fga002_device::do_fga002reg_tim0count_w(UINT8 data)
+void fga002_device::do_fga002reg_tim0count_w(uint8_t data)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_tim0count = m_fga002[FGA_TIM0PRELOAD];
 }
 
-UINT8 fga002_device::do_fga002reg_tim0count_r()
+uint8_t fga002_device::do_fga002reg_tim0count_r()
 {
 	LOG(("%s() %02x\n", FUNCNAME, m_tim0count));
 	return m_tim0count;
@@ -471,13 +471,13 @@ UINT8 fga002_device::do_fga002reg_tim0count_r()
     [3] IRQ enable, 1 = timer interrupt channel enabled, 0 = disabled
     [2:0] IRQ level 000 = interrupt disabled 001-111 = Level 1 to 7  interrupt
 */
-void fga002_device::do_fga002reg_icrtim0_w(UINT8 data)
+void fga002_device::do_fga002reg_icrtim0_w(uint8_t data)
 {
 	LOGINT(("%s(%02x)\n", FUNCNAME, data));
 	m_fga002[FGA_ICRTIM0] = data;
 }
 
-UINT8 fga002_device::do_fga002reg_icrtim0_r()
+uint8_t fga002_device::do_fga002reg_icrtim0_r()
 {
 	LOGINT(("%s() %02x\n", FUNCNAME, m_fga002[FGA_ICRTIM0]));
 	return m_fga002[FGA_ICRTIM0];
@@ -489,13 +489,13 @@ UINT8 fga002_device::do_fga002reg_icrtim0_r()
     [7] The IRQ Status register bit displays if a timer interrupt request is pending. 1 = no interrupt is pending. 0 = interrupt is pending
     [6:0] not used
 */
-void fga002_device::do_fga002reg_istim0_w(UINT8 data)
+void fga002_device::do_fga002reg_istim0_w(uint8_t data)
 {
 	LOGINT(("%s(%02x)\n", FUNCNAME, data));
 	m_fga002[FGA_ISTIM0] &= ~REG_ISTIM0_TIM_INT; // Clear timer interrupt status
 }
 
-UINT8 fga002_device::do_fga002reg_istim0_r()
+uint8_t fga002_device::do_fga002reg_istim0_r()
 {
 	LOGINT(("%s() %02x\n", FUNCNAME, m_fga002[FGA_ISTIM0]));
 	return m_fga002[FGA_ISTIM0];
@@ -505,7 +505,7 @@ UINT8 fga002_device::do_fga002reg_istim0_r()
 /*
  * FGA-002 interrupt support
  */
-void fga002_device::do_fga002reg_localiack_w(UINT8 data)
+void fga002_device::do_fga002reg_localiack_w(uint8_t data)
 {
 	m_fga002[FGA_LOCALIACK] = data;
 
@@ -520,54 +520,54 @@ void fga002_device::do_fga002reg_localiack_w(UINT8 data)
 #endif
 }
 
-UINT8 fga002_device::do_fga002reg_localiack_r()
+uint8_t fga002_device::do_fga002reg_localiack_r()
 {
-	UINT8 ret = m_fga002[FGA_LOCALIACK];
+	uint8_t ret = m_fga002[FGA_LOCALIACK];
 	LOGINT(("%s() <- %02x\n", FUNCNAME, ret));
 	return ret;
 }
 
-UINT8 fga002_device::do_fga002reg_ctl3_r()
+uint8_t fga002_device::do_fga002reg_ctl3_r()
 {
-	UINT8 ret = m_fga002[FGA_CTL3];
+	uint8_t ret = m_fga002[FGA_CTL3];
 	LOGINT(("%s() <- %02x\n", FUNCNAME, ret));
 	return ret;
 }
 
-void fga002_device::do_fga002reg_ctl3_w(UINT8 data)
+void fga002_device::do_fga002reg_ctl3_w(uint8_t data)
 {
 	m_fga002[FGA_CTL3] = data;
 	LOGINT(("%s(%02x)\n", FUNCNAME, data));
 }
 
 // Local Interrupt control register methods
-UINT8 fga002_device::do_fga002reg_icrlocal0_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal1_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal2_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal3_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal4_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal5_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal6_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_icrlocal7_r(){    UINT8 ret = m_fga002[FGA_ICRLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal0_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal1_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal2_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal3_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal4_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal5_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal6_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_icrlocal7_r(){    uint8_t ret = m_fga002[FGA_ICRLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
 
-void  fga002_device::do_fga002reg_icrlocal0_w(UINT8 data){ m_fga002[FGA_ICRLOCAL0] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal1_w(UINT8 data){ m_fga002[FGA_ICRLOCAL1] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal2_w(UINT8 data){ m_fga002[FGA_ICRLOCAL2] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal3_w(UINT8 data){ m_fga002[FGA_ICRLOCAL3] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal4_w(UINT8 data){ m_fga002[FGA_ICRLOCAL4] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal5_w(UINT8 data){ m_fga002[FGA_ICRLOCAL5] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal6_w(UINT8 data){ m_fga002[FGA_ICRLOCAL6] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
-void  fga002_device::do_fga002reg_icrlocal7_w(UINT8 data){ m_fga002[FGA_ICRLOCAL7] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal0_w(uint8_t data){ m_fga002[FGA_ICRLOCAL0] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal1_w(uint8_t data){ m_fga002[FGA_ICRLOCAL1] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal2_w(uint8_t data){ m_fga002[FGA_ICRLOCAL2] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal3_w(uint8_t data){ m_fga002[FGA_ICRLOCAL3] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal4_w(uint8_t data){ m_fga002[FGA_ICRLOCAL4] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal5_w(uint8_t data){ m_fga002[FGA_ICRLOCAL5] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal6_w(uint8_t data){ m_fga002[FGA_ICRLOCAL6] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
+void  fga002_device::do_fga002reg_icrlocal7_w(uint8_t data){ m_fga002[FGA_ICRLOCAL7] = data; LOGINT(("%s(%02x)\n", FUNCNAME, data)); }
 
 // Local Interrupt Status Register methods
-UINT8 fga002_device::do_fga002reg_islocal0_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal1_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal2_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal3_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal4_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal5_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal6_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
-UINT8 fga002_device::do_fga002reg_islocal7_r(){ UINT8 ret = m_fga002[FGA_ISLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal0_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL0]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal1_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL1]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal2_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL2]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal3_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL3]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal4_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL4]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal5_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL5]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal6_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL6]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
+uint8_t fga002_device::do_fga002reg_islocal7_r(){ uint8_t ret = m_fga002[FGA_ISLOCAL7]; LOGINT(("%s() <- %02x\n", FUNCNAME, ret)); return ret; }
 
 void fga002_device::islocal_w(int status, int vector, int control, int data)
 {
@@ -576,14 +576,14 @@ void fga002_device::islocal_w(int status, int vector, int control, int data)
 }
 
 //  TODO: support level triggered interrupts, only edge triggered interrupts are supported atm
-void  fga002_device::do_fga002reg_islocal0_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL0, INT_LOCAL0, FGA_ICRLOCAL0, data ); }
-void  fga002_device::do_fga002reg_islocal1_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL1, INT_LOCAL1, FGA_ICRLOCAL1, data ); }
-void  fga002_device::do_fga002reg_islocal2_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL2, INT_LOCAL2, FGA_ICRLOCAL2, data ); }
-void  fga002_device::do_fga002reg_islocal3_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL3, INT_LOCAL3, FGA_ICRLOCAL3, data ); }
-void  fga002_device::do_fga002reg_islocal4_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL4, INT_LOCAL4, FGA_ICRLOCAL4, data ); m_liack4_cb(); } /* terminate device IRQ */
-void  fga002_device::do_fga002reg_islocal5_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL5, INT_LOCAL5, FGA_ICRLOCAL5, data ); m_liack5_cb(); }
-void  fga002_device::do_fga002reg_islocal6_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, data ); m_liack6_cb(); }
-void  fga002_device::do_fga002reg_islocal7_w(UINT8 data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL6, INT_LOCAL7, FGA_ICRLOCAL7, data ); m_liack7_cb(); }
+void  fga002_device::do_fga002reg_islocal0_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL0, INT_LOCAL0, FGA_ICRLOCAL0, data ); }
+void  fga002_device::do_fga002reg_islocal1_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL1, INT_LOCAL1, FGA_ICRLOCAL1, data ); }
+void  fga002_device::do_fga002reg_islocal2_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL2, INT_LOCAL2, FGA_ICRLOCAL2, data ); }
+void  fga002_device::do_fga002reg_islocal3_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL3, INT_LOCAL3, FGA_ICRLOCAL3, data ); }
+void  fga002_device::do_fga002reg_islocal4_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL4, INT_LOCAL4, FGA_ICRLOCAL4, data ); m_liack4_cb(); } /* terminate device IRQ */
+void  fga002_device::do_fga002reg_islocal5_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL5, INT_LOCAL5, FGA_ICRLOCAL5, data ); m_liack5_cb(); }
+void  fga002_device::do_fga002reg_islocal6_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, data ); m_liack6_cb(); }
+void  fga002_device::do_fga002reg_islocal7_w(uint8_t data){ LOGINT(("%s\n", FUNCNAME)); islocal_w( FGA_ISLOCAL6, INT_LOCAL7, FGA_ICRLOCAL7, data ); m_liack7_cb(); }
 
 // Local IRQ callbacks
 // TODO: support level triggered interrupts, ICR bit 6, only edge triggered interrupts are supported atm
@@ -722,7 +722,7 @@ WRITE8_MEMBER (fga002_device::write){
 }
 
 READ8_MEMBER (fga002_device::read){
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	LOG(("%s[%04x]      ", FUNCNAME, offset));
 	switch(offset)

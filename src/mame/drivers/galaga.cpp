@@ -800,7 +800,7 @@ WRITE8_MEMBER(galaga_state::out_1)
 
 READ8_MEMBER(galaga_state::namco_52xx_rom_r)
 {
-	UINT32 length = memregion("52xx")->bytes();
+	uint32_t length = memregion("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
 	if (!(offset & 0x1000))
 		offset = (offset & 0xfff) | 0x0000;
@@ -3361,7 +3361,7 @@ ROM_END
 DRIVER_INIT_MEMBER(galaga_state,galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int i, len = memregion("gfx1")->bytes();
 
 	for (i = 0;i < len;i++)
@@ -3386,7 +3386,7 @@ DRIVER_INIT_MEMBER(galaga_state,gatsbee)
 
 DRIVER_INIT_MEMBER(xevious_state,xevious)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom = memregion("gfx3")->base() + 0x5000;
@@ -3397,7 +3397,7 @@ DRIVER_INIT_MEMBER(xevious_state,xevious)
 DRIVER_INIT_MEMBER(xevious_state,xevios)
 {
 	int A;
-	UINT8 *rom;
+	uint8_t *rom;
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */

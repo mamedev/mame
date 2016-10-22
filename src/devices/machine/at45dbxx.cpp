@@ -45,7 +45,7 @@ const device_type AT45DB161 = &device_creator<at45db161_device>;
 //  at45db041_device - constructor
 //-------------------------------------------------
 
-at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AT45DB041, "AT45DB041", tag, owner, clock, "at45db041", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	write_so(*this)
@@ -53,7 +53,7 @@ at45db041_device::at45db041_device(const machine_config &mconfig, const char *ta
 }
 
 
-at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_nvram_interface(mconfig, *this),
 	write_so(*this)
@@ -61,13 +61,13 @@ at45db041_device::at45db041_device(const machine_config &mconfig, device_type ty
 }
 
 
-at45db081_device::at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+at45db081_device::at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: at45db041_device(mconfig, AT45DB081, "AT45DB081", tag, owner, clock, "at45db081", __FILE__)
 {
 }
 
 
-at45db161_device::at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+at45db161_device::at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: at45db041_device(mconfig, AT45DB161, "AT45DB161", tag, owner, clock, "at45db161", __FILE__)
 {
 }
@@ -147,7 +147,7 @@ void at45db041_device::nvram_default()
 	memory_region *region = memregion(DEVICE_SELF);
 	if (region != nullptr)
 	{
-		UINT32 bytes = region->bytes();
+		uint32_t bytes = region->bytes();
 		if (bytes > m_size)
 			bytes = m_size;
 
@@ -175,9 +175,9 @@ void at45db041_device::nvram_write(emu_file &file)
 	file.write(&m_data[0], m_size);
 }
 
-UINT8 at45db041_device::read_byte()
+uint8_t at45db041_device::read_byte()
 {
-	UINT8 data;
+	uint8_t data;
 	// check mode
 	if ((m_mode != FLASH_MODE_SO) || (!m_io.data)) return 0;
 	// read byte
@@ -187,46 +187,46 @@ UINT8 at45db041_device::read_byte()
 	return data;
 }
 
-void at45db041_device::flash_set_io(UINT8* data, UINT32 size, UINT32 pos)
+void at45db041_device::flash_set_io(uint8_t* data, uint32_t size, uint32_t pos)
 {
 	m_io.data = data;
 	m_io.size = size;
 	m_io.pos  = pos;
 }
 
-UINT32 at45db041_device::flash_get_page_addr()
+uint32_t at45db041_device::flash_get_page_addr()
 {
 	return ((m_cmd.data[1] & 0x0F) << 7) | ((m_cmd.data[2] & 0xFE) >> 1);
 }
 
-UINT32 at45db041_device::flash_get_byte_addr()
+uint32_t at45db041_device::flash_get_byte_addr()
 {
 	return ((m_cmd.data[2] & 0x01) << 8) | ((m_cmd.data[3] & 0xFF) >> 0);
 }
 
-UINT32 at45db081_device::flash_get_page_addr()
+uint32_t at45db081_device::flash_get_page_addr()
 {
 	return ((m_cmd.data[1] & 0x1F) << 7) | ((m_cmd.data[2] & 0xFE) >> 1);
 }
 
-UINT32 at45db161_device::flash_get_page_addr()
+uint32_t at45db161_device::flash_get_page_addr()
 {
 	return ((m_cmd.data[1] & 0x3F) << 6) | ((m_cmd.data[2] & 0xFC) >> 2);
 }
 
-UINT32 at45db161_device::flash_get_byte_addr()
+uint32_t at45db161_device::flash_get_byte_addr()
 {
 	return ((m_cmd.data[2] & 0x03) << 8) | ((m_cmd.data[3] & 0xFF) >> 0);
 }
 
-void at45db041_device::write_byte(UINT8 data)
+void at45db041_device::write_byte(uint8_t data)
 {
 	// check mode
 	if (m_mode != FLASH_MODE_SI) return;
 	// process byte
 	if (m_cmd.size < 8)
 	{
-		UINT8 opcode;
+		uint8_t opcode;
 		_logerror( 2, ("at45dbxx_write_byte (%02X)\n", data));
 		// add to command buffer
 		m_cmd.data[m_cmd.size++] = data;
@@ -254,8 +254,8 @@ void at45db041_device::write_byte(UINT8 data)
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits don't care
 				if (m_cmd.size == 4)
 				{
-					UINT32 page;
-					UINT8 comp;
+					uint32_t page;
+					uint8_t comp;
 					page = flash_get_page_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page to buffer 1 compare [%04X]\n", opcode, page));
 					comp = memcmp( &m_data[page * page_size()], &m_buffer1[0], page_size()) == 0 ? 0 : 1;
@@ -272,7 +272,7 @@ void at45db041_device::write_byte(UINT8 data)
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits buffer address + 32 bits don't care
 				if (m_cmd.size == 8)
 				{
-					UINT32 page, byte;
+					uint32_t page, byte;
 					page = flash_get_page_addr();
 					byte = flash_get_byte_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page read [%04X/%04X]\n", opcode, page, byte));
@@ -288,7 +288,7 @@ void at45db041_device::write_byte(UINT8 data)
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits buffer address
 				if (m_cmd.size == 4)
 				{
-					UINT32 page, byte;
+					uint32_t page, byte;
 					page = flash_get_page_addr();
 					byte = flash_get_byte_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page program through buffer 1 [%04X/%04X]\n",opcode, page, byte));
@@ -341,7 +341,7 @@ WRITE_LINE_MEMBER(at45db041_device::cs_w)
 		// complete program command
 		if ((m_cmd.size >= 4) && (m_cmd.data[0] == FLASH_CMD_82))
 		{
-			UINT32 page, byte;
+			uint32_t page, byte;
 			page = flash_get_page_addr();
 			byte = flash_get_byte_addr();
 			_logerror( 1, ("at45dbxx - program data stored in buffer 1 into selected page in main memory [%04X/%04X]\n", page, byte));

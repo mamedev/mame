@@ -32,7 +32,7 @@
 
 PALETTE_INIT_MEMBER(bking_state, bking)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
 	static const int resistances_b [2] = { 220, 390 };
 	double rweights[3], gweights[3], bweights[2];
@@ -46,7 +46,7 @@ PALETTE_INIT_MEMBER(bking_state, bking)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		UINT16 pen;
+		uint16_t pen;
 		int bit0, bit1, bit2, r, g, b;
 
 		/* color PROM A7-A8 is the palette select */
@@ -206,8 +206,8 @@ READ8_MEMBER(bking_state::bking_pos_r)
 
 TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 {
-	UINT8 code0 = m_playfield_ram[2 * tile_index + 0];
-	UINT8 code1 = m_playfield_ram[2 * tile_index + 1];
+	uint8_t code0 = m_playfield_ram[2 * tile_index + 0];
+	uint8_t code1 = m_playfield_ram[2 * tile_index + 1];
 
 	int flags = 0;
 
@@ -226,7 +226,7 @@ void bking_state::video_start()
 }
 
 
-UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -264,7 +264,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		int xld = 0;
 		int yld = 0;
 
-		UINT32 latch = 0;
+		uint32_t latch = 0;
 
 		if (m_pc3259_mask == 6) /* player 1 */
 		{
@@ -296,12 +296,12 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		m_bg_tilemap->set_scrolly(0, 0);
 
 		// check for collision
-		const UINT8* colmask = memregion("user1")->base() + 8 * m_hit;
+		const uint8_t* colmask = memregion("user1")->base() + 8 * m_hit;
 
 		for (int y = rect.min_y; y <= rect.max_y; y++)
 		{
-			const UINT16* p0 = &m_colmap_bg.pix16(y);
-			const UINT16* p1 = &m_colmap_ball.pix16(y);
+			const uint16_t* p0 = &m_colmap_bg.pix16(y);
+			const uint16_t* p1 = &m_colmap_ball.pix16(y);
 
 			for (int x = rect.min_x; x <= rect.max_x; x++)
 			{

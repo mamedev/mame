@@ -191,7 +191,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
  *      1111 = right/down full
  */
 
-static const UINT8 translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
+static const uint8_t translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
 READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 {
@@ -281,8 +281,8 @@ READ16_MEMBER(mcr68_state::pigskin_port_2_r)
 
 READ16_MEMBER(mcr68_state::trisport_port_1_r)
 {
-	int xaxis = (INT8)ioport("AN1")->read();
-	int yaxis = (INT8)ioport("AN2")->read();
+	int xaxis = (int8_t)ioport("AN1")->read();
+	int yaxis = (int8_t)ioport("AN2")->read();
 	int result = ioport("IN1")->read();
 
 	result |= (xaxis & 0x3c) << 6;

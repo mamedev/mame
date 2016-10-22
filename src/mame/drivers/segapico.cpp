@@ -145,9 +145,9 @@ public:
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 
-	UINT8 m_page_register;
+	uint8_t m_page_register;
 
-	UINT16 pico_read_penpos(int pen);
+	uint16_t pico_read_penpos(int pen);
 	DECLARE_READ16_MEMBER(pico_68k_io_read);
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
@@ -170,9 +170,9 @@ public:
 
 
 
-UINT16 pico_base_state::pico_read_penpos(int pen)
+uint16_t pico_base_state::pico_read_penpos(int pen)
 {
-	UINT16 penpos = 0;
+	uint16_t penpos = 0;
 
 	switch (pen)
 	{
@@ -195,7 +195,7 @@ UINT16 pico_base_state::pico_read_penpos(int pen)
 
 READ16_MEMBER(pico_base_state::pico_68k_io_read )
 {
-	UINT8 retdata = 0;
+	uint8_t retdata = 0;
 
 	switch (offset)
 	{
@@ -236,7 +236,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 		   either page 5 or page 6 is often unused.
 		*/
 			{
-				UINT8 tmp = m_io_page->read();
+				uint8_t tmp = m_io_page->read();
 				if (tmp == 2 && m_page_register != 0x3f)
 				{
 					m_page_register <<= 1;

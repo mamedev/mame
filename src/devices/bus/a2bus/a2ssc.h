@@ -24,8 +24,8 @@ class a2bus_ssc_device:
 {
 public:
 	// construction/destruction
-	a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,15 +40,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
-	virtual UINT8 read_c800(address_space &space, UINT16 offset) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
 
 	required_device<mos6551_device> m_acia;
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	bool m_started;
 };
 

@@ -44,10 +44,10 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_tmnt2_rom;
-	optional_shared_ptr<UINT16> m_sunset_104000;
-	optional_shared_ptr<UINT16> m_tmnt2_1c0800;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_tmnt2_rom;
+	optional_shared_ptr<uint16_t> m_sunset_104000;
+	optional_shared_ptr<uint16_t> m_tmnt2_1c0800;
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -72,7 +72,7 @@ public:
 	int        m_tmnt_soundlatch;
 	int        m_toggle;
 	int        m_last;
-	UINT16     m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
+	uint16_t     m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -92,9 +92,9 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory buffers */
-	INT16      m_sampledata[0x40000];
+	int16_t      m_sampledata[0x40000];
 
-	UINT8      m_irq5_mask;
+	uint8_t      m_irq5_mask;
 	DECLARE_READ16_MEMBER(k052109_word_noA12_r);
 	DECLARE_WRITE16_MEMBER(k052109_word_noA12_w);
 	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_w);
@@ -155,19 +155,19 @@ public:
 	DECLARE_VIDEO_START(glfgreat);
 	DECLARE_MACHINE_START(prmrsocr);
 	DECLARE_VIDEO_START(prmrsocr);
-	UINT32 screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_blswhstl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
-	inline UINT32 tmnt2_get_word( UINT32 addr );
-	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
+	inline uint32_t tmnt2_get_word( uint32_t addr );
+	void tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data );
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K051960_CB_MEMBER(mia_sprite_callback);
 	K051960_CB_MEMBER(tmnt_sprite_callback);

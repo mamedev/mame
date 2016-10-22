@@ -88,9 +88,9 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 
 
 /* fix dsw/input data to memory mapped data */
-UINT8 tceptor_state::fix_input0(UINT8 in1, UINT8 in2)
+uint8_t tceptor_state::fix_input0(uint8_t in1, uint8_t in2)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	r |= (in1 & 0x80) >> 7;
 	r |= (in1 & 0x20) >> 4;
@@ -104,9 +104,9 @@ UINT8 tceptor_state::fix_input0(UINT8 in1, UINT8 in2)
 	return r;
 }
 
-UINT8 tceptor_state::fix_input1(UINT8 in1, UINT8 in2)
+uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	r |= (in1 & 0x40) >> 6;
 	r |= (in1 & 0x10) >> 3;

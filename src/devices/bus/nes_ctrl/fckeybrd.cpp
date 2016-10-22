@@ -144,7 +144,7 @@ machine_config_constructor nes_fckeybrd_device::device_mconfig_additions() const
 //  nes_fckeybrd_device - constructor
 //-------------------------------------------------
 
-nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_FCKEYBOARD, "Nintendo Family Computer Keyboard Component", tag, owner, clock, "nes_fckeybrd", __FILE__)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_cassette(*this, "tape")
@@ -181,9 +181,9 @@ void nes_fckeybrd_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_fckeybrd_device::read_exp(offs_t offset)
+uint8_t nes_fckeybrd_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 0)    //$4016
 	{
 		// FC Keyboard: tape input
@@ -212,7 +212,7 @@ UINT8 nes_fckeybrd_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_fckeybrd_device::write(UINT8 data)
+void nes_fckeybrd_device::write(uint8_t data)
 {
 	// tape output (not fully tested)
 	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
@@ -220,7 +220,7 @@ void nes_fckeybrd_device::write(UINT8 data)
 
 	if (BIT(data, 2))   // keyboard active
 	{
-		UINT8 out = BIT(data, 1);   // scan
+		uint8_t out = BIT(data, 1);   // scan
 
 		if (m_fck_mode && !out && ++m_fck_scan > 9)
 			m_fck_scan = 0;

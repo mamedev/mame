@@ -34,13 +34,13 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
 
-	required_shared_ptr<UINT16> m_vram_bg;
-	required_shared_ptr<UINT16> m_vram_fg;
+	required_shared_ptr<uint16_t> m_vram_bg;
+	required_shared_ptr<uint16_t> m_vram_fg;
 
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
 
-	UINT8 m_bitvals[32];
+	uint8_t m_bitvals[32];
 
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
@@ -67,8 +67,8 @@ void xtheball_state::machine_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 {
-	UINT16 *srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
@@ -77,12 +77,12 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 	if (!m_bitvals[0x13])
 	{
 		/* mode 0: foreground is the same as background */
-		UINT16 *srcfg = &m_vram_fg[(params->rowaddr << 8) & 0xff00];
+		uint16_t *srcfg = &m_vram_fg[(params->rowaddr << 8) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
-			UINT16 fgpix = srcfg[coladdr & 0xff];
-			UINT16 bgpix = srcbg[coladdr & 0xff];
+			uint16_t fgpix = srcfg[coladdr & 0xff];
+			uint16_t bgpix = srcbg[coladdr & 0xff];
 
 			dest[x + 0] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff)];
 			dest[x + 1] = pens[((fgpix & 0xff00) != 0) ? (fgpix >> 8) : (bgpix >> 8)];
@@ -92,12 +92,12 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 	{
 		/* mode 1: foreground is half background resolution in */
 		/* X and supports two pages */
-		UINT16 *srcfg = &m_vram_fg[(params->rowaddr << 7) & 0xff00];
+		uint16_t *srcfg = &m_vram_fg[(params->rowaddr << 7) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
-			UINT16 fgpix = srcfg[(coladdr >> 1) & 0xff] >> (8 * (coladdr & 1));
-			UINT16 bgpix = srcbg[coladdr & 0xff];
+			uint16_t fgpix = srcfg[(coladdr >> 1) & 0xff] >> (8 * (coladdr & 1));
+			uint16_t bgpix = srcbg[coladdr & 0xff];
 
 			dest[x + 0] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff)];
 			dest[x + 1] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix >> 8)];
@@ -145,7 +145,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
 
 WRITE16_MEMBER(xtheball_state::bit_controls_w)
 {
-	UINT8 *bitvals = m_bitvals;
+	uint8_t *bitvals = m_bitvals;
 	if (ACCESSING_BITS_0_7)
 	{
 		if (bitvals[offset] != (data & 1))

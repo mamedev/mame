@@ -35,10 +35,10 @@ struct SVISION_NOISE
 		pos(0.0),
 		value(0)
 	{
-		memset(reg, 0, sizeof(UINT8)*3);
+		memset(reg, 0, sizeof(uint8_t)*3);
 	}
 
-	UINT8 reg[3];
+	uint8_t reg[3];
 	int on, right, left, play;
 	SVISION_NOISE_Type type;
 	int state;
@@ -61,10 +61,10 @@ struct SVISION_DMA
 		step(0.0),
 		finished(0)
 	{
-		memset(reg, 0, sizeof(UINT8)*5);
+		memset(reg, 0, sizeof(uint8_t)*5);
 	}
 
-	UINT8 reg[5];
+	uint8_t reg[5];
 	int on, right, left;
 	int ca14to16;
 	int start,size;
@@ -82,10 +82,10 @@ struct SVISION_CHANNEL
 		size(0),
 		count(0)
 	{
-		memset(reg, 0, sizeof(UINT8)*4);
+		memset(reg, 0, sizeof(uint8_t)*4);
 	}
 
-	UINT8 reg[4];
+	uint8_t reg[4];
 	int on;
 	int waveform, volume;
 	int pos;
@@ -105,7 +105,7 @@ class svision_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~svision_sound_device() { }
 
 	// static configuration

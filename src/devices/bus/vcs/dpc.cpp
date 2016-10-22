@@ -17,7 +17,7 @@
 const device_type ATARI_DPC = &device_creator<dpc_device>;
 
 
-dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	device_t(mconfig, ATARI_DPC, "Atari DCP", tag, owner, clock, "atari_dcp", __FILE__),
 	m_movamt(0),
 	m_latch_62(0),
@@ -65,7 +65,7 @@ void dpc_device::device_reset()
 
 }
 
-void dpc_device::check_flag(UINT8 data_fetcher)
+void dpc_device::check_flag(uint8_t data_fetcher)
 {
 	/* Set flag when low counter equals top */
 	if (m_df[data_fetcher].low == m_df[data_fetcher].top)
@@ -76,7 +76,7 @@ void dpc_device::check_flag(UINT8 data_fetcher)
 		m_df[data_fetcher].flag = 0;
 }
 
-void dpc_device::decrement_counter(UINT8 data_fetcher)
+void dpc_device::decrement_counter(uint8_t data_fetcher)
 {
 	m_df[data_fetcher].low -= 1;
 	if (m_df[data_fetcher].low == 0xff)
@@ -116,9 +116,9 @@ void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ8_MEMBER(dpc_device::read)
 {
-	static const UINT8 dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0a, 0x0b, 0x0f };
-	UINT8   data_fetcher = offset & 0x07;
-	UINT8   data = 0xff;
+	static const uint8_t dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0a, 0x0b, 0x0f };
+	uint8_t   data_fetcher = offset & 0x07;
+	uint8_t   data = 0xff;
 
 	//logerror("%04X: Read from DPC offset $%02X\n", machine().device<cpu_device>("maincpu")->pc(), offset);
 	if (offset < 0x08)
@@ -148,7 +148,7 @@ READ8_MEMBER(dpc_device::read)
 	}
 	else
 	{
-		UINT8 display_data = m_displaydata[(~((m_df[data_fetcher].low | (m_df[data_fetcher].high << 8))) & 0x7ff)];
+		uint8_t display_data = m_displaydata[(~((m_df[data_fetcher].low | (m_df[data_fetcher].high << 8))) & 0x7ff)];
 
 		switch (offset & 0x38)
 		{
@@ -185,7 +185,7 @@ READ8_MEMBER(dpc_device::read)
 
 WRITE8_MEMBER(dpc_device::write)
 {
-	UINT8 data_fetcher = offset & 0x07;
+	uint8_t data_fetcher = offset & 0x07;
 
 	switch (offset & 0x38)
 	{
@@ -240,7 +240,7 @@ WRITE8_MEMBER(dpc_device::write)
 const device_type A26_ROM_DPC = &device_creator<a26_rom_dpc_device>;
 
 
-a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 						: a26_rom_f8_device(mconfig, A26_ROM_DPC, "Atari 2600 ROM Cart Pitfall II", tag, owner, clock, "a2600_dcp", __FILE__),
 						m_dpc(*this, "dpc")
 {
@@ -260,7 +260,7 @@ void a26_rom_dpc_device::device_reset()
 	m_base_bank = 0;
 }
 
-void a26_rom_dpc_device::setup_addon_ptr(UINT8 *ptr)
+void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 {
 	m_dpc->set_display_data(ptr);
 }
@@ -296,7 +296,7 @@ DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
 {
 	if (!direct.space().debugger_access())
 	{
-		UINT8 new_bit;
+		uint8_t new_bit;
 		new_bit = (m_dpc->m_shift_reg & 0x80) ^ ((m_dpc->m_shift_reg & 0x20) << 2);
 		new_bit = new_bit ^ (((m_dpc->m_shift_reg & 0x10) << 3) ^ ((m_dpc->m_shift_reg & 0x08) << 4));
 		new_bit = new_bit ^ 0x80;

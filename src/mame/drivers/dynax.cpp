@@ -608,7 +608,7 @@ WRITE8_MEMBER(dynax_state::hjingi_hopper_w)
 	m_hopper = data & 0x01;
 }
 
-UINT8 dynax_state::hjingi_hopper_bit()
+uint8_t dynax_state::hjingi_hopper_bit()
 {
 	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6);
 }
@@ -1448,7 +1448,7 @@ WRITE8_MEMBER(dynax_state::gekisha_hopper_w)
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
 }
 
-void dynax_state::gekisha_set_rombank( UINT8 data )
+void dynax_state::gekisha_set_rombank( uint8_t data )
 {
 	m_rombank = data;
 	m_romptr = memregion("maincpu")->base() + 0x8000 + m_rombank * 0x8000;
@@ -4355,7 +4355,7 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 
 MACHINE_START_MEMBER(dynax_state,hanamai)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(dynax);
@@ -4363,7 +4363,7 @@ MACHINE_START_MEMBER(dynax_state,hanamai)
 
 MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	m_hnoridur_ptr = &ROM[0x10000 + 0x18 * 0x8000];
@@ -4734,8 +4734,8 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(dynax_state,jantouki)
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SOUND = memregion("soundcpu")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SOUND = memregion("soundcpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
 	membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
@@ -5472,7 +5472,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dynax_state,blktouch)
 {
 	// fearsome encryption ;-)
-	UINT8   *src = (UINT8 *)memregion("maincpu")->base();
+	uint8_t   *src = (uint8_t *)memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x90000; i++)
@@ -5481,7 +5481,7 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 
-	src = (UINT8 *)memregion("gfx1")->base();
+	src = (uint8_t *)memregion("gfx1")->base();
 
 	for (i = 0; i < 0xc0000; i++)
 	{
@@ -5494,10 +5494,10 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 DRIVER_INIT_MEMBER(dynax_state, maya_common)
 {
 	/* Address lines scrambling on 1 z80 rom */
-	UINT8   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	uint8_t   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
-		UINT8 temp[8];
+		uint8_t temp[8];
 		temp[0] = rom[0];   temp[1] = rom[1];   temp[2] = rom[2];   temp[3] = rom[3];
 		temp[4] = rom[4];   temp[5] = rom[5];   temp[6] = rom[6];   temp[7] = rom[7];
 
@@ -5511,12 +5511,12 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 {
 	DRIVER_INIT_CALL(maya_common);
 
-	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
 
 	/* Address lines scrambling on the blitter data roms */
 	{
-		std::vector<UINT8> rom(0xc0000);
+		std::vector<uint8_t> rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
 			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
@@ -5528,12 +5528,12 @@ DRIVER_INIT_MEMBER(dynax_state,mayac)
 {
 	DRIVER_INIT_CALL(maya_common);
 
-	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
 
 	/* Address lines scrambling on the blitter data roms */
 	{
-		std::vector<UINT8> rom(0xc0000);
+		std::vector<uint8_t> rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
 			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
@@ -6450,9 +6450,9 @@ ROM_END
 DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 {
 	int i;
-	UINT8   *rom = memregion("maincpu")->base();
+	uint8_t   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	std::vector<UINT8> rom1(size);
+	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
 	for (i = 0; i < size; i++)
@@ -6462,9 +6462,9 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 {
 	int i, j;
-	UINT8   *rom = memregion("maincpu")->base();
+	uint8_t   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	std::vector<UINT8> rom1(size);
+	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
 	for (i = 0; i < size; i++)

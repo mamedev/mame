@@ -98,15 +98,15 @@ READ16_MEMBER(exterm_state::exterm_host_data_r)
  *
  *************************************/
 
-UINT16 exterm_state::exterm_trackball_port_r(int which, UINT16 mem_mask)
+uint16_t exterm_state::exterm_trackball_port_r(int which, uint16_t mem_mask)
 {
-	UINT16 port;
+	uint16_t port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = ioport(which ? "DIAL1" : "DIAL0")->read();
+	uint8_t trackball_pos = ioport(which ? "DIAL1" : "DIAL0")->read();
 
 	/* Calculate the change from the last position. */
-	UINT8 trackball_diff = m_trackball_old[which] - trackball_pos;
+	uint8_t trackball_diff = m_trackball_old[which] - trackball_pos;
 
 	/* Store the new position for the next comparision. */
 	m_trackball_old[which] = trackball_pos;

@@ -35,22 +35,22 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_memory_bank m_gfxrombank;
-	required_shared_ptr<UINT16> m_fixram;
-	required_shared_ptr_array<UINT16, 2> m_videoram;
-	optional_shared_ptr<UINT16> m_zipram;
-	optional_shared_ptr<UINT16> m_sprite_gfx_ram;
-	required_region_ptr<UINT16> m_gfxrom;
+	required_shared_ptr<uint16_t> m_fixram;
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	optional_shared_ptr<uint16_t> m_zipram;
+	optional_shared_ptr<uint16_t> m_sprite_gfx_ram;
+	required_region_ptr<uint16_t> m_gfxrom;
 
-	UINT16 m_CPUA_register;
-	UINT16 m_CPUB_register;
+	uint16_t m_CPUA_register;
+	uint16_t m_CPUB_register;
 	bool m_is_fround;
-	UINT16 m_sprite_buffer[0x800];
+	uint16_t m_sprite_buffer[0x800];
 	emu_timer *m_sprite_timer;
 	int m_sprite_busy;
 	int m_need_process_spriteram;
-	UINT16 m_scrollx[3];
-	UINT16 m_scrolly[3];
-	UINT16 m_video_register;
+	uint16_t m_scrollx[3];
+	uint16_t m_scrolly[3];
+	uint16_t m_video_register;
 	tilemap_t *m_fixed_tmap;
 	tilemap_t *m_scroll_tmap[2];
 
@@ -74,7 +74,7 @@ public:
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
-	UINT32 screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_twin16(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
@@ -85,7 +85,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base);
+	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base);
 private:
 	int set_sprite_timer();
 	void spriteram_process();
@@ -107,10 +107,10 @@ public:
 
 protected:
 	virtual void video_start() override;
-	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base) override;
+	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
 private:
-	UINT8 m_gfx_bank[4];
+	uint8_t m_gfx_bank[4];
 };
 
 class cuebrickj_state : public twin16_state
@@ -124,5 +124,5 @@ public:
 	DECLARE_DRIVER_INIT(cuebrickj);
 
 private:
-	UINT16 m_nvram[0x400 * 0x20 / 2];
+	uint16_t m_nvram[0x400 * 0x20 / 2];
 };

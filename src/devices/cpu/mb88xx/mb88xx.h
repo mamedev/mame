@@ -64,11 +64,11 @@ class mb88_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width);
+	mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_width, int data_width);
 
 	// static configuration helpers
-	static void set_pla(device_t &device, UINT8 *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
+	static void set_pla(device_t &device, uint8_t *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 
@@ -78,13 +78,13 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 3; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 3; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 6 - 1) / 6; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 6); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 6 - 1) / 6; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 6); }
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ) ); }
@@ -95,48 +95,48 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	UINT8   m_PC;     /* Program Counter: 6 bits */
-	UINT8   m_PA;     /* Page Address: 4 bits */
-	UINT16  m_SP[4];  /* Stack is 4*10 bit addresses deep, but we also use 3 top bits per address to store flags during irq */
-	UINT8   m_SI;     /* Stack index: 2 bits */
-	UINT8   m_A;      /* Accumulator: 4 bits */
-	UINT8   m_X;      /* Index X: 4 bits */
-	UINT8   m_Y;      /* Index Y: 4 bits */
-	UINT8   m_st;     /* State flag: 1 bit */
-	UINT8   m_zf;     /* Zero flag: 1 bit */
-	UINT8   m_cf;     /* Carry flag: 1 bit */
-	UINT8   m_vf;     /* Timer overflow flag: 1 bit */
-	UINT8   m_sf;     /* Serial Full/Empty flag: 1 bit */
-	UINT8   m_nf;     /* Interrupt flag: 1 bit */
+	uint8_t   m_PC;     /* Program Counter: 6 bits */
+	uint8_t   m_PA;     /* Page Address: 4 bits */
+	uint16_t  m_SP[4];  /* Stack is 4*10 bit addresses deep, but we also use 3 top bits per address to store flags during irq */
+	uint8_t   m_SI;     /* Stack index: 2 bits */
+	uint8_t   m_A;      /* Accumulator: 4 bits */
+	uint8_t   m_X;      /* Index X: 4 bits */
+	uint8_t   m_Y;      /* Index Y: 4 bits */
+	uint8_t   m_st;     /* State flag: 1 bit */
+	uint8_t   m_zf;     /* Zero flag: 1 bit */
+	uint8_t   m_cf;     /* Carry flag: 1 bit */
+	uint8_t   m_vf;     /* Timer overflow flag: 1 bit */
+	uint8_t   m_sf;     /* Serial Full/Empty flag: 1 bit */
+	uint8_t   m_nf;     /* Interrupt flag: 1 bit */
 
 	/* Peripheral Control */
-	UINT8   m_pio; /* Peripheral enable bits: 8 bits */
+	uint8_t   m_pio; /* Peripheral enable bits: 8 bits */
 
 	/* Timer registers */
-	UINT8   m_TH; /* Timer High: 4 bits */
-	UINT8   m_TL; /* Timer Low: 4 bits */
-	UINT8   m_TP; /* Timer Prescale: 6 bits? */
-	UINT8   m_ctr; /* current external counter value */
+	uint8_t   m_TH; /* Timer High: 4 bits */
+	uint8_t   m_TL; /* Timer Low: 4 bits */
+	uint8_t   m_TP; /* Timer Prescale: 6 bits? */
+	uint8_t   m_ctr; /* current external counter value */
 
 	/* Serial registers */
-	UINT8   m_SB; /* Serial buffer: 4 bits */
-	UINT16  m_SBcount;    /* number of bits received */
+	uint8_t   m_SB; /* Serial buffer: 4 bits */
+	uint16_t  m_SBcount;    /* number of bits received */
 	emu_timer *m_serial;
 
 	/* PLA configuration */
-	UINT8 * m_PLA;
+	uint8_t * m_PLA;
 
 	/* IRQ handling */
-	UINT8 m_pending_interrupt;
+	uint8_t m_pending_interrupt;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -145,12 +145,12 @@ private:
 	int m_icount;
 
 	// For the debugger
-	UINT16 m_debugger_pc;
-	UINT8 m_debugger_flags;
+	uint16_t m_debugger_pc;
+	uint8_t m_debugger_flags;
 
 	TIMER_CALLBACK_MEMBER( serial_timer );
 	int pla( int inA, int inB );
-	void update_pio_enable( UINT8 newpio );
+	void update_pio_enable( uint8_t newpio );
 	void increment_timer();
 	void update_pio( int cycles );
 
@@ -161,7 +161,7 @@ class mb88201_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -169,7 +169,7 @@ class mb88202_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -177,7 +177,7 @@ class mb8841_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -185,7 +185,7 @@ class mb8842_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -193,7 +193,7 @@ class mb8843_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -201,7 +201,7 @@ class mb8844_cpu_device : public mb88_cpu_device
 {
 public:
 	// construction/destruction
-	mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

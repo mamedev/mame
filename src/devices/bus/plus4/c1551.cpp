@@ -73,7 +73,7 @@ READ8_MEMBER( c1551_t::port_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// write protect sense
 	data |= !m_floppy->wpt_r() << 4;
@@ -161,7 +161,7 @@ WRITE8_MEMBER( c1551_t::tcbm_data_w )
 
 READ8_MEMBER( c1551_t::tpi0_r )
 {
-	UINT8 data = m_tpi0->read(space, offset);
+	uint8_t data = m_tpi0->read(space, offset);
 
 	m_ga->ted_w(0);
 	m_ga->ted_w(1);
@@ -194,7 +194,7 @@ READ8_MEMBER( c1551_t::tpi0_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// JP1
 	data |= m_jp1->read() << 5;
@@ -279,7 +279,7 @@ READ8_MEMBER( c1551_t::tpi1_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// TCBM acknowledge
 	data |= m_ack << 7;
@@ -413,7 +413,7 @@ ioport_constructor c1551_t::device_input_ports() const
 //  c1551_t - constructor
 //-------------------------------------------------
 
-c1551_t::c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c1551_t::c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C1551, "C1551", tag, owner, clock, "c1551", __FILE__),
 		device_plus4_expansion_card_interface(mconfig, *this),
 		m_maincpu(*this, M6510T_TAG),
@@ -504,8 +504,8 @@ bool c1551_t::tpi1_selected(offs_t offset)
 {
 #ifdef PLA_DUMPED
 	int mux = 0, ras = 0, phi0 = 0, f7 = 0;
-	UINT16 input = A5 << 15 | A6 << 14 | A7 << 13 | A8 << 12 | A9 << 11 | mux << 10 | A10 << 9 | m_dev << 8 | ras << 7 | phi0 << 6 | A15 << 5 | A14 << 4 | A13 << 3 | A12 << 2 | A11 << 1 | f7;
-	UINT8 data = m_pla->read(input);
+	uint16_t input = A5 << 15 | A6 << 14 | A7 << 13 | A8 << 12 | A9 << 11 | mux << 10 | A10 << 9 | m_dev << 8 | ras << 7 | phi0 << 6 | A15 << 5 | A14 << 4 | A13 << 3 | A12 << 2 | A11 << 1 | f7;
+	uint8_t data = m_pla->read(input);
 	return BIT(data, 0) ? true : false;
 #endif
 
@@ -524,7 +524,7 @@ bool c1551_t::tpi1_selected(offs_t offset)
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c1551_t::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t c1551_t::plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	data = m_exp->cd_r(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 
@@ -541,7 +541,7 @@ UINT8 c1551_t::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int b
 //  plus4_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c1551_t::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void c1551_t::plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (tpi1_selected(offset))
 	{

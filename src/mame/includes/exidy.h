@@ -58,21 +58,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_sprite1_xpos;
-	required_shared_ptr<UINT8> m_sprite1_ypos;
-	required_shared_ptr<UINT8> m_sprite2_xpos;
-	required_shared_ptr<UINT8> m_sprite2_ypos;
-	required_shared_ptr<UINT8> m_spriteno;
-	required_shared_ptr<UINT8> m_sprite_enable;
-	required_shared_ptr<UINT8> m_color_latch;
-	required_shared_ptr<UINT8> m_characterram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_sprite1_xpos;
+	required_shared_ptr<uint8_t> m_sprite1_ypos;
+	required_shared_ptr<uint8_t> m_sprite2_xpos;
+	required_shared_ptr<uint8_t> m_sprite2_ypos;
+	required_shared_ptr<uint8_t> m_spriteno;
+	required_shared_ptr<uint8_t> m_sprite_enable;
+	required_shared_ptr<uint8_t> m_color_latch;
+	required_shared_ptr<uint8_t> m_characterram;
 
-	UINT8 m_last_dial;
-	UINT8 m_collision_mask;
-	UINT8 m_collision_invert;
+	uint8_t m_last_dial;
+	uint8_t m_collision_mask;
+	uint8_t m_collision_invert;
 	int m_is_2bpp;
-	UINT8 m_int_condition;
+	uint8_t m_int_condition;
 	bitmap_ind16 m_background_bitmap;
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
@@ -97,11 +97,11 @@ public:
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
 
-	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
 
-	void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
+	void exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);
 	inline void set_1_color(int index, int which);
 	void set_colors();
@@ -112,15 +112,15 @@ public:
 
 	/* Targ and Spectar samples */
 	int m_max_freq;
-	UINT8 m_port_1_last;
-	UINT8 m_port_2_last;
-	UINT8 m_tone_freq;
-	UINT8 m_tone_active;
-	UINT8 m_tone_pointer;
+	uint8_t m_port_1_last;
+	uint8_t m_port_2_last;
+	uint8_t m_tone_freq;
+	uint8_t m_tone_active;
+	uint8_t m_tone_pointer;
 	DECLARE_WRITE8_MEMBER(targ_audio_1_w);
 	DECLARE_WRITE8_MEMBER(targ_audio_2_w);
 	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
-	void adjust_sample(UINT8 freq);
+	void adjust_sample(uint8_t freq);
 	void common_audio_start(int freq);
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);
 	SAMPLES_START_CB_MEMBER(targ_audio_start);

@@ -32,7 +32,7 @@ class qsound_device : public device_t,
 						public device_sound_interface
 {
 public:
-	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~qsound_device() { }
 
 	DECLARE_WRITE8_MEMBER(qsound_w);
@@ -50,29 +50,29 @@ protected:
 private:
 	struct qsound_channel
 	{
-		UINT32 bank;        // bank
-		UINT32 address;     // start/cur address
-		UINT16 loop;        // loop address
-		UINT16 end;         // end address
-		UINT32 freq;        // frequency
-		UINT16 vol;         // master volume
+		uint32_t bank;        // bank
+		uint32_t address;     // start/cur address
+		uint16_t loop;        // loop address
+		uint16_t end;         // end address
+		uint32_t freq;        // frequency
+		uint16_t vol;         // master volume
 
 		// work variables
 		bool enabled;       // key on / key off
 		int lvol;           // left volume
 		int rvol;           // right volume
-		UINT32 step_ptr;    // current offset counter
+		uint32_t step_ptr;    // current offset counter
 	} m_channel[16];
 
 	required_device<dsp16_device> m_cpu;
-	required_region_ptr<INT8> m_sample_rom;
+	required_region_ptr<int8_t> m_sample_rom;
 
 	int m_pan_table[33];    // pan volume table
-	UINT16 m_data;          // register latch data
+	uint16_t m_data;          // register latch data
 	sound_stream *m_stream; // audio stream
 
-	inline INT8 read_sample(UINT32 offset) { return m_sample_rom[offset & m_sample_rom.mask()]; }
-	void write_data(UINT8 address, UINT16 data);
+	inline int8_t read_sample(uint32_t offset) { return m_sample_rom[offset & m_sample_rom.mask()]; }
+	void write_data(uint8_t address, uint16_t data);
 };
 
 extern const device_type QSOUND;

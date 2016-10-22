@@ -320,10 +320,10 @@ public:
 // state information for a joystick
 struct sdl_joystick_state
 {
-	INT32 axes[MAX_AXES];
-	INT32 buttons[MAX_BUTTONS];
-	INT32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	INT32 balls[MAX_AXES];
+	int32_t axes[MAX_AXES];
+	int32_t buttons[MAX_BUTTONS];
+	int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
+	int32_t balls[MAX_AXES];
 };
 
 struct sdl_api_state

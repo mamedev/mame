@@ -26,7 +26,7 @@ const device_type PCD8544 = &device_creator<pcd8544_device>;
 //  pcd8544_device - constructor
 //-------------------------------------------------
 
-pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCD8544, "PCD8544", tag, owner, clock, "pcd8544", __FILE__)
 {
 }
@@ -75,7 +75,7 @@ void pcd8544_device::device_reset()
 	m_dc        = 0;
 }
 
-void pcd8544_device::exec_command(UINT8 cmd)
+void pcd8544_device::exec_command(uint8_t cmd)
 {
 	if (m_mode & 0x01)
 	{
@@ -145,7 +145,7 @@ void pcd8544_device::exec_command(UINT8 cmd)
 	}
 }
 
-void pcd8544_device::write_data(UINT8 data)
+void pcd8544_device::write_data(uint8_t data)
 {
 	m_vram[m_addr_y * 84 + m_addr_x] = data;
 
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER(pcd8544_device::dc_w)
 	m_dc = state;
 }
 
-UINT32 pcd8544_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcd8544_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((m_mode & 0x04) == 0)
 	{

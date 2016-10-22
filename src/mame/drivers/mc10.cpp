@@ -54,15 +54,15 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<printer_image_device> m_printer;
 
-	UINT8 *m_ram_base;
-	UINT32 m_ram_size;
-	UINT8 m_keyboard_strobe;
-	UINT8 m_port2;
+	uint8_t *m_ram_base;
+	uint32_t m_ram_size;
+	uint8_t m_keyboard_strobe;
+	uint8_t m_port2;
 
 	// printer
-	UINT8 m_pr_buffer;
-	UINT8 m_pr_counter;
-	UINT8 m_pr_state;
+	uint8_t m_pr_buffer;
+	uint8_t m_pr_counter;
+	uint8_t m_pr_state;
 
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
@@ -84,7 +84,7 @@ public:
 
 READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
 	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
@@ -100,7 +100,7 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 
 READ8_MEMBER( mc10_state::alice90_bfff_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 	else
@@ -160,7 +160,7 @@ WRITE8_MEMBER( mc10_state::mc10_port1_w )
 
 READ8_MEMBER( mc10_state::mc10_port2_r )
 {
-	UINT8 result = 0xeb;
+	uint8_t result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
 	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read() >> 5;
@@ -225,7 +225,7 @@ READ8_MEMBER( mc10_state::mc6847_videoram_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
 {
-	m_ef9345->update_scanline((UINT16)param);
+	m_ef9345->update_scanline((uint16_t)param);
 }
 
 /***************************************************************************

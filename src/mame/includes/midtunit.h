@@ -34,7 +34,7 @@ public:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 
-	required_shared_ptr<UINT16> m_nvram;
+	required_shared_ptr<uint16_t> m_nvram;
 
 	required_memory_region m_gfxrom;
 
@@ -90,25 +90,25 @@ public:
 	void init_nbajam_common(int te_protection);
 
 	/* CMOS-related variables */
-	UINT8    m_cmos_write_enable;
+	uint8_t    m_cmos_write_enable;
 
 	/* sound-related variables */
-	UINT8    m_chip_type;
-	UINT8    m_fake_sound_state;
+	uint8_t    m_chip_type;
+	uint8_t    m_fake_sound_state;
 
 	/* protection */
-	UINT8    m_mk_prot_index;
-	UINT16   m_mk2_prot_data;
+	uint8_t    m_mk_prot_index;
+	uint16_t   m_mk2_prot_data;
 
-	const UINT32 *m_nbajam_prot_table;
-	UINT16   m_nbajam_prot_queue[5];
-	UINT8    m_nbajam_prot_index;
+	const uint32_t *m_nbajam_prot_table;
+	uint16_t   m_nbajam_prot_queue[5];
+	uint8_t    m_nbajam_prot_index;
 
-	const UINT8 *m_jdredd_prot_table;
-	UINT8    m_jdredd_prot_index;
-	UINT8    m_jdredd_prot_max;
+	const uint8_t *m_jdredd_prot_table;
+	uint8_t    m_jdredd_prot_index;
+	uint8_t    m_jdredd_prot_max;
 
-	UINT8 m_gfx_rom_large;
+	uint8_t m_gfx_rom_large;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

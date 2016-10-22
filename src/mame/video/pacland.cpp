@@ -60,7 +60,7 @@ sprite color 0x7f will erase the tilemap and force it to be transparent.
 void pacland_state::switch_palette()
 {
 	int i;
-	const UINT8 *color_prom = m_color_prom + 256 * m_palette_bank;
+	const uint8_t *color_prom = m_color_prom + 256 * m_palette_bank;
 
 	for (i = 0;i < 256;i++)
 	{
@@ -91,7 +91,7 @@ void pacland_state::switch_palette()
 
 PALETTE_INIT_MEMBER(pacland_state, pacland)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	m_color_prom = color_prom;  /* we'll need this later */
@@ -114,9 +114,9 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 	switch_palette();
 
 	/* precalculate transparency masks for sprites */
-	m_transmask[0] = std::make_unique<UINT32[]>(64);
-	m_transmask[1] = std::make_unique<UINT32[]>(64);
-	m_transmask[2] = std::make_unique<UINT32[]>(64);
+	m_transmask[0] = std::make_unique<uint32_t[]>(64);
+	m_transmask[1] = std::make_unique<uint32_t[]>(64);
+	m_transmask[2] = std::make_unique<uint32_t[]>(64);
 	for (i = 0; i < 64; i++)
 	{
 		int palentry;
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
 		{
-			UINT32 mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
+			uint32_t mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
 			   $00-$7F are opaque, and others are transparent */
@@ -204,7 +204,7 @@ void pacland_state::video_start()
 	assert(m_gfxdecode->gfx(0)->colors() <= TILEMAP_NUM_GROUPS);
 	for (int color = 0; color < m_gfxdecode->gfx(0)->colors(); color++)
 	{
-		UINT32 mask = m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0x7f);
+		uint32_t mask = m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0x7f);
 		mask |= m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0xff);
 		m_fg_tilemap->set_transmask(color, mask, 0);
 	}
@@ -270,9 +270,9 @@ WRITE8_MEMBER(pacland_state::bankswitch_w)
 /* the sprite generator IC is the same as Mappy */
 void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int whichmask)
 {
-	UINT8 *spriteram = m_spriteram + 0x780;
-	UINT8 *spriteram_2 = spriteram + 0x800;
-	UINT8 *spriteram_3 = spriteram_2 + 0x800;
+	uint8_t *spriteram = m_spriteram + 0x780;
+	uint8_t *spriteram_2 = spriteram + 0x800;
+	uint8_t *spriteram_3 = spriteram_2 + 0x800;
 
 	for (int offs = 0;offs < 0x80;offs += 2)
 	{
@@ -336,15 +336,15 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT8 *pri = &screen.priority().pix8(y);
-		UINT16 *src = &m_fg_bitmap.pix16(y);
-		UINT16 *dst = &bitmap.pix16(y);
+		const uint8_t *pri = &screen.priority().pix8(y);
+		uint16_t *src = &m_fg_bitmap.pix16(y);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
 		   source pixel is not the invalid pen; also clear to 0xffff when finished */
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pix = src[x];
+			uint16_t pix = src[x];
 			if (pix != 0xffff)
 			{
 				src[x] = 0xffff;
@@ -356,7 +356,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 }
 
 
-UINT32 pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = flip_screen();
 

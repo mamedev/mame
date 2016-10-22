@@ -17,12 +17,12 @@ class kof2002_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void kof2002_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void matrim_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void samsho5_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void samsh5sp_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
+	void kof2002_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void matrim_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void samsho5_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void samsh5sp_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 
 protected:
 	virtual void device_start() override;

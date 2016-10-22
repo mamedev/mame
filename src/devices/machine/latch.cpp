@@ -5,7 +5,7 @@
 
 const device_type OUTPUT_LATCH = &device_creator<output_latch_device>;
 
-output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OUTPUT_LATCH, "Output Latch", tag, owner, clock, "output_latch", __FILE__),
 	m_resolved(false),
 	m_bit0(-1),
@@ -39,7 +39,7 @@ void output_latch_device::device_start()
 	save_item(NAME(m_bit7));
 }
 
-void output_latch_device::write(UINT8 data)
+void output_latch_device::write(uint8_t data)
 {
 	if (!m_resolved)
 	{

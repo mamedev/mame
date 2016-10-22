@@ -55,7 +55,7 @@ bool dfi_format::supports_save() const
 	return false;
 }
 
-int dfi_format::identify(io_generic *io, UINT32 form_factor)
+int dfi_format::identify(io_generic *io, uint32_t form_factor)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
@@ -64,21 +64,21 @@ int dfi_format::identify(io_generic *io, UINT32 form_factor)
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 
-bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT64 size = io_generic_size(io);
-	UINT64 pos = 4;
-	std::vector<UINT8> data;
+	uint64_t size = io_generic_size(io);
+	uint64_t pos = 4;
+	std::vector<uint8_t> data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
 	int rpm=360; // drive rpm
 	while(pos < size) {
-		UINT8 h[10];
+		uint8_t h[10];
 		io_generic_read(io, h, pos, 10);
-		UINT16 track = (h[0] << 8) | h[1];
-		UINT16 head  = (h[2] << 8) | h[3];
+		uint16_t track = (h[0] << 8) | h[1];
+		uint16_t head  = (h[2] << 8) | h[3];
 		// Ignore sector
-		UINT32 tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
+		uint32_t tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
 
 		// if the position-so-far-in-file plus 10 (for the header) plus track size
 		// is larger than the size of the file, free buffers and bail out
@@ -98,7 +98,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		//int index_polarity = 1; // current polarity of index, starts high
 		int total_time = 0; // total sampled time per track
 		for(int i=0; i<tsize; i++) {
-			UINT8 v = data[i];
+			uint8_t v = data[i];
 			if (v == 0xFF) { fprintf(stderr,"DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN! Bailing out!\n", track, i); exit(1); }
 			if((v & 0x7f) == 0x7f)
 				total_time += 0x7f;
@@ -149,7 +149,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if(!index_time)
 			index_time = total_time;
 
-		std::vector<UINT32> &buf = image->get_buffer(track, head);
+		std::vector<uint32_t> &buf = image->get_buffer(track, head);
 		buf.resize(tsize);
 
 		int cur_time = 0;
@@ -162,11 +162,11 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 #endif
 		index_count = 0;
 		//index_polarity = 0;
-		UINT32 mg = floppy_image::MG_A;
+		uint32_t mg = floppy_image::MG_A;
 		int tpos = 0;
 		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
-			UINT8 v = data[i];
+			uint8_t v = data[i];
 			if((v & 0x7f) == 0x7f) // 0x7F : no transition, but a carry (FF is a board-on-fire error and is checked for above)
 				cur_time += 0x7f;
 			else if(v & 0x80) { // 0x80 set, note the index (TODO: actually do this!) and add number to count
@@ -188,7 +188,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				// the normal case: write the transition at the appropriate time
 				if ((prev_time == 0) || ((trans_time > MIN_THRESH) && (trans_time <= MAX_THRESH))) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | UINT32((200000000ULL*cur_time)/index_time);
+					buf[tpos++] = mg | uint32_t((200000000ULL*cur_time)/index_time);
 					prev_time = cur_time;
 				}
 				// the long case: we probably missed a transition, stuff an extra guessed one in there to see if it helps
@@ -196,14 +196,14 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					if (((track%2)==0)&&(head==0)) fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
 #ifndef FAKETRANS_ONE
-					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
 #else
-					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
+					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/3)))/index_time);
+					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/3)))/index_time);
 #endif
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | UINT32(200000000ULL*cur_time/index_time); // generate transition now
+					buf[tpos++] = mg | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
 					}
 			}

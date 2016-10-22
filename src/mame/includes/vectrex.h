@@ -59,9 +59,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	required_shared_ptr<UINT8> m_gce_vectorram;
+	required_shared_ptr<uint8_t> m_gce_vectorram;
 	int m_imager_status;
-	UINT32 m_beam_color;
+	uint32_t m_beam_color;
 	unsigned char m_via_out[2];
 	double m_imager_freq;
 	emu_timer *m_imager_timer;
@@ -84,16 +84,16 @@ public:
 	int m_pen_y;
 	emu_timer *m_lp_t;
 	emu_timer *m_refresh;
-	UINT8 m_blank;
-	UINT8 m_ramp;
-	INT8 m_analog[5];
+	uint8_t m_blank;
+	uint8_t m_ramp;
+	int8_t m_analog[5];
 	int m_point_index;
 	int m_display_start;
 	int m_display_end;
 	vectrex_point m_points[NVECT];
-	UINT16 m_via_timer2;
+	uint16_t m_via_timer2;
 	attotime m_vector_start_time;
-	UINT8 m_cb2;
+	uint8_t m_cb2;
 	void (vectrex_state::*vector_add_point_function)(int, int, rgb_t, int);
 	DECLARE_WRITE8_MEMBER(vectrex_psg_port_w);
 	DECLARE_READ8_MEMBER(vectrex_via_r);
@@ -103,7 +103,7 @@ public:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(raaspec);
-	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
 	TIMER_CALLBACK_MEMBER(update_level);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);

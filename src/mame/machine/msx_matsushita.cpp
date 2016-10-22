@@ -7,7 +7,7 @@
 const device_type MSX_MATSUSHITA = &device_creator<msx_matsushita_device>;
 
 
-msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_switched_device(mconfig, MSX_MATSUSHITA, "Matsushita switched device", tag, owner, clock, "msx_matsushita", __FILE__)
 	, m_io_config(*this, "CONFIG")
 	, m_nvram(*this, "nvram")
@@ -20,7 +20,7 @@ msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, cons
 }
 
 
-UINT8 msx_matsushita_device::get_id()
+uint8_t msx_matsushita_device::get_id()
 {
 	return 0x08;
 }
@@ -76,7 +76,7 @@ READ8_MEMBER(msx_matsushita_device::io_read)
 
 		case 0x03:
 			{
-				UINT8 result = (((m_pattern & 0x80) ? m_nibble1 : m_nibble2) << 4) | ((m_pattern & 0x40) ? m_nibble1 : m_nibble2);
+				uint8_t result = (((m_pattern & 0x80) ? m_nibble1 : m_nibble2) << 4) | ((m_pattern & 0x40) ? m_nibble1 : m_nibble2);
 				m_pattern = (m_pattern << 2) | (m_pattern >> 6);
 				return result;
 			}

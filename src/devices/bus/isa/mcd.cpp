@@ -35,7 +35,7 @@ ioport_constructor mcd_isa_device::device_input_ports() const
 //  mcd_isa_device - constructor
 //-------------------------------------------------
 
-mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		cdrom_image_device(mconfig, ISA16_MCD, "Mitsumi ISA CDROM Adapter", tag, owner, clock, "mcd_isa", __FILE__),
 		device_isa16_card_interface( mconfig, *this )
 {
@@ -84,7 +84,7 @@ bool mcd_isa_device::read_sector(bool first)
 		m_data = false;
 		return false;
 	}
-	UINT32 lba = msf_to_lba(m_readmsf);
+	uint32_t lba = msf_to_lba(m_readmsf);
 	cdrom_read_data(m_cdrom_handle, lba - 150, m_buf, m_mode & 0x40 ? CD_TRACK_MODE1_RAW : CD_TRACK_MODE1);
 	if(m_mode & 0x40)
 	{
@@ -106,7 +106,7 @@ bool mcd_isa_device::read_sector(bool first)
 
 READ8_MEMBER(mcd_isa_device::flag_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	m_isa->irq5_w(CLEAR_LINE);
 	if(!m_buf_count || !m_data || m_dma) // if dma enabled the cpu will never not see that flag as it will be halted
 		ret |= FLAG_NODATA;
@@ -124,7 +124,7 @@ READ8_MEMBER(mcd_isa_device::data_r)
 	}
 	else if(m_buf_count)
 	{
-		UINT8 ret = m_buf_idx < 2352 ? m_buf[m_buf_idx++] : 0;
+		uint8_t ret = m_buf_idx < 2352 ? m_buf[m_buf_idx++] : 0;
 		m_buf_count--;
 		if(!m_buf_count)
 			read_sector();
@@ -133,11 +133,11 @@ READ8_MEMBER(mcd_isa_device::data_r)
 	return m_stat;
 }
 
-UINT16 mcd_isa_device::dack16_r(int line)
+uint16_t mcd_isa_device::dack16_r(int line)
 {
 	if(m_buf_count & ~1)
 	{
-		UINT16 ret = 0;
+		uint16_t ret = 0;
 		if(m_buf_idx < 2351)
 		{
 			ret = m_buf[m_buf_idx++];
@@ -246,7 +246,7 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 		case CMD_GET_INFO:
 			if(m_cdrom_handle)
 			{
-				UINT32 first = lba_to_msf(150), last = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, 0xaa));
+				uint32_t first = lba_to_msf(150), last = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, 0xaa));
 				m_cmdbuf[1] = 1;
 				m_cmdbuf[2] = dec_2_bcd(cdrom_get_last_track(m_cdrom_handle));
 				m_cmdbuf[3] = dec_2_bcd((last >> 16) & 0xff);
@@ -269,8 +269,8 @@ WRITE8_MEMBER(mcd_isa_device::cmd_w)
 			if(m_cdrom_handle)
 			{
 				int tracks = cdrom_get_last_track(m_cdrom_handle);
-				UINT32 start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
-				UINT32 end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < tracks ? m_curtoctrk + 1 : 0xaa));
+				uint32_t start = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk));
+				uint32_t end = lba_to_msf(cdrom_get_track_start(m_cdrom_handle, m_curtoctrk < tracks ? m_curtoctrk + 1 : 0xaa));
 				m_cmdbuf[1] = (cdrom_get_adr_control(m_cdrom_handle, m_curtoctrk) << 4) & 0xf0;
 				m_cmdbuf[2] = 0; // track num except when reading toc
 				m_cmdbuf[3] = dec_2_bcd(m_curtoctrk); // index

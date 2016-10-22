@@ -136,7 +136,7 @@ machine_config_constructor newbrain_fdc_t::device_mconfig_additions() const
 //  newbrain_fdc_t - constructor
 //-------------------------------------------------
 
-newbrain_fdc_t::newbrain_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+newbrain_fdc_t::newbrain_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEWBRAIN_FDC, "NewBrain FDC", tag, owner, clock, "newbrain_fdc", __FILE__),
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
@@ -183,7 +183,7 @@ void newbrain_fdc_t::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-UINT8 newbrain_fdc_t::mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_fdc_t::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	return m_exp->mreq_r(space, offset, data, romov, exrm, raminh);
 }
@@ -193,7 +193,7 @@ UINT8 newbrain_fdc_t::mreq_r(address_space &space, offs_t offset, UINT8 data, bo
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_fdc_t::mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh)
+void newbrain_fdc_t::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
 }
@@ -203,7 +203,7 @@ void newbrain_fdc_t::mreq_w(address_space &space, offs_t offset, UINT8 data, boo
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-UINT8 newbrain_fdc_t::iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov)
+uint8_t newbrain_fdc_t::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
 {
 	return m_exp->iorq_r(space, offset, data, prtov);
 }
@@ -213,7 +213,7 @@ UINT8 newbrain_fdc_t::iorq_r(address_space &space, offs_t offset, UINT8 data, bo
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_fdc_t::iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov)
+void newbrain_fdc_t::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
 {
 	m_exp->iorq_w(space, offset, data, prtov);
 

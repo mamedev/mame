@@ -256,7 +256,7 @@ GFXDECODE_END
 void speedspn_state::machine_start()
 {
 	/* is this weird banking some form of protection? */
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	m_prgbank->configure_entry(0, &rom[0x28000]);
 	m_prgbank->configure_entry(1, &rom[0x14000]);
 	m_prgbank->configure_entry(2, &rom[0x1c000]);

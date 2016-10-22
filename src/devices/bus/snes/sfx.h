@@ -14,7 +14,7 @@ class sns_rom_superfx_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -40,7 +40,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 
 
-	UINT8 sfx_ram[0x200000];
+	uint8_t sfx_ram[0x200000];
 };
 
 

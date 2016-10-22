@@ -26,7 +26,7 @@ class ata_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	ata_device_interface *dev() { return m_dev; }
 protected:
@@ -77,18 +77,18 @@ SLOT_INTERFACE_EXTERN(ata_devices);
 class ata_interface_device : public device_t
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
-	UINT16 read_dma();
+	uint16_t read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
 
-	void write_dma(UINT16 data);
+	void write_dma(uint16_t data);
 	virtual DECLARE_WRITE16_MEMBER(write_cs0);
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);

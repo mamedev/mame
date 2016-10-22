@@ -19,7 +19,7 @@ g64_format::g64_format()
 {
 }
 
-const UINT32 g64_format::c1541_cell_size[] =
+const uint32_t g64_format::c1541_cell_size[] =
 {
 	4000, // 16MHz/16/4
 	3750, // 16MHz/15/4
@@ -27,7 +27,7 @@ const UINT32 g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-int g64_format::identify(io_generic *io, UINT32 form_factor)
+int g64_format::identify(io_generic *io, uint32_t form_factor)
 {
 	char h[8];
 
@@ -38,10 +38,10 @@ int g64_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT64 size = io_generic_size(io);
-	std::vector<UINT8> img(size);
+	uint64_t size = io_generic_size(io);
+	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
 	if (img[POS_VERSION]) {
@@ -58,9 +58,9 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (track == TRACK_COUNT)
 			head = 1;
 
-		UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
-		UINT32 spos = tpos + (track_count * 4);
-		UINT32 dpos = pick_integer_le(&img[0], tpos, 4);
+		uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
+		uint32_t spos = tpos + (track_count * 4);
+		uint32_t dpos = pick_integer_le(&img[0], tpos, 4);
 
 		if (!dpos)
 			continue;
@@ -68,12 +68,12 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (dpos > size)
 			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, dpos);
 
-		UINT32 speed_zone = pick_integer_le(&img[0], spos, 4);
+		uint32_t speed_zone = pick_integer_le(&img[0], spos, 4);
 
 		if (speed_zone > 3)
 			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
 
-		UINT16 track_bytes = pick_integer_le(&img[0], dpos, 2);
+		uint16_t track_bytes = pick_integer_le(&img[0], dpos, 2);
 		int track_size = track_bytes * 8;
 
 		LOG_FORMATS("head %u track %u offs %u size %u cell %ld\n", head, cylinder, dpos, track_bytes, 200000000L/track_size);
@@ -89,7 +89,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	return true;
 }
 
-int g64_format::generate_bitstream(int track, int head, int speed_zone, UINT8 *trackbuf, int &track_size, floppy_image *image)
+int g64_format::generate_bitstream(int track, int head, int speed_zone, uint8_t *trackbuf, int &track_size, floppy_image *image)
 {
 	int cell_size = c1541_cell_size[speed_zone];
 
@@ -108,19 +108,19 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	tracks = TRACK_COUNT * heads;
 
 	// write header
-	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<UINT8>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
+	uint8_t header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<uint8_t>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
 	io_generic_write(io, header, POS_SIGNATURE, sizeof(header));
 
 	// write tracks
 	for (int head = 0; head < heads; head++) {
 		int tracks_written = 0;
 
-		std::vector<UINT8> trackbuf(TRACK_LENGTH-2);
+		std::vector<uint8_t> trackbuf(TRACK_LENGTH-2);
 
 		for (int track = 0; track < TRACK_COUNT; track++) {
-			UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
-			UINT32 spos = tpos + (tracks * 4);
-			UINT32 dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
+			uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
+			uint32_t spos = tpos + (tracks * 4);
+			uint32_t dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
 
 			io_generic_write_filler(io, 0x00, tpos, 4);
 			io_generic_write_filler(io, 0x00, spos, 4);
@@ -140,9 +140,9 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 
 			LOG_FORMATS("head %u track %u size %u cell %u\n", head, track, track_size, c1541_cell_size[speed_zone]);
 
-			UINT8 track_offset[4];
-			UINT8 speed_offset[4];
-			UINT8 track_length[2];
+			uint8_t track_offset[4];
+			uint8_t speed_offset[4];
+			uint8_t track_length[2];
 
 			place_integer_le(track_offset, 0, 4, dpos);
 			place_integer_le(speed_offset, 0, 4, speed_zone);

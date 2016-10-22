@@ -82,22 +82,22 @@ struct chan_info {
 	bool int_en;
 	bool loop_en;
 	bool initialized;
-	UINT8  format;       // Format of channel
-	UINT32 buf_wptr;     // Address to sample cache memory
-	UINT32 buf_rptr;     // Address to sample cache memory
-	UINT16 buf_count;    // Number of samples that have been played
-	UINT16 buf_size;     // Number of samples minus one to play
-	UINT32 pci_addr;     // PCI Addresss for system memory accesses
-	UINT16 pci_count;    // Number of 32 bits transfered
-	UINT16 pci_size;     // Total number of words (32 bits) minus one in system memory
+	uint8_t  format;       // Format of channel
+	uint32_t buf_wptr;     // Address to sample cache memory
+	uint32_t buf_rptr;     // Address to sample cache memory
+	uint16_t buf_count;    // Number of samples that have been played
+	uint16_t buf_size;     // Number of samples minus one to play
+	uint32_t pci_addr;     // PCI Addresss for system memory accesses
+	uint16_t pci_count;    // Number of 32 bits transfered
+	uint16_t pci_size;     // Total number of words (32 bits) minus one in system memory
 };
 
 class es1373_device : public pci_device, public device_sound_interface
 {
 public:
-	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void set_irq_info(const char *tag, const int irq_num);
 
@@ -120,23 +120,23 @@ protected:
 	FILE *m_eslog;
 
 private:
-	UINT32 m_tempCount;
+	uint32_t m_tempCount;
 	emu_timer *m_timer;
 	address_space *m_memory_space;
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
 	DECLARE_ADDRESS_MAP(map, 32);
-	UINT16 m_ac97_regs[0x80];
-	UINT32 m_es_regs[0x10];
-	UINT32 m_sound_cache[0x40];
-	UINT16 m_src_ram[0x80];
+	uint16_t m_ac97_regs[0x80];
+	uint32_t m_es_regs[0x10];
+	uint32_t m_sound_cache[0x40];
+	uint16_t m_src_ram[0x80];
 	chan_info m_dac1;
 	chan_info m_dac2;
 	chan_info m_adc;
 	void transfer_pci_audio(chan_info& chan, int type);
-	UINT32 calc_size(const UINT8 &format);
-	void send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples);
+	uint32_t calc_size(const uint8_t &format);
+	void send_audio_out(chan_info& chan, uint32_t intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples);
 
 };
 

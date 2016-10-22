@@ -115,16 +115,16 @@ public:
 	int m_sc1;
 
 	/* memory state */
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_boot;
 	int m_ram_protect;
 	int m_ram_disable;
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 
 	/* display state */
-	UINT8 m_segment;
+	uint8_t m_segment;
 	int m_digit;
 	int m_counter;
 	int m_q;

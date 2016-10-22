@@ -35,20 +35,20 @@ public:
 	required_device<gameboy_sound_device> m_gbsound;
 	required_device<gba_cart_slot_device> m_cart;
 
-	void request_irq(UINT32 int_type);
+	void request_irq(uint32_t int_type);
 
 	void dma_exec(int ch);
 	void audio_tick(int ref);
 
 	// DMA
 	emu_timer *m_dma_timer[4];
-	UINT32 m_dma_src[4];
-	UINT32 m_dma_dst[4];
-	UINT16 m_dma_cnt[4];
+	uint32_t m_dma_src[4];
+	uint32_t m_dma_dst[4];
+	uint16_t m_dma_cnt[4];
 
 	// Timers
-	UINT32 m_timer_regs[4];
-	UINT16 m_timer_reload[4];
+	uint32_t m_timer_regs[4];
+	uint16_t m_timer_reload[4];
 	int m_timer_recalc[4];
 
 	emu_timer *m_tmr_timer[4], *m_irq_timer;
@@ -59,10 +59,10 @@ public:
 	int m_fifo_b_ptr;
 	int m_fifo_a_in;
 	int m_fifo_b_in;
-	UINT8 m_fifo_a[20];
-	UINT8 m_fifo_b[20];
+	uint8_t m_fifo_a[20];
+	uint8_t m_fifo_b[20];
 
-	UINT32 m_bios_last_address;
+	uint32_t m_bios_last_address;
 	int m_bios_protected;
 
 	DIRECT_UPDATE_MEMBER(gba_direct);
@@ -83,7 +83,7 @@ public:
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
 protected:
-	required_region_ptr<UINT32> m_region_maincpu;
+	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;
 	required_ioport m_bios_hack;
 };

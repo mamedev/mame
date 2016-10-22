@@ -103,7 +103,7 @@ public:
 	optional_device<floppy_image_device> m_floppy1;
 	required_device<isa8_device> m_bus;
 	optional_memory_region m_char_rom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_lk;
 
 	virtual void machine_start() override;
@@ -111,16 +111,16 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_speaker();
 	void update_fdc_int();
 	void update_fdc_drq();
 	void update_fdc_tc();
 	void update_ack();
-	int get_display_mode(UINT8 mode);
+	int get_display_mode(uint8_t mode);
 	offs_t get_char_rom_offset();
-	int get_color(UINT8 data);
+	int get_color(uint8_t data);
 	MC6845_UPDATE_ROW(draw_alpha);
 	MC6845_UPDATE_ROW(draw_graphics_1);
 	MC6845_UPDATE_ROW(draw_graphics_2);
@@ -171,27 +171,27 @@ public:
 	// system status register
 	int m_pit1;
 	int m_pit2;
-	UINT8 m_status1;
-	UINT8 m_status2;
-	UINT8 m_port61;
+	uint8_t m_status1;
+	uint8_t m_status2;
+	uint8_t m_port61;
 
 	// interrupt state
 	int m_nmi_enable;
 
 	// keyboard state
-	UINT8 m_kbd;
+	uint8_t m_kbd;
 	int m_kb_bits;
 	int m_kbclk;
 	int m_kbdata;
 
 	// mouse state
-	UINT8 m_mouse_x_old;
-	UINT8 m_mouse_y_old;
-	UINT8 m_mouse_x;
-	UINT8 m_mouse_y;
+	uint8_t m_mouse_x_old;
+	uint8_t m_mouse_y_old;
+	uint8_t m_mouse_x;
+	uint8_t m_mouse_y;
 
 	// DMA state
-	UINT8 m_dma_page[4];
+	uint8_t m_dma_page[4];
 	int m_dma_channel;
 	int m_dreq0;
 
@@ -199,7 +199,7 @@ public:
 	int m_nden;
 	int m_dint;
 	int m_ddrq;
-	UINT8 m_fdc_dsr;
+	uint8_t m_fdc_dsr;
 	int m_neop;
 
 	// printer state
@@ -209,8 +209,8 @@ public:
 	int m_centronics_perror;
 	int m_centronics_select;
 	int m_centronics_fault;
-	UINT8 m_printer_data;
-	UINT8 m_printer_control;
+	uint8_t m_printer_data;
+	uint8_t m_printer_control;
 
 	// video state
 	int m_toggle;
@@ -218,11 +218,11 @@ public:
 	int m_blink;
 	int m_cursor;
 	int m_blink_ctr;
-	UINT8 m_vdu_mode;
-	UINT8 m_vdu_color;
-	UINT8 m_vdu_plane;
-	UINT8 m_vdu_rdsel;
-	UINT8 m_vdu_border;
+	uint8_t m_vdu_mode;
+	uint8_t m_vdu_color;
+	uint8_t m_vdu_plane;
+	uint8_t m_vdu_rdsel;
+	uint8_t m_vdu_border;
 
 	// sound state
 	int m_speaker_drive;

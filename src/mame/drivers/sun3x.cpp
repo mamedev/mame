@@ -168,8 +168,8 @@ public:
 	optional_device<n82077aa_device> m_fdc;
 	virtual void machine_reset() override;
 
-	required_shared_ptr<UINT32> m_p_ram;
-	optional_shared_ptr<UINT32> m_bw2_vram;
+	required_shared_ptr<uint32_t> m_p_ram;
+	optional_shared_ptr<uint32_t> m_bw2_vram;
 
 	DECLARE_READ32_MEMBER(enable_r);
 	DECLARE_WRITE32_MEMBER(enable_w);
@@ -199,11 +199,11 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun380_timer);
 
-	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT32 m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
-	UINT32 m_iommu[0x800];
+	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
+	uint32_t m_iommu[0x800];
 	bool m_bInBusErr;
 };
 
@@ -272,7 +272,7 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 	if(m_fdc) {
 		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
 		if(fdev->exists()) {
-			UINT32 variant = fdev->get_variant();
+			uint32_t variant = fdev->get_variant();
 			switch(variant) {
 			case floppy_image::SSSD:
 			case floppy_image::SSDD:
@@ -293,7 +293,7 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 
 WRITE32_MEMBER(sun3x_state::ramwrite_w)
 {
-	UINT32 *pRAM = (UINT32 *)m_p_ram.target();
+	uint32_t *pRAM = (uint32_t *)m_p_ram.target();
 
 	if (((m_memreg & 0xf0000000) == 0x70000000) &&
 		(m_irqctrl & 0x01000000) &&
@@ -357,7 +357,7 @@ WRITE32_MEMBER(sun3x_state::enable_w)
 
 READ32_MEMBER(sun3x_state::buserr_r)
 {
-	UINT32 rv = m_buserr;
+	uint32_t rv = m_buserr;
 	m_buserr = 0;
 	return rv;
 }
@@ -506,13 +506,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3x_state::sun380_timer)
 	}
 }
 
-UINT32 sun3x_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3x_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 900; y++)
 	{
@@ -542,9 +542,9 @@ INPUT_PORTS_END
 
 void sun3x_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x10000);
+	memcpy((uint8_t*)m_p_ram.target(),user1,0x10000);
 
 	m_maincpu->reset();
 

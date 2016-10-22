@@ -29,29 +29,29 @@ public:
 
 	optional_ioport_array<2> m_dials;
 
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	UINT8 m_int_enabled;
-	UINT8 m_coin_status[3];
-	UINT8 m_coin_enable[3];
+	uint8_t m_int_enabled;
+	uint8_t m_coin_status[3];
+	uint8_t m_coin_enable[3];
 
-	UINT8 m_razmataz_dial_pos[2];
-	UINT16 m_razmataz_counter;
+	uint8_t m_razmataz_dial_pos[2];
+	uint16_t m_razmataz_counter;
 
-	UINT8 m_sound_state[3];
-	UINT8 m_bg_enable;
-	UINT8 m_bg_color;
-	UINT16 m_bg_position;
-	UINT8 m_fg_color;
+	uint8_t m_sound_state[3];
+	uint8_t m_bg_enable;
+	uint8_t m_bg_color;
+	uint16_t m_bg_position;
+	uint8_t m_fg_color;
 
-	UINT8 m_congo_fg_bank;
-	UINT8 m_congo_color_bank;
-	UINT8 m_congo_custom[4];
+	uint8_t m_congo_fg_bank;
+	uint8_t m_congo_color_bank;
+	uint8_t m_congo_custom[4];
 
-	const UINT8 *m_color_codes;
+	const uint8_t *m_color_codes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(int_enable_w);
@@ -83,10 +83,10 @@ public:
 	DECLARE_PALETTE_INIT(zaxxon);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
-	UINT32 screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(zaxxon_sound_a_w);
 	DECLARE_WRITE8_MEMBER(zaxxon_sound_b_w);
@@ -95,9 +95,9 @@ public:
 	DECLARE_WRITE8_MEMBER(congo_sound_c_w);
 	void video_start_common(tilemap_get_info_delegate fg_tile_info);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int skew);
-	inline int find_minimum_y(UINT8 value, int flip);
-	inline int find_minimum_x(UINT8 value, int flip);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask);
+	inline int find_minimum_y(uint8_t value, int flip);
+	inline int find_minimum_x(uint8_t value, int flip);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
 };
 
 

@@ -33,18 +33,18 @@ public:
 	required_device<tecmo_spr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_txvideoram;
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_bg2videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_txvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_bg2videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg2_tilemap;
-	UINT16 m_xscroll;
-	UINT16 m_yscroll;
-	UINT16 m_bg2xscroll;
-	UINT16 m_bg2yscroll;
+	uint16_t m_xscroll;
+	uint16_t m_yscroll;
+	uint16_t m_bg2xscroll;
+	uint16_t m_bg2yscroll;
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
 	int m_adpcm_data[2];
@@ -77,8 +77,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);

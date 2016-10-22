@@ -44,13 +44,13 @@ struct rf5c68_pcm_channel
 		step(0),
 		loopst(0) {}
 
-	UINT8       enable;
-	UINT8       env;
-	UINT8       pan;
-	UINT8       start;
-	UINT32      addr;
-	UINT16      step;
-	UINT16      loopst;
+	uint8_t       enable;
+	uint8_t       env;
+	uint8_t       pan;
+	uint8_t       start;
+	uint32_t      addr;
+	uint16_t      step;
+	uint16_t      loopst;
 };
 
 
@@ -60,7 +60,7 @@ class rf5c68_device : public device_t,
 						public device_sound_interface
 {
 public:
-	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~rf5c68_device() { }
 
 	static void set_end_callback(device_t &device, rf5c68_sample_end_cb_delegate callback) { downcast<rf5c68_device &>(device).m_sample_end_cb = callback; }
@@ -82,10 +82,10 @@ public:
 private:
 	sound_stream*        m_stream;
 	rf5c68_pcm_channel   m_chan[RF5C68_NUM_CHANNELS];
-	UINT8                m_cbank;
-	UINT8                m_wbank;
-	UINT8                m_enable;
-	UINT8                m_data[0x10000];
+	uint8_t                m_cbank;
+	uint8_t                m_wbank;
+	uint8_t                m_enable;
+	uint8_t                m_data[0x10000];
 
 	rf5c68_sample_end_cb_delegate m_sample_end_cb;
 };

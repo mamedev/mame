@@ -298,7 +298,7 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 					if (memregion("x1snd") == nullptr) // triplfun no longer has the hardware, but still writes here
 						break;
 
-					UINT8 *rom = memregion("x1snd")->base();
+					uint8_t *rom = memregion("x1snd")->base();
 					int samples_len = memregion("x1snd")->bytes();
 					int addr;
 
@@ -369,9 +369,9 @@ Offset + 0x4:
 
 inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index, int offset )
 {
-	UINT16 *vram = m_vram_0 + offset;
-	UINT16 code =   vram[ tile_index ];
-	UINT16 attr =   vram[ tile_index + 0x800 ];
+	uint16_t *vram = m_vram_0 + offset;
+	uint16_t code =   vram[ tile_index ];
+	uint16_t attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
@@ -384,10 +384,10 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info(t
 inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset )
 {
 	int gfx = 1 + layer;
-	UINT16 *vram = (layer == 0) ? m_vram_0 + offset : m_vram_2 + offset;
-	UINT16 *vctrl = (layer == 0) ? m_vctrl_0 : m_vctrl_2;
-	UINT16 code =   vram[ tile_index ];
-	UINT16 attr =   vram[ tile_index + 0x800 ];
+	uint16_t *vram = (layer == 0) ? m_vram_0 + offset : m_vram_2 + offset;
+	uint16_t *vctrl = (layer == 0) ? m_vctrl_0 : m_vctrl_2;
+	uint16_t code =   vram[ tile_index ];
+	uint16_t attr =   vram[ tile_index + 0x800 ];
 
 	if(m_gfxdecode->gfx(gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)) != nullptr)
 	{
@@ -672,7 +672,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 // color prom
 PALETTE_INIT_MEMBER(seta_state,inttoote)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int x;
 	for (x = 0; x < 0x200 ; x++)
 	{
@@ -691,14 +691,14 @@ PALETTE_INIT_MEMBER(seta_state,setaroul)
 
 PALETTE_INIT_MEMBER(seta_state,usclssic)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int color, pen;
 	int x;
 
 	/* DECODE PROM */
 	for (x = 0; x < 0x200 ; x++)
 	{
-		UINT16 data = (color_prom[x*2] <<8) | color_prom[x*2+1];
+		uint16_t data = (color_prom[x*2] <<8) | color_prom[x*2+1];
 
 		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -723,7 +723,7 @@ void seta_state::set_pens()
 
 	for (i = 0; i < m_paletteram.bytes() / 2; i++)
 	{
-		UINT16 data = m_paletteram[i];
+		uint16_t data = m_paletteram[i];
 
 		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -737,7 +737,7 @@ void seta_state::set_pens()
 	{
 		for (i = 0; i < m_paletteram2.bytes() / 2; i++)
 		{
-			UINT16 data = m_paletteram2[i];
+			uint16_t data = m_paletteram2[i];
 
 			rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -756,7 +756,7 @@ void seta_state::usclssic_set_pens()
 
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT16 data = m_paletteram[i];
+		uint16_t data = m_paletteram[i];
 
 		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -785,7 +785,7 @@ void seta_state::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectang
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
 
 		int x;
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -828,7 +828,7 @@ void seta_state::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectang
 
 
 /* For games without tilemaps */
-UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
@@ -1045,14 +1045,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 }
 
-UINT32 seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
 	return 0;
 }
 
 
-UINT32 seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x0, cliprect);
 
@@ -1070,21 +1070,21 @@ void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 
 
 
-UINT32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 
 
-UINT32 seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 
 
-UINT32 seta_state::screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seta_state::screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* no palette to set */
 	return screen_update_seta_layers(screen, bitmap, cliprect);

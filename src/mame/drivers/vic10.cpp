@@ -61,7 +61,7 @@ public:
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<UINT8> m_color_ram;
+	optional_shared_ptr<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport m_restore;
 	required_ioport m_lock;
@@ -126,7 +126,7 @@ READ8_MEMBER( vic10_state::read )
 {
 	// TODO this is really handled by the PLA
 
-	UINT8 data = m_vic->bus_r();
+	uint8_t data = m_vic->bus_r();
 	int lorom = 1, uprom = 1, exram = 1;
 
 	if (offset < 0x800)
@@ -384,7 +384,7 @@ WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 
 READ8_MEMBER( vic10_state::sid_potx_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia->pa_r() >> 6)
 	{
@@ -411,7 +411,7 @@ READ8_MEMBER( vic10_state::sid_potx_r )
 
 READ8_MEMBER( vic10_state::sid_poty_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia->pa_r() >> 6)
 	{
@@ -465,17 +465,17 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
-	UINT8 joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->joy_r();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	UINT8 cia_pb = m_cia->pb_r();
-	UINT32 row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
+	uint8_t cia_pb = m_cia->pb_r();
+	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
 	for (int i = 0; i < 8; i++)
@@ -513,16 +513,16 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
-	UINT8 joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->joy_r();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	UINT8 cia_pa = m_cia->pa_r();
+	uint8_t cia_pa = m_cia->pa_r();
 
 	if (!BIT(cia_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia_pa, 6)) data &= m_row[6]->read();
@@ -576,7 +576,7 @@ READ8_MEMBER( vic10_state::cpu_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// expansion port
 	data |= m_exp->p0_r();
@@ -650,7 +650,7 @@ void vic10_state::machine_start()
 	m_color_ram.allocate(0x400);
 
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

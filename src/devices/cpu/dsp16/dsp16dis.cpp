@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "dsp16.h"
 
-std::string disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
+std::string disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 {
 	switch (F1)
 	{
@@ -28,7 +28,7 @@ std::string disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
 	}
 }
 
-std::string disasmYField(const UINT8& Y)
+std::string disasmYField(const uint8_t& Y)
 {
 	switch (Y)
 	{
@@ -58,7 +58,7 @@ std::string disasmYField(const UINT8& Y)
 	//return "";
 }
 
-std::string disasmZField(const UINT8& Z)
+std::string disasmZField(const uint8_t& Z)
 {
 	switch (Z)
 	{
@@ -88,7 +88,7 @@ std::string disasmZField(const UINT8& Z)
 	//return "";
 }
 
-std::string disasmF2Field(const UINT8& F2, const UINT8& D, const UINT8& S)
+std::string disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
 {
 	std::string ret = "";
 	switch (F2)
@@ -116,7 +116,7 @@ std::string disasmF2Field(const UINT8& F2, const UINT8& D, const UINT8& S)
 	return ret;
 }
 
-std::string disasmCONField(const UINT8& CON)
+std::string disasmCONField(const uint8_t& CON)
 {
 	switch (CON)
 	{
@@ -145,7 +145,7 @@ std::string disasmCONField(const UINT8& CON)
 	//return "";
 }
 
-std::string disasmBField(const UINT8& B)
+std::string disasmBField(const uint8_t& B)
 {
 	switch (B)
 	{
@@ -164,7 +164,7 @@ std::string disasmBField(const UINT8& B)
 	//return "";
 }
 
-std::string disasmRImmediateField(const UINT8& R)
+std::string disasmRImmediateField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -183,7 +183,7 @@ std::string disasmRImmediateField(const UINT8& R)
 	//return "";
 }
 
-std::string disasmRField(const UINT8& R)
+std::string disasmRField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -222,7 +222,7 @@ std::string disasmRField(const UINT8& R)
 	//return "";
 }
 
-std::string disasmIField(const UINT8& I)
+std::string disasmIField(const uint8_t& I)
 {
 	switch (I)
 	{
@@ -237,7 +237,7 @@ std::string disasmIField(const UINT8& I)
 	//return "";
 }
 
-bool disasmSIField(const UINT8& SI)
+bool disasmSIField(const uint8_t& SI)
 {
 	switch (SI)
 	{
@@ -250,24 +250,24 @@ bool disasmSIField(const UINT8& SI)
 
 CPU_DISASSEMBLE( dsp16a )
 {
-	UINT8 opSize = 1;
-	UINT32 dasmflags = 0;
-	UINT16 op  = oprom[0] | (oprom[1] << 8);
-	UINT16 op2 = oprom[2] | (oprom[3] << 8);
+	uint8_t opSize = 1;
+	uint32_t dasmflags = 0;
+	uint16_t op  = oprom[0] | (oprom[1] << 8);
+	uint16_t op2 = oprom[2] | (oprom[3] << 8);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 
-	const UINT8 opcode = (op >> 11) & 0x1f;
+	const uint8_t opcode = (op >> 11) & 0x1f;
 	switch(opcode)
 	{
 		// Format 1: Multiply/ALU Read/Write Group
 		case 0x06:
 		{
 			// F1, Y
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			sprintf(buffer, "%s, %s", fString.c_str(), yString.c_str());
@@ -276,11 +276,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x04: case 0x1c:
 		{
 			// F1 Y=a0[1] | F1 Y=a1[1]
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string aString = (opcode == 0x1c) ? "a0" : "a1";
@@ -291,10 +291,10 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x16:
 		{
 			// F1, x = Y
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			sprintf(buffer, "%s, x = %s", fString.c_str(), yString.c_str());
@@ -303,11 +303,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x17:
 		{
 			// F1, y[l] = Y
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "y" : "y1");
@@ -317,11 +317,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x1f:
 		{
 			// F1, y = Y, x = *pt++[i]
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "*pt++i" : "*pt++");
@@ -331,11 +331,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x19: case 0x1b:
 		{
 			// F1, y = a0|1, x = *pt++[i]
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "*pt++i" : "*pt++");
 			std::string aString = (opcode == 0x19) ? "a0" : "a1";
@@ -346,11 +346,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x14:
 		{
 			// F1, Y = y[1]
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string xString = (X ? "y" : "y1");
 			std::string fString = disasmF1Field(F1, D, S);
@@ -362,10 +362,10 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x07:
 		{
 			// F1, At[1] = Y
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 aT = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t aT = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string atString = (aT ? "a0" : "a1");
 			std::string fString = disasmF1Field(F1, aT, S);
@@ -377,11 +377,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x15:
 		{
 			// F1, Z : y[1]
-			const UINT8 Z = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Z = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
 			std::string xString = (X ? "y" : "y1");
 			std::string fString = disasmF1Field(F1, D, S);
@@ -391,11 +391,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x1d:
 		{
 			// F1, Z : y, x=*pt++[i]
-			const UINT8 Z = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Z = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
 			std::string xString = (X ? "*pt++i" : "*pt++");
 			std::string fString = disasmF1Field(F1, D, S);
@@ -407,11 +407,11 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x05:
 		{
 			// F1, Z : aT[1]
-			const UINT8 Z = (op & 0x000f);
-			const UINT8 X = (op & 0x0010) >> 4;
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 aT = (op & 0x0400) >> 10;
-			const UINT8 F1 = (op & 0x01e0) >> 5;
+			const uint8_t Z = (op & 0x000f);
+			const uint8_t X = (op & 0x0010) >> 4;
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t aT = (op & 0x0400) >> 10;
+			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
 			std::string atString = (aT ? "a0" : "a1");
 			atString += X ? "" : "1";   // TODO: Figure out unclear wording.
@@ -425,10 +425,10 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x13:
 		{
 			// if|ifc CON F2
-			const UINT8 CON = (op & 0x001f);
-			const UINT8 S = (op & 0x0200) >> 9;
-			const UINT8 D = (op & 0x0400) >> 10;
-			const UINT8 F2 = (op & 0x01e0) >> 5;
+			const uint8_t CON = (op & 0x001f);
+			const uint8_t S = (op & 0x0200) >> 9;
+			const uint8_t D = (op & 0x0400) >> 10;
+			const uint8_t F2 = (op & 0x01e0) >> 5;
 			std::string fString = disasmF2Field(F2, D, S);
 			std::string conString = disasmCONField(CON);
 			if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.c_str(), fString.c_str());
@@ -440,14 +440,14 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x00: case 0x01:
 		{
 			// goto JA
-			const UINT16 JA = (op & 0x0fff) | (pc & 0xf000);
+			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
 			sprintf(buffer, "goto 0x%04x", JA);
 			break;
 		}
 		case 0x10: case 0x11:
 		{
 			// call JA
-			const UINT16 JA = (op & 0x0fff) | (pc & 0xf000);
+			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
 			sprintf(buffer, "call 0x%04x", JA);
 			break;
 		}
@@ -456,7 +456,7 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x18:
 		{
 			// goto B
-			const UINT8 B = (op & 0x0700) >> 8;
+			const uint8_t B = (op & 0x0700) >> 8;
 			std::string bString = disasmBField(B);
 			sprintf(buffer, "%s", bString.c_str());
 			break;
@@ -466,7 +466,7 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x1a:
 		{
 			// if CON [goto/call/return]
-			const UINT8 CON = (op & 0x001f);
+			const uint8_t CON = (op & 0x001f);
 			std::string conString = disasmCONField(CON);
 			sprintf(buffer, "if %s:", conString.c_str());
 			// TODO: Test for invalid ops
@@ -479,8 +479,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x09: case 0x0b:
 		{
 			// R = aS
-			const UINT8 R = (op & 0x03f0) >> 4;
-			const UINT8 S = (op & 0x1000) >> 12;
+			const uint8_t R = (op & 0x03f0) >> 4;
+			const uint8_t S = (op & 0x1000) >> 12;
 			std::string rString = disasmRField(R);
 			sprintf(buffer, "%s = %s", rString.c_str(), (S ? "a1" : "a0"));
 			break;
@@ -488,8 +488,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x08:
 		{
 			// aT = R
-			const UINT8 R  = (op & 0x03f0) >> 4;
-			const UINT8 aT = (op & 0x0400) >> 10;
+			const uint8_t R  = (op & 0x03f0) >> 4;
+			const uint8_t aT = (op & 0x0400) >> 10;
 			std::string rString = disasmRField(R);
 			sprintf(buffer, "%s = %s", (aT ? "a0" : "a1"), rString.c_str());
 			break;
@@ -497,8 +497,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x0f:
 		{
 			// R = Y
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 R = (op & 0x03f0) >> 4;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
 			sprintf(buffer, "%s = %s", rString.c_str(), yString.c_str());
@@ -508,8 +508,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x0c:
 		{
 			// Y = R
-			const UINT8 Y = (op & 0x000f);
-			const UINT8 R = (op & 0x03f0) >> 4;
+			const uint8_t Y = (op & 0x000f);
+			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
 			// TODO: page 3-31 "special function encoding"
@@ -519,8 +519,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x0d:
 		{
 			// Z : R
-			const UINT8 Z = (op & 0x000f);
-			const UINT8 R = (op & 0x03f0) >> 4;
+			const uint8_t Z = (op & 0x000f);
+			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string zString = disasmZField(Z);
 			std::string rString = disasmRField(R);
 			sprintf(buffer, "%s <=> %s", zString.c_str(), rString.c_str());
@@ -531,7 +531,7 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x0a:
 		{
 			// R = N
-			const UINT8 R = (op & 0x03f0) >> 4;
+			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string rString = disasmRField(R);
 			sprintf(buffer, "%s = 0x%04x", rString.c_str(), op2);
 			opSize = 2;
@@ -542,8 +542,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x02: case 0x03:
 		{
 			// R = M
-			const UINT16 M = (op & 0x01ff);
-			const UINT8  R = (op & 0x0e00) >> 9;
+			const uint16_t M = (op & 0x01ff);
+			const uint8_t  R = (op & 0x0e00) >> 9;
 			std::string rString = disasmRImmediateField(R);
 			sprintf(buffer, "%s = 0x%04x", rString.c_str(), M);
 			break;
@@ -553,8 +553,8 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x0e:
 		{
 			// do|redo K
-			const UINT8 K = (op & 0x007f);
-			const UINT8 NI = (op & 0x0780) >> 7;
+			const uint8_t K = (op & 0x007f);
+			const uint8_t NI = (op & 0x0780) >> 7;
 			sprintf(buffer, "do (next %d inst) %d times", NI, K);
 			// TODO: Limits on K & NI
 			if (NI == 0x00)

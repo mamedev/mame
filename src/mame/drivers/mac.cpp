@@ -215,7 +215,7 @@ WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 void mac_state::rbv_recalc_irqs()
 {
 	// check slot interrupts and bubble them down to IFR
-	UINT8 slot_irqs = (~m_rbv_regs[2]) & 0x78;
+	uint8_t slot_irqs = (~m_rbv_regs[2]) & 0x78;
 	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
 
 	if (slot_irqs)
@@ -227,7 +227,7 @@ void mac_state::rbv_recalc_irqs()
 		m_rbv_regs[3] &= ~2; // any slot
 	}
 
-	UINT8 ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
+	uint8_t ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
 
 //  printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
 	if (ifr != 0)
@@ -502,7 +502,7 @@ WRITE8_MEMBER(mac_state::amic_dma_w)
 // HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
 READ8_MEMBER(mac_state::hmc_r)
 {
-	UINT8 rv = (UINT8)(m_hmc_shiftout&1);
+	uint8_t rv = (uint8_t)(m_hmc_shiftout&1);
 	m_hmc_shiftout>>= 1;
 	return rv;
 }
@@ -516,7 +516,7 @@ WRITE8_MEMBER(mac_state::hmc_w)
 	}
 	else
 	{
-		UINT64 temp = (data & 1) ? U64(0x400000000) : U64(0x0);
+		uint64_t temp = (data & 1) ? U64(0x400000000) : U64(0x0);
 		m_hmc_reg >>= 1;
 		m_hmc_reg |= temp;
 	}
@@ -569,15 +569,15 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
 {
 	int scanline = param;
-	UINT16 *mac_snd_buf_ptr;
+	uint16_t *mac_snd_buf_ptr;
 
 	if (m_main_buffer)
 	{
-		mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
 	}
 	else
 	{
-		mac_snd_buf_ptr = (UINT16 *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
 	}
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);

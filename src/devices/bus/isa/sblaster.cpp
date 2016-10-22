@@ -129,7 +129,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( sb8_device::ym3812_16_r )
 {
-	UINT8 retVal = 0xff;
+	uint8_t retVal = 0xff;
 	switch(offset)
 	{
 		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
@@ -169,7 +169,7 @@ WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_2_16_w )
 	}
 }
 
-void sb_device::queue(UINT8 data)
+void sb_device::queue(uint8_t data)
 {
 	if (m_dsp.fifo_ptr < 15)
 	{
@@ -184,7 +184,7 @@ void sb_device::queue(UINT8 data)
 	}
 }
 
-void sb_device::queue_r(UINT8 data)
+void sb_device::queue_r(uint8_t data)
 {
 	m_dsp.rbuf_status |= 0x80;
 
@@ -201,9 +201,9 @@ void sb_device::queue_r(UINT8 data)
 	}
 }
 
-UINT8 sb_device::dequeue_r()
+uint8_t sb_device::dequeue_r()
 {
-	UINT8 data = m_dsp.fifo_r[0];
+	uint8_t data = m_dsp.fifo_r[0];
 
 	if (m_dsp.fifo_r_ptr > 0)
 	{
@@ -285,7 +285,7 @@ READ8_MEMBER( sb_device::dsp_data_r )
 
 	if (m_uart_midi)
 	{
-		UINT8 rv = m_recvring[m_recv_read++];
+		uint8_t rv = m_recvring[m_recv_read++];
 		if (m_recv_read >= MIDI_RING_SIZE)
 		{
 			m_recv_read = 0;
@@ -370,7 +370,7 @@ WRITE8_MEMBER(sb_device::dsp_rbuf_status_w)
 	logerror("Soundblaster DSP Read Buffer status undocumented write\n");
 }
 
-void sb_device::process_fifo(UINT8 cmd)
+void sb_device::process_fifo(uint8_t cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
@@ -523,7 +523,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.adc_length = 1;
 				m_dsp.wbuf_status = 0x80;
 				m_dsp.dma_no_irq = true;
-				m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
+				m_dack_out = (uint8_t)(m_dsp.prot_value & 0xff);
 				drq_w(1);
 				break;
 
@@ -712,29 +712,29 @@ WRITE8_MEMBER(sb_device::dsp_cmd_w)
 	process_fifo(m_dsp.fifo[0]);
 }
 
-void sb_device::adpcm_decode(UINT8 sample, int size)
+void sb_device::adpcm_decode(uint8_t sample, int size)
 {
-	const UINT8 adpcm_2_table[] =  {0, 1, 1, 3, 2, 6, 4, 12, 8, 24, 16, 48};
-	const UINT8 step_2_table[] =   {0, 2, 0, 4, 2, 6, 4,  8, 6, 10,  8, 10};
+	const uint8_t adpcm_2_table[] =  {0, 1, 1, 3, 2, 6, 4, 12, 8, 24, 16, 48};
+	const uint8_t step_2_table[] =   {0, 2, 0, 4, 2, 6, 4,  8, 6, 10,  8, 10};
 
-	const UINT8 adpcm_3_table[] =  {0,  1,  2,  3,  1,  3,  5,  7,
+	const uint8_t adpcm_3_table[] =  {0,  1,  2,  3,  1,  3,  5,  7,
 									2,  6, 10, 14,  4, 12, 20, 28,
 									8, 24, 40, 56};
-	const UINT8 step_3_table[] =   {0,  0,  0,  4,  0,  4,  4,  8,
+	const uint8_t step_3_table[] =   {0,  0,  0,  4,  0,  4,  4,  8,
 									4,  8,  8, 12,  8, 12, 12, 16,
 									12, 16, 16, 16};
 
-	const UINT8 adpcm_4_table[] =  {0,  1,  2,  3,  4,  5,  6,  7,
+	const uint8_t adpcm_4_table[] =  {0,  1,  2,  3,  4,  5,  6,  7,
 									1,  3,  5,  7,  9, 11, 13, 15,
 									2,  6, 10, 14, 18, 22, 26, 30,
 									4, 12, 20, 28, 36, 44, 52, 60};
-	const UINT8 step_4_table[]  =  {0,  0,  0,  0,  0,  8,  8,  8,
+	const uint8_t step_4_table[]  =  {0,  0,  0,  0,  0,  8,  8,  8,
 									0,  8,  8,  8,  8, 16, 16, 16,
 									8, 16, 16, 16, 16, 24, 24, 24,
 									16, 24, 24, 24, 24, 24, 24, 24};
 
-	INT16 dec_sample = m_dsp.adpcm_ref;
-	UINT8 index;
+	int16_t dec_sample = m_dsp.adpcm_ref;
+	uint8_t index;
 	switch(size)
 	{
 		case 2:
@@ -765,7 +765,7 @@ void sb_device::adpcm_decode(UINT8 sample, int size)
 
 READ8_MEMBER( sb16_device::mpu401_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	irq_w(0, IRQ_MPU);
 	if(offset == 0) // data
@@ -1217,7 +1217,7 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
@@ -1228,14 +1228,14 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	m_ym3812(*this, "ym3812")
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa16_card_interface(mconfig, *this)
 {
@@ -1245,19 +1245,19 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__),
 	m_saa1099_1(*this, "saa1099.1"),
 	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
-isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5", "isa_sblaster1_5", __FILE__)
 {
 }
 
-isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16", "isa_sblaster_16", __FILE__)
 {
 }
@@ -1401,7 +1401,7 @@ void sb_device::device_reset()
 	set_rate(31250);
 }
 
-UINT8 sb_device::dack_r(int line)
+uint8_t sb_device::dack_r(int line)
 {
 	m_dsp.adc_transferred++;
 	if(m_dsp.adc_transferred >= m_dsp.adc_length)
@@ -1425,7 +1425,7 @@ UINT8 sb_device::dack_r(int line)
 	return m_dack_out;
 }
 
-UINT16 sb16_device::dack16_r(int line)
+uint16_t sb16_device::dack16_r(int line)
 {
 	m_dsp.adc_transferred += 2;
 	if (m_dsp.adc_transferred >= m_dsp.adc_length)
@@ -1444,7 +1444,7 @@ UINT16 sb16_device::dack16_r(int line)
 	return m_dack_out;
 }
 
-void sb16_device::dack16_w(int line, UINT16 data)
+void sb16_device::dack16_w(int line, uint16_t data)
 {
 	// set the transfer timer on the 1st byte
 	if (!m_dsp.dma_timer_started)
@@ -1487,7 +1487,7 @@ void sb16_device::dack16_w(int line, UINT16 data)
 }
 
 /* TODO: this mustn't be instant! */
-void sb_device::dack_w(int line, UINT8 data)
+void sb_device::dack_w(int line, uint8_t data)
 {
 //    printf("dack_w: line %x data %02x\n", line, data);
 //  if(data != 0x80)
@@ -1541,7 +1541,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 		return;
 	}
 
-	UINT16 lsample, rsample;
+	uint16_t lsample, rsample;
 	switch (m_dsp.flags) {
 		case 0: // 8-bit unsigned mono
 			m_ldac->write(m_dsp.data[m_dsp.d_rptr] << 8);
@@ -1698,7 +1698,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 void sb_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 	// in UART MIDI mode, we set the DMA8 IRQ on receiving a character
 	if (m_uart_midi)
@@ -1723,7 +1723,7 @@ void sb_device::rcv_complete()    // Rx completed receiving byte
 void sb16_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 	// for UART or MPU, add character to the receive queue
 	if (m_uart_midi || m_mpu_midi)
@@ -1776,7 +1776,7 @@ void sb_device::tra_callback()    // Tx send bit
 	m_mdout->write_txd(bit);
 }
 
-void sb_device::xmit_char(UINT8 data)
+void sb_device::xmit_char(uint8_t data)
 {
 //  printf("SB: xmit %02x\n", data);
 

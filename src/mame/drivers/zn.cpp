@@ -116,22 +116,22 @@ public:
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
-	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data );
+	inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
 
-	UINT8 m_n_znsecsel;
+	uint8_t m_n_znsecsel;
 
-	UINT16 m_bam2_mcu_command;
+	uint16_t m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
-	std::unique_ptr<UINT8[]> m_fx1b_fram;
+	std::unique_ptr<uint8_t[]> m_fx1b_fram;
 
-	UINT16 m_vt83c461_latch;
+	uint16_t m_vt83c461_latch;
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
@@ -169,15 +169,15 @@ inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fm
 }
 
 #ifdef UNUSED_FUNCTION
-inline UINT16 zn_state::psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
+inline uint16_t zn_state::psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
 {
-	return *( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
+	return *( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
 #endif
 
-inline void zn_state::psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data )
+inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data )
 {
-	*( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
+	*( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
 
 READ8_MEMBER(zn_state::znsecsel_r)
@@ -1042,7 +1042,7 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-	m_fx1b_fram = std::make_unique<UINT8[]>(0x200);
+	m_fx1b_fram = std::make_unique<uint8_t[]>(0x200);
 	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 }
 
@@ -1208,7 +1208,7 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void zn_state::atpsx_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 //  logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1224,13 +1224,13 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 	n_size <<= 1;
 	while( n_size > 0 )
 	{
-		psxwriteword( p_n_psxram, n_address, m_vt83c461->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) );
+		psxwriteword( p_n_psxram, n_address, m_vt83c461->read_cs0(space, (uint32_t) 0, (uint32_t) 0xffff) );
 		n_address += 2;
 		n_size--;
 	}
 }
 
-void zn_state::atpsx_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void zn_state::atpsx_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
@@ -1245,11 +1245,11 @@ READ16_MEMBER(zn_state::vt83c461_16_r)
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		return m_vt83c461->read_cs0( space, ( offset / 2 ) & 1, (UINT32) mem_mask << shift ) >> shift;
+		return m_vt83c461->read_cs0( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		return m_vt83c461->read_cs1( space, ( offset / 2 ) & 1, (UINT32) mem_mask << shift ) >> shift;
+		return m_vt83c461->read_cs1( space, ( offset / 2 ) & 1, (uint32_t) mem_mask << shift ) >> shift;
 	}
 	else
 	{
@@ -1268,11 +1268,11 @@ WRITE16_MEMBER(zn_state::vt83c461_16_w)
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
-		m_vt83c461->write_cs0( space, ( offset / 2 ) & 1, (UINT32) data << shift, (UINT32) mem_mask << shift );
+		m_vt83c461->write_cs0( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
 	}
 	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
 	{
-		m_vt83c461->write_cs1( space, ( offset / 2 ) & 1, (UINT32) data << shift, (UINT32) mem_mask << shift );
+		m_vt83c461->write_cs1( space, ( offset / 2 ) & 1, (uint32_t) data << shift, (uint32_t) mem_mask << shift );
 	}
 	else
 	{
@@ -1284,7 +1284,7 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 {
 	if( offset == 0x1f0/2 )
 	{
-		UINT32 data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
+		uint32_t data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
 		m_vt83c461_latch = data >> 16;
 		return data & 0xffff;
 	}
@@ -1853,7 +1853,7 @@ WRITE16_MEMBER(zn_state::acpsx_00_w)
 
 WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 {
-	UINT32 newbank = 0;
+	uint32_t newbank = 0;
 
 	verboselog(0, "nbajamex_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
@@ -1904,7 +1904,7 @@ WRITE16_MEMBER(zn_state::nbajamex_80_w)
 
 READ16_MEMBER(zn_state::nbajamex_08_r)
 {
-	UINT32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
@@ -1912,7 +1912,7 @@ READ16_MEMBER(zn_state::nbajamex_08_r)
 // possibly a readback from the external soundboard?
 READ16_MEMBER(zn_state::nbajamex_80_r)
 {
-	UINT32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }

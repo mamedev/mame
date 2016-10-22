@@ -70,7 +70,7 @@ public:
 	virtual void wait_for_debugger(device_t &device, bool firststop) = 0;
 
 	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) = 0;
+	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) = 0;
 	virtual void set_mastervolume(int attenuation) = 0;
 	virtual bool no_sound() = 0;
 
@@ -78,7 +78,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
 
 	// video overridables
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) = 0;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) = 0;
 	virtual std::vector<ui::menu_item> get_slider_list() = 0;
 
 	// font interface

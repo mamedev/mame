@@ -181,7 +181,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 
 MACHINE_START_MEMBER( nes_state, fds )
 {
-	m_ciram = std::make_unique<UINT8[]>(0x800);
+	m_ciram = std::make_unique<uint8_t[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
 	setup_disk(m_disk);
 

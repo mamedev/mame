@@ -70,12 +70,12 @@ private:
 	bool m_gten;
 	bool m_disp_on;
 	bool m_diag_on;
-	UINT8 m_firqtimer;
-	UINT8 m_diag_segments;
+	uint8_t m_firqtimer;
+	uint8_t m_diag_segments;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
-	required_shared_ptr<UINT8> m_shared_ram;
+	required_shared_ptr<uint8_t> m_shared_ram;
 };
 
 // housekeeping cpu
@@ -322,7 +322,7 @@ WRITE8_MEMBER( wico_state::msols_w )
 // write to diagnostic display
 WRITE8_MEMBER( wico_state::muxen_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // MC14495
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // MC14495
 
 	m_diag_segments = patterns[data>>4];
 
@@ -358,7 +358,7 @@ READ8_MEMBER( wico_state::switch_r )
 	char kbdrow[8];
 	offset = m_shared_ram[0x95];
 	sprintf(kbdrow,"X%X",offset);
-	UINT8 data = ioport(kbdrow)->read();
+	uint8_t data = ioport(kbdrow)->read();
 
 	// Reflex solenoids - operated directly by the switches without needing the cpu
 	if ((offset==2) && (data & 15))

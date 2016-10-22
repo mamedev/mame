@@ -31,8 +31,8 @@ Not nice, but it works...
 #define WAVE_HIGH   32767
 #define WAVE_NULL   0
 
-static const UINT8 UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 0x65, 0x21, 0x00 };
-static const UINT8 GZ_HEADER[2] = { 0x1f, 0x8b };
+static const uint8_t UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 0x65, 0x21, 0x00 };
+static const uint8_t GZ_HEADER[2] = { 0x1f, 0x8b };
 
 /*
     bytes are stored as
@@ -49,8 +49,8 @@ static const UINT8 GZ_HEADER[2] = { 0x1f, 0x8b };
 #define COMMENT     0x10 /* bit 4 set: file comment present */
 #define RESERVED    0xE0 /* bits 5..7: reserved */
 
-static const UINT8* skip_gz_header( const UINT8 *p ) {
-	UINT8 method, flags;
+static const uint8_t* skip_gz_header( const uint8_t *p ) {
+	uint8_t method, flags;
 	/* skip initial 1f 8b header */
 	p += 2;
 	/* get method and flags */
@@ -82,9 +82,9 @@ static const UINT8* skip_gz_header( const UINT8 *p ) {
 	return p;
 }
 
-static UINT8 *gz_ptr = nullptr;
+static uint8_t *gz_ptr = nullptr;
 
-static float get_uef_float( const UINT8 *Float)
+static float get_uef_float( const uint8_t *Float)
 {
 		int Mantissa;
 		float Result;
@@ -112,19 +112,19 @@ static float get_uef_float( const UINT8 *Float)
 	return Result;
 }
 
-static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int uef_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	int pos, size;
 
 	if ( casdata[0] == 0x1f && casdata[1] == 0x8b ) {
 		int err;
 		z_stream d_stream;
 		int inflate_size = ( casdata[ caslen - 1 ] << 24 ) | ( casdata[ caslen - 2 ] << 16 ) | ( casdata[ caslen - 3 ] << 8 ) | casdata[ caslen - 4 ];
-		const UINT8 *in_ptr = skip_gz_header( casdata );
+		const uint8_t *in_ptr = skip_gz_header( casdata );
 
 		if ( in_ptr == nullptr ) {
 			goto cleanup;
 		}
-		gz_ptr = (UINT8 *)malloc( inflate_size );
+		gz_ptr = (uint8_t *)malloc( inflate_size );
 
 		d_stream.zalloc = nullptr;
 		d_stream.zfree = nullptr;
@@ -222,7 +222,7 @@ cleanup:
 	return -1;
 }
 
-static INT16* uef_cas_fill_bit( INT16 *buffer, int bit ) {
+static int16_t* uef_cas_fill_bit( int16_t *buffer, int bit ) {
 	if ( bit ) {
 		*buffer = WAVE_LOW; buffer++;
 		*buffer = WAVE_HIGH; buffer++;
@@ -237,9 +237,9 @@ static INT16* uef_cas_fill_bit( INT16 *buffer, int bit ) {
 	return buffer;
 }
 
-static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int pos;
-	INT16 *p = buffer;
+	int16_t *p = buffer;
 
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == nullptr ) {
@@ -255,12 +255,12 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 		int chunk_length = ( bytes[pos+5] << 24 ) | ( bytes[pos+4] << 16 ) | ( bytes[pos+3] << 8 ) | bytes[pos+2];
 
 		int baud_length, i, j;
-		UINT8 *c;
+		uint8_t *c;
 		pos += 6;
 		switch( chunk_type ) {
 		case 0x0100:    /* implicit start/stop bit data block */
 			for( j = 0; j < chunk_length; j++ ) {
-				UINT8 byte = bytes[pos+j];
+				uint8_t byte = bytes[pos+j];
 				p = uef_cas_fill_bit( p, 0 );
 				for( i = 0; i < 8; i++ ) {
 					p = uef_cas_fill_bit( p, byte & 1 );
@@ -278,7 +278,7 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 			j = ( chunk_length * 10 ) - bytes[pos];
 			c = bytes + pos;
 			while( j ) {
-				UINT8 byte = *c;
+				uint8_t byte = *c;
 				for( i = 0; i < 8 && i < j; i++ ) {
 					p = uef_cas_fill_bit( p, byte & 1 );
 					byte = byte >> 1;
@@ -324,7 +324,7 @@ static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
 };
 
 static cassette_image::error uef_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
-	UINT8 header[10];
+	uint8_t header[10];
 
 	cassette_image_read(cassette, header, 0, sizeof(header));
 	if (memcmp(&header[0], GZ_HEADER, sizeof(GZ_HEADER)) && memcmp(&header[0], UEF_HEADER, sizeof(UEF_HEADER))) {

@@ -42,28 +42,28 @@ public:
 	required_device<palette_device> m_radar_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fgscroll;
-	required_shared_ptr<UINT8> m_scrollx1;
-	required_shared_ptr<UINT8> m_scrolly1;
-	required_shared_ptr<UINT8> m_scrollx2;
-	required_shared_ptr<UINT8> m_scrolly2;
-	required_shared_ptr<UINT8> m_scrollx3;
-	required_shared_ptr<UINT8> m_scrolly3;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_fgcolorram;
-	required_shared_ptr<UINT8> m_bg1videoram;
-	required_shared_ptr<UINT8> m_bg2videoram;
-	required_shared_ptr<UINT8> m_bg3videoram;
-	required_shared_ptr<UINT8> m_radarram;
-	required_shared_ptr<UINT8> m_bgstripesram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgscroll;
+	required_shared_ptr<uint8_t> m_scrollx1;
+	required_shared_ptr<uint8_t> m_scrolly1;
+	required_shared_ptr<uint8_t> m_scrollx2;
+	required_shared_ptr<uint8_t> m_scrolly2;
+	required_shared_ptr<uint8_t> m_scrollx3;
+	required_shared_ptr<uint8_t> m_scrolly3;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_fgcolorram;
+	required_shared_ptr<uint8_t> m_bg1videoram;
+	required_shared_ptr<uint8_t> m_bg2videoram;
+	required_shared_ptr<uint8_t> m_bg3videoram;
+	required_shared_ptr<uint8_t> m_radarram;
+	required_shared_ptr<uint8_t> m_bgstripesram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	// game specific initialization
 	int m_is_senjyo;
 	int m_scrollhack;
 
-	UINT8 m_sound_cmd;
+	uint8_t m_sound_cmd;
 	int m_single_volume;
 	int m_sound_state;
 	int m_bgstripes;
@@ -103,7 +103,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,int priority);

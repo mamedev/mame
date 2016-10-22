@@ -669,8 +669,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx2")->base();
 	int size = memregion("gfx2")->bytes();
 	int data;
 

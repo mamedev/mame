@@ -260,7 +260,7 @@ ioport_constructor amigakbd_device::device_input_ports() const
 //  amigakbd_device - constructor
 //-------------------------------------------------
 
-amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGAKBD, "Amiga 500 Keyboard with 6570-036 MPU", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
 	m_write_kdat(*this),
@@ -394,7 +394,7 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 
 INPUT_CHANGED_MEMBER( amigakbd_device::check_reset )
 {
-	UINT8 keys = m_special->read();
+	uint8_t keys = m_special->read();
 
 	// ctrl-amiga-amiga pressed?
 	if (!BIT(keys, 6) && !BIT(keys, 3) && !BIT(keys, 2))
@@ -421,7 +421,7 @@ void amigakbd_device::update_irqs()
 
 READ8_MEMBER( amigakbd_device::port_a_r )
 {
-	UINT8 data = 0xfc;
+	uint8_t data = 0xfc;
 
 	// kdat & kclk
 	data |= m_kdat << 0;

@@ -22,7 +22,7 @@ class voltage_regulator_device : public device_t,
 public:
 	static void set_output(device_t &device, double analogue_dc) { downcast<voltage_regulator_device &>(device).m_output = (analogue_dc * 32768) / 5.0f; }
 
-	voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~voltage_regulator_device() { }
 
 	virtual bool issound() override { return false; }

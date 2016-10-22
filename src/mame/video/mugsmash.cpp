@@ -26,8 +26,8 @@ void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	*/
 
-	const UINT16 *source = m_spriteram;
-	const UINT16 *finish = source + 0x2000;
+	const uint16_t *source = m_spriteram;
+	const uint16_t *finish = source + 0x2000;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	while (source < finish)
@@ -139,7 +139,7 @@ void mugsmash_state::video_start()
 	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
-UINT32 mugsmash_state::screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mugsmash_state::screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);

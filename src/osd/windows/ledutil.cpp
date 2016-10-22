@@ -153,7 +153,7 @@ static LRESULT handle_update_state(WPARAM wparam, LPARAM lparam);
 // these functions provide the meat
 static void output_startup(const char *commandline);
 static void output_mame_start(void);
-static void output_set_state(const char *name, INT32 state);
+static void output_set_state(const char *name, int32_t state);
 static void output_mame_stop(void);
 static void output_shutdown(void);
 
@@ -319,7 +319,7 @@ static LRESULT CALLBACK listener_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 static LRESULT handle_mame_start(WPARAM wparam, LPARAM lparam)
 {
-	DEBUG_PRINTF(("mame_start (%08X)\n", (UINT32)wparam));
+	DEBUG_PRINTF(("mame_start (%08X)\n", (uint32_t)wparam));
 
 	// make this the targeted version of MAME
 	mame_target = (HWND)wparam;
@@ -343,7 +343,7 @@ static LRESULT handle_mame_start(WPARAM wparam, LPARAM lparam)
 
 static LRESULT handle_mame_stop(WPARAM wparam, LPARAM lparam)
 {
-	DEBUG_PRINTF(("mame_stop (%08X)\n", (UINT32)wparam));
+	DEBUG_PRINTF(("mame_stop (%08X)\n", (uint32_t)wparam));
 
 	// ignore if this is not the instance we care about
 	if (mame_target != (HWND)wparam)
@@ -370,7 +370,7 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 	id_map_entry *entry;
 	char *string;
 
-	DEBUG_PRINTF(("copydata (%08X)\n", (UINT32)wparam));
+	DEBUG_PRINTF(("copydata (%08X)\n", (uint32_t)wparam));
 
 	// ignore requests we don't care about
 	if (mame_target != (HWND)wparam)
@@ -452,7 +452,7 @@ static const char *map_id_to_outname(WPARAM id)
 
 static LRESULT handle_update_state(WPARAM wparam, LPARAM lparam)
 {
-	DEBUG_PRINTF(("update_state: id=%d state=%d\n", (UINT32)wparam, (UINT32)lparam));
+	DEBUG_PRINTF(("update_state: id=%d state=%d\n", (uint32_t)wparam, (uint32_t)lparam));
 	output_set_state(map_id_to_outname(wparam), lparam);
 	return 0;
 }
@@ -517,7 +517,7 @@ static void output_mame_start(void)
 			if (!DefineDosDevice(DDD_RAW_TARGET_PATH, TEXT("Kbd"), TEXT("\\Device\\KeyboardClass0")))
 			{
 				error_number = GetLastError();
-				fprintf(stderr, "Unable to open the keyboard device. (error %d)\n", (UINT32)error_number);
+				fprintf(stderr, "Unable to open the keyboard device. (error %d)\n", (uint32_t)error_number);
 				return;
 			}
 
@@ -525,7 +525,7 @@ static void output_mame_start(void)
 			if (hKbdDev == INVALID_HANDLE_VALUE)
 			{
 				error_number = GetLastError();
-				fprintf(stderr, "Unable to open the keyboard device. (error %d)\n", (UINT32)error_number);
+				fprintf(stderr, "Unable to open the keyboard device. (error %d)\n", (uint32_t)error_number);
 				return;
 			}
 			break;
@@ -571,7 +571,7 @@ static void output_mame_stop(void)
 //  output_set_state
 //============================================================
 
-static void output_set_state(const char *outname, INT32 state)
+static void output_set_state(const char *outname, int32_t state)
 {
 	// look for pause state
 	if (strcmp(outname, "pause") == 0)

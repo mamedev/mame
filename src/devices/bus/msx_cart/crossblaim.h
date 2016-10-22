@@ -13,7 +13,7 @@ class msx_cart_crossblaim : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -27,8 +27,8 @@ public:
 	void restore_banks();
 
 private:
-	UINT8 m_selected_bank;
-	UINT8 *m_bank_base[4];
+	uint8_t m_selected_bank;
+	uint8_t *m_bank_base[4];
 
 	void setup_bank();
 };

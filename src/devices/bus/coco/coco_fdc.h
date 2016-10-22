@@ -28,7 +28,7 @@ class coco_family_fdc_device_base :
 {
 public:
 	// construction/destruction
-	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 		, device_cococart_interface(mconfig, *this)
 	{
@@ -47,7 +47,7 @@ protected:
 
 	// FDC overrides
 	virtual void update_lines() = 0;
-	virtual UINT8* get_cart_base() override;
+	virtual uint8_t* get_cart_base() override;
 
 	// wrapper for setting the cart line
 	void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
@@ -60,17 +60,17 @@ protected:
 	}
 
 	// accessors
-	UINT8 dskreg() const { return m_dskreg; }
+	uint8_t dskreg() const { return m_dskreg; }
 	bool intrq() const { return m_intrq; }
 	bool drq() const { return m_drq; }
-	void set_dskreg(UINT8 data) { m_dskreg = data; }
+	void set_dskreg(uint8_t data) { m_dskreg = data; }
 
 private:
 	// internal state
 	cococart_slot_device *m_owner;
 
 	// registers
-	UINT8 m_dskreg;
+	uint8_t m_dskreg;
 	bool m_intrq;
 	bool m_drq;
 };

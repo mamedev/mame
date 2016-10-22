@@ -66,10 +66,10 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_region_ptr<UINT8> m_basic;
-	required_region_ptr<UINT8> m_kernal;
-	required_region_ptr<UINT8> m_charom;
-	required_shared_ptr<UINT8> m_color_ram;
+	required_region_ptr<uint8_t> m_basic;
+	required_region_ptr<uint8_t> m_kernal;
+	required_region_ptr<uint8_t> m_charom;
+	required_shared_ptr<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport m_restore;
 	required_ioport m_lock;
@@ -162,7 +162,7 @@ QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )
 
 READ8_MEMBER( vic20_state::read )
 {
-	UINT8 data = m_vic->bus_r();
+	uint8_t data = m_vic->bus_r();
 
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -314,7 +314,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
 	int io2 = 1, io3 = 1;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(offset, 13))
 	{
@@ -536,7 +536,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// serial clock in
 	data |= m_iec->clk_r();
@@ -545,7 +545,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	data |= m_iec->data_r() << 1;
 
 	// joystick / user port
-	UINT8 joy = m_joy->joy_r();
+	uint8_t joy = m_joy->joy_r();
 
 	data |= (m_user_joy0 && BIT(joy, 0)) << 2;
 	data |= (m_user_joy1 && BIT(joy, 1)) << 3;
@@ -613,7 +613,7 @@ READ8_MEMBER( vic20_state::via2_pa_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -640,10 +640,10 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
-	UINT8 joy = m_joy->joy_r();
+	uint8_t joy = m_joy->joy_r();
 
 	data &= BIT(joy, 3) << 7;
 
@@ -711,7 +711,7 @@ WRITE_LINE_MEMBER( vic20_state::exp_reset_w )
 void vic20_state::machine_start()
 {
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

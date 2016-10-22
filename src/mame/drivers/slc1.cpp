@@ -67,7 +67,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-	UINT8 m_digit;
+	uint8_t m_digit;
 	bool m_kbd_type;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -100,9 +100,9 @@ WRITE8_MEMBER( slc1_state::io_w )
 	if (offset == 0x2f07)
 		return;
 
-	UINT8 segdata = output().get_digit_value(m_digit);
-	UINT8 segnum  = offset & 7;
-	UINT8 segmask = 1 << segnum;
+	uint8_t segdata = output().get_digit_value(m_digit);
+	uint8_t segnum  = offset & 7;
+	uint8_t segmask = 1 << segnum;
 
 	if (segonoff)
 		segdata |= segmask;
@@ -126,7 +126,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 
 READ8_MEMBER( slc1_state::io_r )
 {
-	UINT8 data = 0xff, upper = (offset >> 8) & 7;
+	uint8_t data = 0xff, upper = (offset >> 8) & 7;
 
 	if (m_kbd_type)
 	{ // Trainer

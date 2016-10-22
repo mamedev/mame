@@ -65,8 +65,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
-		int const bestwidth = (std::min<UINT32>)(maxwidth(), work_bounds.right - work_bounds.left);
-		int const bestheight = (std::min<UINT32>)(500, work_bounds.bottom - work_bounds.top);
+		int const bestwidth = (std::min<uint32_t>)(maxwidth(), work_bounds.right - work_bounds.left);
+		int const bestheight = (std::min<uint32_t>)(500, work_bounds.bottom - work_bounds.top);
 		SetWindowPos(window(), HWND_TOP,
 					work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
 					bestwidth, bestheight,
@@ -157,7 +157,7 @@ void consolewin_info::update_menu()
 	if (m_devices_menu != nullptr)
 	{
 		// create the image menu
-		UINT32 cnt = 0;
+		uint32_t cnt = 0;
 		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
 			HMENU const devicesubmenu = CreatePopupMenu();
@@ -202,7 +202,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
 	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) >= ID_DEVICE_OPTIONS))
 	{
-		UINT32 const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
+		uint32_t const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
 		image_interface_iterator iter(machine().root_device());
 		device_image_interface *const img = iter.byindex(devid);
 		if (img != nullptr)

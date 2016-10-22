@@ -18,7 +18,7 @@ class cedar_magnet_plane_device :  public cedar_magnet_board_device
 {
 public:
 	// construction/destruction
-	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	DECLARE_READ8_MEMBER(pio0_pa_r);
 	DECLARE_WRITE8_MEMBER(pio0_pa_w);
@@ -35,19 +35,19 @@ public:
 	DECLARE_WRITE8_MEMBER(plane_portce_w);
 	DECLARE_WRITE8_MEMBER(plane_portcf_w);
 
-	UINT8 m_framebuffer[0x10000];
+	uint8_t m_framebuffer[0x10000];
 	int m_curline;
 	int m_lineoffset;
 
-	UINT8 m_pio0_pa_data;
-	UINT8 m_pio0_pb_data;
-	UINT8 m_scrollx;
-	UINT8 m_scrolly;
+	uint8_t m_pio0_pa_data;
+	uint8_t m_pio0_pb_data;
+	uint8_t m_scrollx;
+	uint8_t m_scrolly;
 	int m_direction;
 
-	UINT8 m_cd_data;
-	UINT8 m_cf_data;
-	UINT32 draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
+	uint8_t m_cd_data;
+	uint8_t m_cf_data;
+	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;

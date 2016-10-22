@@ -35,10 +35,10 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // tokib
 
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_background1_videoram;
-	required_shared_ptr<UINT16> m_background2_videoram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_scrollram;
+	required_shared_ptr<uint16_t> m_background1_videoram;
+	required_shared_ptr<uint16_t> m_background2_videoram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_scrollram;
 
 	int m_msm5205next;
 	int m_toggle;
@@ -67,8 +67,8 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

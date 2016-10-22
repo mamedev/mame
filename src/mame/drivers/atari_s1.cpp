@@ -86,19 +86,19 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
 	bool m_audiores;
-	UINT8 m_timer_s[3];
-	UINT8 m_vol;
-	UINT8 m_1080;
-	UINT8 m_1084;
-	UINT8 m_1088;
-	UINT8 m_108c;
-	UINT8 m_bit6;
-	UINT8 m_out_offs;
-	UINT8 m_t_c;
-	UINT8 *m_p_prom;
+	uint8_t m_timer_s[3];
+	uint8_t m_vol;
+	uint8_t m_1080;
+	uint8_t m_1084;
+	uint8_t m_1088;
+	uint8_t m_108c;
+	uint8_t m_bit6;
+	uint8_t m_out_offs;
+	uint8_t m_t_c;
+	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport_array<10> m_switch;
 };
@@ -360,7 +360,7 @@ READ8_MEMBER( atari_s1_state::switch_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_bit6++;
 	if (m_t_c > 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

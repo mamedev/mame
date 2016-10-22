@@ -234,7 +234,7 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x01) // DMA Unit available
 	{
-		UINT16 base = (m_OPHA << 8) | m_DULA;
+		uint16_t base = (m_OPHA << 8) | m_DULA;
 		base &= 0xfffe;
 
 		if (m_SCTL & 0x02) // uPD71037 mode
@@ -254,7 +254,7 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x02) // Interupt Control Unit available
 	{
-		UINT16 base = (m_OPHA << 8) | m_IULA;
+		uint16_t base = (m_OPHA << 8) | m_IULA;
 		base &= 0xfffe;
 
 		if (IOAG) // 8-bit
@@ -268,7 +268,7 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x04) // Timer Control Unit available
 	{
-		UINT16 base = (m_OPHA << 8) | m_TULA;
+		uint16_t base = (m_OPHA << 8) | m_TULA;
 		//printf("installing TCU to %04x\n", base);
 		base &= 0xfffe;
 
@@ -286,7 +286,7 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x08) // Serial Control Unit available
 	{
-		UINT16 base = (m_OPHA << 8) | m_SULA;
+		uint16_t base = (m_OPHA << 8) | m_SULA;
 		base &= 0xfffe;
 
 		if (IOAG) // 8-bit
@@ -526,7 +526,7 @@ machine_config_constructor v53_base_device::device_mconfig_additions() const
 }
 
 
-v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
+v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
 	m_v53tcu(*this, "pit"),
@@ -566,13 +566,13 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 }
 
 
-v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: v53_base_device(mconfig, V53, "V53", tag, owner, clock, "v53", BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 
 
-v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: v53_base_device(mconfig, V53A, "V53A", tag, owner, clock, "v53a", BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }

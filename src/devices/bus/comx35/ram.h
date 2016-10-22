@@ -27,7 +27,7 @@ class comx_ram_device : public device_t,
 {
 public:
 	// construction/destruction
-	comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -35,12 +35,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void comx_io_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
 	int m_bank;
 };

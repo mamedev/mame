@@ -8,17 +8,17 @@
 #include "debugger.h"
 #include "hphybrid.h"
 
-typedef void (*fn_dis_param)(char *buffer , offs_t pc , UINT16 opcode , bool is_3001);
+typedef void (*fn_dis_param)(char *buffer , offs_t pc , uint16_t opcode , bool is_3001);
 
 typedef struct {
-		UINT16 m_op_mask;
-		UINT16 m_opcode;
+		uint16_t m_op_mask;
+		uint16_t m_opcode;
 		const char *m_mnemonic;
 		fn_dis_param m_param_fn;
-		UINT32 m_dasm_flags;
+		uint32_t m_dasm_flags;
 } dis_entry_t;
 
-static void addr_2_str(char *buffer , UINT16 addr , bool indirect , bool is_3001)
+static void addr_2_str(char *buffer , uint16_t addr , bool indirect , bool is_3001)
 {
 				char *s = buffer + strlen(buffer);
 
@@ -167,14 +167,14 @@ static void addr_2_str(char *buffer , UINT16 addr , bool indirect , bool is_3001
 				}
 }
 
-static void param_none(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_none(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 }
 
-static void param_loc(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_loc(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
-		UINT16 base;
-		UINT16 off;
+		uint16_t base;
+		uint16_t off;
 
 		if (opcode & 0x0400) {
 				// Current page
@@ -192,21 +192,21 @@ static void param_loc(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 		addr_2_str(buffer , base + off , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_addr32(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_addr32(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 		addr_2_str(buffer , opcode & 0x1f , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_skip(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_skip(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
-		UINT16 off = opcode & 0x3f;
+		uint16_t off = opcode & 0x3f;
 		if (off & 0x20) {
 				off -= 0x40;
 		}
 		addr_2_str(buffer , pc + off , false , is_3001);
 }
 
-static void param_skip_sc(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_skip_sc(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 		param_skip(buffer, pc, opcode , is_3001);
 
@@ -219,7 +219,7 @@ static void param_skip_sc(char *buffer , offs_t pc , UINT16 opcode , bool is_300
 		}
 }
 
-static void param_ret(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_ret(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 		char *s = buffer + strlen(buffer);
 
@@ -235,14 +235,14 @@ static void param_ret(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 		}
 }
 
-static void param_n16(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_n16(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 		char *s = buffer + strlen(buffer);
 
 		sprintf(s , "%u" , (opcode & 0xf) + 1);
 }
 
-static void param_reg_id(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
+static void param_reg_id(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
 {
 		addr_2_str(buffer, opcode & 7, false , is_3001);
 
@@ -362,7 +362,7 @@ static const dis_entry_t dis_table_emc[] = {
 		{0 , 0 , nullptr , nullptr , 0 }
 };
 
-static offs_t disassemble_table(UINT16 opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , char *buffer)
+static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , char *buffer)
 {
 	const dis_entry_t *p;
 
@@ -380,7 +380,7 @@ static offs_t disassemble_table(UINT16 opcode , offs_t pc , const dis_entry_t *t
 
 CPU_DISASSEMBLE(hp_hybrid)
 {
-		UINT16 opcode = ((UINT16)oprom[ 0 ] << 8) | oprom[ 1 ];
+		uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
 		offs_t res;
 
 		res = disassemble_table(opcode , pc , dis_table , false , buffer);
@@ -396,7 +396,7 @@ CPU_DISASSEMBLE(hp_hybrid)
 
 CPU_DISASSEMBLE(hp_5061_3001)
 {
-		UINT16 opcode = ((UINT16)oprom[ 0 ] << 8) | oprom[ 1 ];
+		uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
 		offs_t res;
 
 		res = disassemble_table(opcode , pc , dis_table_emc , true , buffer);

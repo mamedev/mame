@@ -161,19 +161,19 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT8 m_port_a;
-	UINT8 m_port_b;
-	UINT8 m_port_c;
-	UINT8 m_port_d;
-	UINT8 m_port_e;
-	UINT8 m_port_f;
-	UINT8 m_port_g;
-	UINT8 m_port_h;
-	UINT8 m_port_j;
-	UINT8 m_port_k;
-	UINT8 m_port_l;
+	uint8_t m_port_a;
+	uint8_t m_port_b;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
+	uint8_t m_port_e;
+	uint8_t m_port_f;
+	uint8_t m_port_g;
+	uint8_t m_port_h;
+	uint8_t m_port_j;
+	uint8_t m_port_k;
+	uint8_t m_port_l;
 
-	UINT8 shift_register_value;
+	uint8_t shift_register_value;
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -283,8 +283,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_a) break;
 #if LOG_PORTS
-			UINT8 old_port_a = m_port_a;
-			UINT8 changed = data ^ old_port_a;
+			uint8_t old_port_a = m_port_a;
+			uint8_t changed = data ^ old_port_a;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & A_AXIS_DIR) printf("[A] A_AXIS_DIR: %s\n", data & A_AXIS_DIR ? "HIGH" : "LOW");
@@ -301,8 +301,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_b) break;
 #if LOG_PORTS
-			UINT8 old_port_b = m_port_b;
-			UINT8 changed = data ^ old_port_b;
+			uint8_t old_port_b = m_port_b;
+			uint8_t changed = data ^ old_port_b;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & SD_CS) printf("[B] SD Card Chip Select: %s\n", data & SD_CS ? "HIGH" : "LOW");
@@ -321,8 +321,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_c) break;
 
-			UINT8 old_port_c = m_port_c;
-			UINT8 changed = data ^ old_port_c;
+			uint8_t old_port_c = m_port_c;
+			uint8_t changed = data ^ old_port_c;
 #if LOG_PORTS
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & EX2_1280) printf("[C] EX2_1280: %s\n", data & EX2_1280 ? "HIGH" : "LOW");
@@ -348,7 +348,7 @@ WRITE8_MEMBER(replicator_state::port_w)
 					bool RS = (shift_register_value >> 1) & 1;
 					bool RW = (shift_register_value >> 2) & 1;
 					bool enable = (shift_register_value >> 3) & 1;
-					UINT8 lcd_data = shift_register_value & 0xF0;
+					uint8_t lcd_data = shift_register_value & 0xF0;
 
 					if (enable && RW==0){
 						if (RS==0){
@@ -367,8 +367,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_d) break;
 #if LOG_PORTS
-			UINT8 old_port_d = m_port_d;
-			UINT8 changed = data ^ old_port_d;
+			uint8_t old_port_d = m_port_d;
+			uint8_t changed = data ^ old_port_d;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & PORTD_SCL) printf("[D] PORTD_SCL: %s\n", data & PORTD_SCL ? "HIGH" : "LOW");
@@ -383,8 +383,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_e) break;
 #if LOG_PORTS
-			UINT8 old_port_e = m_port_e;
-			UINT8 changed = data ^ old_port_e;
+			uint8_t old_port_e = m_port_e;
+			uint8_t changed = data ^ old_port_e;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & RX_1280) printf("[E] 1280-RX: %s\n", data & RX_1280 ? "HIGH" : "LOW");
@@ -401,8 +401,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_f) break;
 #if LOG_PORTS
-			UINT8 old_port_f = m_port_f;
-			UINT8 changed = data ^ old_port_f;
+			uint8_t old_port_f = m_port_f;
+			uint8_t changed = data ^ old_port_f;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & X_AXIS_DIR) printf("[F] X_AXIS_DIR: %s\n", data & X_AXIS_DIR ? "HIGH" : "LOW");
@@ -421,8 +421,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_g) break;
 
-			UINT8 old_port_g = m_port_g;
-			UINT8 changed = data ^ old_port_g;
+			uint8_t old_port_g = m_port_g;
+			uint8_t changed = data ^ old_port_g;
 
 #if LOG_PORTS
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
@@ -445,8 +445,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_h) break;
 #if LOG_PORTS
-			UINT8 old_port_h = m_port_h;
-			UINT8 changed = data ^ old_port_h;
+			uint8_t old_port_h = m_port_h;
+			uint8_t changed = data ^ old_port_h;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & CUTOFF_TEST) printf("[H] CUTOFF_TEST: %s\n", data & CUTOFF_TEST ? "HIGH" : "LOW");
@@ -464,8 +464,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_j) break;
 #if LOG_PORTS
-			UINT8 old_port_j = m_port_j;
-			UINT8 changed = data ^ old_port_j;
+			uint8_t old_port_j = m_port_j;
+			uint8_t changed = data ^ old_port_j;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & BUTTON_CENTER) printf("[J] BUTTON_CENTER: %s\n", data & BUTTON_CENTER ? "HIGH" : "LOW");
@@ -483,8 +483,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_k) break;
 #if LOG_PORTS
-			UINT8 old_port_k = m_port_k;
-			UINT8 changed = data ^ old_port_k;
+			uint8_t old_port_k = m_port_k;
+			uint8_t changed = data ^ old_port_k;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & Z_AXIS_DIR) printf("[K] Z_AXIS_DIR: %s\n", data & Z_AXIS_DIR ? "HIGH" : "LOW");
@@ -503,8 +503,8 @@ WRITE8_MEMBER(replicator_state::port_w)
 		{
 			if (data == m_port_l) break;
 #if LOG_PORTS
-			UINT8 old_port_l = m_port_l;
-			UINT8 changed = data ^ old_port_l;
+			uint8_t old_port_l = m_port_l;
+			uint8_t changed = data ^ old_port_l;
 
 			printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & X_MIN) printf("[L] X_MIN: %s\n", data & X_MIN ? "HIGH" : "LOW");

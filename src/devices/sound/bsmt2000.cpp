@@ -69,7 +69,7 @@ ROM_END
 //  bsmt2000_device - constructor
 //-------------------------------------------------
 
-bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BSMT2000, "BSMT2000", tag, owner, clock, "bsmt2000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 32),
@@ -218,7 +218,7 @@ void bsmt2000_device::rom_bank_updated()
 //  read_status - return the write pending status
 //-------------------------------------------------
 
-UINT16 bsmt2000_device::read_status()
+uint16_t bsmt2000_device::read_status()
 {
 	return m_write_pending ? 0 : 1;
 }
@@ -229,7 +229,7 @@ UINT16 bsmt2000_device::read_status()
 //  register select interface
 //-------------------------------------------------
 
-void bsmt2000_device::write_reg(UINT16 data)
+void bsmt2000_device::write_reg(uint16_t data)
 {
 	synchronize(TIMER_ID_REG_WRITE, data);
 }
@@ -240,7 +240,7 @@ void bsmt2000_device::write_reg(UINT16 data)
 //  data port
 //-------------------------------------------------
 
-void bsmt2000_device::write_data(UINT16 data)
+void bsmt2000_device::write_data(uint16_t data)
 {
 	synchronize(TIMER_ID_DATA_WRITE, data);
 
@@ -283,7 +283,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
 	// underlying logic assumes this is a sign-extended value
-	return (INT8)read_byte((m_rom_bank << 16) + m_rom_address);
+	return (int8_t)read_byte((m_rom_bank << 16) + m_rom_address);
 }
 
 

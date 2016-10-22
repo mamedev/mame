@@ -180,7 +180,7 @@ Super Strong Warriors
 
 CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 {
-	UINT32 mj_input;
+	uint32_t mj_input;
 
 	switch (m_mahjong_input_select[0])
 	{
@@ -2187,7 +2187,7 @@ void ms32_state::configure_banks()
 
 DRIVER_INIT_MEMBER(ms32_state,ms32_common)
 {
-	m_nvram_8 = std::make_unique<UINT8[]>(0x2000);
+	m_nvram_8 = std::make_unique<uint8_t[]>(0x2000);
 	configure_banks();
 }
 
@@ -2240,7 +2240,7 @@ DRIVER_INIT_MEMBER(ms32_state,47pie2)
 DRIVER_INIT_MEMBER(ms32_state,f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *pROM = (uint32_t *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

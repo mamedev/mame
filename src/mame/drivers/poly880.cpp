@@ -181,7 +181,7 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 
 	*/
 
-	UINT8 data = 0xf0 | ((m_cassette->input() < +0.0) << 1);
+	uint8_t data = 0xf0 | ((m_cassette->input() < +0.0) << 1);
 	int i;
 
 	for (i = 0; i < 8; i++)

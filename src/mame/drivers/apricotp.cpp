@@ -122,7 +122,7 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ16_MEMBER( mem_r );
@@ -137,11 +137,11 @@ public:
 
 	void lat_ls259_w(offs_t offset, int state);
 
-	optional_shared_ptr<UINT16> m_work_ram;
+	optional_shared_ptr<uint16_t> m_work_ram;
 
 	// video state
-	optional_shared_ptr<UINT16> m_video_ram;
-	UINT8 m_video;
+	optional_shared_ptr<uint16_t> m_video_ram;
+	uint8_t m_video;
 
 	int m_centronics_busy;
 	int m_centronics_select;
@@ -169,7 +169,7 @@ MC6845_UPDATE_ROW( fp_state::update_row )
 {
 }
 
-UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	offs_t addr = (!BIT(m_video, 4) << 15) | (BIT(m_video, 1) << 14);
 
@@ -177,7 +177,7 @@ UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		for (int sx = 0; sx < 40; sx++)
 		{
-			UINT16 data = m_video_ram[addr++];
+			uint16_t data = m_video_ram[addr++];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -228,7 +228,7 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics
 	data |= m_centronics_busy;
@@ -334,7 +334,7 @@ WRITE8_MEMBER( fp_state::lat_w )
 
 READ16_MEMBER( fp_state::mem_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (offset >= 0xd0000/2 && offset < 0xf0000/2)
 	{

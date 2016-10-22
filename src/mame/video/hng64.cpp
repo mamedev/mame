@@ -27,7 +27,7 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 // pppppppp ff--atttt tttttttt tttttttt
 #define HNG64_GET_TILE_INFO                                                     \
 {                                                                               \
-	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                      \
+	uint16_t tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                      \
 	int tileno,pal, flip;                                                       \
 																				\
 	tileno = m_videoram[tile_index+(offset/4)];                                 \
@@ -176,7 +176,7 @@ WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 /* internal set of transparency states for rendering */
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -220,9 +220,9 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 	}
 }
 
-static inline UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
+static inline uint32_t alpha_additive_r32(uint32_t d, uint32_t s, uint8_t level)
 {
-	UINT32 add;
+	uint32_t add;
 	add = (s & 0x00ff0000) + (d & 0x00ff0000);
 	if (add & 0x01000000) d = (d & 0xff00ffff) | (0x00ff0000);
 	else d = (d & 0xff00ffff) | (add & 0x00ff0000);
@@ -245,15 +245,15 @@ static inline UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
 do {                                                                                    \
 	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                       \
-		*(UINT32 *)dest = clut[INPUT_VAL];                                              \
+		*(uint32_t *)dest = clut[INPUT_VAL];                                              \
 	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                                \
-		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);  \
+		*(uint32_t *)dest = alpha_additive_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha);  \
 	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                                   \
-		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);     \
+		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha);     \
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
@@ -264,21 +264,21 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
-	UINT32 priority = blit->tilemap_priority_code;
-	UINT8 mask = blit->mask;
-	UINT8 value = blit->value;
-	UINT8 alpha = blit->alpha;
-	UINT32 cx;
-	UINT32 cy;
+	uint32_t priority = blit->tilemap_priority_code;
+	uint8_t mask = blit->mask;
+	uint8_t value = blit->value;
+	uint8_t alpha = blit->alpha;
+	uint32_t cx;
+	uint32_t cy;
 	int x;
 	int sx;
 	int sy;
 	int ex;
 	int ey;
-	UINT32 *dest;
-	UINT8 *pri;
-	const UINT16 *src;
-	const UINT8 *maskptr;
+	uint32_t *dest;
+	uint8_t *pri;
+	const uint16_t *src;
+	const uint8_t *maskptr;
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
@@ -430,13 +430,13 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 
 void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
 {
 	blit_parameters blit;
 
 	// notes:
-	// - startx and starty MUST be UINT32 for calculations to work correctly
+	// - startx and starty MUST be uint32_t for calculations to work correctly
 	// - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
 
 	// skip if disabled
@@ -457,8 +457,8 @@ g_profiler.stop();
 
 
 inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat)
 {
 	hng64_tilemap_draw_roz_primask(screen, dest, cliprect, tmap, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, 0xff, drawformat);
 }
@@ -469,7 +469,7 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
  * Video Regs Format (appear to just be tilemap regs)
  * --------------------------------------------------
  *
- * UINT32 | Bits                                    | Use
+ * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---- |  C = global complex zoom
@@ -522,7 +522,7 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
 void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm)
 {
 	// Useful bits from the global tilemap flags
-	const UINT32& global_tileregs = m_videoregs[0x00];
+	const uint32_t& global_tileregs = m_videoregs[0x00];
 	const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
 	const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
 	const int global_zoom_disable = global_tileregs & 0x00010000;
@@ -538,8 +538,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 #endif
 
 	// Determine which tilemap registers and scroll base this tilemap uses
-	UINT16 tileregs = 0;
-	UINT16 scrollbase = 0;
+	uint16_t tileregs = 0;
+	uint16_t scrollbase = 0;
 	if (tm==0)
 	{
 		scrollbase = (m_videoregs[0x04]&0x3fff0000)>>16;
@@ -562,11 +562,11 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// Useful bits from the tilemap registers
-	const UINT8 mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
-	const UINT8 floorModeBit     = (tileregs & 0x0800) >> 11;
-	const UINT8 bppBit           = (tileregs & 0x0400) >> 10;
-	const UINT8 bigTilemapBit    = (tileregs & 0x0200) >>  9;
-	const UINT8 tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
+	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
+	const uint8_t floorModeBit     = (tileregs & 0x0800) >> 11;
+	const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
+	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
+	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
 
 	// Tilemap drawing enable (sams64_2 demo mode says this is legit)
 	//if (!tilemapEnableBit)
@@ -600,7 +600,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		// life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
 
 		// fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
-		const UINT32 floorAddress = 0x40000 + (scrollbase << 4);
+		const uint32_t floorAddress = 0x40000 + (scrollbase << 4);
 
 		// TODO: The row count is correct, but how is this layer clipped? m_tcram?
 
@@ -668,8 +668,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
-			INT32 xtopleft, xmiddle;
-			INT32 ytopleft, ymiddle;
+			int32_t xtopleft, xmiddle;
+			int32_t ytopleft, ymiddle;
 
 			for (int line=0; line < 448; line++)
 			{
@@ -725,8 +725,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			*/
 
-			INT32 xtopleft,xmiddle, xalt;
-			INT32 ytopleft,ymiddle, yalt;
+			int32_t xtopleft,xmiddle, xalt;
+			int32_t ytopleft,ymiddle, yalt;
 			int xinc, xinc2, yinc, yinc2;
 
 #if HNG64_VIDEO_DEBUG
@@ -766,8 +766,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = m_palette->pens();
-				UINT32* dstptr;
-				UINT16* srcptr;
+				uint32_t* dstptr;
+				uint16_t* srcptr;
 				int xx,yy;
 
 
@@ -786,7 +786,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 					{
 						int realsrcx = (xtopleft>>16)&(bmwidth-1);
 						int realsrcy = (ytopleft>>16)&(bmheight-1);
-						UINT16 pen;
+						uint16_t pen;
 
 						srcptr = &bm.pix16(realsrcy);
 
@@ -819,8 +819,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
 			   this allows simple zooming, but not rotation */
 
-			INT32 xtopleft,xmiddle;
-			INT32 ytopleft,ymiddle;
+			int32_t xtopleft,xmiddle;
+			int32_t ytopleft,ymiddle;
 			int xinc,yinc;
 
 #if HNG64_VIDEO_DEBUG
@@ -864,8 +864,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = m_palette->pens();
-				UINT32* dstptr;
-				UINT16* srcptr;
+				uint32_t* dstptr;
+				uint16_t* srcptr;
 				int xx,yy;
 
 				int tmp = xtopleft;
@@ -885,7 +885,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 					{
 						int realsrcx = (xtopleft>>16)&(bmwidth-1);
 
-						UINT16 pen;
+						uint16_t pen;
 
 						pen = srcptr[realsrcx];
 
@@ -911,7 +911,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 
-UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 #if 1
 	// press in sams64_2 attract mode for a nice debug screen from the game
@@ -947,8 +947,8 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		return 0;
 
 	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
-	const UINT32 animmask = m_videoregs[0x0b];
-	const UINT32 animbits = m_videoregs[0x0c];
+	const uint32_t animmask = m_videoregs[0x0b];
+	const uint32_t animbits = m_videoregs[0x0c];
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
 		int tile_index;
@@ -977,12 +977,12 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	}
 
 	// If any magic bits have been touched, mark every tilemap dirty
-	UINT16 tileflags[4];
+	uint16_t tileflags[4];
 	tileflags[0] = m_videoregs[0x02] >> 16;
 	tileflags[1] = m_videoregs[0x02] & 0xffff;
 	tileflags[2] = m_videoregs[0x03] >> 16;
 	tileflags[3] = m_videoregs[0x03] & 0xffff;
-	const UINT16 IMPORTANT_DIRTY_TILEFLAG_MASK = 0x0600;
+	const uint16_t IMPORTANT_DIRTY_TILEFLAG_MASK = 0x0600;
 	for (int i = 0; i < 4; i++)
 	{
 		if ((m_old_tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK) != (tileflags[i] & IMPORTANT_DIRTY_TILEFLAG_MASK))
@@ -1006,8 +1006,8 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &m_poly_renderer->colorBuffer3d().pix32(y, cliprect.min_x);
-			UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
+			uint32_t *src = &m_poly_renderer->colorBuffer3d().pix32(y, cliprect.min_x);
+			uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
@@ -1121,7 +1121,7 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 /* Transition Control Video Registers
  * ----------------------------------
  *
- * UINT32 | Bits                                    | Use
+ * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *      0 |                                         |
@@ -1163,21 +1163,21 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 	int i, j;
 
 //  float colorScaleR, colorScaleG, colorScaleB;
-	INT32 finR, finG, finB;
+	int32_t finR, finG, finB;
 
-	INT32 darkR, darkG, darkB;
-	INT32 brigR, brigG, brigB;
+	int32_t darkR, darkG, darkB;
+	int32_t brigR, brigG, brigB;
 
 	// If either of the fading memory regions is non-zero...
 	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
 	{
-		darkR = (INT32)( m_tcram[0x00000007]        & 0xff);
-		darkG = (INT32)((m_tcram[0x00000007] >> 8)  & 0xff);
-		darkB = (INT32)((m_tcram[0x00000007] >> 16) & 0xff);
+		darkR = (int32_t)( m_tcram[0x00000007]        & 0xff);
+		darkG = (int32_t)((m_tcram[0x00000007] >> 8)  & 0xff);
+		darkB = (int32_t)((m_tcram[0x00000007] >> 16) & 0xff);
 
-		brigR = (INT32)( m_tcram[0x0000000a]        & 0xff);
-		brigG = (INT32)((m_tcram[0x0000000a] >> 8)  & 0xff);
-		brigB = (INT32)((m_tcram[0x0000000a] >> 16) & 0xff);
+		brigR = (int32_t)( m_tcram[0x0000000a]        & 0xff);
+		brigG = (int32_t)((m_tcram[0x0000000a] >> 8)  & 0xff);
+		brigB = (int32_t)((m_tcram[0x0000000a] >> 16) & 0xff);
 
 		for (i = cliprect.min_x; i < cliprect.max_x; i++)
 		{
@@ -1185,9 +1185,9 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 			{
 				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix32(j, i));
 
-				finR = (INT32)thePixel->r();
-				finG = (INT32)thePixel->g();
-				finB = (INT32)thePixel->b();
+				finR = (int32_t)thePixel->r();
+				finG = (int32_t)thePixel->g();
+				finB = (int32_t)thePixel->b();
 
 #if 0
 				// Apply the darkening pass (0x07)...
@@ -1243,7 +1243,7 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 				if (finG < 0) finG = 0;
 				if (finB < 0) finB = 0;
 
-				*thePixel = rgb_t(255, (UINT8)finR, (UINT8)finG, (UINT8)finB);
+				*thePixel = rgb_t(255, (uint8_t)finR, (uint8_t)finG, (uint8_t)finB);
 			}
 		}
 	}
@@ -1288,11 +1288,11 @@ void hng64_state::video_start()
 	m_poly_renderer = std::make_unique<hng64_poly_renderer>(*this);
 
 	// 3d information
-	m_dl = std::make_unique<UINT16[]>(0x100);
+	m_dl = std::make_unique<uint16_t[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
 	m_texturerom = memregion("textures")->base();
-	m_vertsrom = (UINT16*)memregion("verts")->base();
+	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 }
 

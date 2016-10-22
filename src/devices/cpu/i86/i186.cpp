@@ -45,7 +45,7 @@
 #define BYTE_WORD               0x0001
 
 /* these come from the Intel 80186 datasheet */
-const UINT8 i80186_cpu_device::m_i80186_timing[] =
+const uint8_t i80186_cpu_device::m_i80186_timing[] =
 {
 	45,28,          /* exception, IRET */
 		0, 2, 4, 3, /* INTs */
@@ -120,7 +120,7 @@ const UINT8 i80186_cpu_device::m_i80186_timing[] =
 const device_type I80186 = &device_creator<i80186_cpu_device>;
 const device_type I80188 = &device_creator<i80188_cpu_device>;
 
-i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, "I80188", tag, owner, clock, "i80188", __FILE__, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
@@ -128,7 +128,7 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80186, "I80186", tag, owner, clock, "i80186", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
@@ -142,7 +142,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
@@ -153,16 +153,16 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-UINT8 i80186_cpu_device::fetch_op()
+uint8_t i80186_cpu_device::fetch_op()
 {
-	UINT8 data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
 
-UINT8 i80186_cpu_device::fetch()
+uint8_t i80186_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -228,13 +228,13 @@ void i80186_cpu_device::execute_run()
 
 		debugger_instruction_hook( this, pc() );
 
-		UINT8 op = fetch_op();
+		uint8_t op = fetch_op();
 
 		switch(op)
 		{
 			case 0x60: // i_pusha
 				{
-					UINT32 tmp = m_regs.w[SP];
+					uint32_t tmp = m_regs.w[SP];
 
 					PUSH(m_regs.w[AX]);
 					PUSH(m_regs.w[CX]);
@@ -262,7 +262,7 @@ void i80186_cpu_device::execute_run()
 
 			case 0x62: // i_bound
 				{
-					UINT32 low,high,tmp;
+					uint32_t low,high,tmp;
 					m_modrm = fetch();
 					low = GetRMWord();
 					high = GetnextRMWord();
@@ -281,28 +281,28 @@ void i80186_cpu_device::execute_run()
 
 			case 0x69: // i_imul_d16
 				{
-					UINT32 tmp;
+					uint32_t tmp;
 					DEF_r16w();
 					tmp = fetch_word();
-					m_dst = (INT32)((INT16)m_src)*(INT32)((INT16)tmp);
-					m_CarryVal = m_OverVal = (((INT32)m_dst) >> 15 != 0) && (((INT32)m_dst) >> 15 != -1);
+					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)tmp);
+					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
 					RegWord(m_dst);
 					CLKM(IMUL_RRI16, IMUL_RMI16);
 				}
 				break;
 
 			case 0x6a: // i_push_d8
-				PUSH( (UINT16)((INT16)((INT8)fetch())) );
+				PUSH( (uint16_t)((int16_t)((int8_t)fetch())) );
 				CLK(PUSH_IMM);
 				break;
 
 			case 0x6b: // i_imul_d8
 				{
-					UINT32 src2;
+					uint32_t src2;
 					DEF_r16w();
-					src2= (UINT16)((INT16)((INT8)fetch()));
-					m_dst = (INT32)((INT16)m_src)*(INT32)((INT16)src2);
-					m_CarryVal = m_OverVal = (((INT32)m_dst) >> 15 != 0) && (((INT32)m_dst) >> 15 != -1);
+					src2= (uint16_t)((int16_t)((int8_t)fetch()));
+					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)src2);
+					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
 					RegWord(m_dst);
 					CLKM(IMUL_RRI8, IMUL_RMI8);
 				}
@@ -350,7 +350,7 @@ void i80186_cpu_device::execute_run()
 
 			case 0xc0: // i_rotshft_bd8
 				{
-					UINT8 c;
+					uint8_t c;
 					m_modrm = fetch();
 					m_src = GetRMByte();
 					m_dst = m_src;
@@ -376,7 +376,7 @@ void i80186_cpu_device::execute_run()
 
 			case 0xc1: // i_rotshft_wd8
 				{
-					UINT8 c;
+					uint8_t c;
 					m_modrm = fetch();
 					m_src = GetRMWord();
 					m_dst = m_src;
@@ -402,8 +402,8 @@ void i80186_cpu_device::execute_run()
 
 			case 0xc8: // i_enter
 				{
-					UINT16 nb = fetch();
-					UINT32 level;
+					uint16_t nb = fetch();
+					uint32_t level;
 
 					nb |= fetch() << 8;
 					level = fetch();
@@ -432,7 +432,7 @@ void i80186_cpu_device::execute_run()
 
 			case 0xd2: // i_rotshft_bcl
 				{
-					UINT8 c;
+					uint8_t c;
 
 					m_modrm = fetch();
 					m_src = GetRMByte();
@@ -459,7 +459,7 @@ void i80186_cpu_device::execute_run()
 
 			case 0xd3: // i_rotshft_wcl
 				{
-					UINT8 c;
+					uint8_t c;
 
 					m_modrm = fetch();
 					m_src = GetRMWord();
@@ -510,8 +510,8 @@ void i80186_cpu_device::execute_run()
 			case 0xf3:
 				{
 					bool pass = false;
-					UINT8 next = repx_op();
-					UINT16 c = m_regs.w[CX];
+					uint8_t next = repx_op();
+					uint16_t c = m_regs.w[CX];
 
 					switch (next)
 					{
@@ -653,23 +653,23 @@ void i80186_cpu_device::device_reset()
 	}
 }
 
-UINT8 i80186_cpu_device::read_port_byte(UINT16 port)
+uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
-		UINT16 ret = internal_port_r(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), (port & 1) ? 0xff00 : 0x00ff);
+		uint16_t ret = internal_port_r(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), (port & 1) ? 0xff00 : 0x00ff);
 		return (port & 1) ? (ret >> 8) : (ret & 0xff);
 	}
 	return m_io->read_byte(port);
 }
 
-UINT16 i80186_cpu_device::read_port_word(UINT16 port)
+uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
 		if(port & 1)
 		{
-			UINT8 low = read_port_byte(port);
+			uint8_t low = read_port_byte(port);
 			return read_port_byte(port + 1) << 8 | low;
 		}
 		return internal_port_r(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7));
@@ -677,7 +677,7 @@ UINT16 i80186_cpu_device::read_port_word(UINT16 port)
 	return m_io->read_word_unaligned(port);
 }
 
-void i80186_cpu_device::write_port_byte(UINT16 port, UINT8 data)
+void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 		internal_port_w(*m_io, (port >> 1) - ((m_reloc & 0xff) << 7), (port & 1) ? (data << 8) : data, (port & 1) ? 0xff00 : 0x00ff);
@@ -685,7 +685,7 @@ void i80186_cpu_device::write_port_byte(UINT16 port, UINT8 data)
 		m_io->write_byte(port, data);
 }
 
-void i80186_cpu_device::write_port_word(UINT16 port, UINT16 data)
+void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
@@ -708,9 +708,9 @@ void i80186_cpu_device::write_port_word(UINT16 port, UINT16 data)
  *************************************/
 IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 {
-	UINT8   vector;
-	UINT16  old;
-	UINT16  oldreq;
+	uint8_t   vector;
+	uint16_t  old;
+	uint16_t  oldreq;
 
 	if (LOG_INTERRUPTS)
 		logerror("(%f) **** Acknowledged interrupt vector %02X\n", machine().time().as_double(), m_intr.poll_status & 0x1f);
@@ -943,7 +943,7 @@ void i80186_cpu_device::handle_eoi(int data)
 }
 
 /* Trigger an external interrupt, optionally supplying the vector to take */
-void i80186_cpu_device::external_int(UINT16 intno, int state)
+void i80186_cpu_device::external_int(uint16_t intno, int state)
 {
 	if (!(m_intr.ext_state & (1 << intno)) == !state)
 		return;
@@ -1135,7 +1135,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	if (new_control != -1)
 	{
 		int diff;
-		UINT16 resbits = (which == 2) ? 0x1fde : 0x1fc0;
+		uint16_t resbits = (which == 2) ? 0x1fde : 0x1fc0;
 
 		/* merge back in the bits we don't modify */
 		new_control = (new_control & ~resbits) | (t->control & resbits);
@@ -1231,9 +1231,9 @@ void i80186_cpu_device::drq_callback(int which)
 {
 	dma_state *dma = &m_dma[which];
 
-	UINT16  dma_word;
-	UINT8   dma_byte;
-	UINT8   incdec_size;
+	uint16_t  dma_word;
+	uint8_t   dma_byte;
+	uint8_t   incdec_size;
 
 	if (LOG_DMA>1)
 		logerror("Control=%04X, src=%05X, dest=%05X, count=%04X\n",dma->control,dma->source,dma->dest,dma->count);
@@ -1693,8 +1693,8 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X\n", pc(), data);
 			if ((data & 0x1fff) != (m_reloc & 0x1fff))
 			{
-				UINT32 newmap = (data & 0xfff) << 8;
-				UINT32 oldmap = (m_reloc & 0xfff) << 8;
+				uint32_t newmap = (data & 0xfff) << 8;
+				uint32_t oldmap = (m_reloc & 0xfff) << 8;
 				if (!(data & 0x1000) || ((data & 0x1000) && (m_reloc & 0x1000)))
 					m_program->unmap_readwrite(oldmap, oldmap + 0xff);
 				if (data & 0x1000) // TODO: make work with 80188 if needed

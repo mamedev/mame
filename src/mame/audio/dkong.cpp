@@ -1239,7 +1239,7 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 READ8_MEMBER(dkong_state::dkong_tune_r)
 {
 	latch8_device *m_ls175_3d = machine().device<latch8_device>("ls175.3d");
-	UINT8 page = m_dev_vp2->read(space, 0) & 0x47;
+	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
 
 	if ( page & 0x40 )
 	{

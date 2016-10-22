@@ -83,7 +83,7 @@ const device_type VRENDER0 = &device_creator<vrender0_device>;
 //  vrender0_device - constructor
 //-------------------------------------------------
 
-vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock, "vrender0", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_TexBase(nullptr),
@@ -133,7 +133,7 @@ WRITE32_MEMBER(vrender0_device::vr0_snd_write)
 		data&=0xffff;
 		if(data&0x8000)
 		{
-			UINT32 c=data&0x1f;
+			uint32_t c=data&0x1f;
 			STATUS|=1<<c;
 			CURSADDR(c)=0;
 		}
@@ -150,7 +150,7 @@ WRITE32_MEMBER(vrender0_device::vr0_snd_write)
 }
 
 
-void vrender0_device::set_areas(UINT32 *texture, UINT32 *frame)
+void vrender0_device::set_areas(uint32_t *texture, uint32_t *frame)
 {
 	m_TexBase=texture;
 	m_FBBase=frame;
@@ -159,21 +159,21 @@ void vrender0_device::set_areas(UINT32 *texture, UINT32 *frame)
 
 void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
-	INT16 *SAMPLES;
-	UINT32 st=STATUS;
+	int16_t *SAMPLES;
+	uint32_t st=STATUS;
 	signed int lsample,rsample=0;
-	UINT32 CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
-	UINT32 NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
-	UINT32 CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;
-	UINT32 CT2=(m_SOUNDREGS[0x600/4]>>24)&0xff;
+	uint32_t CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
+	uint32_t NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
+	uint32_t CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;
+	uint32_t CT2=(m_SOUNDREGS[0x600/4]>>24)&0xff;
 	int div;
 	int s;
 
 
 	if(CT1&0x20)
-		SAMPLES=(INT16 *)m_TexBase;
+		SAMPLES=(int16_t *)m_TexBase;
 	else
-		SAMPLES=(INT16 *)m_FBBase;
+		SAMPLES=(int16_t *)m_FBBase;
 
 	if(CLK)
 		div=((30<<16)|0x8000)/(CLK+1);
@@ -187,20 +187,20 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 		for(i=0;i<=NCH;++i)
 		{
 			signed int sample;
-			UINT32 cur=CURSADDR(i);
-			UINT32 a=LOOPBEGIN(i)+(cur>>10);
-			UINT8 Mode=m_SOUNDREGS[(0x20/4)*i+0x8/4]>>24;
+			uint32_t cur=CURSADDR(i);
+			uint32_t a=LOOPBEGIN(i)+(cur>>10);
+			uint8_t Mode=m_SOUNDREGS[(0x20/4)*i+0x8/4]>>24;
 			signed int LVOL=m_SOUNDREGS[(0x20/4)*i+0xc/4]>>24;
 			signed int RVOL=m_SOUNDREGS[(0x20/4)*i+0x10/4]>>24;
 
-			INT32 DSADD=(DSADDR(i)*div)>>16;
+			int32_t DSADD=(DSADDR(i)*div)>>16;
 
 			if(!(st&(1<<i)) || !(CT2&0x80))
 				continue;
 
 			if(Mode&0x10)       //u-law
 			{
-				UINT16 s=SAMPLES[a];
+				uint16_t s=SAMPLES[a];
 				if((cur&0x200))
 					s>>=8;
 				sample=(signed short)ULawTo16[s&0xff];
@@ -209,7 +209,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			{
 				if(Mode&0x20)   //8bit
 				{
-					UINT16 s=SAMPLES[a];
+					uint16_t s=SAMPLES[a];
 					if((cur&0x200))
 						s>>=8;
 					sample=(signed short) (((signed char) (s&0xff))<<8);
@@ -231,7 +231,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 					break;
 				}
 			}
-//          UINT32 v=(ENVVOL(i))>>8;
+//          uint32_t v=(ENVVOL(i))>>8;
 //          sample=(sample*v)>>16;
 			lsample+=(sample*LVOL)>>8;
 			rsample+=(sample*RVOL)>>8;

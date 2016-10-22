@@ -271,7 +271,7 @@ READ8_MEMBER(combatsc_state::trackball_r)
 
 		for (i = 0; i < 4; i++)
 		{
-			UINT8 curr;
+			uint8_t curr;
 
 			curr = m_track_ports[i].read_safe(0xff);
 
@@ -645,7 +645,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(combatsc_state,combatsc)
 {
-	UINT8 *MEM = memregion("maincpu")->base() + 0x38000;
+	uint8_t *MEM = memregion("maincpu")->base() + 0x38000;
 
 	m_io_ram  = MEM + 0x0000;
 	m_page[0] = MEM + 0x4000;

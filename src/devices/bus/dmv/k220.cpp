@@ -132,7 +132,7 @@ const device_type DMV_K220 = &device_creator<dmv_k220_device>;
 //  dmv_k220_device - constructor
 //-------------------------------------------------
 
-dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, DMV_K220, "K220 diagnostic", tag, owner, clock, "dmv_k220", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_pit(*this, "pit8253"),
@@ -195,7 +195,7 @@ const tiny_rom_entry *dmv_k220_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-bool dmv_k220_device::read(offs_t offset, UINT8 &data)
+bool dmv_k220_device::read(offs_t offset, uint8_t &data)
 {
 	if ((m_portc & 0x01) && offset >= 0x2000 && offset < 0x6000)
 	{
@@ -215,7 +215,7 @@ bool dmv_k220_device::read(offs_t offset, UINT8 &data)
 //  write
 //-------------------------------------------------
 
-bool dmv_k220_device::write(offs_t offset, UINT8 data)
+bool dmv_k220_device::write(offs_t offset, uint8_t data)
 {
 	if ((m_portc & 0x01) && offset >= 0x2000 && offset < 0x4000)
 	{
@@ -234,7 +234,7 @@ bool dmv_k220_device::write(offs_t offset, UINT8 data)
 WRITE8_MEMBER( dmv_k220_device::porta_w )
 {
 	// 74LS247 BCD-to-Seven-Segment Decoder
-	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
+	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 	machine().output().set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
 	machine().output().set_digit_value(1, bcd2hex[data & 0x0f]);

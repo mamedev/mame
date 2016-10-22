@@ -63,19 +63,19 @@ public:
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
-	UINT8     m_vidram_bank;
+	uint8_t     m_vidram_bank;
 
 	/* misc */
-	UINT8     m_okibanking;
-	UINT8     m_gfx_banking;
+	uint8_t     m_okibanking;
+	uint8_t     m_gfx_banking;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
-	required_shared_ptr<UINT8> m_atram;
-	UINT8     m_bgram[0x1000];
-	UINT8     m_spram[0x1000];
+	required_shared_ptr<uint8_t> m_atram;
+	uint8_t     m_bgram[0x1000];
+	uint8_t     m_spram[0x1000];
 	DECLARE_READ8_MEMBER(egghunt_bgram_r);
 	DECLARE_WRITE8_MEMBER(egghunt_bgram_w);
 	DECLARE_WRITE8_MEMBER(egghunt_atram_w);
@@ -88,7 +88,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -194,7 +194,7 @@ void egghunt_state::video_start()
 	save_item(NAME(m_spram));
 }
 
-UINT32 egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

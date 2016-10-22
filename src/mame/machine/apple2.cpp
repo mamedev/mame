@@ -62,8 +62,8 @@ void apple2_state::apple2_update_memory()
 	read8_delegate *rh;
 	write8_delegate *wh;
 	offs_t begin, end_r, end_w;
-	UINT8 *rbase, *wbase;
-	UINT32 offset;
+	uint8_t *rbase, *wbase;
+	uint32_t offset;
 	bank_disposition_t bank_disposition;
 	int wh_nop = 0;
 
@@ -378,7 +378,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 		if ((m_machinetype == LASER128) && (slot == 5))
 		{
 			offset &= 0xf;
-			UINT8 retval = m_exp_regs[offset];
+			uint8_t retval = m_exp_regs[offset];
 
 			if (offset == 3)
 			{
@@ -513,7 +513,7 @@ WRITE8_MEMBER(apple2_state::apple2_c080_w)
 }
 
 /* returns default CnXX slotram for a slot space */
-INT8 apple2_state::apple2_slotram_r(address_space &space, int slotnum, int offset)
+int8_t apple2_state::apple2_slotram_r(address_space &space, int slotnum, int offset)
 {
 	if (m_slot_ram)
 	{
@@ -1097,7 +1097,7 @@ static const apple2_memmap_entry tk2000_memmap_entries[] =
 	{ 0 }
 };
 
-void apple2_state::apple2_setvar(UINT32 val, UINT32 mask)
+void apple2_state::apple2_setvar(uint32_t val, uint32_t mask)
 {
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
 					(unsigned int) m_maincpu->pc()));
@@ -1127,7 +1127,7 @@ void apple2_state::apple2_setvar(UINT32 val, UINT32 mask)
  *     with FIX:
  * ----------------------------------------------------------------------- */
 
-UINT8 apple2_state::apple2_getfloatingbusvalue()
+uint8_t apple2_state::apple2_getfloatingbusvalue()
 {
 	enum
 	{
@@ -1301,7 +1301,7 @@ void apple2_state::machine_reset()
 	m_joystick_x1_time = m_joystick_y1_time = 0;
 	m_joystick_x2_time = m_joystick_y2_time = 0;
 
-	memset(m_exp_regs, 0, sizeof(UINT8) * 0x10);
+	memset(m_exp_regs, 0, sizeof(uint8_t) * 0x10);
 	m_exp_wptr = m_exp_liveptr = 0;
 
 }
@@ -1743,7 +1743,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxrame000_w )
 
 READ8_MEMBER ( apple2_state::apple2_c00x_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	if(!space.debugger_access())
 	{
@@ -1783,7 +1783,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
 
 WRITE8_MEMBER ( apple2_state::apple2_c00x_w )
 {
-	UINT32 mask;
+	uint32_t mask;
 
 	mask = 1 << (offset / 2);
 	apple2_setvar((offset & 1) ? mask : 0, mask);
@@ -1797,7 +1797,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c00x_w )
 
 READ8_MEMBER( apple2_state::apple2_c01x_r )
 {
-	UINT8 result = apple2_getfloatingbusvalue() & 0x7F;
+	uint8_t result = apple2_getfloatingbusvalue() & 0x7F;
 
 	if(!space.debugger_access())
 	{
@@ -1917,7 +1917,7 @@ READ8_MEMBER ( apple2_state::apple2_c05x_r )
 {
 	if(!space.debugger_access())
 	{
-		UINT32 mask;
+		uint32_t mask;
 
 		if (m_machinetype == TK2000)
 		{
@@ -2078,7 +2078,7 @@ int apple2_state::apple2_fdc_has_525()
 	return 1; //apple525_get_count(machine) > 0;
 }
 
-static void apple2_fdc_set_lines(device_t *device, UINT8 lines)
+static void apple2_fdc_set_lines(device_t *device, uint8_t lines)
 {
 	apple2_state *state = device->machine().driver_data<apple2_state>();
 	if (state->m_fdc_diskreg & 0x40)
@@ -2127,10 +2127,10 @@ static void apple2_fdc_set_enable_lines(device_t *device,int enable_mask)
 
 
 
-static UINT8 apple2_fdc_read_data(device_t *device)
+static uint8_t apple2_fdc_read_data(device_t *device)
 {
 	apple2_state *state = device->machine().driver_data<apple2_state>();
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	if (state->m_fdc_diskreg & 0x40)
 	{
@@ -2153,7 +2153,7 @@ static UINT8 apple2_fdc_read_data(device_t *device)
 
 
 
-static void apple2_fdc_write_data(device_t *device, UINT8 data)
+static void apple2_fdc_write_data(device_t *device, uint8_t data)
 {
 	apple2_state *state = device->machine().driver_data<apple2_state>();
 	if (state->m_fdc_diskreg & 0x40)
@@ -2201,7 +2201,7 @@ static int apple2_fdc_read_status(device_t *device)
 }
 
 
-void apple2_state::apple2_iwm_setdiskreg(UINT8 data)
+void apple2_state::apple2_iwm_setdiskreg(uint8_t data)
 {
 	m_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35())
@@ -2275,7 +2275,7 @@ void apple2_state::apple2eplus_init_common(void *apple2cp_ce00_ram)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	mem_cfg.auxmem = (uint8_t*)apple2cp_ce00_ram;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2300,8 +2300,8 @@ MACHINE_START_MEMBER(apple2_state,apple2cp)
 	/* there appears to be some hidden RAM that is swapped in on the Apple
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
-	apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
-	memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
+	apple2cp_ce00_ram = auto_alloc_array(machine(), uint8_t, 0x200);
+	memset(apple2cp_ce00_ram, 0, sizeof(uint8_t) * 0x200);
 
 	m_machinetype = APPLE_IICPLUS;
 
@@ -2322,7 +2322,7 @@ MACHINE_START_MEMBER(apple2_state,apple2e)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)nullptr;
+	mem_cfg.auxmem = (uint8_t*)nullptr;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2336,7 +2336,7 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	apple2_init_common();
 
 	// 1 MB of expansion RAM in slot 5
-	m_exp_ram = std::make_unique<UINT8[]>(1024*1024);
+	m_exp_ram = std::make_unique<uint8_t[]>(1024*1024);
 	memset(m_exp_ram.get(), 0xff, 1024*1024);
 
 	m_exp_bankhior = 0xf0;
@@ -2353,7 +2353,7 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)nullptr;
+	mem_cfg.auxmem = (uint8_t*)nullptr;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2373,7 +2373,7 @@ MACHINE_START_MEMBER(apple2_state,apple2orig)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	mem_cfg.auxmem = (uint8_t*)apple2cp_ce00_ram;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2393,7 +2393,7 @@ MACHINE_START_MEMBER(apple2_state,space84)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	mem_cfg.auxmem = (uint8_t*)apple2cp_ce00_ram;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2413,7 +2413,7 @@ MACHINE_START_MEMBER(apple2_state,laba2p)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	mem_cfg.auxmem = (uint8_t*)apple2cp_ce00_ram;
 	apple2_setup_memory(&mem_cfg);
 }
 
@@ -2432,11 +2432,11 @@ MACHINE_START_MEMBER(apple2_state,tk2000)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = tk2000_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)nullptr;
+	mem_cfg.auxmem = (uint8_t*)nullptr;
 	apple2_setup_memory(&mem_cfg);
 }
 
-int apple2_state::apple2_pressed_specialkey(UINT8 key)
+int apple2_state::apple2_pressed_specialkey(uint8_t key)
 {
 	return (m_kbspecial.read_safe(0) & key)
 		|| (m_joybuttons.read_safe(0) & key);
@@ -2533,7 +2533,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-static const UINT8 a2_key_remap[0x32][4] =
+static const uint8_t a2_key_remap[0x32][4] =
 {
 /*    norm shft ctrl both */
 	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
@@ -2612,8 +2612,8 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_iie_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		UINT8 *decode = m_kbdrom->base();
-		UINT16 trans;
+		uint8_t *decode = m_kbdrom->base();
+		uint16_t trans;
 
 		m_lastchar = m_ay3600->b_r();
 

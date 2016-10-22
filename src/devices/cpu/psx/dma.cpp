@@ -27,7 +27,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_DMA = &device_creator<psxdma_device>;
 
-psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_DMA, "Sony PSX DMA", tag, owner, clock, "psxdma", __FILE__), m_ram( ), m_ramsize(0), m_dpcp(0), m_dicr(0),
 	m_irq_handler(*this)
 {
@@ -77,7 +77,7 @@ void psxdma_device::device_start()
 	save_item( NAME(m_dicr) );
 }
 
-void psxdma_device::dma_start_timer( int index, UINT32 n_ticks )
+void psxdma_device::dma_start_timer( int index, uint32_t n_ticks )
 {
 	psx_dma_channel *dma = &m_channel[ index ];
 
@@ -135,11 +135,11 @@ void psxdma_device::dma_finished( int index )
 
 	if( dma->n_channelcontrol == 0x01000401 && index == 2 )
 	{
-		UINT32 n_size;
-		UINT32 n_total;
-		UINT32 n_address = ( dma->n_base & 0xffffff );
-		UINT32 n_adrmask = m_ramsize - 1;
-		UINT32 n_nextaddress;
+		uint32_t n_size;
+		uint32_t n_total;
+		uint32_t n_address = ( dma->n_base & 0xffffff );
+		uint32_t n_adrmask = m_ramsize - 1;
+		uint32_t n_nextaddress;
 
 		if( n_address != 0xffffff )
 		{
@@ -233,10 +233,10 @@ WRITE32_MEMBER( psxdma_device::write )
 			dma->n_channelcontrol = data;
 			if( ( dma->n_channelcontrol & ( 1L << 0x18 ) ) != 0 && ( m_dpcp & ( 1 << ( 3 + ( index * 4 ) ) ) ) != 0 )
 			{
-				INT32 n_size;
-				UINT32 n_address;
-				UINT32 n_nextaddress;
-				UINT32 n_adrmask;
+				int32_t n_size;
+				uint32_t n_address;
+				uint32_t n_nextaddress;
+				uint32_t n_adrmask;
 
 				n_adrmask = m_ramsize - 1;
 
@@ -244,7 +244,7 @@ WRITE32_MEMBER( psxdma_device::write )
 				n_size = dma->n_blockcontrol;
 				if( ( dma->n_channelcontrol & 0x200 ) != 0 )
 				{
-					UINT32 n_ba;
+					uint32_t n_ba;
 					n_ba = dma->n_blockcontrol >> 16;
 					if( n_ba == 0 )
 					{

@@ -204,8 +204,8 @@ public:
 	required_device<serflash_device> m_serflash;
 	required_device<rtc9701_device> m_eeprom;
 
-	required_shared_ptr<UINT64> m_ram;
-	required_shared_ptr<UINT64> m_rombase;
+	required_shared_ptr<uint64_t> m_ram;
+	required_shared_ptr<uint64_t> m_rombase;
 
 	DECLARE_READ8_MEMBER(flash_io_r);
 	DECLARE_WRITE8_MEMBER(flash_io_w);
@@ -213,7 +213,7 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
 	DECLARE_READ64_MEMBER(flash_port_e_r);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
 
@@ -230,15 +230,15 @@ public:
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
 
-	UINT32 m_idleramoffs;
-	UINT32 m_idlepc;
-	void install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed);
+	uint32_t m_idleramoffs;
+	uint32_t m_idlepc;
+	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
 };
 
 
 /**************************************************************************/
 
-UINT32 cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_blitter->set_delay_scale(m_blitrate->read());
 
@@ -421,7 +421,7 @@ INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
-	m_blitter->set_rambase (reinterpret_cast<UINT16 *>(m_ram.target()));
+	m_blitter->set_rambase (reinterpret_cast<uint16_t *>(m_ram.target()));
 	m_blitter->set_cpu_device (m_maincpu);
 	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
@@ -835,7 +835,7 @@ READ64_MEMBER( cv1k_state::speedup_r )
 	return m_ram[m_idleramoffs/8];
 }
 
-void cv1k_state::install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed)
+void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed)
 {
 	m_idleramoffs = idleramoff;
 	m_idlepc = idlepc;

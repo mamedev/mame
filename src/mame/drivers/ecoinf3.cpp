@@ -42,8 +42,8 @@ public:
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
 
-	UINT16 m_lamps[16];
-	UINT16 m_chars[14];
+	uint16_t m_lamps[16];
+	uint16_t m_chars[14];
 	void update_display();
 
 	int strobe_addr;
@@ -275,7 +275,7 @@ public:
 
 // this is a copy of roc10937charset for now, I don't know what chip we're meant be using here
 // it is some kind of 14 digit, 16 seg display tho
-static const UINT16 ecoin_charset[]=
+static const uint16_t ecoin_charset[]=
 {            // FEDC BA98 7654 3210
 	0x507F, // 0101 0000 0111 1111 @.
 	0x44CF, // 0100 0100 1100 1111 A.
@@ -345,7 +345,7 @@ static const UINT16 ecoin_charset[]=
 	0x1407, // 0001 0100 0000 0111 ?.
 };
 
-static UINT32 set_display(UINT32 segin)
+static uint32_t set_display(uint32_t segin)
 {
 	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
@@ -364,7 +364,7 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", m_maincpu->pcbase(), data, data);
 	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", m_maincpu->pcbase(), data);
 
-	static UINT8 send_buffer = 0;
+	static uint8_t send_buffer = 0;
 	static int count = 0;
 	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
 	// along with port 40/41/42 accesses
@@ -821,7 +821,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 {
 	// not all sets have this, are they just badly dumped?
-	UINT8 table[] =
+	uint8_t table[] =
 	{
 		0x48, 0x4c, 0x49, 0x4d, 0x40, 0x44, 0x41, 0x45,     0x68, 0x78, 0x60, 0x70, 0x6a, 0x7a, 0x62, 0x72,
 		0x08, 0x0c, 0x09, 0x0d, 0x00, 0x04, 0x01, 0x05,     0x6c, 0x7c, 0x64, 0x74, 0x6e, 0x7e, 0x66, 0x76,
@@ -833,8 +833,8 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b,
 	};
 
-	auto buffer = std::make_unique<UINT8[]>(0x10000);
-	UINT8 *rom = memregion( "maincpu" )->base();
+	auto buffer = std::make_unique<uint8_t[]>(0x10000);
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 
 	for (int i=0;i<0x10000;i++)

@@ -269,7 +269,7 @@ ioport_constructor km035_device::device_input_ports() const
 //  km035_device - constructor
 //-------------------------------------------------
 
-km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KM035, "KM035 keyboard", tag, owner, clock, "km035", __FILE__),
 	m_maincpu(*this, KM035_CPU_TAG),
 	m_speaker(*this, KM035_SPK_TAG),

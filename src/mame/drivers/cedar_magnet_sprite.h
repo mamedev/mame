@@ -22,10 +22,10 @@ class cedar_magnet_sprite_device :  public cedar_magnet_board_device
 {
 public:
 	// construction/destruction
-	cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
-	UINT8 m_framebuffer[0x10000];
-	UINT8 pio2_pb_data;
+	uint8_t m_framebuffer[0x10000];
+	uint8_t pio2_pb_data;
 
 	required_device<address_map_bank_device> m_sprite_ram_bankdev;
 
@@ -52,18 +52,18 @@ public:
 
 	DECLARE_READ8_MEMBER(exzisus_hack_r);
 
-	UINT8 m_upperaddr;
-	UINT8 m_loweraddr;
+	uint8_t m_upperaddr;
+	uint8_t m_loweraddr;
 	
 	void do_blit();
 
-	UINT8 m_spritesize;
-	UINT8 pio0_pb_data;
-	UINT8 m_spritecodelow;
-	UINT8 m_spritecodehigh;
+	uint8_t m_spritesize;
+	uint8_t pio0_pb_data;
+	uint8_t m_spritecodelow;
+	uint8_t m_spritecodehigh;
 	
 	int m_high_write;
-	UINT8 m_uppersprite;
+	uint8_t m_uppersprite;
 
 	INTERRUPT_GEN_MEMBER(irq);
 
@@ -71,7 +71,7 @@ public:
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
 	
-	UINT32 draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
+	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;

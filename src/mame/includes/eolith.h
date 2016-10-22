@@ -41,9 +41,9 @@ public:
 
 	int m_coin_counter_bit;
 	int m_buffer;
-	std::unique_ptr<UINT32[]> m_vram;
+	std::unique_ptr<uint32_t[]> m_vram;
 
-	UINT8 m_sound_data;
+	uint8_t m_sound_data;
 
 	// speedups - see machine/eolithsp.c
 	int m_speedup_address;
@@ -79,7 +79,7 @@ public:
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);
 
-	UINT32 screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
 };

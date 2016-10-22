@@ -33,19 +33,19 @@ public:
 	required_device<tms34010_device> m_tms;
 	required_device<tlc34076_device> m_tlc34076;
 
-	required_shared_ptr<UINT16> m_control;
-	required_shared_ptr<UINT16> m_vram0;
-	required_shared_ptr<UINT16> m_vram1;
+	required_shared_ptr<uint16_t> m_control;
+	required_shared_ptr<uint16_t> m_vram0;
+	required_shared_ptr<uint16_t> m_vram1;
 
-	UINT8 m_tms_irq;
-	UINT8 m_hack_irq;
-	UINT8 m_prot_input[16];
-	UINT8 m_prot_input_index;
-	UINT8 m_prot_output[16];
-	UINT8 m_prot_output_index;
-	UINT8 m_prot_output_bit;
-	UINT8 m_prot_bit_index;
-	UINT16 m_prot_save;
+	uint8_t m_tms_irq;
+	uint8_t m_hack_irq;
+	uint8_t m_prot_input[16];
+	uint8_t m_prot_input_index;
+	uint8_t m_prot_output[16];
+	uint8_t m_prot_output_index;
+	uint8_t m_prot_output_bit;
+	uint8_t m_prot_bit_index;
+	uint16_t m_prot_save;
 	typedef void (artmagic_state::*prot_func)();
 	prot_func m_protection_handler;
 	void ultennis_protection();
@@ -54,10 +54,10 @@ public:
 
 	int m_xor[16];
 	int m_is_stoneball;
-	UINT16 *m_blitter_base;
-	UINT32 m_blitter_mask;
-	UINT16 m_blitter_data[8];
-	UINT8 m_blitter_page;
+	uint16_t *m_blitter_base;
+	uint32_t m_blitter_mask;
+	uint16_t m_blitter_data[8];
+	uint8_t m_blitter_page;
 	attotime m_blitter_busy_until;
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
@@ -82,7 +82,7 @@ public:
 	void decrypt_ultennis();
 	void execute_blit();
 	void update_irq_state();
-	inline UINT16 *address_to_vram(offs_t *address);
+	inline uint16_t *address_to_vram(offs_t *address);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

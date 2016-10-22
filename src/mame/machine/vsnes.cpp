@@ -188,7 +188,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 	int i;
 
 	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<UINT8[]>(0x1000);
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
 	/* set mirroring */
 	m_nt_page[0][0] = m_nt_ram[0].get();
 	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
@@ -236,8 +236,8 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	m_vrom_size[1] = memregion("gfx2")->bytes();
 
 	/* establish nametable ram */
-	m_nt_ram[0] = std::make_unique<UINT8[]>(0x1000);
-	m_nt_ram[1] = std::make_unique<UINT8[]>(0x1000);
+	m_nt_ram[0] = std::make_unique<uint8_t[]>(0x1000);
+	m_nt_ram[1] = std::make_unique<uint8_t[]>(0x1000);
 	/* set mirroring */
 	m_nt_page[0][0] = m_nt_ram[0].get();
 	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
@@ -369,24 +369,24 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		/* do the gun thing */
 		int x = ioport("GUNX")->read();
 		float y = ioport("GUNY")->read();
-		UINT8 pix;
+		uint8_t pix;
 
 		y = y * 0.9375f; // scale 256 (our gun input range is 0 - 255) to 240 (screen visible area / bitmap we're using is 0 - 239)
 
-		UINT8 realy = (int)y;
+		uint8_t realy = (int)y;
 
 		/* get the pixel at the gun position */
 		pix = m_ppu1->get_pixel(x, realy);
 
 
 		rgb_t col = m_palette->pen_color(pix);
-		UINT8 bright = col.brightness();
+		uint8_t bright = col.brightness();
 		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
-		// the mame calc above is UINT8 brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)
+		// the mame calc above is uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)
 #if 0
-		UINT8 r = col.r();
-		UINT8 g = col.g();
-		UINT8 b = col.b();
+		uint8_t r = col.r();
+		uint8_t g = col.g();
+		uint8_t b = col.b();
 		printf("pix is %02x | %02x %02x %02x | %02x\n", pix, r,g,b,bright);
 #endif
 		if (bright == 0xff)
@@ -398,7 +398,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 
 #if 0 // this is junk code, only works for NES palette..
 		/* get the color base from the ppu */
-		UINT32 color_base = m_ppu1->get_colorbase();
+		uint32_t color_base = m_ppu1->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
@@ -441,7 +441,7 @@ WRITE8_MEMBER(vsnes_state::vskonami_rom_banking)
 		case 2: /* code bank 1 */
 		case 4: /* code bank 2 */
 		{
-			UINT8 *prg = memregion("maincpu")->base();
+			uint8_t *prg = memregion("maincpu")->base();
 			memcpy(&prg[0x08000 + reg * 0x1000], &prg[bankoffset], 0x2000);
 		}
 		break;
@@ -460,7 +460,7 @@ DRIVER_INIT_MEMBER(vsnes_state,vskonami)
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -475,7 +475,7 @@ WRITE8_MEMBER(vsnes_state::vsgshoe_gun_in0_w)
 	int addr;
 	if((data & 0x04) != m_old_bank)
 	{
-		UINT8 *prg = memregion("maincpu")->base();
+		uint8_t *prg = memregion("maincpu")->base();
 		m_old_bank = data & 0x04;
 		addr = m_old_bank ? 0x12000: 0x10000;
 		memcpy(&prg[0x08000], &prg[addr], 0x2000);
@@ -487,7 +487,7 @@ WRITE8_MEMBER(vsnes_state::vsgshoe_gun_in0_w)
 DRIVER_INIT_MEMBER(vsnes_state,vsgshoe)
 {
 	/* set up the default bank */
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
 
 	/* vrom switching is enabled with bit 2 of $4016 */
@@ -582,7 +582,7 @@ WRITE8_MEMBER(vsnes_state::drmario_rom_banking)
 			case 3: /* program banking */
 				{
 					int bank = (m_drmario_shiftreg & 0x03) * 0x4000;
-					UINT8 *prg = memregion("maincpu")->base();
+					uint8_t *prg = memregion("maincpu")->base();
 
 					if (!m_size16k)
 					{
@@ -615,7 +615,7 @@ DRIVER_INIT_MEMBER(vsnes_state,drmario)
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x1c000], 0x4000);
 
@@ -632,7 +632,7 @@ DRIVER_INIT_MEMBER(vsnes_state,drmario)
 WRITE8_MEMBER(vsnes_state::vsvram_rom_banking)
 {
 	int rombank = 0x10000 + (data & 7) * 0x4000;
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 
 	memcpy(&prg[0x08000], &prg[rombank], 0x4000);
 }
@@ -640,14 +640,14 @@ WRITE8_MEMBER(vsnes_state::vsvram_rom_banking)
 DRIVER_INIT_MEMBER(vsnes_state,vsvram)
 {
 	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(vsnes_state::vsvram_rom_banking),this));
 
 	/* allocate m_vram */
-	m_vram = std::make_unique<UINT8[]>(0x2000);
+	m_vram = std::make_unique<uint8_t[]>(0x2000);
 }
 
 /**********************************************************************************/
@@ -655,8 +655,8 @@ DRIVER_INIT_MEMBER(vsnes_state,vsvram)
 
 void vsnes_state::mapper4_set_prg(  )
 {
-	UINT8 *prg = memregion("maincpu")->base();
-	UINT8 prg_flip = (m_MMC3_cmd & 0x40) ? 2 : 0;
+	uint8_t *prg = memregion("maincpu")->base();
+	uint8_t prg_flip = (m_MMC3_cmd & 0x40) ? 2 : 0;
 
 	memcpy(&prg[0x8000], &prg[0x2000 * (m_MMC3_prg_bank[0 ^ prg_flip] & m_MMC3_prg_mask) + 0x10000], 0x2000);
 	memcpy(&prg[0xa000], &prg[0x2000 * (m_MMC3_prg_bank[1] & m_MMC3_prg_mask) + 0x10000], 0x2000);
@@ -666,7 +666,7 @@ void vsnes_state::mapper4_set_prg(  )
 
 void vsnes_state::mapper4_set_chr(  )
 {
-	UINT8 chr_page = (m_MMC3_cmd & 0x80) >> 5;
+	uint8_t chr_page = (m_MMC3_cmd & 0x80) >> 5;
 
 	v_set_videorom_bank(chr_page ^ 0, 1, m_MMC3_chr_bank[0] & ~0x01);
 	v_set_videorom_bank(chr_page ^ 1, 1, m_MMC3_chr_bank[0] |  0x01);
@@ -702,7 +702,7 @@ void vsnes_state::mapper4_irq( int scanline, int vblank, int blanked )
 
 WRITE8_MEMBER(vsnes_state::mapper4_w)
 {
-	UINT8 MMC3_helper, cmd;
+	uint8_t MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
 	{
@@ -781,7 +781,7 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 
 DRIVER_INIT_MEMBER(vsnes_state,MMC3)
 {
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	m_IRQ_enable = m_IRQ_count = m_IRQ_count_latch = 0;
 	int MMC3_prg_chunks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
@@ -894,7 +894,7 @@ DRIVER_INIT_MEMBER(vsnes_state,supxevs)
 
 READ8_MEMBER(vsnes_state::tko_security_r)
 {
-	static const UINT8 security_data[] = {
+	static const uint8_t security_data[] = {
 		0xff, 0xbf, 0xb7, 0x97, 0x97, 0x17, 0x57, 0x4f,
 		0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90, 0x94, 0x14,
 		0x56, 0x4e, 0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90,
@@ -956,7 +956,7 @@ WRITE8_MEMBER(vsnes_state::mapper68_rom_banking)
 
 		case 0x7000:
 		{
-			UINT8 *prg = memregion("maincpu")->base();
+			uint8_t *prg = memregion("maincpu")->base();
 			memcpy(&prg[0x08000], &prg[0x10000 + data * 0x4000], 0x4000);
 		}
 		break;
@@ -970,7 +970,7 @@ DRIVER_INIT_MEMBER(vsnes_state,platoon)
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
 	the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x2c000], 0x4000);
 
@@ -1035,7 +1035,7 @@ WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking_sub)
 
 DRIVER_INIT_MEMBER(vsnes_state,vsdual)
 {
-	UINT8 *prg = memregion("maincpu")->base();
+	uint8_t *prg = memregion("maincpu")->base();
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking_main),this));

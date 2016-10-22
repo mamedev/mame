@@ -490,9 +490,9 @@ public:
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
 	optional_device<ata_interface_device> m_ide1;
 	optional_device<ata_interface_device> m_ide2;
-	required_shared_ptr<UINT16> m_video_ram_1;
-	required_shared_ptr<UINT16> m_video_ram_2;
-	optional_shared_ptr<UINT32> m_ext_gvram;
+	required_shared_ptr<uint16_t> m_video_ram_1;
+	required_shared_ptr<uint16_t> m_video_ram_2;
+	optional_shared_ptr<uint32_t> m_ext_gvram;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
@@ -501,7 +501,7 @@ public:
 	required_device<screen_device> m_screen;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
@@ -510,62 +510,62 @@ public:
 	};
 
 	emu_timer *m_vbirq;
-	UINT8 *m_char_rom;
-	UINT8 *m_kanji_rom;
+	uint8_t *m_char_rom;
+	uint8_t *m_kanji_rom;
 
-	UINT8 m_dma_offset[4];
-	UINT8 m_dma_autoinc[4];
+	uint8_t m_dma_offset[4];
+	uint8_t m_dma_autoinc[4];
 	int m_dack;
 
-	UINT8 m_video_ff[8],m_gfx_ff;
-	UINT8 m_txt_scroll_reg[8];
-	UINT8 m_pal_clut[4];
+	uint8_t m_video_ff[8],m_gfx_ff;
+	uint8_t m_txt_scroll_reg[8];
+	uint8_t m_pal_clut[4];
 
-	std::unique_ptr<UINT16[]> m_tvram;
+	std::unique_ptr<uint16_t[]> m_tvram;
 
-	UINT16 m_font_addr;
-	UINT8 m_font_line;
-	UINT16 m_font_lr;
+	uint16_t m_font_addr;
+	uint8_t m_font_line;
+	uint16_t m_font_lr;
 
-	UINT8 m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
-	UINT8 m_nmi_ff;
+	uint8_t m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
+	uint8_t m_nmi_ff;
 
-	UINT8 m_vram_bank;
-	UINT8 m_vram_disp;
+	uint8_t m_vram_bank;
+	uint8_t m_vram_disp;
 
 	/* PC9801RS specific */
-	UINT8 m_gate_a20; //A20 line
-	UINT8 m_access_ctrl; // DMA related
-	UINT8 m_fdc_ctrl;
-	UINT8 m_ex_video_ff[128];
+	uint8_t m_gate_a20; //A20 line
+	uint8_t m_access_ctrl; // DMA related
+	uint8_t m_fdc_ctrl;
+	uint8_t m_ex_video_ff[128];
 	struct {
-		UINT8 pal_entry;
-		UINT8 r[16],g[16],b[16];
+		uint8_t pal_entry;
+		uint8_t r[16],g[16],b[16];
 	}m_analog16;
 	struct {
-		UINT8 pal_entry;
-		UINT8 r[0x100],g[0x100],b[0x100];
+		uint8_t pal_entry;
+		uint8_t r[0x100],g[0x100],b[0x100];
 	}m_analog256;
 	struct {
-		UINT8 mode;
-		UINT8 tile[4], tile_index;
+		uint8_t mode;
+		uint8_t tile[4], tile_index;
 	}m_grcg;
 
 	struct {
-		UINT16 regs[8];
-		UINT16 pat[4];
-		UINT16 src[4];
-		INT16 count;
-		UINT16 leftover[4];
+		uint16_t regs[8];
+		uint16_t pat[4];
+		uint16_t src[4];
+		int16_t count;
+		uint16_t leftover[4];
 		bool first;
 		bool init;
 	} m_egc;
 
 	/* PC9821 specific */
-	UINT8 m_sdip[24], m_sdip_bank;
-	UINT8 m_pc9821_window_bank;
-	UINT8 m_ext2_ff;
-	UINT8 m_sys_type;
+	uint8_t m_sdip[24], m_sdip_bank;
+	uint8_t m_pc9821_window_bank;
+	uint8_t m_ext2_ff;
+	uint8_t m_sys_type;
 
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_w);
@@ -597,9 +597,9 @@ public:
 	DECLARE_WRITE16_MEMBER(grcg_gvram0_w);
 	DECLARE_READ16_MEMBER(upd7220_grcg_r);
 	DECLARE_WRITE16_MEMBER(upd7220_grcg_w);
-	void egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask);
-	UINT16 egc_blit_r(UINT32 offset, UINT16 mem_mask);
-	UINT32 a20_286(bool state);
+	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t egc_blit_r(uint32_t offset, uint16_t mem_mask);
+	uint32_t a20_286(bool state);
 
 	DECLARE_READ8_MEMBER(ide_ctrl_r);
 	DECLARE_WRITE8_MEMBER(ide_ctrl_w);
@@ -610,7 +610,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide1_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ide2_irq_w);
 
-	UINT8 m_ide_sel;
+	uint8_t m_ide_sel;
 	bool m_ide1_irq, m_ide2_irq;
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
@@ -620,9 +620,9 @@ public:
 	DECLARE_READ8_MEMBER(sasi_status_r);
 	DECLARE_WRITE8_MEMBER(sasi_ctrl_w);
 
-	UINT8 m_sasi_data;
+	uint8_t m_sasi_data;
 	int m_sasi_data_enable;
-	UINT8 m_sasi_ctrl;
+	uint8_t m_sasi_ctrl;
 
 	DECLARE_READ8_MEMBER(pc9801rs_knjram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_knjram_w);
@@ -683,10 +683,10 @@ public:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 private:
-	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
-	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
-	UINT16 egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst);
-	UINT16 egc_shift(int plane, UINT16 val);
+	uint8_t m_sdip_read(uint16_t port, uint8_t sdip_offset);
+	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
+	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst);
+	uint16_t egc_shift(int plane, uint16_t val);
 public:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_START(pc9801f);
@@ -721,11 +721,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_mouse_portb_w);
 	DECLARE_WRITE8_MEMBER(ppi_mouse_portc_w);
 	struct{
-		UINT8 control;
-		UINT8 lx;
-		UINT8 ly;
-		UINT8 freq_reg;
-		UINT8 freq_index;
+		uint8_t control;
+		uint8_t lx;
+		uint8_t ly;
+		uint8_t freq_reg;
+		uint8_t freq_index;
 	}m_mouse;
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	DECLARE_READ8_MEMBER(unk_r);
@@ -758,14 +758,14 @@ void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void pc9801_state::video_start()
 {
-	m_tvram = std::make_unique<UINT16[]>(0x2000);
+	m_tvram = std::make_unique<uint16_t[]>(0x2000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
 	m_kanji_rom = memregion("kanji")->base();
 }
 
-UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -780,8 +780,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi;
 	int res_x,res_y;
-	UINT8 pen;
-	UINT8 colors16_mode;
+	uint8_t pen;
+	uint8_t colors16_mode;
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
@@ -790,7 +790,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		UINT8 *ext_gvram = (UINT8 *)m_ext_gvram.target();
+		uint8_t *ext_gvram = (uint8_t *)m_ext_gvram.target();
 		for(xi=0;xi<16;xi++)
 		{
 			res_x = x + xi;
@@ -823,12 +823,12 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,yi;
 	int x;
-	UINT8 char_size;
-//  UINT8 interlace_on;
-	UINT16 tile;
-	UINT8 kanji_lr;
-	UINT8 kanji_sel;
-	UINT8 x_step;
+	uint8_t char_size;
+//  uint8_t interlace_on;
+	uint16_t tile;
+	uint8_t kanji_lr;
+	uint8_t kanji_sel;
+	uint8_t x_step;
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
@@ -839,13 +839,13 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 
 	for(x=0;x<pitch;x+=x_step)
 	{
-		UINT8 tile_data,secret,reverse,u_line,v_line,blink;
-		UINT8 color;
-		UINT8 attr;
+		uint8_t tile_data,secret,reverse,u_line,v_line,blink;
+		uint8_t color;
+		uint8_t attr;
 		int pen;
-		UINT32 tile_addr;
-		UINT8 knj_tile;
-		UINT8 gfx_mode;
+		uint32_t tile_addr;
+		uint8_t knj_tile;
+		uint8_t gfx_mode;
 
 		tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 
@@ -1099,7 +1099,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		{
 			case 0x09://cg window font read
 			{
-				UINT32 pcg_offset;
+				uint32_t pcg_offset;
 
 				pcg_offset = (m_font_addr & 0x7f7f) << 5;
 				pcg_offset|= m_font_line;
@@ -1136,7 +1136,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			case 0x0c:
 			case 0x0e:
 			{
-				UINT8 pal_entry;
+				uint8_t pal_entry;
 
 				m_pal_clut[(offset & 0x6) >> 1] = data;
 
@@ -1170,7 +1170,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				return;
 			case 0x09: //cg window font write
 			{
-				UINT32 pcg_offset;
+				uint32_t pcg_offset;
 
 				pcg_offset = m_font_addr << 5;
 				pcg_offset|= m_font_line;
@@ -1251,7 +1251,7 @@ WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
 /* TODO: banking? */
 READ16_MEMBER(pc9801_state::tvram_r)
 {
-	UINT16 res;
+	uint16_t res;
 
 	if((offset & 0x1000) && (mem_mask == 0xff00))
 		return 0xffff;
@@ -1277,17 +1277,17 @@ READ8_MEMBER(pc9801_state::gvram_r)
 
 WRITE8_MEMBER(pc9801_state::gvram_w)
 {
-	UINT16 ram = m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000];
+	uint16_t ram = m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000];
 	int mask = (offset & 1) << 3;
 	data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 	m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] = (ram & (0xff00 >> mask)) | (data << mask);
 }
 
-UINT16 pc9801_state::egc_shift(int plane, UINT16 val)
+uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
 {
 	int src_off = m_egc.regs[6] & 0xf, dst_off = (m_egc.regs[6] >> 4) & 0xf;
 	int left = src_off - dst_off, right = dst_off - src_off;
-	UINT16 out;
+	uint16_t out;
 	if(m_egc.regs[6] & 0x1000)
 	{
 		if(right >= 0)
@@ -1317,9 +1317,9 @@ UINT16 pc9801_state::egc_shift(int plane, UINT16 val)
 	return out;
 }
 
-UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst)
+uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst)
 {
-	UINT16 out = 0;
+	uint16_t out = 0;
 
 	for(int i = 7; i >= 0; i--)
 	{
@@ -1332,9 +1332,9 @@ UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16
 	return out;
 }
 
-void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
+void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 {
-	UINT16 mask = m_egc.regs[4] & mem_mask, out = 0;
+	uint16_t mask = m_egc.regs[4] & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
 	int dst_off = (m_egc.regs[6] >> 4) & 0xf, src_off = m_egc.regs[6] & 0xf;
 	offset &= 0x13fff;
@@ -1363,7 +1363,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	// mask off the bits past the end of the blit
 	if(((m_egc.count < 8) && (mem_mask != 0xffff)) || ((m_egc.count < 16) && (mem_mask == 0xffff)))
 	{
-		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
+		uint16_t end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
 		// if the blit is less than the write size, adjust the masks
 		if(m_egc.first)
 		{
@@ -1379,7 +1379,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		if(!BIT(m_egc.regs[0], i))
 		{
-			UINT16 src = m_egc.src[i], pat = m_egc.pat[i];
+			uint16_t src = m_egc.src[i], pat = m_egc.pat[i];
 			if(BIT(m_egc.regs[2], 10))
 				src = egc_shift(i, data);
 
@@ -1431,9 +1431,9 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	}
 }
 
-UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
+uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 {
-	UINT32 plane_off = offset & 0x13fff;
+	uint32_t plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)
 	{
 		m_egc.pat[0] = m_video_ram_2[plane_off + 0x4000];
@@ -1457,7 +1457,7 @@ UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 
 READ16_MEMBER(pc9801_state::upd7220_grcg_r)
 {
-	UINT16 res = 0;
+	uint16_t res = 0;
 
 	if(!(m_grcg.mode & 0x80) || space.debugger_access())
 		res = m_video_ram_2[offset];
@@ -1492,7 +1492,7 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 	else
 	{
 		int i;
-		UINT8 *vram = (UINT8 *)m_video_ram_2.target();
+		uint8_t *vram = (uint8_t *)m_video_ram_2.target();
 		offset = (offset << 1) & 0x27fff;
 
 		if(m_grcg.mode & 0x40) // RMW
@@ -1578,7 +1578,7 @@ WRITE_LINE_MEMBER(pc9801_state::ide2_irq_w)
 
 READ8_MEMBER( pc9801_state::sasi_data_r )
 {
-	UINT8 data = m_sasi_data_in->read();
+	uint8_t data = m_sasi_data_in->read();
 
 	if(m_sasi_ctrl_in->read() & 0x80)
 		m_sasibus->write_ack(1);
@@ -1635,7 +1635,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
 
 READ8_MEMBER( pc9801_state::sasi_status_r )
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	if(m_sasi_ctrl & 0x40) // read status
 	{
@@ -1743,7 +1743,7 @@ ADDRESS_MAP_END
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
-	UINT32 pcg_offset;
+	uint32_t pcg_offset;
 
 	pcg_offset = m_font_addr << 5;
 	pcg_offset|= offset & 0x1e;
@@ -1768,7 +1768,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
-	UINT32 pcg_offset;
+	uint32_t pcg_offset;
 
 	pcg_offset = m_font_addr << 5;
 	pcg_offset|= offset & 0x1e;
@@ -1822,7 +1822,7 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 {
 	if(offset == 0x00)
 	{
-		UINT8 por;
+		uint8_t por;
 		/* reset POR bit, TODO: is there any other way? */
 		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
 		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
@@ -1893,7 +1893,7 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 		case 3:
 		case 5:
 		{
-			UINT8 color = 0;
+			uint8_t color = 0;
 			switch((m_egc.regs[1] >> 13) & 3)
 			{
 				case 1:
@@ -2076,7 +2076,7 @@ WRITE8_MEMBER(pc9801_state::pic_w)
 
 READ16_MEMBER(pc9801_state::grcg_gvram_r)
 {
-	UINT16 ret = upd7220_grcg_r(space, (offset + 0x4000) | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(space, (offset + 0x4000) | (m_vram_bank << 16), mem_mask);
 	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
@@ -2088,7 +2088,7 @@ WRITE16_MEMBER(pc9801_state::grcg_gvram_w)
 
 READ16_MEMBER(pc9801_state::grcg_gvram0_r)
 {
-	UINT16 ret = upd7220_grcg_r(space, offset | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(space, offset | (m_vram_bank << 16), mem_mask);
 	return BITSWAP16(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
@@ -2181,7 +2181,7 @@ READ8_MEMBER(pc9801_state::pc9821_a0_r)
 		}
 		else if(m_ex_video_ff[ANALOG_16_MODE]) //16 color mode, readback possible there
 		{
-			UINT8 res = 0;
+			uint8_t res = 0;
 
 			switch(offset)
 			{
@@ -2236,7 +2236,7 @@ WRITE8_MEMBER(pc9801_state::window_bank_w)
 		logerror("PC-9821 $f0000 window bank %02x\n",data);
 }
 
-UINT8 pc9801_state::m_sdip_read(UINT16 port, UINT8 sdip_offset)
+uint8_t pc9801_state::m_sdip_read(uint16_t port, uint8_t sdip_offset)
 {
 	if(port == 2)
 		return m_sdip[sdip_offset];
@@ -2245,7 +2245,7 @@ UINT8 pc9801_state::m_sdip_read(UINT16 port, UINT8 sdip_offset)
 	return 0xff;
 }
 
-void pc9801_state::m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data)
+void pc9801_state::m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data)
 {
 	if(port == 2)
 	{
@@ -2300,7 +2300,7 @@ READ16_MEMBER(pc9801_state::timestamp_r)
 /* basically a read-back of various registers */
 READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -2762,7 +2762,7 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 		{
 			case 1:
 			{
-				UINT8 page = m_dma_offset[m_dack];
+				uint8_t page = m_dma_offset[m_dack];
 				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
 				break;
 			}
@@ -2788,7 +2788,7 @@ WRITE8_MEMBER(pc9801_state::dma_write_byte)
 		{
 			case 1:
 			{
-				UINT8 page = m_dma_offset[m_dack];
+				uint8_t page = m_dma_offset[m_dack];
 				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
 				break;
 			}
@@ -2831,8 +2831,8 @@ WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 
 READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 {
-	UINT8 res;
-	UINT8 isporthi;
+	uint8_t res;
+	uint8_t isporthi;
 	const char *const mousenames[] = { "MOUSE_X", "MOUSE_Y" };
 
 	res = ioport("MOUSE_B")->read() & 0xf0;
@@ -2935,7 +2935,7 @@ WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_drq )
 		m_dmac->dreq3_w(state ^ 1);
 }
 
-UINT32 pc9801_state::a20_286(bool state)
+uint32_t pc9801_state::a20_286(bool state)
 {
 	return (state ? 0xffffff : 0x0fffff);
 }
@@ -3017,11 +3017,11 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
-	memset(m_tvram.get(), 0, sizeof(UINT16) * 0x2000);
+	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;
-		static const UINT8 default_memsw_data[0x10] =
+		static const uint8_t default_memsw_data[0x10] =
 		{
 			0xe1, 0x48, 0xe1, 0x05, 0xe1, 0x04, 0xe1, 0x00, 0xe1, 0x01, 0xe1, 0x00, 0xe1, 0x00, 0xe1, 0x6e
 //          0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff
@@ -3045,9 +3045,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
-	UINT8 op_mode;
-	UINT8 *ROM;
-	UINT8 *PRG = memregion("fdc_data")->base();
+	uint8_t op_mode;
+	uint8_t *ROM;
+	uint8_t *PRG = memregion("fdc_data")->base();
 	int i;
 
 	ROM = memregion("fdc_bios_2dd")->base();
@@ -3791,12 +3791,12 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 		for(j=0;j<0x20;j++) \
 			kanji[j+(i << 5)] = _fill_type ? new_chargen[j+(k << 5)] : 0; \
 	}
-	UINT32 i,j,k;
-	UINT32 pcg_tile;
-	UINT8 *kanji = memregion("kanji")->base();
-	UINT8 *raw_kanji = memregion("raw_kanji")->base();
-	UINT8 *new_chargen = memregion("new_chargen")->base();
-	UINT8 *chargen = memregion("chargen")->base();
+	uint32_t i,j,k;
+	uint32_t pcg_tile;
+	uint8_t *kanji = memregion("kanji")->base();
+	uint8_t *raw_kanji = memregion("raw_kanji")->base();
+	uint8_t *new_chargen = memregion("new_chargen")->base();
+	uint8_t *chargen = memregion("chargen")->base();
 
 	/* Convert the ROM bitswap here from the original structure */
 	/* TODO: kanji bitswap should be completely wrong, will check it out once that a dump is remade. */

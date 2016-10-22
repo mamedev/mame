@@ -874,7 +874,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_1943_state,1943)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 

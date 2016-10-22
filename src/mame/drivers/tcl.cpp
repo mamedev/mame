@@ -55,7 +55,7 @@ public:
 
 	DECLARE_DRIVER_INIT(tcl);
 	virtual void video_start() override;
-	UINT32 screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -63,7 +63,7 @@ public:
 void tcl_state::video_start()
 {
 }
-UINT32 tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -171,9 +171,9 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	std::vector<UINT8> src(len);
+	std::vector<uint8_t> src(len);
 
 	int i,idx=0;
 	memcpy(&src[0], dest, len);

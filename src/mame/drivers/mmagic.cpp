@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(color_w);
 	DECLARE_WRITE8_MEMBER(audio_w);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void machine_start() override;
@@ -93,13 +93,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_vram;
-	required_region_ptr<UINT8> m_tiles;
-	required_region_ptr<UINT8> m_colors;
+	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint8_t> m_tiles;
+	required_region_ptr<uint8_t> m_colors;
 
-	UINT8 m_ball_x;
-	UINT8 m_ball_y;
-	UINT8 m_color;
+	uint8_t m_ball_x;
+	uint8_t m_ball_y;
+	uint8_t m_color;
 };
 
 
@@ -169,7 +169,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mmagic_state::vblank_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// bit 0 = vblank
 	data |= m_screen->vblank() << 0;
@@ -198,22 +198,22 @@ WRITE8_MEMBER( mmagic_state::color_w )
 	m_color = data;
 }
 
-UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// draw playfield
 	for (int y = 0; y < 192 / 12; y++)
 	{
 		for (int x = 0; x < 256 / 8; x++)
 		{
-			UINT8 code = m_vram[(y * 32) + x] & 0x7f;
+			uint8_t code = m_vram[(y * 32) + x] & 0x7f;
 
 			// normal palette 00..7f, alternate palette 80..ff
-			UINT8 color = m_colors[code | (BIT(m_color, 6) << 7)];
+			uint8_t color = m_colors[code | (BIT(m_color, 6) << 7)];
 
 			// draw one tile
 			for (int tx = 0; tx < 12; tx++)
 			{
-				UINT8 gfx = m_tiles[(code << 4) + tx];
+				uint8_t gfx = m_tiles[(code << 4) + tx];
 
 				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black : m_palette->pen_color(color);
 				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black : m_palette->pen_color(color);

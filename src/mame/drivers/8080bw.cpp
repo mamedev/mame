@@ -802,7 +802,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	// bad byte: should be push a at RST 10h
 	ROM[0x10] = 0xf5;
@@ -818,7 +818,7 @@ DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 
 READ8_MEMBER(_8080bw_state::invrvnge_02_r)
 {
-	UINT8 data = ioport("IN2")->read();
+	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
 	return (data & 0x8f) | (ioport("IN1")->read() & 0x70);
 }
@@ -1333,8 +1333,8 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,rollingc)
 {
-	m_scattered_colorram = std::make_unique<UINT8 []>(0x400);
-	m_scattered_colorram2 = std::make_unique<UINT8 []>(0x400);
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x400);
+	m_scattered_colorram2 = std::make_unique<uint8_t []>(0x400);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
 	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
 
@@ -1468,7 +1468,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schaser)
 {
-	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	MACHINE_START_CALL_MEMBER(schaser_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
@@ -1539,9 +1539,9 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(_8080bw_state::schasercv_02_r)
 {
-	UINT8 data = ioport("IN2")->read();
+	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
-	UINT8 in1 = ioport("IN1")->read();
+	uint8_t in1 = ioport("IN1")->read();
 	return (data & 0x89) | (in1 & 0x70) | (BIT(in1, 3) << 1) | (BIT(in1, 7) << 2);
 }
 
@@ -1596,7 +1596,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schasercv)
 {
-	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
 	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
@@ -1689,7 +1689,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,sflush)
 {
-	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
 	MACHINE_START_CALL_MEMBER(mw8080bw);
@@ -1876,7 +1876,7 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 
 MACHINE_START_MEMBER(_8080bw_state,polaris)
 {
-	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
@@ -1886,7 +1886,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
 {
-	UINT8 data = ioport("IN0")->read();
+	uint8_t data = ioport("IN0")->read();
 	if (m_flip_screen) return data;
 	return (data & 7) | (ioport("IN1")->read() & 0xf8);
 }
@@ -2309,7 +2309,7 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 
 READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
 {
-	UINT8 data = ioport("IN1")->read();
+	uint8_t data = ioport("IN1")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x8f) | (ioport("IN2")->read() & 0x70);
 }
@@ -2578,7 +2578,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 {
-	UINT8 data = ioport("INPUTS")->read();
+	uint8_t data = ioport("INPUTS")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
@@ -2673,7 +2673,7 @@ MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 
 READ8_MEMBER(_8080bw_state::darthvdr_01_r)
 {
-	UINT8 data = ioport("P2")->read();
+	uint8_t data = ioport("P2")->read();
 	if (m_flip_screen) return data;
 	return (data & 0xe1) | (ioport("P1")->read() & 0x0e);
 }
@@ -2831,13 +2831,13 @@ MACHINE_CONFIG_END
 /* decrypt function for vortex */
 DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
-	std::vector<UINT8> buf1(length);
-	UINT32 x;
+	std::vector<uint8_t> buf1(length);
+	uint32_t x;
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr = x;
+		uint32_t addr = x;
 		/*
 		A15 A14 A13     A0  A3  A9
 		0   0   0       I   I   I
@@ -3036,8 +3036,8 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 		    ana  a
 		    rz
 		*/
-		UINT8 const gunx = m_gunx.read_safe(0x00);
-		UINT8 const guny = m_guny.read_safe(0x20);
+		uint8_t const gunx = m_gunx.read_safe(0x00);
+		uint8_t const guny = m_guny.read_safe(0x20);
 		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
 		m_claybust_gun_on->adjust(attotime::from_msec(250)); // timing is a guess
 	}
@@ -3245,9 +3245,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT32 len = memregion("maincpu")->bytes();
-	std::vector<UINT8> buffer(len);
+	uint8_t *rom = memregion("maincpu")->base();
+	uint32_t len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(len);
 
 	// swap a8/a9
 	for (int i = 0; i < len; i++)
@@ -3380,9 +3380,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 {
-	UINT8 *src = memregion("user1")->base();
+	uint8_t *src = memregion("user1")->base();
 	int len = memregion("user1")->bytes();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 
 	// decrypt rom
 	for (int i = 0; i < len; i++)

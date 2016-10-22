@@ -39,7 +39,7 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(microvision);
 	DECLARE_MACHINE_START(microvision);
@@ -100,24 +100,24 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// i8021 variables
-	UINT8   m_p0;
-	UINT8   m_p2;
-	UINT8   m_t1;
+	uint8_t   m_p0;
+	uint8_t   m_p2;
+	uint8_t   m_t1;
 
 	// tms1100 variables
-	UINT16  m_r;
-	UINT16  m_o;
+	uint16_t  m_r;
+	uint16_t  m_o;
 
 	// generic variables
 	void    update_lcd();
-	void    lcd_write(UINT8 control, UINT8 data);
+	void    lcd_write(uint8_t control, uint8_t data);
 	bool    m_pla;
 
-	UINT8   m_lcd_latch[8];
-	UINT8   m_lcd_holding_latch[8];
-	UINT8   m_lcd_latch_index;
-	UINT8   m_lcd[16][16];
-	UINT8   m_lcd_control_old;
+	uint8_t   m_lcd_latch[8];
+	uint8_t   m_lcd_holding_latch[8];
+	uint8_t   m_lcd_latch_index;
+	uint8_t   m_lcd[16][16];
+	uint8_t   m_lcd_control_old;
 };
 
 
@@ -216,13 +216,13 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 
 void microvision_state::update_lcd()
 {
-	UINT16 row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
-	UINT16 col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
+	uint16_t row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
+	uint16_t col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
 
 	if (LOG) logerror("row = %04x, col = %04x\n", row, col );
 	for ( int i = 0; i < 16; i++ )
 	{
-		UINT16 temp = row;
+		uint16_t temp = row;
 
 		for (auto & elem : m_lcd)
 		{
@@ -237,11 +237,11 @@ void microvision_state::update_lcd()
 }
 
 
-UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for ( UINT8 i = 0; i < 16; i++ )
+	for ( uint8_t i = 0; i < 16; i++ )
 	{
-		for ( UINT8 j = 0; j < 16; j++ )
+		for ( uint8_t j = 0; j < 16; j++ )
 		{
 			bitmap.pix16(i,j) = m_lcd [i] [j];
 		}
@@ -280,7 +280,7 @@ control is signals LCD5 LCD4
   LCD0 = Data 3
 data is signals LCD3 LCD2 LCD1 LCD0
 */
-void microvision_state::lcd_write(UINT8 control, UINT8 data)
+void microvision_state::lcd_write(uint8_t control, uint8_t data)
 {
 	// Latch pulse, when high, resets the %8 latch address counter
 	if ( control & 0x01 ) {
@@ -380,7 +380,7 @@ WRITE8_MEMBER( microvision_state::i8021_p2_write )
 	else
 	{
 		// Start paddle timer (min is 160uS, max is 678uS)
-		UINT8 paddle = 255 - ioport("PADDLE")->read();
+		uint8_t paddle = 255 - ioport("PADDLE")->read();
 		m_paddle_timer->adjust( attotime::from_usec(160 + ( 518 * paddle ) / 255 ) );
 	}
 }
@@ -394,34 +394,34 @@ READ8_MEMBER( microvision_state::i8021_t1_read )
 
 READ8_MEMBER( microvision_state::i8021_bus_read )
 {
-	UINT8 data = m_p0;
+	uint8_t data = m_p0;
 
-	UINT8 col0 = ioport("COL0")->read();
-	UINT8 col1 = ioport("COL1")->read();
-	UINT8 col2 = ioport("COL2")->read();
+	uint8_t col0 = ioport("COL0")->read();
+	uint8_t col1 = ioport("COL1")->read();
+	uint8_t col2 = ioport("COL2")->read();
 
 	// Row scanning
 	if ( ! ( m_p0 & 0x80 ) )
 	{
-		UINT8 t = ( ( col0 & 0x01 ) << 2 ) | ( ( col1 & 0x01 ) << 1 ) | ( col2 & 0x01 );
+		uint8_t t = ( ( col0 & 0x01 ) << 2 ) | ( ( col1 & 0x01 ) << 1 ) | ( col2 & 0x01 );
 
 		data &= ( t ^ 0xFF );
 	}
 	if ( ! ( m_p0 & 0x40 ) )
 	{
-		UINT8 t = ( ( col0 & 0x02 ) << 1 ) | ( col1 & 0x02 ) | ( ( col2 & 0x02 ) >> 1 );
+		uint8_t t = ( ( col0 & 0x02 ) << 1 ) | ( col1 & 0x02 ) | ( ( col2 & 0x02 ) >> 1 );
 
 		data &= ( t ^ 0xFF );
 	}
 	if ( ! ( m_p0 & 0x20 ) )
 	{
-		UINT8 t = ( col0 & 0x04 ) | ( ( col1 & 0x04 ) >> 1 ) | ( ( col2 & 0x04 ) >> 2 );
+		uint8_t t = ( col0 & 0x04 ) | ( ( col1 & 0x04 ) >> 1 ) | ( ( col2 & 0x04 ) >> 2 );
 
 		data &= ( t ^ 0xFF );
 	}
 	if ( ! ( m_p0 & 0x10 ) )
 	{
-		UINT8 t = ( ( col0 & 0x08 ) >> 1 ) | ( ( col1 & 0x08 ) >> 2 ) | ( ( col2 & 0x08 ) >> 3 );
+		uint8_t t = ( ( col0 & 0x08 ) >> 1 ) | ( ( col1 & 0x08 ) >> 2 ) | ( ( col2 & 0x08 ) >> 3 );
 
 		data &= ( t ^ 0xFF );
 	}
@@ -431,7 +431,7 @@ READ8_MEMBER( microvision_state::i8021_bus_read )
 
 READ8_MEMBER( microvision_state::tms1100_read_k )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (LOG) logerror("read_k\n");
 
@@ -481,7 +481,7 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 }
 
 
-static const UINT16 microvision_output_pla_0[0x20] =
+static const uint16_t microvision_output_pla_0[0x20] =
 {
 	/* O output PLA configuration currently unknown */
 	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
@@ -491,7 +491,7 @@ static const UINT16 microvision_output_pla_0[0x20] =
 };
 
 
-static const UINT16 microvision_output_pla_1[0x20] =
+static const uint16_t microvision_output_pla_1[0x20] =
 {
 	/* O output PLA configuration currently unknown */
 	/* Reversed bit order */
@@ -504,9 +504,9 @@ static const UINT16 microvision_output_pla_1[0x20] =
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 {
-	UINT8 *rom1 = memregion("maincpu1")->base();
-	UINT8 *rom2 = memregion("maincpu2")->base();
-	UINT32 file_size = m_cart->common_get_size("rom");
+	uint8_t *rom1 = memregion("maincpu1")->base();
+	uint8_t *rom2 = memregion("maincpu2")->base();
+	uint32_t file_size = m_cart->common_get_size("rom");
 	m_pla = 0;
 
 	if ( file_size != 1024 && file_size != 2048 )

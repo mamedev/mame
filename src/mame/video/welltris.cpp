@@ -53,7 +53,7 @@ WRITE16_MEMBER(welltris_state::scrollreg_w)
 
 TILE_GET_INFO_MEMBER(welltris_state::get_tile_info)
 {
-	UINT16 code = m_charvideoram[tile_index];
+	uint16_t code = m_charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
 
 	SET_TILE_INFO_MEMBER(0,
@@ -97,7 +97,7 @@ void welltris_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 	}
 }
 
-UINT32 welltris_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t welltris_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_char_tilemap->set_scrollx(0, m_scrollx);
 	m_char_tilemap->set_scrolly(0, m_scrolly);

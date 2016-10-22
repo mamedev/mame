@@ -68,7 +68,7 @@ WRITE8_MEMBER(quasar_state::quasar_video_w)
 
 READ8_MEMBER(quasar_state::quasar_IO_r)
 {
-	UINT8 ans = 0;
+	uint8_t ans = 0;
 
 	switch (m_io_page)
 	{

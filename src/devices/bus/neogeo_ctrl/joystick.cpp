@@ -59,7 +59,7 @@ ioport_constructor neogeo_joystick_device::device_input_ports() const
 //  neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NEOGEO_JOY, "SNK Neo Geo Joystick", tag, owner, clock, "neogeo_joy", __FILE__),
 					device_neogeo_control_port_interface(mconfig, *this),
 					m_joy(*this, "JOY"),
@@ -90,7 +90,7 @@ void neogeo_joystick_device::device_reset()
 //  read_ctrl
 //-------------------------------------------------
 
-UINT8 neogeo_joystick_device::read_ctrl()
+uint8_t neogeo_joystick_device::read_ctrl()
 {
 	return m_joy->read();
 }
@@ -99,7 +99,7 @@ UINT8 neogeo_joystick_device::read_ctrl()
 //  read_start_sel
 //-------------------------------------------------
 
-UINT8 neogeo_joystick_device::read_start_sel()
+uint8_t neogeo_joystick_device::read_start_sel()
 {
 	return m_ss->read();
 }
@@ -160,7 +160,7 @@ ioport_constructor neogeo_joy_ac_device::device_input_ports() const
 //  neogeo_joy_ac_device / neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NEOGEO_JOY_AC, "SNK Neo Geo Arcade Joystick", tag, owner, clock, "neogeo_joyac", __FILE__),
 					device_neogeo_ctrl_edge_interface(mconfig, *this),
 					m_joy1(*this, "JOY1"),

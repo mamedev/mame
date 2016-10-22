@@ -44,22 +44,22 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ16_MEMBER(test_hi_r);
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 *m_p_chargen;
-	UINT8 *m_p_pcg;
-	required_shared_ptr<UINT16> m_p_vram;
-	required_shared_ptr<UINT16> m_p_gvram;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t *m_p_chargen;
+	uint8_t *m_p_pcg;
+	required_shared_ptr<uint16_t> m_p_vram;
+	required_shared_ptr<uint16_t> m_p_gvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	struct{
-		UINT8 portb;
+		uint8_t portb;
 	}m_keyb;
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -86,12 +86,12 @@ void paso1600_state::video_start()
 	m_p_pcg = memregion("pcg")->base();
 }
 
-UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
 	#if 0
-	UINT32 count;
+	uint32_t count;
 	static int test_x;
 
 	if(machine().input().code_pressed(KEYCODE_Z))

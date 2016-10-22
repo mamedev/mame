@@ -26,25 +26,25 @@ public:
 
 	// ROM/RAM/SRAM management
 	// Mainly used by the cartridge slot when loading images
-	void rom_alloc(UINT32 size);
-	void ram_alloc(UINT32 size);
-	void rom_vlm5030_alloc(UINT32 size);
-	void sram_alloc(UINT32 size);
+	void rom_alloc(uint32_t size);
+	void ram_alloc(uint32_t size);
+	void rom_vlm5030_alloc(uint32_t size);
+	void sram_alloc(uint32_t size);
 
-	UINT8* get_rom_base() { return &m_rom[0]; }
-	UINT8* get_rom_vlm5030_base() { return &m_rom_vlm5030[0]; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT8* get_sram_base() { return &m_sram[0]; }
-	UINT32 get_rom_size() { return m_rom.size(); }
-	UINT32 get_rom_vlm5030_size() { return m_rom_vlm5030.size(); }
-	UINT32 get_ram_size() { return m_ram.size(); }
-	UINT32 get_sram_size() { return m_sram.size(); }
+	uint8_t* get_rom_base() { return &m_rom[0]; }
+	uint8_t* get_rom_vlm5030_base() { return &m_rom_vlm5030[0]; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t* get_sram_base() { return &m_sram[0]; }
+	uint32_t get_rom_size() { return m_rom.size(); }
+	uint32_t get_rom_vlm5030_size() { return m_rom_vlm5030.size(); }
+	uint32_t get_ram_size() { return m_ram.size(); }
+	uint32_t get_sram_size() { return m_sram.size(); }
 
 protected:
-	std::vector<UINT8> m_rom;
-	std::vector<UINT8> m_ram;
-	std::vector<UINT8> m_rom_vlm5030;
-	std::vector<UINT8> m_sram;
+	std::vector<uint8_t> m_rom;
+	std::vector<uint8_t> m_ram;
+	std::vector<uint8_t> m_rom_vlm5030;
+	std::vector<uint8_t> m_sram;
 	devcb_write_line m_out_irq_cb;
 };
 

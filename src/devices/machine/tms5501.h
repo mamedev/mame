@@ -67,7 +67,7 @@ class tms5501_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_xmt_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(object); }
@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sens_w );
 	DECLARE_WRITE_LINE_MEMBER( xi7_w );
 
-	UINT8 get_vector();
+	uint8_t get_vector();
 
 protected:
 	// device-level overrides
@@ -162,9 +162,9 @@ private:
 		RR_STOP  = 0x80
 	};
 
-	static const UINT8 rst_vector[];
+	static const uint8_t rst_vector[];
 
-	void set_interrupt(UINT8 mask);
+	void set_interrupt(uint8_t mask);
 	void check_interrupt();
 
 	devcb_write_line m_write_irq;
@@ -172,13 +172,13 @@ private:
 	devcb_read8 m_read_xi;
 	devcb_write8 m_write_xo;
 
-	UINT8 m_irq;
-	UINT8 m_rb;
-	UINT8 m_sta;
-	UINT8 m_cmd;
-	UINT8 m_rr;
-	UINT8 m_tb;
-	UINT8 m_mr;
+	uint8_t m_irq;
+	uint8_t m_rb;
+	uint8_t m_sta;
+	uint8_t m_cmd;
+	uint8_t m_rr;
+	uint8_t m_tb;
+	uint8_t m_mr;
 
 	int m_sens;
 	int m_xi7;

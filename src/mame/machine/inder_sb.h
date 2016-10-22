@@ -25,7 +25,7 @@ class inder_sb_device :  public device_t,
 {
 public:
 	// construction/destruction
-	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
@@ -53,11 +53,11 @@ public:
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 
-	UINT8 m_soundbank[4];
+	uint8_t m_soundbank[4];
 
 	int m_soundsent;
-	UINT8 m_sounddata;
-	UINT8 m_soundback;
+	uint8_t m_sounddata;
+	uint8_t m_soundback;
 
 	void install_sound_hacks(void);
 	void update_sound_irqs(void);

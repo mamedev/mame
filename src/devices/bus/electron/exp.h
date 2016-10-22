@@ -130,7 +130,7 @@ class electron_expansion_slot_device : public device_t, public device_slot_inter
 {
 public:
 	// construction/destruction
-	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~electron_expansion_slot_device();
 
 	// callbacks

@@ -183,8 +183,8 @@ public:
 
 	emu_timer *m_mk5_2KHz_timer;
 	emu_timer *m_mk5_VSYNC_timer;
-	UINT8 m_ext_latch;
-	UINT8 m_flyback;
+	uint8_t m_ext_latch;
+	uint8_t m_flyback;
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
 	DECLARE_READ32_MEMBER(mk5_ioc_r);
@@ -301,7 +301,7 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 /* same as plain AA but with the I2C unconnected */
 READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 {
-	UINT32 ioc_addr;
+	uint32_t ioc_addr;
 
 	ioc_addr = offset*4;
 	ioc_addr >>= 16;
@@ -324,7 +324,7 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 
 WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 {
-	UINT32 ioc_addr;
+	uint32_t ioc_addr;
 
 	ioc_addr = offset*4;
 	ioc_addr >>= 16;
@@ -472,8 +472,8 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 {
-	UINT8 *SRAM    = memregion("sram")->base();
-	UINT8 *SRAM_NZ = memregion("sram")->base();
+	uint8_t *SRAM    = memregion("sram")->base();
+	uint8_t *SRAM_NZ = memregion("sram")->base();
 
 	archimedes_driver_init();
 
@@ -500,10 +500,10 @@ void aristmk5_state::machine_reset()
 
 	/* load the roms according to what the operator wants */
 	{
-		UINT8 *ROM = memregion("maincpu")->base();
-		UINT8 *PRG;// = memregion("prg_code")->base();
+		uint8_t *ROM = memregion("maincpu")->base();
+		uint8_t *PRG;// = memregion("prg_code")->base();
 		int i;
-		UINT8 op_mode;
+		uint8_t op_mode;
 		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "clear_chip", "game_prg" };
 
 		op_mode = ioport("ROM_LOAD")->read();

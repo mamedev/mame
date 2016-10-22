@@ -34,11 +34,11 @@
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
-UINT8 *NeoSpriteRAM, *NeoTextRAM;
-//UINT8* NeoSpriteROM;
-//UINT8* NeoTextROM;
-UINT8* YM2610ADPCMAROM;
-UINT8* NeoZ80ROMActive;
+uint8_t *NeoSpriteRAM, *NeoTextRAM;
+//uint8_t* NeoSpriteROM;
+//uint8_t* NeoTextROM;
+uint8_t* YM2610ADPCMAROM;
+uint8_t* NeoZ80ROMActive;
 
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
@@ -47,7 +47,7 @@ UINT8* NeoZ80ROMActive;
 #define NEOCD_REGION_JAPAN 0
 
 
-UINT8 NeoSystem = NEOCD_REGION_JAPAN;
+uint8_t NeoSystem = NEOCD_REGION_JAPAN;
 
 
 class ngcd_state : public aes_state
@@ -76,7 +76,7 @@ public:
 
 
 	void NeoCDDoDMA(address_space& curr_space);
-	void set_DMA_regs(int offset, UINT16 wordValue);
+	void set_DMA_regs(int offset, uint16_t wordValue);
 
 	DECLARE_READ16_MEMBER(neocd_memcard_r);
 	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
@@ -92,16 +92,16 @@ public:
 
 	// neoCD
 
-	INT32 nActiveTransferArea;
-	INT32 nSpriteTransferBank;
-	INT32 nADPCMTransferBank;
-	INT32 NeoCDDMAAddress1;
-	INT32 NeoCDDMAAddress2;
-	INT32 NeoCDDMAValue1;
-	INT32 NeoCDDMAValue2;
-	INT32 NeoCDDMACount;
-	INT32 NeoCDDMAMode;
-	INT32 nIRQAcknowledge;
+	int32_t nActiveTransferArea;
+	int32_t nSpriteTransferBank;
+	int32_t nADPCMTransferBank;
+	int32_t NeoCDDMAAddress1;
+	int32_t NeoCDDMAAddress2;
+	int32_t NeoCDDMAValue1;
+	int32_t NeoCDDMAValue2;
+	int32_t NeoCDDMACount;
+	int32_t NeoCDDMAMode;
+	int32_t nIRQAcknowledge;
 	int nNeoCDIRQVectorAck;
 	int nNeoCDIRQVector;
 
@@ -113,28 +113,28 @@ public:
 	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
 	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
 	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
-	void NeoCDIRQUpdate(UINT8 byteValue);
+	void NeoCDIRQUpdate(uint8_t byteValue);
 
 	// from the CDC
 	void interrupt_callback_type1(void);
 	void interrupt_callback_type2(void);
 	void interrupt_callback_type3(void);
 
-	UINT8 nTransferWriteEnable;
+	uint8_t nTransferWriteEnable;
 
 	bool prohibit_cdc_irq; // hack?
 
-	UINT32 screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(neocdz);
 	DECLARE_DRIVER_INIT(neocdzj);
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
-	std::unique_ptr<UINT8[]> m_meminternal_data;
+	std::unique_ptr<uint8_t[]> m_meminternal_data;
 protected:
 
-	INT32 SekIdle(INT32 nCycles);
+	int32_t SekIdle(int32_t nCycles);
 };
 
 
@@ -172,7 +172,7 @@ WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
 
 READ16_MEMBER(ngcd_state::neocd_control_r)
 {
-	UINT32 sekAddress = 0xff0000+ (offset*2);
+	uint32_t sekAddress = 0xff0000+ (offset*2);
 
 	switch (sekAddress & 0xFFFF) {
 		case 0x0016:
@@ -201,8 +201,8 @@ READ16_MEMBER(ngcd_state::neocd_control_r)
 
 WRITE16_MEMBER(ngcd_state::neocd_control_w)
 {
-	UINT32 sekAddress = 0xff0000+ (offset*2);
-	UINT16 wordValue = data;
+	uint32_t sekAddress = 0xff0000+ (offset*2);
+	uint16_t wordValue = data;
 
 //  bprintf(PRINT_NORMAL, _T("  - NGCD port 0x%06X -> 0x%04X (PC: 0x%06X)\n"), sekAddress, wordValue, SekGetPC(-1));
 	int byteValue = wordValue & 0xff;
@@ -331,7 +331,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 				m_use_cart_vectors = (data == 0 ? 0 : 1);
 			}
 
-//extern INT32 bRunPause;
+//extern int32_t bRunPause;
 //bRunPause = 1;
 			break;
 
@@ -400,7 +400,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 
 READ8_MEMBER(ngcd_state::neocd_transfer_r)
 {
-	UINT32 sekAddress = 0xe00000+ (offset);
+	uint32_t sekAddress = 0xe00000+ (offset);
 	int address;
 	sekAddress ^= 1;
 
@@ -430,8 +430,8 @@ READ8_MEMBER(ngcd_state::neocd_transfer_r)
 
 WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 {
-	UINT8 byteValue = data;
-	UINT32 sekAddress = 0xe00000+ (offset);
+	uint8_t byteValue = data;
+	uint32_t sekAddress = 0xe00000+ (offset);
 
 	if (!nTransferWriteEnable) {
 //      return;
@@ -479,7 +479,7 @@ WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 
 
 
-void ngcd_state::set_DMA_regs(int offset, UINT16 wordValue)
+void ngcd_state::set_DMA_regs(int offset, uint16_t wordValue)
 {
 	switch (offset)
 	{
@@ -524,7 +524,7 @@ void ngcd_state::set_DMA_regs(int offset, UINT16 wordValue)
 
 
 
-INT32 ngcd_state::SekIdle(INT32 nCycles)
+int32_t ngcd_state::SekIdle(int32_t nCycles)
 {
 	return nCycles;
 }
@@ -709,7 +709,7 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 if (NeoCDDMAAddress2 == 0x0800)  {
 // MapVectorTable(false);
 //  bprintf(PRINT_ERROR, _T("    RAM vectors mapped (PC = 0x%08X\n"), SekGetPC(0));
-//  extern INT32 bRunPause;
+//  extern int32_t bRunPause;
 //  bRunPause = 1;
 }
 			break;
@@ -809,7 +809,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//bprintf(PRINT_ERROR, _T("    Unknown transfer type 0x%04X (PC: 0x%06X)\n"), NeoCDDMAMode, SekGetPC(-1));
 			//bprintf(PRINT_NORMAL, _T("    ??? : 0x%08X  0x%08X 0x%04X 0x%04X 0x%08X\n"), NeoCDDMAAddress1, NeoCDDMAAddress2, NeoCDDMAValue1, NeoCDDMAValue2, NeoCDDMACount);
 
-//extern INT32 bRunPause;
+//extern int32_t bRunPause;
 //bRunPause = 1;
 
 		}
@@ -844,7 +844,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
-	m_meminternal_data = make_unique_clear<UINT8[]>(0x2000);
+	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
@@ -993,7 +993,7 @@ void ngcd_state::interrupt_callback_type3(void)
 }
 
 
-void ngcd_state::NeoCDIRQUpdate(UINT8 byteValue)
+void ngcd_state::NeoCDIRQUpdate(uint8_t byteValue)
 {
 	// do we also need to check the regular interrupts like FBA?
 
@@ -1023,7 +1023,7 @@ void ngcd_state::NeoCDIRQUpdate(UINT8 byteValue)
 }
 
 
-UINT32 ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);

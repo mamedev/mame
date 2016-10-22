@@ -13,7 +13,7 @@ class nes_oekakids_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,7 +28,7 @@ public:
 	// TODO: add oeka kids controller emulation
 protected:
 	void update_chr();
-	UINT8 m_reg, m_latch;
+	uint8_t m_reg, m_latch;
 };
 
 
@@ -38,8 +38,8 @@ class nes_fcg_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,7 +50,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	UINT16     m_irq_count;
+	uint16_t     m_irq_count;
 	int        m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -64,8 +64,8 @@ class nes_lz93d50_device : public nes_fcg_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { fcg_write(space, offset, data, mem_mask); }
@@ -78,8 +78,8 @@ class nes_lz93d50_24c01_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -91,7 +91,7 @@ public:
 
 	// TODO: fix EEPROM I/O emulation
 	required_device<i2cmem_device> m_i2cmem;
-	UINT8 m_i2c_dir;
+	uint8_t m_i2c_dir;
 };
 
 
@@ -101,7 +101,7 @@ class nes_lz93d50_24c02_device : public nes_lz93d50_24c01_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -114,7 +114,7 @@ class nes_fjump2_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -126,7 +126,7 @@ public:
 
 protected:
 	void set_prg();
-	UINT8 m_reg[5];
+	uint8_t m_reg[5];
 };
 
 

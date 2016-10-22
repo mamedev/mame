@@ -34,7 +34,7 @@ inline void ATTR_PRINTF( 3, 4 ) x76f041_device::verboselog( int n_level, const c
 // device type definition
 const device_type X76F041 = &device_creator<x76f041_device>;
 
-x76f041_device::x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+x76f041_device::x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t( mconfig, X76F041, "X76F041 Flash", tag, owner, clock, "x76f041", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
@@ -118,7 +118,7 @@ WRITE_LINE_MEMBER( x76f041_device::write_rst )
 	m_rst = state;
 }
 
-UINT8 *x76f041_device::password()
+uint8_t *x76f041_device::password()
 {
 	switch( m_command & 0xe0 )
 	{
@@ -509,7 +509,7 @@ void x76f041_device::nvram_default()
 	}
 	else
 	{
-		UINT8 *region = m_region->base();
+		uint8_t *region = m_region->base();
 
 		memcpy( m_response_to_reset, region, sizeof( m_response_to_reset ) ); region += sizeof( m_response_to_reset );
 		memcpy( m_write_password, region, sizeof( m_write_password ) ); region += sizeof( m_write_password );

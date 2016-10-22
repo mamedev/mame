@@ -32,9 +32,9 @@ public:
 	DECLARE_READ16_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
@@ -60,7 +60,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER( codata_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
@@ -77,7 +77,7 @@ WRITE8_MEMBER( codata_state::kbd_put )
 
 void codata_state::machine_reset()
 {
-	UINT8* RAM = memregion("user1")->base();
+	uint8_t* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
 	m_term_data = 0;
 	m_maincpu->reset();

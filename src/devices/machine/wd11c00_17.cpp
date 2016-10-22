@@ -111,9 +111,9 @@ inline void wd11c00_17_device::increment_address()
 //  read_data -
 //-------------------------------------------------
 
-inline UINT8 wd11c00_17_device::read_data()
+inline uint8_t wd11c00_17_device::read_data()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_status & STATUS_BUSY)
 	{
@@ -130,7 +130,7 @@ inline UINT8 wd11c00_17_device::read_data()
 //  write_data -
 //-------------------------------------------------
 
-inline void wd11c00_17_device::write_data(UINT8 data)
+inline void wd11c00_17_device::write_data(uint8_t data)
 {
 	if (m_status & STATUS_BUSY)
 	{
@@ -175,7 +175,7 @@ inline void wd11c00_17_device::select()
 //  wd11c00_17_device - constructor
 //-------------------------------------------------
 
-wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock, "wd11c00_17", __FILE__),
 		m_out_irq5_cb(*this),
 		m_out_drq3_cb(*this),
@@ -240,7 +240,7 @@ void wd11c00_17_device::device_reset()
 
 READ8_MEMBER( wd11c00_17_device::io_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -304,7 +304,7 @@ WRITE8_MEMBER( wd11c00_17_device::io_w )
 //  dack_r -
 //-------------------------------------------------
 
-UINT8 wd11c00_17_device::dack_r()
+uint8_t wd11c00_17_device::dack_r()
 {
 	return read_data();
 }
@@ -314,7 +314,7 @@ UINT8 wd11c00_17_device::dack_r()
 //  dack_w -
 //-------------------------------------------------
 
-void wd11c00_17_device::dack_w(UINT8 data)
+void wd11c00_17_device::dack_w(uint8_t data)
 {
 	write_data(data);
 }
@@ -326,7 +326,7 @@ void wd11c00_17_device::dack_w(UINT8 data)
 
 READ8_MEMBER( wd11c00_17_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{

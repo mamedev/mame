@@ -12,7 +12,7 @@ extern const device_type MICRODISC;
 class microdisc_device : public oricext_device
 {
 public:
-	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdisc_device();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -38,9 +38,9 @@ protected:
 
 	required_device<fd1793_t> fdc;
 
-	UINT8 *microdisc_rom;
+	uint8_t *microdisc_rom;
 	floppy_image_device *floppies[4];
-	UINT8 port_314;
+	uint8_t port_314;
 	bool intrq_state, drq_state, hld_state;
 
 	virtual void device_start() override;

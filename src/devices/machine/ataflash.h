@@ -14,7 +14,7 @@ class ata_flash_pccard_device : public ide_hdd_device,
 	public pccard_interface
 {
 public:
-	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ16_MEMBER(read_memory) override;
 	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
@@ -32,9 +32,9 @@ protected:
 	virtual bool is_ready() override;
 
 private:
-	UINT8 m_cis[512];
-	UINT8 m_key[5];
-	UINT8 m_gnetreadlock;
+	uint8_t m_cis[512];
+	uint8_t m_key[5];
+	uint8_t m_gnetreadlock;
 	int m_locked;
 };
 

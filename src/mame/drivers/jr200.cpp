@@ -48,12 +48,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_cram;
-	required_shared_ptr<UINT8> m_mn1271_ram;
-	UINT8 m_border_col;
-	UINT8 m_old_keydata;
-	UINT8 m_freq_reg[2];
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_cram;
+	required_shared_ptr<uint8_t> m_mn1271_ram;
+	uint8_t m_border_col;
+	uint8_t m_old_keydata;
+	uint8_t m_freq_reg[2];
 	emu_timer *m_timer_d;
 	DECLARE_READ8_MEMBER(jr200_pcg_1_r);
 	DECLARE_READ8_MEMBER(jr200_pcg_2_r);
@@ -70,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
 protected:
@@ -96,7 +96,7 @@ protected:
 
 
 /* TODO: double check this */
-static const UINT8 jr200_keycodes[4][9][8] =
+static const uint8_t jr200_keycodes[4][9][8] =
 {
 	/* unshifted */
 	{
@@ -156,7 +156,7 @@ void jr200_state::video_start()
 {
 }
 
-UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi,yi,pen;
 
@@ -166,14 +166,14 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = m_vram[x + y*32];
-			UINT8 attr = m_cram[x + y*32];
+			uint8_t tile = m_vram[x + y*32];
+			uint8_t attr = m_cram[x + y*32];
 
 			for(yi=0;yi<8;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data;
+					uint8_t *gfx_data;
 
 					if(attr & 0x80) //bitmap mode
 					{
@@ -254,7 +254,7 @@ I/O Device
 READ8_MEMBER(jr200_state::mcu_keyb_r)
 {
 	int row, col, table = 0;
-	UINT8 keydata = 0;
+	uint8_t keydata = 0;
 
 	if (m_row9->read() & 0x07)
 	{
@@ -265,7 +265,7 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = 0xff;
+		uint8_t data = 0xff;
 
 		switch ( row )
 		{
@@ -306,7 +306,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_w)
 
 WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 {
-	UINT32 beep_freq;
+	uint32_t beep_freq;
 
 	m_freq_reg[offset] = data;
 
@@ -328,7 +328,7 @@ TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 
 READ8_MEMBER(jr200_state::mn1271_io_r)
 {
-	UINT8 retVal = m_mn1271_ram[offset];
+	uint8_t retVal = m_mn1271_ram[offset];
 	if((offset+0xc800) > 0xca00)
 		retVal= 0xff;
 
@@ -517,8 +517,8 @@ void jr200_state::machine_start()
 
 void jr200_state::machine_reset()
 {
-	UINT8 *gfx_rom = m_gfx_rom->base();
-	UINT8 *gfx_ram = m_gfx_ram->base();
+	uint8_t *gfx_rom = m_gfx_rom->base();
+	uint8_t *gfx_ram = m_gfx_ram->base();
 	int i;
 	memset(m_mn1271_ram,0,0x800);
 

@@ -103,7 +103,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_tx_videoram_w)
 }
 
 
-UINT32 inufuku_state::inufuku_tile_callback( UINT32 code )
+uint32_t inufuku_state::inufuku_tile_callback( uint32_t code )
 {
 	return ((m_spriteram2[code*2] & 0x0007) << 16) + m_spriteram2[(code*2)+ 1];
 }
@@ -123,7 +123,7 @@ void inufuku_state::video_start()
 	m_bg_tilemap->set_transparent_pen(255);
 	m_tx_tilemap->set_transparent_pen(255);
 
-	m_spriteram1_old = make_unique_clear<UINT16[]>(m_spriteram1.bytes()/2);
+	m_spriteram1_old = make_unique_clear<uint16_t[]>(m_spriteram1.bytes()/2);
 
 }
 
@@ -134,7 +134,7 @@ void inufuku_state::video_start()
 
 ******************************************************************************/
 
-UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

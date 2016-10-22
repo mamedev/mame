@@ -83,7 +83,7 @@ ioport_constructor nes_ftrainer_device::device_input_ports() const
 //  nes_ftrainer_device - constructor
 //-------------------------------------------------
 
-nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_FTRAINER, "Bandai Family Trainer", tag, owner, clock, "nes_famtrain", __FILE__)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_trainer(*this, "FT_COL.%u", 0)
@@ -116,9 +116,9 @@ void nes_ftrainer_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_ftrainer_device::read_exp(offs_t offset)
+uint8_t nes_ftrainer_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 1)    //$4017
 	{
 		if (!BIT(m_row_scan, 0))
@@ -147,7 +147,7 @@ UINT8 nes_ftrainer_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_ftrainer_device::write(UINT8 data)
+void nes_ftrainer_device::write(uint8_t data)
 {
 	// select row to scan
 	m_row_scan = data & 0x07;

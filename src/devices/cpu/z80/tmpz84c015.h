@@ -105,7 +105,7 @@
 class tmpz84c015_device : public z80_device
 {
 public:
-	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_txda_cb.set_callback(object); }
@@ -229,7 +229,7 @@ private:
 	required_device<z80pio_device> m_pio;
 
 	// internal state
-	UINT8 m_irq_priority;
+	uint8_t m_irq_priority;
 
 	// callbacks
 	devcb_write_line m_out_txda_cb;

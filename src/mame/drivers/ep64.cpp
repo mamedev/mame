@@ -209,7 +209,7 @@ public:
 	DECLARE_READ8_MEMBER( rd1_r );
 	DECLARE_WRITE8_MEMBER( wr2_w );
 
-	UINT8 m_key;
+	uint8_t m_key;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
@@ -227,7 +227,7 @@ public:
 
 READ8_MEMBER( ep64_state::rd0_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_key < 10)
 	{
@@ -300,7 +300,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// printer
 	data |= m_centronics_busy << 3;

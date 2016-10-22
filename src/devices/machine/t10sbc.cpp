@@ -138,7 +138,7 @@ void t10sbc::ExecCommand()
 	}
 }
 
-void t10sbc::ReadData( UINT8 *data, int dataLength )
+void t10sbc::ReadData( uint8_t *data, int dataLength )
 {
 	// if we're a drive without a disk, return all zeroes
 	if (!m_disk)
@@ -195,7 +195,7 @@ void t10sbc::ReadData( UINT8 *data, int dataLength )
 	case T10SBC_CMD_READ_CAPACITY: // READ CAPACITY
 		{
 			hard_disk_info *info;
-			UINT32 temp;
+			uint32_t temp;
 
 			info = hard_disk_get_info(m_disk);
 
@@ -222,7 +222,7 @@ void t10sbc::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void t10sbc::WriteData( UINT8 *data, int dataLength )
+void t10sbc::WriteData( uint8_t *data, int dataLength )
 {
 	if (!m_disk)
 	{

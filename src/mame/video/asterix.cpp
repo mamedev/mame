@@ -42,7 +42,7 @@ K056832_CB_MEMBER(asterix_state::tile_callback)
 	*code = (*code & 0x03ff) | m_tilebanks[(*code >> 10) & 3];
 }
 
-UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[3], plane, new_colorbase;

@@ -65,9 +65,9 @@ WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 
 inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	UINT16 attr = m_vram[_N_][tile_index * 2 + 0 ];
-	UINT16 code = m_vram[_N_][ tile_index * 2 + 1 ];
-	UINT16 pri  = (attr & 0x0e00) >> 9;
+	uint16_t attr = m_vram[_N_][tile_index * 2 + 0 ];
+	uint16_t code = m_vram[_N_][ tile_index * 2 + 1 ];
+	uint16_t pri  = (attr & 0x0e00) >> 9;
 	SET_TILE_INFO_MEMBER(_N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(tileinfo, ti
 TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
-inline void lordgun_state::lordgun_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+inline void lordgun_state::lordgun_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tilemap[_N_]->mark_tile_dirty(offset/2);
@@ -235,8 +235,8 @@ void lordgun_state::lordgun_update_gun(int i)
 
 void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *s       =   m_spriteram;
-	UINT16 *end     =   m_spriteram + m_spriteram.bytes()/2;
+	uint16_t *s       =   m_spriteram;
+	uint16_t *end     =   m_spriteram + m_spriteram.bytes()/2;
 
 	for ( ; s < end; s += 8/2 )
 	{
@@ -314,7 +314,7 @@ void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 ***************************************************************************/
 
-UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -383,7 +383,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pens[5];
+			uint16_t pens[5];
 
 			int pri_addr = 0;
 

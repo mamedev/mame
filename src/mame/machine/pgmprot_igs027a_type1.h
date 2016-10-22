@@ -13,36 +13,36 @@ public:
 	}
 
 	/////////////// simulations
-	UINT16 m_value0;
-	UINT16 m_value1;
-	UINT16 m_valuekey;
-	UINT16 m_ddp3lastcommand;
-	UINT32 m_valueresponse;
+	uint16_t m_value0;
+	uint16_t m_value1;
+	uint16_t m_valuekey;
+	uint16_t m_ddp3lastcommand;
+	uint32_t m_valueresponse;
 	int m_curslots;
-	UINT32 m_slots[0x100];
+	uint32_t m_slots[0x100];
 
 	// pstars / oldsplus / kov
-	UINT16 m_pstar_e7_value;
-	UINT16 m_pstar_b1_value;
-	UINT16 m_pstar_ce_value;
-	UINT16 m_kov_c0_value;
-	UINT16 m_kov_cb_value;
-	UINT16 m_kov_fe_value;
-	UINT16 m_extra_ram[0x100];
+	uint16_t m_pstar_e7_value;
+	uint16_t m_pstar_b1_value;
+	uint16_t m_pstar_ce_value;
+	uint16_t m_kov_c0_value;
+	uint16_t m_kov_cb_value;
+	uint16_t m_kov_fe_value;
+	uint16_t m_extra_ram[0x100];
 	// puzzli2
-	INT32 m_puzzli_54_trigger;
+	int32_t m_puzzli_54_trigger;
 
 	typedef void (pgm_arm_type1_state::*pgm_arm_sim_command_handler)(int pc);
 
 	pgm_arm_sim_command_handler arm_sim_handler;
 
 	/////////////// emulation
-	UINT16        m_pgm_arm_type1_highlatch_arm_w;
-	UINT16        m_pgm_arm_type1_lowlatch_arm_w;
-	UINT16        m_pgm_arm_type1_highlatch_68k_w;
-	UINT16        m_pgm_arm_type1_lowlatch_68k_w;
-	UINT32        m_pgm_arm_type1_counter;
-	optional_shared_ptr<UINT32> m_arm7_shareram;
+	uint16_t        m_pgm_arm_type1_highlatch_arm_w;
+	uint16_t        m_pgm_arm_type1_lowlatch_arm_w;
+	uint16_t        m_pgm_arm_type1_highlatch_68k_w;
+	uint16_t        m_pgm_arm_type1_lowlatch_68k_w;
+	uint32_t        m_pgm_arm_type1_counter;
+	optional_shared_ptr<uint32_t> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
 
@@ -78,7 +78,7 @@ public:
 	DECLARE_READ16_MEMBER( kovsh_fake_region_r );
 	DECLARE_WRITE16_MEMBER( kovshp_asic27a_write_word );
 	void pgm_decode_kovlsqh2_tiles();
-	void pgm_decode_kovlsqh2_sprites(UINT8 *src );
+	void pgm_decode_kovlsqh2_sprites(uint8_t *src );
 	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
@@ -106,7 +106,7 @@ public:
 	int prev_tablloc;
 	int numbercolumns;
 	int depth;
-	UINT16 m_row_bitmask;
+	uint16_t m_row_bitmask;
 	int hackcount;
 	int hackcount2;
 	int hack_47_value;
@@ -114,16 +114,16 @@ public:
 	int hack_31_table_offset2;
 	int p2_31_retcounter;
 
-	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
+	uint8_t coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
 
 
 	// the maximum level size returned or read by the device appears to be this size
-	UINT16 level_structure[8][10];
+	uint16_t level_structure[8][10];
 
 
-	int puzzli2_take_leveldata_value(UINT8 datvalue);
+	int puzzli2_take_leveldata_value(uint8_t datvalue);
 };
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type1 );

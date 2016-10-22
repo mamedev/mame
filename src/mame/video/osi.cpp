@@ -26,7 +26,7 @@ PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 void sb2m600_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
-	UINT16 addr;
+	uint16_t addr;
 
 	/* randomize video memory contents */
 	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
@@ -40,7 +40,7 @@ void sb2m600_state::video_start()
 
 /* Video Update */
 
-UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, bit, sx;
 
@@ -48,15 +48,15 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (y = 0; y < 256; y++)
 		{
-			UINT16 videoram_addr = (y >> 4) * 64;
+			uint16_t videoram_addr = (y >> 4) * 64;
 			int line = (y >> 1) & 0x07;
 			int x = 0;
 
 			for (sx = 0; sx < 64; sx++)
 			{
-				UINT8 videoram_data = m_video_ram[videoram_addr];
-				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = m_p_chargen[charrom_addr];
+				uint8_t videoram_data = m_video_ram[videoram_addr];
+				uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
+				uint8_t charrom_data = m_p_chargen[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -64,7 +64,7 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 					if (m_coloren)
 					{
-						UINT8 colorram_data = m_color_ram[videoram_addr];
+						uint8_t colorram_data = m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
@@ -81,15 +81,15 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (y = 0; y < 256; y++)
 		{
-			UINT16 videoram_addr = (y >> 3) * 32;
+			uint16_t videoram_addr = (y >> 3) * 32;
 			int line = y & 0x07;
 			int x = 0;
 
 			for (sx = 0; sx < 32; sx++)
 			{
-				UINT8 videoram_data = m_video_ram[videoram_addr];
-				UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-				UINT8 charrom_data = m_p_chargen[charrom_addr];
+				uint8_t videoram_data = m_video_ram[videoram_addr];
+				uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
+				uint8_t charrom_data = m_p_chargen[charrom_addr];
 
 				for (bit = 0; bit < 8; bit++)
 				{
@@ -97,7 +97,7 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 					if (m_coloren)
 					{
-						UINT8 colorram_data = m_color_ram[videoram_addr];
+						uint8_t colorram_data = m_color_ram[videoram_addr];
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
@@ -115,21 +115,21 @@ UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, bit, sx;
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16 videoram_addr = (y >> 4) * 64;
+		uint16_t videoram_addr = (y >> 4) * 64;
 		int line = (y >> 1) & 0x07;
 		int x = 0;
 
 		for (sx = 0; sx < 64; sx++)
 		{
-			UINT8 videoram_data = m_video_ram[videoram_addr++];
-			UINT16 charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
-			UINT8 charrom_data = m_p_chargen[charrom_addr];
+			uint8_t videoram_data = m_video_ram[videoram_addr++];
+			uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
+			uint8_t charrom_data = m_p_chargen[charrom_addr];
 
 			for (bit = 0; bit < 8; bit++)
 			{

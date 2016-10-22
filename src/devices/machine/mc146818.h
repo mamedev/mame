@@ -57,8 +57,8 @@ class mc146818_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(object); }
@@ -171,8 +171,8 @@ private:
 
 	// internal state
 
-	UINT8           m_index;
-	std::vector<UINT8>  m_data;
+	uint8_t           m_index;
+	std::vector<uint8_t>  m_data;
 
 	attotime        m_last_refresh;
 

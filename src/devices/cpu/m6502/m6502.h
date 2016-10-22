@@ -26,8 +26,8 @@ public:
 		V_LINE   = INPUT_LINE_IRQ0 + 16
 	};
 
-	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
@@ -43,28 +43,28 @@ protected:
 		direct_read_data *direct, *sdirect;
 
 		virtual ~memory_interface() {}
-		virtual UINT8 read(UINT16 adr) = 0;
-		virtual UINT8 read_9(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr) = 0;
-		virtual UINT8 read_arg(UINT16 adr) = 0;
-		virtual void write(UINT16 adr, UINT8 val) = 0;
-		virtual void write_9(UINT16 adr, UINT8 val);
+		virtual uint8_t read(uint16_t adr) = 0;
+		virtual uint8_t read_9(uint16_t adr);
+		virtual uint8_t read_sync(uint16_t adr) = 0;
+		virtual uint8_t read_arg(uint16_t adr) = 0;
+		virtual void write(uint16_t adr, uint8_t val) = 0;
+		virtual void write_9(uint16_t adr, uint8_t val);
 	};
 
 	class mi_default_normal : public memory_interface {
 	public:
 		virtual ~mi_default_normal() {}
-		virtual UINT8 read(UINT16 adr) override;
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
-		virtual void write(UINT16 adr, UINT8 val) override;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
 	class mi_default_nd : public mi_default_normal {
 	public:
 		virtual ~mi_default_nd() {}
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	struct disasm_entry {
@@ -129,9 +129,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -144,23 +144,23 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config program_config, sprogram_config;
 
-	UINT16  PPC;                    /* previous program counter */
-	UINT16  NPC;                    /* next start-of-instruction program counter */
-	UINT16  PC;                     /* program counter */
-	UINT16  SP;                     /* stack pointer (always 100 - 1FF) */
-	UINT16  TMP;                    /* temporary internal values */
-	UINT8   TMP2;                   /* another temporary internal value, 8 bits this time */
-	UINT8   A;                      /* Accumulator */
-	UINT8   X;                      /* X index register */
-	UINT8   Y;                      /* Y index register */
-	UINT8   P;                      /* Processor status */
-	UINT8   IR;                     /* Prefetched instruction register */
+	uint16_t  PPC;                    /* previous program counter */
+	uint16_t  NPC;                    /* next start-of-instruction program counter */
+	uint16_t  PC;                     /* program counter */
+	uint16_t  SP;                     /* stack pointer (always 100 - 1FF) */
+	uint16_t  TMP;                    /* temporary internal values */
+	uint8_t   TMP2;                   /* another temporary internal value, 8 bits this time */
+	uint8_t   A;                      /* Accumulator */
+	uint8_t   X;                      /* X index register */
+	uint8_t   Y;                      /* Y index register */
+	uint8_t   P;                      /* Processor status */
+	uint8_t   IR;                     /* Prefetched instruction register */
 	int     inst_state_base;        /* Current instruction bank */
 
 	memory_interface *mintf;
@@ -171,46 +171,46 @@ protected:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	offs_t disassemble_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *table);
-	UINT8 read(UINT16 adr) { return mintf->read(adr); }
-	UINT8 read_9(UINT16 adr) { return mintf->read_9(adr); }
-	void write(UINT16 adr, UINT8 val) { mintf->write(adr, val); }
-	void write_9(UINT16 adr, UINT8 val) { mintf->write_9(adr, val); }
-	UINT8 read_arg(UINT16 adr) { return mintf->read_arg(adr); }
-	UINT8 read_pc() { return mintf->read_arg(PC++); }
-	UINT8 read_pc_noinc() { return mintf->read_arg(PC); }
+	offs_t disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
+	uint8_t read(uint16_t adr) { return mintf->read(adr); }
+	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
+	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
+	void write_9(uint16_t adr, uint8_t val) { mintf->write_9(adr, val); }
+	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
+	uint8_t read_pc() { return mintf->read_arg(PC++); }
+	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
 	void prefetch();
 	void prefetch_noirq();
-	void set_nz(UINT8 v);
+	void set_nz(uint8_t v);
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
 
 	// inline helpers
-	static inline bool page_changing(UINT16 base, int delta) { return ((base + delta) ^ base) & 0xff00; }
-	static inline UINT16 set_l(UINT16 base, UINT8 val) { return (base & 0xff00) | val; }
-	static inline UINT16 set_h(UINT16 base, UINT8 val) { return (base & 0x00ff) | (val << 8); }
+	static inline bool page_changing(uint16_t base, int delta) { return ((base + delta) ^ base) & 0xff00; }
+	static inline uint16_t set_l(uint16_t base, uint8_t val) { return (base & 0xff00) | val; }
+	static inline uint16_t set_h(uint16_t base, uint8_t val) { return (base & 0x00ff) | (val << 8); }
 
 	inline void dec_SP() { SP = set_l(SP, SP-1); }
 	inline void inc_SP() { SP = set_l(SP, SP+1); }
 
-	void do_adc_d(UINT8 val);
-	void do_adc_nd(UINT8 val);
-	void do_sbc_d(UINT8 val);
-	void do_sbc_nd(UINT8 val);
+	void do_adc_d(uint8_t val);
+	void do_adc_nd(uint8_t val);
+	void do_sbc_d(uint8_t val);
+	void do_sbc_nd(uint8_t val);
 	void do_arr_d();
 	void do_arr_nd();
 
-	void do_adc(UINT8 val);
-	void do_cmp(UINT8 val1, UINT8 val2);
-	void do_sbc(UINT8 val);
-	void do_bit(UINT8 val);
+	void do_adc(uint8_t val);
+	void do_cmp(uint8_t val1, uint8_t val2);
+	void do_sbc(uint8_t val);
+	void do_bit(uint8_t val);
 	void do_arr();
-	UINT8 do_asl(UINT8 v);
-	UINT8 do_lsr(UINT8 v);
-	UINT8 do_ror(UINT8 v);
-	UINT8 do_rol(UINT8 v);
-	UINT8 do_asr(UINT8 v);
+	uint8_t do_asl(uint8_t v);
+	uint8_t do_lsr(uint8_t v);
+	uint8_t do_ror(uint8_t v);
+	uint8_t do_rol(uint8_t v);
+	uint8_t do_asr(uint8_t v);
 
 #define O(o) void o ## _full(); void o ## _partial()
 

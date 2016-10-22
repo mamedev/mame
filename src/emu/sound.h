@@ -68,7 +68,7 @@ class sound_stream
 		sound_stream *      m_stream;               // owning stream
 		std::vector<stream_sample_t> m_buffer;    // output buffer
 		int                 m_dependents;           // number of dependents
-		INT16               m_gain;                 // gain to apply to the output
+		int16_t               m_gain;                 // gain to apply to the output
 	};
 
 	// stream input class
@@ -83,15 +83,15 @@ class sound_stream
 		stream_output *     m_source;               // pointer to the sound_output for this source
 		std::vector<stream_sample_t> m_resample;  // buffer for resampling to the stream's sample rate
 		attoseconds_t       m_latency_attoseconds;  // latency between this stream and the input stream
-		INT16               m_gain;                 // gain to apply to this input
-		INT16               m_user_gain;            // user-controlled gain to apply to this input
+		int16_t               m_gain;                 // gain to apply to this input
+		int16_t               m_user_gain;            // user-controlled gain to apply to this input
 	};
 
 	// constants
 	static const int OUTPUT_BUFFER_UPDATES      = 5;
-	static const UINT32 FRAC_BITS               = 22;
-	static const UINT32 FRAC_ONE                = 1 << FRAC_BITS;
-	static const UINT32 FRAC_MASK               = FRAC_ONE - 1;
+	static const uint32_t FRAC_BITS               = 22;
+	static const uint32_t FRAC_ONE                = 1 << FRAC_BITS;
+	static const uint32_t FRAC_MASK               = FRAC_ONE - 1;
 
 public:
 	// construction/destruction
@@ -134,21 +134,21 @@ private:
 	void allocate_output_buffers();
 	void postload();
 	void generate_samples(int samples);
-	stream_sample_t *generate_resampled_data(stream_input &input, UINT32 numsamples);
-	void sync_update(void *, INT32);
+	stream_sample_t *generate_resampled_data(stream_input &input, uint32_t numsamples);
+	void sync_update(void *, int32_t);
 
 	// linking information
 	device_t &          m_device;                     // owning device
 	sound_stream *      m_next;                       // next stream in the chain
 
 	// general information
-	UINT32              m_sample_rate;                // sample rate of this stream
-	UINT32              m_new_sample_rate;            // newly-set sample rate for the stream
+	uint32_t              m_sample_rate;                // sample rate of this stream
+	uint32_t              m_new_sample_rate;            // newly-set sample rate for the stream
 	bool                m_synchronous;                // synchronous stream that runs at the rate of its input
 
 	// timing information
 	attoseconds_t       m_attoseconds_per_sample;     // number of attoseconds per sample
-	INT32               m_max_samples_per_update;     // maximum samples per update
+	int32_t               m_max_samples_per_update;     // maximum samples per update
 	emu_timer *         m_sync_timer;                 // update timer for synchronous streams
 
 	// input information
@@ -156,17 +156,17 @@ private:
 	std::vector<stream_sample_t *> m_input_array;   // array of inputs for passing to the callback
 
 	// resample buffer information
-	UINT32              m_resample_bufalloc;          // allocated size of each resample buffer
+	uint32_t              m_resample_bufalloc;          // allocated size of each resample buffer
 
 	// output information
 	std::vector<stream_output> m_output;            // list of streams which directly depend upon us
 	std::vector<stream_sample_t *> m_output_array;  // array of outputs for passing to the callback
 
 	// output buffer information
-	UINT32              m_output_bufalloc;            // allocated size of each output buffer
-	INT32               m_output_sampindex;           // current position within each output buffer
-	INT32               m_output_update_sampindex;    // position at time of last global update
-	INT32               m_output_base_sampindex;      // sample at base of buffer, relative to the current emulated second
+	uint32_t              m_output_bufalloc;            // allocated size of each output buffer
+	int32_t               m_output_sampindex;           // current position within each output buffer
+	int32_t               m_output_update_sampindex;    // position at time of last global update
+	int32_t               m_output_base_sampindex;      // sample at base of buffer, relative to the current emulated second
 
 	// callback information
 	stream_update_delegate  m_callback;                   // callback function
@@ -180,10 +180,10 @@ class sound_manager
 	friend class sound_stream;
 
 	// reasons for muting
-	static const UINT8 MUTE_REASON_PAUSE = 0x01;
-	static const UINT8 MUTE_REASON_UI = 0x02;
-	static const UINT8 MUTE_REASON_DEBUGGER = 0x04;
-	static const UINT8 MUTE_REASON_SYSTEM = 0x08;
+	static const uint8_t MUTE_REASON_PAUSE = 0x01;
+	static const uint8_t MUTE_REASON_UI = 0x02;
+	static const uint8_t MUTE_REASON_DEBUGGER = 0x04;
+	static const uint8_t MUTE_REASON_SYSTEM = 0x08;
 
 	// stream updates
 	static const attotime STREAMS_UPDATE_ATTOTIME;
@@ -219,25 +219,25 @@ public:
 
 private:
 	// internal helpers
-	void mute(bool mute, UINT8 reason);
+	void mute(bool mute, uint8_t reason);
 	void reset();
 	void pause();
 	void resume();
 	void config_load(config_type cfg_type, xml_data_node *parentnode);
 	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
-	void update(void *ptr = nullptr, INT32 param = 0);
+	void update(void *ptr = nullptr, int32_t param = 0);
 
 	// internal state
 	running_machine &   m_machine;              // reference to our machine
 	emu_timer *         m_update_timer;         // timer to drive periodic updates
 
-	UINT32              m_finalmix_leftover;
-	std::vector<INT16>       m_finalmix;
-	std::vector<INT32>       m_leftmix;
-	std::vector<INT32>       m_rightmix;
+	uint32_t              m_finalmix_leftover;
+	std::vector<int16_t>       m_finalmix;
+	std::vector<int32_t>       m_leftmix;
+	std::vector<int32_t>       m_rightmix;
 
-	UINT8               m_muted;
+	uint8_t               m_muted;
 	int                 m_attenuation;
 	int                 m_nosound_mode;
 

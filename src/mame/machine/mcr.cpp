@@ -20,10 +20,10 @@
  *
  *************************************/
 
-UINT8 mcr_cocktail_flip;
+uint8_t mcr_cocktail_flip;
 
-UINT32 mcr_cpu_board;
-UINT32 mcr_sprite_board;
+uint32_t mcr_cpu_board;
+uint32_t mcr_sprite_board;
 
 
 

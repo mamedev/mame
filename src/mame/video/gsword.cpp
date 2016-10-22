@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(gsword_state,josvolly)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(gsword_state,josvolly)
 	/* sprites */
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		uint8_t ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(gsword_state,josvolly)
 
 PALETTE_INIT_MEMBER(gsword_state,gsword)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -84,7 +84,7 @@ PALETTE_INIT_MEMBER(gsword_state,gsword)
 	/* sprites */
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		uint8_t ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -197,7 +197,7 @@ void gsword_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 gsword_state::screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gsword_state::screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

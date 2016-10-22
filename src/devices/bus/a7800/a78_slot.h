@@ -55,24 +55,24 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
-	void nvram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT8* get_nvram_base() { return &m_nvram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.size(); }
-	UINT32 get_nvram_size() { return m_nvram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	void nvram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t* get_nvram_base() { return &m_nvram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
+	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	std::vector<UINT8> m_ram;
-	std::vector<UINT8> m_nvram; // HiScore cart can save scores!
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
+	std::vector<uint8_t> m_nvram; // HiScore cart can save scores!
 	// helpers
-	UINT32 m_base_rom;
+	uint32_t m_base_rom;
 	int m_bank_mask;
 };
 
@@ -88,7 +88,7 @@ class a78_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a78_cart_slot_device();
 
 	// device-level overrides
@@ -132,7 +132,7 @@ private:
 
 	image_verify_result verify_header(char *header);
 	int validate_header(int head, bool log);
-	void internal_header_logging(UINT8 *header, UINT32 len);
+	void internal_header_logging(uint8_t *header, uint32_t len);
 };
 
 

@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 ADDRESS_MAP_END
 
 
-tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
@@ -77,7 +77,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char* shortname, const char* source)
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char* shortname, const char* source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
@@ -106,13 +106,13 @@ static ADDRESS_MAP_START( tms32053_internal_data, AS_DATA, 16, tms32053_device )
 ADDRESS_MAP_END
 
 
-tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__)
 {
 }
 
 
-offs_t tms32051_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms32051_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32051 );
 	return CPU_DISASSEMBLE_NAME(tms32051)(this, buffer, pc, oprom, opram, options);
@@ -123,27 +123,27 @@ offs_t tms32051_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 
 #define ROPCODE()       m_direct->read_word((m_pc++) << 1)
 
-void tms32051_device::CHANGE_PC(UINT16 new_pc)
+void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
 	m_pc = new_pc;
 }
 
-UINT16 tms32051_device::PM_READ16(UINT16 address)
+uint16_t tms32051_device::PM_READ16(uint16_t address)
 {
 	return m_program->read_word(address << 1);
 }
 
-void tms32051_device::PM_WRITE16(UINT16 address, UINT16 data)
+void tms32051_device::PM_WRITE16(uint16_t address, uint16_t data)
 {
 	m_program->write_word(address << 1, data);
 }
 
-UINT16 tms32051_device::DM_READ16(UINT16 address)
+uint16_t tms32051_device::DM_READ16(uint16_t address)
 {
 	return m_data->read_word(address << 1);
 }
 
-void tms32051_device::DM_WRITE16(UINT16 address, UINT16 data)
+void tms32051_device::DM_WRITE16(uint16_t address, uint16_t data)
 {
 	m_data->write_word(address << 1, data);
 }
@@ -161,7 +161,7 @@ void tms32051_device::op_group_bf()
 	(this->*s_opcode_table_bf[m_op & 0xff])();
 }
 
-void tms32051_device::delay_slot(UINT16 startpc)
+void tms32051_device::delay_slot(uint16_t startpc)
 {
 	m_op = ROPCODE();
 	(this->*s_opcode_table[m_op >> 8])();
@@ -281,7 +281,7 @@ void tms32051_device::device_reset()
 	m_pmst.ovly = 0;
 
 	int i;
-	UINT16 src, dst, length;
+	uint16_t src, dst, length;
 
 	src = 0x7800;
 	dst = DM_READ16(src++);
@@ -292,7 +292,7 @@ void tms32051_device::device_reset()
 	/* TODO: if you soft reset on Taito JC it tries to do a 0x7802->0x9007 (0xff00) transfer. */
 	for (i=0; i < (length & 0x7ff); i++)
 	{
-		UINT16 data = DM_READ16(src++);
+		uint16_t data = DM_READ16(src++);
 		PM_WRITE16(dst++, data);
 	}
 }
@@ -368,7 +368,7 @@ void tms32051_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		UINT16 ppc;
+		uint16_t ppc;
 
 		if (m_idle)
 		{
@@ -444,7 +444,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 
 		case 0x07: // PMST
 		{
-			UINT16 r = 0;
+			uint16_t r = 0;
 			r |= m_pmst.iptr << 11;
 			r |= m_pmst.avis << 7;
 			r |= m_pmst.ovly << 5;
@@ -482,7 +482,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 
 		case 0x26: // TCR
 		{
-			UINT16 r = 0;
+			uint16_t r = 0;
 			r |= (m_timer.psc & 0xf) << 6;
 			r |= (m_timer.tddr & 0xf);
 			return r;
@@ -631,7 +631,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 }
 
 
-bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
+bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
 {
 	/* TODO: alignment if offset is odd */
 	if (spacenum == AS_PROGRAM)

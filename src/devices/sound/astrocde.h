@@ -27,7 +27,7 @@ class astrocade_device : public device_t,
 							public device_sound_interface
 {
 public:
-	astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~astrocade_device() { }
 
 protected:
@@ -47,24 +47,24 @@ private:
 private:
 	sound_stream *m_stream;       /* sound stream */
 
-	UINT8       m_reg[8];         /* 8 control registers */
+	uint8_t       m_reg[8];         /* 8 control registers */
 
-	UINT8       m_master_count;   /* current master oscillator count */
-	UINT16      m_vibrato_clock;  /* current vibrato clock */
+	uint8_t       m_master_count;   /* current master oscillator count */
+	uint16_t      m_vibrato_clock;  /* current vibrato clock */
 
-	UINT8       m_noise_clock;    /* current noise generator clock */
-	UINT16      m_noise_state;    /* current noise LFSR state */
+	uint8_t       m_noise_clock;    /* current noise generator clock */
+	uint16_t      m_noise_state;    /* current noise LFSR state */
 
-	UINT8       m_a_count;        /* current tone generator A count */
-	UINT8       m_a_state;        /* current tone generator A state */
+	uint8_t       m_a_count;        /* current tone generator A count */
+	uint8_t       m_a_state;        /* current tone generator A state */
 
-	UINT8       m_b_count;        /* current tone generator B count */
-	UINT8       m_b_state;        /* current tone generator B state */
+	uint8_t       m_b_count;        /* current tone generator B count */
+	uint8_t       m_b_state;        /* current tone generator B state */
 
-	UINT8       m_c_count;        /* current tone generator C count */
-	UINT8       m_c_state;        /* current tone generator C state */
+	uint8_t       m_c_count;        /* current tone generator C count */
+	uint8_t       m_c_state;        /* current tone generator C state */
 
-	UINT8       m_bitswap[256];   /* bitswap table */
+	uint8_t       m_bitswap[256];   /* bitswap table */
 };
 
 extern const device_type ASTROCADE;

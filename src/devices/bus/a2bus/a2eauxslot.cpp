@@ -25,7 +25,7 @@ const device_type A2EAUXSLOT_SLOT = &device_creator<a2eauxslot_slot_device>;
 //-------------------------------------------------
 //  a2eauxslot_slot_device - constructor
 //-------------------------------------------------
-a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2EAUXSLOT_SLOT, "Apple IIe AUX Slot", tag, owner, clock, "a2eauxslot_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 	m_a2eauxslot_tag(nullptr),
@@ -33,7 +33,7 @@ a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, co
 {
 }
 
-a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this), m_a2eauxslot_tag(nullptr), m_a2eauxslot_slottag(nullptr)
 {
@@ -77,14 +77,14 @@ void a2eauxslot_device::static_set_cputag(device_t &device, const char *tag)
 //  a2eauxslot_device - constructor
 //-------------------------------------------------
 
-a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2EAUXSLOT, "Apple IIe AUX Bus", tag, owner, clock, "a2eauxslot", __FILE__), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
 {
 }
 
-a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)

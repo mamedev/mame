@@ -41,12 +41,12 @@ const char *dmk_format::extensions() const
 }
 
 
-int dmk_format::identify(io_generic *io, UINT32 form_factor)
+int dmk_format::identify(io_generic *io, uint32_t form_factor)
 {
 	const int header_size = 16;
-	UINT8 header[header_size];
+	uint8_t header[header_size];
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 
 	io_generic_read(io, header, 0, header_size);
 
@@ -81,10 +81,10 @@ int dmk_format::identify(io_generic *io, UINT32 form_factor)
 }
 
 
-bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool dmk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	const int header_size = 16;
-	UINT8 header[header_size];
+	uint8_t header[header_size];
 
 	io_generic_read(io, header, 0, header_size);
 
@@ -121,8 +121,8 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	{
 		for (int head = 0; head < heads; head++)
 		{
-			std::vector<UINT8> track_data(track_size);
-			std::vector<UINT32> raw_track_data;
+			std::vector<uint8_t> track_data(track_size);
+			std::vector<uint32_t> raw_track_data;
 			int iam_location = -1;
 			int idam_location[64];
 			int dam_location[64];
@@ -137,8 +137,8 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			}
 
 			// Find IDAM locations
-			UINT16 track_header_offset = 0;
-			UINT16 track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
+			uint16_t track_header_offset = 0;
+			uint16_t track_offset = ( ( track_data[track_header_offset + 1] << 8 ) | track_data[track_header_offset] ) & 0x3fff;
 			track_header_offset += 2;
 
 			while ( track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80 )

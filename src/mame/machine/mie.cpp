@@ -87,12 +87,12 @@ machine_config_constructor mie_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(mie);
 }
 
-mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, MIE_JVS, "JVS (MIE)", tag, owner, clock, "mie_jvs", __FILE__)
 {
 }
 
-mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));
@@ -121,7 +121,7 @@ void mie_device::device_start()
 
 	// patch out MIE RAM test
 	// TODO: figure out why SH4 code doesn't wait long enough for internal firmware's RAM test completed in the case of reset
-	UINT32 *rom = (UINT32*)memregion("mie")->base();
+	uint32_t *rom = (uint32_t*)memregion("mie")->base();
 	rom[0x144/4] = 0x0001d8c3;
 }
 
@@ -148,7 +148,7 @@ READ8_MEMBER(mie_device::control_r)
 
 WRITE8_MEMBER(mie_device::control_w)
 {
-	UINT32 prev_control = control;
+	uint32_t prev_control = control;
 	int shift = offset*8;
 	control = (control & ~(255 << shift)) | (data << shift);
 
@@ -189,7 +189,7 @@ void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param, 
 	}
 }
 
-void mie_device::maple_w(const UINT32 *data, UINT32 in_size)
+void mie_device::maple_w(const uint32_t *data, uint32_t in_size)
 {
 	memcpy(tbuf, data, in_size*4);
 	lreg = in_size-1;
@@ -337,8 +337,8 @@ READ8_MEMBER(mie_device::jvs_r)
 	if (jvs_lcr & 0x80)
 		return 0;
 
-	const UINT8 *buf;
-	UINT32 size;
+	const uint8_t *buf;
+	uint32_t size;
 	jvs->get_encoded_reply(buf, size);
 	if(jvs_rpos >= size)
 		return 0;
@@ -363,8 +363,8 @@ READ8_MEMBER(mie_device::jvs_status_r)
 	// 01 = ready for reading
 	// 20 = ready for writing
 	// 40 = sending done
-	const UINT8 *buf;
-	UINT32 size;
+	const uint8_t *buf;
+	uint32_t size;
 	jvs->get_encoded_reply(buf, size);
 	return 0x60 | (jvs_rpos < size ? 1 : 0);
 }

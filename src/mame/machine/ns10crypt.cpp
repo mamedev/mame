@@ -219,7 +219,7 @@ ns10_type2_decrypter_device::ns10_type2_decrypter_device(device_type type, const
 {
 }
 
-uint16_t ns10_type2_decrypter_device::decrypt(UINT16 cipherword)
+uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 {
 	uint16_t plainword = cipherword ^ _mask;
 
@@ -274,7 +274,7 @@ gf2_reducer::gf2_reducer()
 	}
 }
 
-int gf2_reducer::gf2_reduce(UINT64 num)const
+int gf2_reducer::gf2_reduce(uint64_t num)const
 {
 	return
 		_gf2Reduction[num & 0xffff]         ^

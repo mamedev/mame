@@ -30,7 +30,7 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	printf("\ncopyright string:\n");
 	for (int i = 0xffe0; i<0xfff0; i++)
 	{

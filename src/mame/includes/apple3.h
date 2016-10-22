@@ -92,7 +92,7 @@ public:
 	DECLARE_DRIVER_INIT(apple3);
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
-	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
 	TIMER_CALLBACK_MEMBER(scanstart_cb);
 	TIMER_CALLBACK_MEMBER(scanend_cb);
@@ -110,11 +110,11 @@ public:
 	void graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void graphics_chires(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset);
-	UINT8 *apple3_get_zpa_addr(offs_t offset);
+	uint8_t *apple3_bankaddr(uint16_t bank, offs_t offset);
+	uint8_t *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
-	void apple3_via_out(UINT8 *var, UINT8 data);
-	UINT8 *apple3_get_indexed_addr(offs_t offset);
+	void apple3_via_out(uint8_t *var, uint8_t data);
+	uint8_t *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	DECLARE_PALETTE_INIT(apple3);
 	void apple3_irq_update();
@@ -129,34 +129,34 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 
 	// these need to be public for now
-	UINT32 m_flags;
+	uint32_t m_flags;
 	int m_enable_mask;
 
 private:
 	int m_acia_irq;
-	UINT8 m_via_0_a;
-	UINT8 m_via_0_b;
-	UINT8 m_via_1_a;
-	UINT8 m_via_1_b;
+	uint8_t m_via_0_a;
+	uint8_t m_via_0_b;
+	uint8_t m_via_1_a;
+	uint8_t m_via_1_b;
 	int m_via_0_irq;
 	int m_via_1_irq;
 	offs_t m_zpa;
-	UINT8 m_last_n;
-	UINT8 m_char_mem[0x800];
-	std::unique_ptr<UINT32[]> m_hgr_map;
+	uint8_t m_last_n;
+	uint8_t m_char_mem[0x800];
+	std::unique_ptr<uint32_t[]> m_hgr_map;
 
 	bool m_sync;
 	bool m_rom_has_been_disabled;
 	int m_cnxx_slot;
-	UINT8 m_indir_bank;
+	uint8_t m_indir_bank;
 
-	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
-	UINT8 *m_bank10, *m_bank11;
-	UINT8 *m_bank6, *m_bank7rd, *m_bank7wr;
+	uint8_t *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
+	uint8_t *m_bank10, *m_bank11;
+	uint8_t *m_bank6, *m_bank7rd, *m_bank7wr;
 	int m_bell_state;
 	int m_c040_time;
-	UINT16 m_lastchar, m_strobe;
-	UINT8 m_transchar;
+	uint16_t m_lastchar, m_strobe;
+	uint8_t m_transchar;
 
 	emu_timer *m_scanstart, *m_scanend;
 

@@ -75,7 +75,7 @@ class wd2010_device :   public device_t
 {
 public:
 	// construction/destruction
-	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_intrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_bdrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_bdrq_cb.set_callback(object); }
@@ -106,16 +106,16 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	void compute_correction(UINT8 data);
-	void set_parameter(UINT8 data);
-	void restore(UINT8 data);
-	void seek(UINT8 data);
-	void read_sector(UINT8 data);
-	void write_sector(UINT8 data);
-	void scan_id(UINT8 data);
-	void update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new_cylinder, UINT8 new_sectornr);
-	void auto_scan_id(UINT8 data);
-	void format(UINT8 data);
+	void compute_correction(uint8_t data);
+	void set_parameter(uint8_t data);
+	void restore(uint8_t data);
+	void seek(uint8_t data);
+	void read_sector(uint8_t data);
+	void write_sector(uint8_t data);
+	void scan_id(uint8_t data);
+	void update_sdh(uint8_t new_sector_size, uint8_t new_head, uint16_t new_cylinder, uint8_t new_sectornr);
+	void auto_scan_id(uint8_t data);
+	void format(uint8_t data);
 
 	devcb_write_line    m_out_intrq_cb;
 	devcb_write_line    m_out_bdrq_cb;
@@ -133,22 +133,22 @@ private:
 	devcb_read_line     m_in_tk000_cb;
 	devcb_read_line     m_in_sc_cb;
 
-	UINT8 m_status;
-	UINT8 m_error;
-	UINT8 m_task_file[8];
+	uint8_t m_status;
+	uint8_t m_error;
+	uint8_t m_task_file[8];
 
 	emu_timer   *cmd_timer;
 	emu_timer   *complete_write_when_buffer_ready_high;
 	emu_timer   *deassert_write_when_buffer_ready_low;
 	emu_timer   *deassert_read_when_buffer_ready_high;
 
-	void complete_write_sector(UINT8 status);
-	void complete_cmd(UINT8 status);
-	void complete_immediate(UINT8 status);
+	void complete_write_sector(uint8_t status);
+	void complete_cmd(uint8_t status);
+	void complete_immediate(uint8_t status);
 
 	bool is_buffer_ready;
 
-	UINT32 m_present_cylinder; // Present Cylinder Position Register
+	uint32_t m_present_cylinder; // Present Cylinder Position Register
 };
 
 // device type definition

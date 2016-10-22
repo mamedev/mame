@@ -292,11 +292,11 @@
 #include "dpoker.lh"
 
 
-static UINT8 input_mux;
-static UINT8 last_op4;
+static uint8_t input_mux;
+static uint8_t last_op4;
 
-static UINT8 dpoker_coin_status;
-static UINT8 dpoker_output;
+static uint8_t dpoker_coin_status;
+static uint8_t dpoker_output;
 
 
 
@@ -411,7 +411,7 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 	// d3: Coin-out Down
 	// d6: Coin-drop Hit
 	// d7: Coin-drop Release
-	UINT8 p0 = ioport("ssio:IP0")->read();
+	uint8_t p0 = ioport("ssio:IP0")->read();
 	p0 |= (dpoker_coin_status >> 1 & 1);
 	p0 ^= (p0 << 1 & 0x80) | dpoker_coin_status;
 	return p0;
@@ -642,7 +642,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
-	UINT8 val = m_sio_txda << 7;
+	uint8_t val = m_sio_txda << 7;
 
 	if (space.device().safe_pc() != 0x107)
 		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);

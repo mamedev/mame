@@ -38,7 +38,7 @@ class pps4_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -46,10 +46,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 3; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 3; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -62,9 +62,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -77,32 +77,32 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
-	UINT8   m_A;        //!< Accumulator A(4:1)
-	UINT8   m_X;        //!< X register X(4:1)
-	UINT16  m_P;        //!< program counter P(12:1)
-	UINT16  m_SA;       //!< Shift register SA(12:1)
-	UINT16  m_SB;       //!< Shift register SB(12:1)
-	UINT8   m_Skip;     //!< Skip next instruction
-	UINT16  m_SAG;      //!< Special address generation mask
-	UINT16  m_B;        //!< B register B(12:1) (BL, BM and BH)
-	UINT8   m_C;        //!< Carry flip-flop
-	UINT8   m_FF1;      //!< Flip-flop 1
-	UINT8   m_FF2;      //!< Flip-flop 2
-	UINT8   m_I1;        //!< Most recent instruction I(8:1)
-	UINT8   m_I2;       //!< Most recent parameter I2(8:1)
-	UINT8   m_Ip;       //!< Previous instruction I(8:1)
+	uint8_t   m_A;        //!< Accumulator A(4:1)
+	uint8_t   m_X;        //!< X register X(4:1)
+	uint16_t  m_P;        //!< program counter P(12:1)
+	uint16_t  m_SA;       //!< Shift register SA(12:1)
+	uint16_t  m_SB;       //!< Shift register SB(12:1)
+	uint8_t   m_Skip;     //!< Skip next instruction
+	uint16_t  m_SAG;      //!< Special address generation mask
+	uint16_t  m_B;        //!< B register B(12:1) (BL, BM and BH)
+	uint8_t   m_C;        //!< Carry flip-flop
+	uint8_t   m_FF1;      //!< Flip-flop 1
+	uint8_t   m_FF2;      //!< Flip-flop 2
+	uint8_t   m_I1;        //!< Most recent instruction I(8:1)
+	uint8_t   m_I2;       //!< Most recent parameter I2(8:1)
+	uint8_t   m_Ip;       //!< Previous instruction I(8:1)
 
 	//! return memory at address B(12:1)
-	inline UINT8 M();
+	inline uint8_t M();
 
 	//! write to memory at address B(12:1)
-	inline void W(UINT8 data);
+	inline void W(uint8_t data);
 
 	//! return the next opcode (also in m_I)
-	inline UINT8 ROP();
+	inline uint8_t ROP();
 
 	//! return the next argument (also in m_I2)
-	inline UINT8 ARG();
+	inline uint8_t ARG();
 
 	void iAD();          //!< Add
 	void iADC();         //!< Add with carry-in

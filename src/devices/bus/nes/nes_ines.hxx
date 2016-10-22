@@ -339,10 +339,10 @@ void ines_mapr_setup( int mapper, int *pcb_id )
 
 void nes_cart_slot_device::call_load_ines()
 {
-	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
-	UINT32 prg_size, vrom_size;
-	UINT8 header[0x10];
-	UINT8 mapper, submapper = 0, local_options;
+	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
+	uint32_t prg_size, vrom_size;
+	uint8_t header[0x10];
+	uint8_t mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -797,8 +797,8 @@ void nes_cart_slot_device::call_load_ines()
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (battery_size || mapper_sram_size)
 	{
-		UINT32 tot_size = battery_size + mapper_sram_size;
-		std::vector<UINT8> temp_nvram(tot_size);
+		uint32_t tot_size = battery_size + mapper_sram_size;
+		std::vector<uint8_t> temp_nvram(tot_size);
 		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{
@@ -811,9 +811,9 @@ void nes_cart_slot_device::call_load_ines()
 	}
 }
 
-const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
+const char * nes_cart_slot_device::get_default_card_ines(uint8_t *ROM, uint32_t len)
 {
-	UINT8 mapper, submapper = 0;
+	uint8_t mapper, submapper = 0;
 	bool ines20 = FALSE;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;

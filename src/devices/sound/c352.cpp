@@ -33,7 +33,7 @@ const device_type C352 = &device_creator<c352_device>;
 //  c352_device - constructor
 //-------------------------------------------------
 
-c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C352, "C352", tag, owner, clock, "c352", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24)
@@ -72,16 +72,16 @@ void c352_device::fetch_sample(c352_voice_t* v)
 	}
 	else
 	{
-		INT8 s;
+		int8_t s;
 
-		s = (INT8)read_byte(v->pos);
+		s = (int8_t)read_byte(v->pos);
 
 		if(v->flags & C352_FLG_MULAW)
-			v->sample = m_mulaw_table[(UINT8)s];
+			v->sample = m_mulaw_table[(uint8_t)s];
 		else
 			v->sample = s<<8;
 
-		UINT16 pos = v->pos&0xffff;
+		uint16_t pos = v->pos&0xffff;
 
 		if((v->flags & C352_FLG_LOOP) && v->flags & C352_FLG_REVERSE)
 		{
@@ -124,7 +124,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 {
 
 	int i,j;
-	INT16 s;
+	int16_t s;
 	stream_sample_t *buffer_fl = outputs[0];
 	stream_sample_t *buffer_fr = outputs[1];
 	stream_sample_t *buffer_rl = outputs[2];
@@ -169,33 +169,33 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			out[3] += ((v->flags & C352_FLG_PHASEFR) ? -s * (v->vol_r&0xff) : s * (v->vol_r&0xff))>>8;
 		}
 
-		*buffer_fl++ = (INT16) (out[0]>>3);
-		*buffer_fr++ = (INT16) (out[1]>>3);
-		*buffer_rl++ = (INT16) (out[2]>>3);
-		*buffer_rr++ = (INT16) (out[3]>>3);
+		*buffer_fl++ = (int16_t) (out[0]>>3);
+		*buffer_fr++ = (int16_t) (out[1]>>3);
+		*buffer_rl++ = (int16_t) (out[2]>>3);
+		*buffer_rr++ = (int16_t) (out[3]>>3);
 	}
 
 
 }
 
-UINT16 c352_device::read_reg16(unsigned long address)
+uint16_t c352_device::read_reg16(unsigned long address)
 {
 	m_stream->update();
 
 	const int reg_map[8] =
 	{
-		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
-		offsetof(c352_voice_t,vol_r) / sizeof(UINT16),
-		offsetof(c352_voice_t,freq) / sizeof(UINT16),
-		offsetof(c352_voice_t,flags) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_bank) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_start) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_end) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_loop) / sizeof(UINT16),
+		offsetof(c352_voice_t,vol_f) / sizeof(uint16_t),
+		offsetof(c352_voice_t,vol_r) / sizeof(uint16_t),
+		offsetof(c352_voice_t,freq) / sizeof(uint16_t),
+		offsetof(c352_voice_t,flags) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_bank) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_start) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_end) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_loop) / sizeof(uint16_t),
 	};
 
 	if(address < 0x100)
-		return *((UINT16*)&m_c352_v[address/8]+reg_map[address%8]);
+		return *((uint16_t*)&m_c352_v[address/8]+reg_map[address%8]);
 	else
 		return 0;
 
@@ -208,14 +208,14 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 
 	const int reg_map[8] =
 	{
-		offsetof(c352_voice_t,vol_f) / sizeof(UINT16),
-		offsetof(c352_voice_t,vol_r) / sizeof(UINT16),
-		offsetof(c352_voice_t,freq) / sizeof(UINT16),
-		offsetof(c352_voice_t,flags) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_bank) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_start) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_end) / sizeof(UINT16),
-		offsetof(c352_voice_t,wave_loop) / sizeof(UINT16),
+		offsetof(c352_voice_t,vol_f) / sizeof(uint16_t),
+		offsetof(c352_voice_t,vol_r) / sizeof(uint16_t),
+		offsetof(c352_voice_t,freq) / sizeof(uint16_t),
+		offsetof(c352_voice_t,flags) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_bank) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_start) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_end) / sizeof(uint16_t),
+		offsetof(c352_voice_t,wave_loop) / sizeof(uint16_t),
 	};
 
 	int i;
@@ -223,7 +223,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 	if(address < 0x100)
 	{
 		//printf("w %04lx,%04x, %d\n", address, val, reg_map[address&7]);
-		*((UINT16*)&m_c352_v[address/8]+reg_map[address%8]) = val;
+		*((uint16_t*)&m_c352_v[address/8]+reg_map[address%8]) = val;
 	}
 	else if(address == 0x200)
 		m_control = val;
@@ -282,7 +282,7 @@ void c352_device::device_start()
 			{
 				x = -x;
 			}
-			m_mulaw_table[i] = (UINT16)x;
+			m_mulaw_table[i] = (uint16_t)x;
 	}
 
 	// register save state info

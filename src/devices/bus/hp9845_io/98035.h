@@ -23,7 +23,7 @@ class hp98035_io_card : public hp9845_io_card_device
 {
 public:
 	// construction/destruction
-	hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp98035_io_card();
 
 	// device-level overrides
@@ -42,24 +42,24 @@ private:
 	bool m_intflag;
 	bool m_irq;
 	bool m_idr_full;
-	UINT8 m_idr;	// Input Data Register
-	UINT8 m_odr;	// Output Data Register
-	UINT8 m_error;
-	UINT8 m_triggered;
-	UINT8 m_lost_irq;
-	UINT8 m_ibuffer[ HP98035_IBUFFER_LEN + 1 ];
+	uint8_t m_idr;	// Input Data Register
+	uint8_t m_odr;	// Output Data Register
+	uint8_t m_error;
+	uint8_t m_triggered;
+	uint8_t m_lost_irq;
+	uint8_t m_ibuffer[ HP98035_IBUFFER_LEN + 1 ];
 	unsigned m_ibuffer_ptr;
-	UINT8 m_obuffer[ HP98035_OBUFFER_LEN ];
+	uint8_t m_obuffer[ HP98035_OBUFFER_LEN ];
 	unsigned m_obuffer_len;
 	unsigned m_obuffer_ptr;
 
 	// Clock/timer state
 	unsigned m_msec;	// Milliseconds
-	UINT8 m_sec;	// Seconds
-	UINT8 m_min;	// Minutes
-	UINT8 m_hrs;	// Hours
-	UINT8 m_dom;	// Day of month
-	UINT8 m_mon;	// Month
+	uint8_t m_sec;	// Seconds
+	uint8_t m_min;	// Minutes
+	uint8_t m_hrs;	// Hours
+	uint8_t m_dom;	// Day of month
+	uint8_t m_mon;	// Month
 	// Strangely enough this RTC has no notion of current year
 	emu_timer *m_msec_timer;
 
@@ -73,8 +73,8 @@ private:
 	typedef struct {
 		unit_state_t m_state;	// State
 		bool m_input;	// Input or output
-		UINT8 m_port;	// Assigned port # (0 if not assigned)
-		UINT8 m_match_datetime[ 4 ];	// Date&time to match (month is not included)
+		uint8_t m_port;	// Assigned port # (0 if not assigned)
+		uint8_t m_match_datetime[ 4 ];	// Date&time to match (month is not included)
 		unsigned m_delay;	// Timer delay
 		unsigned m_period;	// Timer period (when != 0)
 		unsigned m_value;	// Current counter value
@@ -91,16 +91,16 @@ private:
 	void update_irq(void);
 	void update_ibuffer(void);
 	void process_ibuffer(void);
-	bool assign_unit(timer_unit_t& unit , const UINT8*& p , bool input);
-	bool parse_unit_command(const UINT8*& p, unsigned unit_no);
+	bool assign_unit(timer_unit_t& unit , const uint8_t*& p , bool input);
+	bool parse_unit_command(const uint8_t*& p, unsigned unit_no);
 	void clear_obuffer(void);
-	void set_obuffer(UINT8 b);
+	void set_obuffer(uint8_t b);
 	void set_obuffer(const char* s);
 	void update_obuffer(void);
-	void set_error(UINT8 mask);
-	bool parse_datetime(const UINT8*& p, UINT8 *out) const;
-	bool parse_unit_no(const UINT8*& p, unsigned& unit) const;
-	bool parse_msec(const UINT8*& p, unsigned& msec) const;
+	void set_error(uint8_t mask);
+	bool parse_datetime(const uint8_t*& p, uint8_t *out) const;
+	bool parse_unit_no(const uint8_t*& p, unsigned& unit) const;
+	bool parse_msec(const uint8_t*& p, unsigned& msec) const;
 };
 
 // device type definition

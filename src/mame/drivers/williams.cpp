@@ -2996,7 +2996,7 @@ DRIVER_INIT_MEMBER(williams_state,defender)
 
 DRIVER_INIT_MEMBER(williams_state,defndjeu)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);

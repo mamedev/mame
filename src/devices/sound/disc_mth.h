@@ -64,12 +64,12 @@ DISCRETE_CLASS_STEP_RESET(dst_logic_jkff, 1,
 
 DISCRETE_CLASS_STEP_RESET(dst_logic_shift, 1,
 	double          m_t_left;                   /* time unused during last sample in seconds */
-	UINT32          m_shift_data;
-	UINT32          m_bit_mask;
-	UINT8           m_clock_type;
-	UINT8           m_reset_on_high;
-	UINT8           m_shift_r;
-	UINT8           m_last;
+	uint32_t          m_shift_data;
+	uint32_t          m_bit_mask;
+	uint8_t           m_clock_type;
+	uint8_t           m_reset_on_high;
+	uint8_t           m_shift_r;
+	uint8_t           m_last;
 );
 
 DISCRETE_CLASS_STEP(dst_lookup_table, 1, /* no context */ );
@@ -186,9 +186,9 @@ DISCRETE_CLASS_STEP_RESET(dst_mixer, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_op_amp, 1,
-	UINT8           m_has_cap;
-	UINT8           m_has_r1;
-	UINT8           m_has_r4;
+	uint8_t           m_has_cap;
+	uint8_t           m_has_r1;
+	uint8_t           m_has_r4;
 	double          m_v_max;
 	double          m_i_fixed;
 	double          m_v_cap;
@@ -223,8 +223,8 @@ DISCRETE_CLASS_STEP_RESET(dst_tvca_op_amp, 1,
 	double          m_v_cap3;               /* charge on cap c3 */
 	double          m_v_cap4;               /* charge on cap c4 */
 	double          m_r67;                  /* = r6 + r7 (for easy use later) */
-	UINT8           m_has_c4;
-	UINT8           m_has_r4;
+	uint8_t           m_has_c4;
+	uint8_t           m_has_r4;
 );
 
 DISCRETE_CLASS_STEP(dst_xtime_buffer, 1, /* no context */ );

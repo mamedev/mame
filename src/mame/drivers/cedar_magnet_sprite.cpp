@@ -13,7 +13,7 @@
 extern const device_type CEDAR_MAGNET_SPRITE = &device_creator<cedar_magnet_sprite_device>;
 
 
-cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cedar_magnet_board_device(mconfig, CEDAR_MAGNET_SPRITE, "Cedar Sprite", tag, owner, clock, "cedmag_sprite", __FILE__),
 	m_sprite_ram_bankdev(*this, "sp_sub_ram"),
 	m_pio0(*this, "z80pio0"),
@@ -113,7 +113,7 @@ void cedar_magnet_sprite_device::do_blit()
 			int xpos = (m_loweraddr + x);
 			int ypos = (m_upperaddr + y);
 
-			UINT8 data = m_ram[source + ((m_uppersprite & 0x3) * 0x10000)];
+			uint8_t data = m_ram[source + ((m_uppersprite & 0x3) * 0x10000)];
 			
 			if (!(pio0_pb_data & 0x02))
 				data = rand();
@@ -294,7 +294,7 @@ machine_config_constructor cedar_magnet_sprite_device::device_mconfig_additions(
 void cedar_magnet_sprite_device::device_start()
 {
 	m_cpu = subdevice<z80_device>("spritecpu");
-	m_ram = (UINT8*)memshare("ram")->ptr();
+	m_ram = (uint8_t*)memshare("ram")->ptr();
 }
 
 
@@ -307,13 +307,13 @@ void cedar_magnet_sprite_device::device_reset()
 	m_spritesize = 0xff;
 }
 
-UINT32 cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
+uint32_t cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
 {
 //	printf("-----------------------------------------------------------------------------------------------------------\n");
 //	printf("--------------------------------------------- FRAME -------------------------------------------------------\n");
 //	printf("-----------------------------------------------------------------------------------------------------------\n");
 
-	UINT8* mem = m_framebuffer;
+	uint8_t* mem = m_framebuffer;
 	int count = 0;
 
 //	if (!(m_m_spritesize & 0x40))
@@ -321,11 +321,11 @@ UINT32 cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bit
 
 	for (int y = 0;y < 256;y++)
 	{
-		UINT16 *dst = &bitmap.pix16((y)&0xff);
+		uint16_t *dst = &bitmap.pix16((y)&0xff);
 
 		for (int x = 0; x < 256;x++)
 		{
-			UINT8 pix = mem[count];
+			uint8_t pix = mem[count];
 			count++;
 
 			if (pix) dst[(x)&0xff] = pix + palbase*0x100;

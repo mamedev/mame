@@ -16,7 +16,7 @@ const device_type TVC_SOUND = &device_creator<tvc_sound_device>;
 //  tvc_sound_device - constructor
 //-------------------------------------------------
 
-tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TVC_SOUND, "TVC 64 Audio Custom", tag, owner, clock, "tvc_sound", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_write_sndint(*this)
@@ -106,7 +106,7 @@ WRITE8_MEMBER(tvc_sound_device::write)
 
 		case 0:
 		{
-			UINT16 pitch = (m_ports[0] | (m_ports[1]<<8)) & 0x0fff;
+			uint16_t pitch = (m_ports[0] | (m_ports[1]<<8)) & 0x0fff;
 			m_freq = (pitch == 0x0fff) ? 0 : (int)(195312.5 / (4096 - pitch));
 
 			if ((m_ports[1] & 0x20) && m_freq != 0)

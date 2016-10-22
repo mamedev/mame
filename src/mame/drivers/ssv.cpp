@@ -189,7 +189,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 	{
 		if (m_requested_int & (1 << i))
 		{
-			UINT16 vector = m_irq_vectors[i * (16/2)] & 7;
+			uint16_t vector = m_irq_vectors[i * (16/2)] & 7;
 			return vector;
 		}
 	}
@@ -349,8 +349,8 @@ WRITE16_MEMBER(ssv_state::dsp_dr_w)
 
 READ16_MEMBER(ssv_state::dsp_r)
 {
-	UINT16 temp = m_dsp->dataram_r(offset/2);
-	UINT16 res;
+	uint16_t temp = m_dsp->dataram_r(offset/2);
+	uint16_t res;
 
 	if (offset & 1)
 	{
@@ -366,7 +366,7 @@ READ16_MEMBER(ssv_state::dsp_r)
 
 WRITE16_MEMBER(ssv_state::dsp_w)
 {
-	UINT16 temp = m_dsp->dataram_r(offset/2);
+	uint16_t temp = m_dsp->dataram_r(offset/2);
 
 	if (offset & 1)
 	{
@@ -502,7 +502,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::hypreact_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0001) return m_io_key0->read();
 	if (input_sel & 0x0002) return m_io_key1->read();
@@ -625,7 +625,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::srmp4_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0002) return m_io_key0->read();
 	if (input_sel & 0x0004) return m_io_key1->read();
@@ -662,7 +662,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int bank = 0x400000/2 * (data & 1); // UINT16 address
+		int bank = 0x400000/2 * (data & 1); // uint16_t address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
 			m_ensoniq->voice_bank_w(voice, bank);
@@ -672,7 +672,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 
 READ16_MEMBER(ssv_state::srmp7_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0002) return m_io_key0->read();
 	if (input_sel & 0x0004) return m_io_key1->read();
@@ -2511,9 +2511,9 @@ void ssv_state::init_eaglshot_banking()
 // massages the data from the BPMicro-compatible dump to runnable form
 void ssv_state::init_st010()
 {
-	UINT8 *dspsrc = (UINT8 *)memregion("st010")->base();
-	UINT32 *dspprg = (UINT32 *)memregion("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)memregion("dspdata")->base();
+	uint8_t *dspsrc = (uint8_t *)memregion("st010")->base();
+	uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
+	uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2540,7 +2540,7 @@ DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
-//  ((UINT16 *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }

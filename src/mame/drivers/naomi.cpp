@@ -1574,12 +1574,12 @@ Premier Eleven
 
 READ64_MEMBER(naomi_state::naomi_arm_r )
 {
-	return *(reinterpret_cast<UINT64 *>(dc_sound_ram.target())+offset);
+	return *(reinterpret_cast<uint64_t *>(dc_sound_ram.target())+offset);
 }
 
 WRITE64_MEMBER(naomi_state::naomi_arm_w )
 {
-	COMBINE_DATA(reinterpret_cast<UINT64 *>(dc_sound_ram.target()) + offset);
+	COMBINE_DATA(reinterpret_cast<uint64_t *>(dc_sound_ram.target()) + offset);
 }
 
 READ64_MEMBER(naomi_state::naomi_unknown1_r )
@@ -1795,18 +1795,18 @@ ADDRESS_MAP_END
 
 READ64_MEMBER(naomi_state::aw_flash_r )
 {
-	return (UINT64)m_awflash->read(offset*8) | (UINT64)m_awflash->read((offset*8)+1)<<8 | (UINT64)m_awflash->read((offset*8)+2)<<16 | (UINT64)m_awflash->read((offset*8)+3)<<24 |
-			(UINT64)m_awflash->read((offset*8)+4)<<32 | (UINT64)m_awflash->read((offset*8)+5)<<40 | (UINT64)m_awflash->read((offset*8)+6)<<48 | (UINT64)m_awflash->read((offset*8)+7)<<56;
+	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
+			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
 }
 
 WRITE64_MEMBER(naomi_state::aw_flash_w )
 {
 	int i;
-	UINT32 addr = offset * 8;
+	uint32_t addr = offset * 8;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (mem_mask & ((UINT64)0xff)<< (i*8))
+		if (mem_mask & ((uint64_t)0xff)<< (i*8))
 		{
 			addr += i;
 			break;
@@ -1818,7 +1818,7 @@ WRITE64_MEMBER(naomi_state::aw_flash_w )
 	m_awflash->write(addr, data);
 }
 
-inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+inline int naomi_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
 	int reg = offset * 2;
 
@@ -1843,7 +1843,7 @@ inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *
 READ64_MEMBER(naomi_state::aw_modem_r )
 {
 	int reg;
-	UINT64 shift;
+	uint64_t shift;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
 
@@ -1869,11 +1869,11 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 WRITE64_MEMBER(naomi_state::aw_modem_w )
 {
 	int reg;
-	UINT64 shift;
-	UINT32 dat;
+	uint64_t shift;
+	uint32_t dat;
 
 	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+	dat = (uint32_t)(data >> shift);
 	if (reg == 0x284/4)
 	{
 		aw_ctrl_type = dat & 0xF0;
@@ -6990,7 +6990,7 @@ time to go to sleep
 void naomi_write_keyfile(void)
 {
 	// default key structure
-	UINT8 response[10][8] = {
+	uint8_t response[10][8] = {
 	{ ':', 0x70, 0x1f, 0x71, 0x1f, 0x00, 0x00, 0x00 }, // response to kayjyo!?
 	{ '8', 'V',  'E',  'R',  '0',  '0',  '0',  '1'  }, // response to bsec_ver
 	{ '7', 'T',  'E',  'S',  'T',  '_',  'O',  'K'  }, // response to atestpic
@@ -7008,7 +7008,7 @@ void naomi_write_keyfile(void)
 	char picname[256];
 
 	// ######### edit this ###########
-	UINT64 key = 0x4FF16D1A9E0BFBCDULL;
+	uint64_t key = 0x4FF16D1A9E0BFBCDULL;
 
 	memset(bootname,0x00,14);
 	memset(picname,0x00,256);
@@ -7031,7 +7031,7 @@ void naomi_write_keyfile(void)
 
 	for (i=0;i<8;i++)
 	{
-		UINT8 keybyte = (key>>(7-i)*8)&0xff;
+		uint8_t keybyte = (key>>(7-i)*8)&0xff;
 
 		if (i<7)
 		{
@@ -9003,10 +9003,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 {
-	UINT64 *ROM = (UINT64 *)memregion("awflash")->base();
+	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
 
 	// patch out long startup delay
-	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
+	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (uint64_t)0x0009<<48;
 
 	aw_ctrl_type = 0;
 }
@@ -9016,13 +9016,13 @@ READ64_MEMBER(naomi_state::xtrmhnt2_hack_r)
 	// disable ALL.Net board check
 	if (space.device().safe_pc() == 0xc03cb30)
 	{
-		dc_ram[0x357fe/8] |= (UINT64)0x200 << 48;
-		dc_ram[0x358e2/8] |= (UINT64)0x200 << 16;
-		dc_ram[0x38bb2/8] |= (UINT64)0x200 << 16;
-		dc_ram[0x38bee/8] |= (UINT64)0x200 << 48;
+		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
+		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
+		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
+		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
 	}
 	if (space.device().safe_pc() == 0xc108240)
-		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & U64(0xffffffffffff0000)) | (UINT64)0x0009;
+		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & U64(0xffffffffffff0000)) | (uint64_t)0x0009;
 	return 0;
 }
 

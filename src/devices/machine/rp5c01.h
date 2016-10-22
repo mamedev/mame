@@ -52,7 +52,7 @@ class rp5c01_device :   public device_t,
 {
 public:
 	// construction/destruction
-	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(object); }
 	static void remove_battery(device_t &device) { downcast<rp5c01_device &>(device).m_battery_backed = false; }
@@ -89,11 +89,11 @@ private:
 	devcb_write_line m_out_alarm_cb;
 	bool m_battery_backed;
 
-	UINT8 m_reg[2][13];         // clock registers
-	UINT8 m_ram[13];            // RAM
+	uint8_t m_reg[2][13];         // clock registers
+	uint8_t m_ram[13];            // RAM
 
-	UINT8 m_mode;               // mode register
-	UINT8 m_reset;              // reset register
+	uint8_t m_mode;               // mode register
+	uint8_t m_reset;              // reset register
 	int m_alarm;                // alarm output
 	int m_alarm_on;             // alarm condition
 	int m_1hz;                  // 1 Hz condition

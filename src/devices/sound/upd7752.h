@@ -37,7 +37,7 @@ class upd7752_device : public device_t,
 {
 public:
 	// construction/destruction
-	upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -55,12 +55,12 @@ protected:
 private:
 	sound_stream  *m_stream;
 	const address_space_config      m_space_config;
-	UINT8 m_status;
-	UINT16 m_ram_addr;
-	UINT8 m_mode;
-	void status_change(UINT8 flag,bool type);
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	uint8_t m_status;
+	uint16_t m_ram_addr;
+	uint8_t m_mode;
+	void status_change(uint8_t flag,bool type);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 };
 
 

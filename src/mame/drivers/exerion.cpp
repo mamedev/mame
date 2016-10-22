@@ -509,11 +509,11 @@ ROM_END
 
 DRIVER_INIT_MEMBER(exerion_state,exerion)
 {
-	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst;
+	uint32_t oldaddr, newaddr, length;
+	uint8_t *src, *dst;
 
 	/* allocate some temporary space */
-	std::vector<UINT8> temp(0x10000);
+	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];
@@ -556,7 +556,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 
 DRIVER_INIT_MEMBER(exerion_state,exerionb)
 {
-	UINT8 *ram = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

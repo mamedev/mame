@@ -203,7 +203,7 @@ ioport_constructor isa8_pgc_device::device_input_ports() const
 //  isa8_pgc_device - constructor
 //-------------------------------------------------
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_PGC, "IBM Professional Graphics Controller", tag, owner, clock, "isa_ibm_pgc", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
@@ -212,7 +212,7 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
@@ -240,11 +240,11 @@ void isa8_pgc_device::device_start()
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	m_bitmap->fill(0);
 
-	m_vram = std::make_unique<UINT8[]>(0x78000);
+	m_vram = std::make_unique<uint8_t[]>(0x78000);
 	space.install_readwrite_bank(0x80000, 0xf7fff, "vram");
 	membank("vram")->set_base(m_vram.get());
 
-	m_eram = std::make_unique<UINT8[]>(0x8000);
+	m_eram = std::make_unique<uint8_t[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(isa8_pgc_device::reset_common), this));
 }
@@ -287,7 +287,7 @@ IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 // memory handlers
 
 READ8_MEMBER( isa8_pgc_device::stateparam_r ) {
-	UINT8 ret;
+	uint8_t ret;
 
 	ret = m_stateparam[offset >> 1];
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -306,7 +306,7 @@ WRITE8_MEMBER( isa8_pgc_device::stateparam_w ) {
 }
 
 WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
-	UINT8 o = (offset >> 1) * 3;
+	uint8_t o = (offset >> 1) * 3;
 
 	if (offset & 1) {
 		m_lut[o + 2] = (data & 15) << 4;
@@ -336,9 +336,9 @@ READ8_MEMBER( isa8_pgc_device::init_r ) {
 
 TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 {
-	UINT16 x, y = m_screen->vpos();
-	UINT16 *p;
-	UINT8 *v;
+	uint16_t x, y = m_screen->vpos();
+	uint16_t *p;
+	uint8_t *v;
 
 	// XXX hpos shifts every frame -- fix
 	if (y == 0) DBG_LOG(2,"scanline_cb",
@@ -358,7 +358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	}
 }
 
-UINT32 isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, PGC_HORZ_START, PGC_VERT_START, cliprect);
 	return 0;

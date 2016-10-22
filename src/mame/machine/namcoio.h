@@ -11,7 +11,7 @@
 class namcoio_device : public device_t
 {
 public:
-	namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 
 	template<class _Object> static devcb_base &set_in_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_0_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_1_cb.set_callback(object); }
@@ -41,7 +41,7 @@ protected:
 	};
 
 	// internal state
-	UINT8          m_ram[16];
+	uint8_t          m_ram[16];
 
 	devcb_read8 m_in_0_cb;
 	devcb_read8 m_in_1_cb;
@@ -51,12 +51,12 @@ protected:
 	devcb_write8 m_out_1_cb;
 
 	int            m_reset;
-	INT32          m_lastcoins, m_lastbuttons;
-	INT32          m_credits;
-	INT32          m_coins[2];
-	INT32          m_coins_per_cred[2];
-	INT32          m_creds_per_coin[2];
-	INT32          m_in_count;
+	int32_t          m_lastcoins, m_lastbuttons;
+	int32_t          m_credits;
+	int32_t          m_coins[2];
+	int32_t          m_coins_per_cred[2];
+	int32_t          m_creds_per_coin[2];
+	int32_t          m_in_count;
 
 	void handle_coins( int swap );
 
@@ -69,7 +69,7 @@ private:
 class namco56xx_device : public namcoio_device
 {
 public:
-	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void customio_run() override;
 };
@@ -77,7 +77,7 @@ public:
 class namco58xx_device : public namcoio_device
 {
 public:
-	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void customio_run() override;
 };
@@ -85,7 +85,7 @@ public:
 class namco59xx_device : public namcoio_device
 {
 public:
-	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void customio_run() override;
 };

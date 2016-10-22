@@ -35,13 +35,13 @@ static const char *const udk_ini[12] = {
 	""
 };
 
-static const UINT16 udk_offset[12] =
+static const uint16_t udk_offset[12] =
 {
 	0x0000, 0x002a, 0x0054, 0x007e, 0x00a8, 0x00d2,
 	0x0100, 0x012a, 0x0154, 0x017e, 0x01a8, 0x01d2
 };
 
-static const UINT8 printer_charcode[256] =
+static const uint8_t printer_charcode[256] =
 {
 	0xff, 0x7f, 0xbf, 0x3f, 0xdf, 0x5f, 0x9f, 0x1f,
 	0xef, 0x6f, 0xaf, 0x2f, 0xcf, 0x4f, 0x8f, 0x0f,
@@ -77,7 +77,7 @@ static const UINT8 printer_charcode[256] =
 	0xe0, 0x60, 0xa0, 0x20, 0xc0, 0x40, 0x80, 0x00
 };
 
-static const UINT8 t6834_cmd_len[0x47] =
+static const uint8_t t6834_cmd_len[0x47] =
 {
 	0x01, 0x01, 0x01, 0x01, 0x01, 0x03, 0x04, 0x03,
 	0x01, 0x02, 0x09, 0x01, 0x09, 0x01, 0x01, 0x02,
@@ -93,8 +93,8 @@ static const UINT8 t6834_cmd_len[0x47] =
 struct x07_kb
 {
 	const char *tag;        //input port tag
-	UINT8       mask;       //bit mask
-	UINT8       codes[7];   //port codes
+	uint8_t       mask;       //bit mask
+	uint8_t       codes[7];   //port codes
 };
 
 static const x07_kb x07_keycodes[56] =
@@ -184,7 +184,7 @@ public:
 
 	void machine_start() override;
 	void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 
@@ -196,7 +196,7 @@ public:
 	DECLARE_DRIVER_INIT(x07);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	void t6834_cmd(UINT8 cmd);
+	void t6834_cmd(uint8_t cmd);
 	void t6834_r();
 	void t6834_w();
 	void cassette_w();
@@ -207,74 +207,74 @@ public:
 	void cassette_save();
 	void receive_bit(int bit);
 
-	inline UINT8 get_char(UINT16 pos);
-	inline UINT8 kb_get_index(UINT8 char_code);
-	inline void draw_char(UINT8 x, UINT8 y, UINT8 char_pos);
-	inline void draw_point(UINT8 x, UINT8 y, UINT8 color);
+	inline uint8_t get_char(uint16_t pos);
+	inline uint8_t kb_get_index(uint8_t char_code);
+	inline void draw_char(uint8_t x, uint8_t y, uint8_t char_pos);
+	inline void draw_point(uint8_t x, uint8_t y, uint8_t color);
 	inline void draw_udk();
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( x07_card );
 
 	/* general */
-	UINT8 m_sleep;
-	UINT8 m_warm_start;
-	UINT8 m_t6834_ram[0x800];
-	UINT8 m_regs_r[8];
-	UINT8 m_regs_w[8];
-	UINT8 m_alarm[8];
+	uint8_t m_sleep;
+	uint8_t m_warm_start;
+	uint8_t m_t6834_ram[0x800];
+	uint8_t m_regs_r[8];
+	uint8_t m_regs_w[8];
+	uint8_t m_alarm[8];
 
 	struct fifo_buffer
 	{
-		UINT8 data[0x100];
-		UINT8 read;
-		UINT8 write;
+		uint8_t data[0x100];
+		uint8_t read;
+		uint8_t write;
 	};
 	fifo_buffer m_in;
 	fifo_buffer m_out;
 
-	UINT8 m_udk_on;
-	UINT8 m_draw_udk;
-	UINT8 m_sp_on;
-	UINT8 m_font_code;
+	uint8_t m_udk_on;
+	uint8_t m_draw_udk;
+	uint8_t m_sp_on;
+	uint8_t m_font_code;
 	emu_timer *m_rsta_clear;
 	emu_timer *m_rstb_clear;
 	emu_timer *m_beep_stop;
 
 	/* LCD */
-	UINT8 m_lcd_on;
-	UINT8 m_lcd_map[32][120];
-	UINT8 m_scroll_min;
-	UINT8 m_scroll_max;
-	UINT8 m_blink;
+	uint8_t m_lcd_on;
+	uint8_t m_lcd_map[32][120];
+	uint8_t m_scroll_min;
+	uint8_t m_scroll_max;
+	uint8_t m_blink;
 
 	struct lcd_position
 	{
-		UINT8 x;
-		UINT8 y;
-		UINT8 on;
+		uint8_t x;
+		uint8_t y;
+		uint8_t on;
 	};
 	lcd_position m_locate;
 	lcd_position m_cursor;
 
 	/* keyboard */
-	UINT8 m_kb_on;
-	UINT8 m_repeat_key;         //not supported
-	UINT8 m_kb_size;
+	uint8_t m_kb_on;
+	uint8_t m_repeat_key;         //not supported
+	uint8_t m_kb_size;
 
 	/* cassette */
-	UINT8  m_cass_motor;
-	UINT8  m_cass_data;
-	UINT32 m_cass_clk;
-	UINT8  m_bit_count;
+	uint8_t  m_cass_motor;
+	uint8_t  m_cass_data;
+	uint32_t m_cass_clk;
+	uint8_t  m_bit_count;
 	int    m_cass_state;
 	emu_timer *m_cass_poll;
 	emu_timer *m_cass_tick;
 
 	/* printer */
-	UINT8 m_prn_sendbit;
-	UINT8 m_prn_char_code;
-	UINT8 m_prn_buffer[0x100];
-	UINT8 m_prn_size;
+	uint8_t m_prn_sendbit;
+	uint8_t m_prn_char_code;
+	uint8_t m_prn_buffer[0x100];
+	uint8_t m_prn_size;
 	DECLARE_PALETTE_INIT(x07);
 	TIMER_CALLBACK_MEMBER(cassette_tick);
 	TIMER_CALLBACK_MEMBER(cassette_poll);

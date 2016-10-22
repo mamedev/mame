@@ -62,7 +62,7 @@ machine_info::machine_info(running_machine &machine)
 
 std::string machine_info::warnings_string()
 {
-	constexpr UINT32 warning_flags = ( MACHINE_FATAL_FLAGS | MACHINE_WARNING_FLAGS | MACHINE_BTANB_FLAGS );
+	constexpr uint32_t warning_flags = ( MACHINE_FATAL_FLAGS | MACHINE_WARNING_FLAGS | MACHINE_BTANB_FLAGS );
 
 	// if no warnings, nothing to return
 	if (m_machine.rom_load().warnings() == 0 && m_machine.rom_load().knownbad() == 0 && !(m_machine.system().flags & warning_flags) && m_machine.rom_load().software_load_warnings_message().length() == 0)

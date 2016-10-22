@@ -25,12 +25,12 @@
 
 
 image_init_result general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
-	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, UINT16 hiaddress) )
+	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, uint16_t hiaddress) )
 {
 	char buffer[7];
-	std::vector<UINT8> data;
-	UINT32 bytesread;
-	UINT16 address = 0;
+	std::vector<uint8_t> data;
+	uint32_t bytesread;
+	uint16_t address = 0;
 	int i;
 
 	if (!file_type)
@@ -87,7 +87,7 @@ error:
 	return image_init_result::FAIL;
 }
 
-void cbm_quick_sethiaddress( address_space &space, UINT16 hiaddress )
+void cbm_quick_sethiaddress( address_space &space, uint16_t hiaddress )
 {
 	space.write_byte(0xae, hiaddress & 0xff);
 	space.write_byte(0x31, hiaddress & 0xff);

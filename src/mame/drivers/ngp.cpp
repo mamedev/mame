@@ -155,18 +155,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT8 m_io_reg[0x40];
-	UINT8 m_old_to3;
+	uint8_t m_io_reg[0x40];
+	uint8_t m_old_to3;
 	emu_timer* m_seconds_timer;
 
 	struct {
 		int     present;
-		UINT8   manufacturer_id;
-		UINT8   device_id;
-		UINT8   *data;
-		UINT8   org_data[16];
+		uint8_t   manufacturer_id;
+		uint8_t   device_id;
+		uint8_t   *data;
+		uint8_t   org_data[16];
 		int     state;
-		UINT8   command[2];
+		uint8_t   command[2];
 	} m_flash_chip[2];
 
 	required_device<cpu_device> m_tlcs900;
@@ -175,13 +175,13 @@ public:
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
 	required_device<generic_slot_device> m_cart;
-	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
 
 	DECLARE_READ8_MEMBER( ngp_io_r );
 	DECLARE_WRITE8_MEMBER( ngp_io_w );
 
-	void flash_w( int which, offs_t offset, UINT8 data );
+	void flash_w( int which, offs_t offset, uint8_t data );
 	DECLARE_WRITE8_MEMBER( flash0_w );
 	DECLARE_WRITE8_MEMBER( flash1_w );
 
@@ -194,7 +194,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ngp_vblank_pin_w );
 	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
-	UINT32 screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
@@ -248,7 +248,7 @@ TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 
 READ8_MEMBER( ngp_state::ngp_io_r )
 {
-	UINT8 data = m_io_reg[offset];
+	uint8_t data = m_io_reg[offset];
 
 	switch( offset )
 	{
@@ -322,7 +322,7 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 }
 
 
-void ngp_state::flash_w( int which, offs_t offset, UINT8 data )
+void ngp_state::flash_w( int which, offs_t offset, uint8_t data )
 {
 	if ( ! m_flash_chip[which].present )
 		return;
@@ -346,7 +346,7 @@ void ngp_state::flash_w( int which, offs_t offset, UINT8 data )
 			if ( m_flash_chip[which].command[0] == 0x80 )
 			{
 				int size = 0x10000;
-				UINT8 *block = m_flash_chip[which].data;
+				uint8_t *block = m_flash_chip[which].data;
 
 				m_flash_chip[which].state = F_AUTO_BLOCK_ERASE;
 				switch( m_flash_chip[which].device_id )
@@ -648,7 +648,7 @@ void ngp_state::machine_start()
 	if (m_cart->exists())
 	{
 		std::string region_tag;
-		UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
+		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x3fffff, "flash0");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x9fffff, "flash1");
@@ -732,7 +732,7 @@ void ngp_state::machine_reset()
 }
 
 
-UINT32 ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k1ge->update( bitmap, cliprect );
 	return 0;
@@ -741,7 +741,7 @@ UINT32 ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap,
 
 DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
 	{

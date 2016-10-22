@@ -33,11 +33,11 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_sound_flag;
-	UINT8 m_tile_bank;
+	uint8_t m_sound_flag;
+	uint8_t m_tile_bank;
 
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(player_mux_w);
@@ -57,7 +57,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
 };
@@ -65,7 +65,7 @@ public:
 
 TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
 	code |= 0x200 * m_tile_bank;
 
@@ -83,7 +83,7 @@ void wink_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -91,7 +91,7 @@ UINT32 wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitma
 
 WRITE8_MEMBER(wink_state::bgram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -426,9 +426,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wink_state,wink)
 {
-	UINT32 i;
-	UINT8 *ROM = memregion("maincpu")->base();
-	std::vector<UINT8> buffer(0x8000);
+	uint32_t i;
+	uint8_t *ROM = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 

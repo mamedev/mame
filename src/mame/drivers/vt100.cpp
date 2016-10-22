@@ -57,19 +57,19 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
 	bool m_vertical_int;
 	bool m_key_scan;
-	UINT8 m_key_code;
+	uint8_t m_key_code;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
-	UINT8 bit_sel(UINT8 data);
+	uint8_t bit_sel(uint8_t data);
 };
 
 
@@ -108,13 +108,13 @@ ADDRESS_MAP_END
 // 7 - Keyboard TBMT H
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_crtc->lba7_r(space, 0) << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
 }
 
-UINT8 vt100_state::bit_sel(UINT8 data)
+uint8_t vt100_state::bit_sel(uint8_t data)
 {
 	if (!BIT(data,7)) return 0x70;
 	if (!BIT(data,6)) return 0x60;
@@ -129,7 +129,7 @@ UINT8 vt100_state::bit_sel(UINT8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 {
-	UINT8 i, code;
+	uint8_t i, code;
 	char kbdrow[8];
 	if (m_key_scan)
 	{
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
-UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_crtc->video_update(bitmap, cliprect);
 	return 0;
@@ -337,7 +337,7 @@ UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bit
 //          all other set to 1
 IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
 {
-	UINT8 ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
+	uint8_t ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
 	m_receiver_int = 0;
 	return ret;
 }

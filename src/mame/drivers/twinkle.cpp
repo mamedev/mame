@@ -261,17 +261,17 @@ public:
 
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<ata_interface_device> m_ata;
-	required_region_ptr<UINT16> m_waveram;
+	required_region_ptr<uint16_t> m_waveram;
 
-	UINT16 m_spu_ctrl;      // SPU board control register
-	UINT8 m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
-	UINT32 m_spu_ata_dma;
+	uint16_t m_spu_ctrl;      // SPU board control register
+	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
+	uint32_t m_spu_ata_dma;
 	int m_spu_ata_dmarq;
 
 	int m_io_offset;
 	int m_output_last[ 0x100 ];
 	int m_last_io_offset;
-	UINT8 m_sector_buffer[ 4096 ];
+	uint8_t m_sector_buffer[ 4096 ];
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
 	DECLARE_READ8_MEMBER(twinkle_io_r);
 	DECLARE_WRITE16_MEMBER(twinkle_output_w);
@@ -328,7 +328,7 @@ public:
 //   D2  D1
 
 
-static const UINT16 asciicharset[]=
+static const uint16_t asciicharset[]=
 {
 	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_J | LED_M, // 0
 	LED_B | LED_C, // 1
@@ -534,7 +534,7 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 
 READ8_MEMBER(twinkle_state::twinkle_io_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch( offset )
 	{
@@ -686,7 +686,7 @@ WRITE8_MEMBER(twinkle_state::shared_psx_w)
 
 READ8_MEMBER(twinkle_state::shared_psx_r)
 {
-	UINT32 result = m_spu_shared[offset];
+	uint32_t result = m_spu_shared[offset];
 
 	//printf("shared_psx_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
@@ -777,7 +777,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 
 			while (m_spu_ata_dmarq)
 			{
-				UINT16 data = m_ata->read_dma();
+				uint16_t data = m_ata->read_dma();
 				//printf("spu_ata_dmarq %08x %04x\n", m_spu_ata_dma * 2, data);
 				//waveram[m_spu_ata_dma++] = (data >> 8) | (data << 8);
 				// bp 4a0e ;bmiidx4 checksum
@@ -809,7 +809,7 @@ WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 
 READ16_MEMBER(twinkle_state::shared_68k_r)
 {
-	UINT16 result = m_spu_shared[offset];
+	uint16_t result = m_spu_shared[offset];
 
 //  printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
@@ -848,7 +848,7 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;
@@ -891,7 +891,7 @@ static void scsi_dma_read( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_ad
 	}
 }
 
-static void scsi_dma_write( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;

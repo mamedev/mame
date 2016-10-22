@@ -80,19 +80,19 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_shared_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_shared_ram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	UINT8    m_bg_bank;
+	uint8_t    m_bg_bank;
 
 	/* misc */
-	UINT8 m_deposits1;
-	UINT8 m_deposits2;
-	UINT8 m_credits;
-	UINT8 m_coinvalue;
+	uint8_t m_deposits1;
+	uint8_t m_deposits2;
+	uint8_t m_credits;
+	uint8_t m_coinvalue;
 	int m_mcu_latch;
 
 	DECLARE_WRITE16_MEMBER(sound_w);
@@ -101,7 +101,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(meijinsn);
-	UINT32 screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
 };
 
@@ -115,8 +115,8 @@ WRITE16_MEMBER(meijinsn_state::sound_w)
 
 READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 {
-	static const UINT8 coinage1[2][2] = {{1,1}, {1,2}};
-	static const UINT8 coinage2[2][2] = {{1,5}, {2,1}};
+	static const uint8_t coinage1[2][2] = {{1,1}, {1,2}};
+	static const uint8_t coinage2[2][2] = {{1,5}, {2,1}};
 
 	int source = m_shared_ram[offset];
 
@@ -259,7 +259,7 @@ void meijinsn_state::video_start()
 
 PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -297,7 +297,7 @@ PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
 }
 
 
-UINT32 meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

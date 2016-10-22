@@ -73,7 +73,7 @@ machine_config_constructor wangpc_lic_device::device_mconfig_additions() const
 //  wangpc_lic_device - constructor
 //-------------------------------------------------
 
-wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WANGPC_LIC, "Wang PC-PM070", tag, owner, clock, "wangpc_lic", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this)
 {
@@ -102,9 +102,9 @@ void wangpc_lic_device::device_reset()
 //  wangpcbus_mrdc_r - memory read
 //-------------------------------------------------
 
-UINT16 wangpc_lic_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_lic_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	return data;
 }
@@ -114,7 +114,7 @@ UINT16 wangpc_lic_device::wangpcbus_mrdc_r(address_space &space, offs_t offset, 
 //  wangpcbus_amwc_w - memory write
 //-------------------------------------------------
 
-void wangpc_lic_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_lic_device::wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 }
 
@@ -123,9 +123,9 @@ void wangpc_lic_device::wangpcbus_amwc_w(address_space &space, offs_t offset, UI
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-UINT16 wangpc_lic_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_lic_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (sad(offset))
 	{
@@ -145,7 +145,7 @@ UINT16 wangpc_lic_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_lic_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_lic_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset))
 	{

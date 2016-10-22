@@ -31,7 +31,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 const device_type S3C44B0 = &device_creator<s3c44b0_device>;
 
-s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__), m_cpu(nullptr),
 					m_port_r_cb(*this),
 					m_port_w_cb(*this),
@@ -283,8 +283,8 @@ void s3c44b0_device::device_reset()
 
 #define CLOCK_MULTIPLIER 1
 
-#define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
-#define CLR_BITS(x,m,n) ((x) & ~((((UINT32)1 << ((m) - (n) + 1)) - 1) << n))
+#define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
+#define CLR_BITS(x,m,n) ((x) & ~((((uint32_t)1 << ((m) - (n) + 1)) - 1) << n))
 
 
 /***************************************************************************
@@ -293,24 +293,24 @@ void s3c44b0_device::device_reset()
 
 /* LCD Controller */
 
-rgb_t s3c44b0_device::lcd_get_color_stn_04(UINT8 data)
+rgb_t s3c44b0_device::lcd_get_color_stn_04(uint8_t data)
 {
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	r = g = b = BITS(data, 3, 0) << 4;
 	return rgb_t(r, g, b);
 }
 
-UINT8 s3c44b0_device::lcd_get_color_stn_08_r(UINT8 data)
+uint8_t s3c44b0_device::lcd_get_color_stn_08_r(uint8_t data)
 {
 	return ((m_lcd.regs.redlut >> (BITS(data, 7, 5) << 2)) & 0xf) << 4;
 }
 
-UINT8 s3c44b0_device::lcd_get_color_stn_08_g(UINT8 data)
+uint8_t s3c44b0_device::lcd_get_color_stn_08_g(uint8_t data)
 {
 	return ((m_lcd.regs.greenlut >> (BITS(data, 4, 2) << 2)) & 0xf) << 4;
 }
 
-UINT8 s3c44b0_device::lcd_get_color_stn_08_b(UINT8 data)
+uint8_t s3c44b0_device::lcd_get_color_stn_08_b(uint8_t data)
 {
 	return ((m_lcd.regs.bluelut >> (BITS(data, 1, 0) << 2)) & 0xf) << 4;
 }
@@ -339,10 +339,10 @@ void s3c44b0_device::lcd_dma_init()
 	lcd_dma_reload();
 }
 
-void s3c44b0_device::lcd_dma_read(int count, UINT8 *data)
+void s3c44b0_device::lcd_dma_read(int count, uint8_t *data)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	UINT8 *vram = (UINT8 *)space.get_read_ptr(m_lcd.vramaddr_cur);
+	uint8_t *vram = (uint8_t *)space.get_read_ptr(m_lcd.vramaddr_cur);
 	for (int i = 0; i < count / 2; i++)
 	{
 		if (m_lcd.bswp == 0)
@@ -373,7 +373,7 @@ void s3c44b0_device::lcd_dma_read(int count, UINT8 *data)
 				lcd_dma_reload();
 			}
 			m_lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space.get_read_ptr(m_lcd.vramaddr_cur);
+			vram = (uint8_t *)space.get_read_ptr(m_lcd.vramaddr_cur);
 		}
 		else
 		{
@@ -385,8 +385,8 @@ void s3c44b0_device::lcd_dma_read(int count, UINT8 *data)
 
 void s3c44b0_device::lcd_render_stn_04()
 {
-	UINT8 *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
-	UINT8 data[16];
+	uint8_t *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
+	uint8_t data[16];
 	lcd_dma_read(16, data);
 	for (auto & elem : data)
 	{
@@ -411,12 +411,12 @@ void s3c44b0_device::lcd_render_stn_04()
 
 void s3c44b0_device::lcd_render_stn_08()
 {
-	UINT8 *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
-	UINT8 data[16];
+	uint8_t *bitmap = m_lcd.bitmap.get() + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
+	uint8_t data[16];
 	lcd_dma_read(16, data);
 	for (auto & elem : data)
 	{
-		UINT8 xxx[3];
+		uint8_t xxx[3];
 		xxx[0] = lcd_get_color_stn_08_r(elem);
 		xxx[1] = lcd_get_color_stn_08_g(elem);
 		xxx[2] = lcd_get_color_stn_08_b(elem);
@@ -499,7 +499,7 @@ void s3c44b0_device::video_start()
 	// do nothing
 }
 
-UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_lcd.regs.lcdcon1 & (1 << 0))
 	{
@@ -507,8 +507,8 @@ UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			for (int y = 0; y < screen.height(); y++)
 			{
-				UINT32 *scanline = &bitmap.pix32(y);
-				UINT8 *vram = m_lcd.bitmap.get() + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
+				uint32_t *scanline = &bitmap.pix32(y);
+				uint8_t *vram = m_lcd.bitmap.get() + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
 				for (int x = 0; x < screen.width(); x++)
 				{
 					*scanline++ = rgb_t(vram[0], vram[1], vram[2]);
@@ -521,7 +521,7 @@ UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for (int y = 0; y < screen.height(); y++)
 		{
-			UINT32 *scanline = &bitmap.pix32(y);
+			uint32_t *scanline = &bitmap.pix32(y);
 			memset(scanline, 0, screen.width() * 4);
 		}
 	}
@@ -530,7 +530,7 @@ UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 READ32_MEMBER( s3c44b0_device::lcd_r )
 {
-	UINT32 data = ((UINT32*)&m_lcd.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_LCDCON1 :
@@ -596,7 +596,7 @@ void s3c44b0_device::lcd_configure()
 	{
 		m_lcd.bitmap = nullptr;
 	}
-	m_lcd.bitmap = std::make_unique<UINT8[]>((m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
+	m_lcd.bitmap = std::make_unique<uint8_t[]>((m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
 	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
 	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);
@@ -635,9 +635,9 @@ void s3c44b0_device::lcd_recalc()
 
 WRITE32_MEMBER( s3c44b0_device::lcd_w )
 {
-	UINT32 old_value = ((UINT32*)&m_lcd.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
 //  verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_lcd.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_lcd.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_LCDCON1 :
@@ -654,19 +654,19 @@ WRITE32_MEMBER( s3c44b0_device::lcd_w )
 
 /* Clock & Power Management */
 
-UINT32 s3c44b0_device::get_mclk()
+uint32_t s3c44b0_device::get_mclk()
 {
-	UINT32 data, mdiv, pdiv, sdiv;
+	uint32_t data, mdiv, pdiv, sdiv;
 	data = m_clkpow.regs.pllcon;
 	mdiv = BITS(data, 19, 12);
 	pdiv = BITS(data, 9, 4);
 	sdiv = BITS(data, 1, 0);
-	return (UINT32)((double)((mdiv + 8) * clock()) / (double)((pdiv + 2) * (1 << sdiv)));
+	return (uint32_t)((double)((mdiv + 8) * clock()) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
 READ32_MEMBER( s3c44b0_device::clkpow_r )
 {
-	UINT32 data = ((UINT32*)&m_clkpow.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
 	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
 	return data;
 }
@@ -674,7 +674,7 @@ READ32_MEMBER( s3c44b0_device::clkpow_r )
 WRITE32_MEMBER( s3c44b0_device::clkpow_w )
 {
 	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_clkpow.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_PLLCON :
@@ -699,11 +699,11 @@ WRITE32_MEMBER( s3c44b0_device::clkpow_w )
 void s3c44b0_device::check_pending_irq()
 {
 	// normal irq
-	UINT32 temp = (m_irq.regs.intpnd & ~m_irq.regs.intmsk) & ~m_irq.regs.intmod;
+	uint32_t temp = (m_irq.regs.intpnd & ~m_irq.regs.intmsk) & ~m_irq.regs.intmod;
 
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -728,7 +728,7 @@ void s3c44b0_device::check_pending_irq()
 	temp = (m_irq.regs.intpnd & ~m_irq.regs.intmsk) & m_irq.regs.intmod;
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -750,7 +750,7 @@ void s3c44b0_device::check_pending_irq()
 	}
 }
 
-void s3c44b0_device::request_irq(UINT32 int_type)
+void s3c44b0_device::request_irq(uint32_t int_type)
 {
 	verboselog( *this, 5, "request irq %d\n", int_type);
 	m_irq.regs.intpnd |= (1 << int_type);
@@ -759,10 +759,10 @@ void s3c44b0_device::request_irq(UINT32 int_type)
 
 void s3c44b0_device::check_pending_eint()
 {
-	UINT32 temp = m_gpio.regs.extintpnd;
+	uint32_t temp = m_gpio.regs.extintpnd;
 	if (temp != 0)
 	{
-		UINT32 int_type = 0;
+		uint32_t int_type = 0;
 		while ((temp & 1) == 0)
 		{
 			int_type++;
@@ -772,7 +772,7 @@ void s3c44b0_device::check_pending_eint()
 	}
 }
 
-void s3c44b0_device::request_eint(UINT32 number)
+void s3c44b0_device::request_eint(uint32_t number)
 {
 	verboselog( *this, 5, "request external interrupt %d\n", number);
 	if (number < 4)
@@ -788,7 +788,7 @@ void s3c44b0_device::request_eint(UINT32 number)
 
 READ32_MEMBER( s3c44b0_device::irq_r )
 {
-	UINT32 data = ((UINT32*)&m_irq.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
 	return data;
 }
@@ -796,7 +796,7 @@ READ32_MEMBER( s3c44b0_device::irq_r )
 WRITE32_MEMBER( s3c44b0_device::irq_w )
 {
 	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_irq.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_irq.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_INTMSK :
@@ -822,10 +822,10 @@ WRITE32_MEMBER( s3c44b0_device::irq_w )
 
 /* PWM Timer */
 
-UINT16 s3c44b0_device::pwm_calc_observation(int ch)
+uint16_t s3c44b0_device::pwm_calc_observation(int ch)
 {
 	double timeleft, x1, x2;
-	UINT32 cnto;
+	uint32_t cnto;
 	timeleft = (m_pwm.timer[ch]->remaining()).as_double();
 //  printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, m_pwm.freq[ch], m_pwm.cnt[ch], m_pwm.cmp[ch]);
 	x1 = 1 / ((double)m_pwm.freq[ch] / (m_pwm.cnt[ch]- m_pwm.cmp[ch] + 1));
@@ -838,7 +838,7 @@ UINT16 s3c44b0_device::pwm_calc_observation(int ch)
 
 READ32_MEMBER( s3c44b0_device::pwm_r )
 {
-	UINT32 data = ((UINT32*)&m_pwm.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_pwm.regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_TCNTO0 :
@@ -881,7 +881,7 @@ void s3c44b0_device::pwm_start(int timer)
 	const int mux_table[] = { 2, 4, 8, 16};
 	const int prescaler_shift[] = { 0, 0, 8, 8, 16, 16};
 	const int mux_shift[] = { 0, 4, 8, 12, 16, 20};
-	UINT32 mclk, prescaler, mux, cnt, cmp, auto_reload;
+	uint32_t mclk, prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
 	verboselog( *this, 1, "PWM %d start\n", timer);
 	mclk = get_mclk();
@@ -993,9 +993,9 @@ void s3c44b0_device::pwm_recalc(int timer)
 
 WRITE32_MEMBER( s3c44b0_device::pwm_w )
 {
-	UINT32 old_value = ((UINT32*)&m_pwm.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_pwm.regs)[offset];
 	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C44B0_BASE_PWM + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_pwm.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_pwm.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_TCON :
@@ -1084,9 +1084,9 @@ void s3c44b0_device::i2c_send_stop()
 	iface_i2c_scl_w(0);
 }
 
-UINT8 s3c44b0_device::i2c_receive_byte(int ack)
+uint8_t s3c44b0_device::i2c_receive_byte(int ack)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	verboselog( *this, 5, "i2c_receive_byte ...\n");
 	iface_i2c_sda_w(1);
 	for (int i = 0; i < 8; i++)
@@ -1103,7 +1103,7 @@ UINT8 s3c44b0_device::i2c_receive_byte(int ack)
 	return data;
 }
 
-int s3c44b0_device::i2c_send_byte(UINT8 data)
+int s3c44b0_device::i2c_send_byte(uint8_t data)
 {
 	int ack;
 	verboselog( *this, 5, "i2c_send_byte ...\n");
@@ -1159,7 +1159,7 @@ void s3c44b0_device::iic_resume()
 
 READ32_MEMBER( s3c44b0_device::iic_r )
 {
-	UINT32 data = ((UINT32*)&m_iic.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_iic.regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_IICSTAT :
@@ -1174,9 +1174,9 @@ READ32_MEMBER( s3c44b0_device::iic_r )
 
 WRITE32_MEMBER( s3c44b0_device::iic_w )
 {
-	UINT32 old_value = ((UINT32*)&m_iic.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
 	verboselog( *this, 9, "(IIC) %08X <- %08X\n", S3C44B0_BASE_IIC + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_iic.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_iic.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_IICCON :
@@ -1268,7 +1268,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
 
 /* I/O Port */
 
-inline UINT32 s3c44b0_device::iface_gpio_port_r(int port)
+inline uint32_t s3c44b0_device::iface_gpio_port_r(int port)
 {
 	if (!m_port_r_cb.isnull())
 		return (m_port_r_cb)(port);
@@ -1276,7 +1276,7 @@ inline UINT32 s3c44b0_device::iface_gpio_port_r(int port)
 		return 0;
 }
 
-inline void s3c44b0_device::iface_gpio_port_w(int port, UINT32 data)
+inline void s3c44b0_device::iface_gpio_port_w(int port, uint32_t data)
 {
 	if (!m_port_w_cb.isnull())
 		(m_port_w_cb)(port, data, 0xffff);
@@ -1284,7 +1284,7 @@ inline void s3c44b0_device::iface_gpio_port_w(int port, UINT32 data)
 
 READ32_MEMBER( s3c44b0_device::gpio_r )
 {
-	UINT32 data = ((UINT32*)&m_gpio.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_gpio.regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_GPADAT :
@@ -1329,9 +1329,9 @@ READ32_MEMBER( s3c44b0_device::gpio_r )
 
 WRITE32_MEMBER( s3c44b0_device::gpio_w )
 {
-	UINT32 old_value = ((UINT32*)&m_gpio.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_gpio.regs)[offset];
 	verboselog( *this, 9, "(GPIO) %08X <- %08X\n", S3C44B0_BASE_GPIO + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_gpio.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_gpio.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_GPADAT :
@@ -1380,9 +1380,9 @@ WRITE32_MEMBER( s3c44b0_device::gpio_w )
 
 /* UART */
 
-UINT32 s3c44b0_device::uart_r(int ch, UINT32 offset)
+uint32_t s3c44b0_device::uart_r(int ch, uint32_t offset)
 {
-	UINT32 data = ((UINT32*)&m_uart[ch].regs)[offset];
+	uint32_t data = ((uint32_t*)&m_uart[ch].regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_UTRSTAT :
@@ -1392,7 +1392,7 @@ UINT32 s3c44b0_device::uart_r(int ch, UINT32 offset)
 		break;
 		case S3C44B0_URXH :
 		{
-			UINT8 rxdata = data & 0xFF;
+			uint8_t rxdata = data & 0xFF;
 			verboselog( *this, 5, "UART %d read %02X (%c)\n", ch, rxdata, ((rxdata >= 32) && (rxdata < 128)) ? (char)rxdata : '?');
 			m_uart[ch].regs.utrstat &= ~1; // [bit 0] Receive buffer data ready
 		}
@@ -1401,14 +1401,14 @@ UINT32 s3c44b0_device::uart_r(int ch, UINT32 offset)
 	return data;
 }
 
-void s3c44b0_device::uart_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&((UINT32*)&m_uart[ch].regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_uart[ch].regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_UTXH :
 		{
-			UINT8 txdata = data & 0xFF;
+			uint8_t txdata = data & 0xFF;
 			verboselog( *this, 5, "UART %d write %02X (%c)\n", ch, txdata, ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
 #ifdef UART_PRINTF
 			printf( "%c", ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
@@ -1417,7 +1417,7 @@ void s3c44b0_device::uart_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 		break;
 		case S3C44B0_UBRDIV :
 		{
-			UINT32 mclk, hz;
+			uint32_t mclk, hz;
 			mclk = get_mclk();
 			hz = (mclk / (m_uart->regs.ubrdiv + 1)) / 16;
 			verboselog( *this, 5, "UART %d - mclk %08X hz %08X\n", ch, mclk, hz);
@@ -1429,14 +1429,14 @@ void s3c44b0_device::uart_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 READ32_MEMBER( s3c44b0_device::uart_0_r )
 {
-	UINT32 data = uart_r(0, offset);
+	uint32_t data = uart_r(0, offset);
 //  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C44B0_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( s3c44b0_device::uart_1_r )
 {
-	UINT32 data = uart_r(1, offset);
+	uint32_t data = uart_r(1, offset);
 //  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C44B0_BASE_UART_1 + (offset << 2), data);
 	return data;
 }
@@ -1453,7 +1453,7 @@ WRITE32_MEMBER( s3c44b0_device::uart_1_w )
 	uart_w(1, offset, data, mem_mask);
 }
 
-void s3c44b0_device::uart_fifo_w(int uart, UINT8 data)
+void s3c44b0_device::uart_fifo_w(int uart, uint8_t data)
 {
 //  printf("s3c44b0_uart_fifo_w (%c)\n", data);
 	m_uart[uart].regs.urxh = data;
@@ -1473,14 +1473,14 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::uart_timer_exp )
 
 /* Watchdog Timer */
 
-UINT16 s3c44b0_device::wdt_calc_current_count()
+uint16_t s3c44b0_device::wdt_calc_current_count()
 {
 	return 0;
 }
 
 READ32_MEMBER( s3c44b0_device::wdt_r )
 {
-	UINT32 data = ((UINT32*)&m_wdt.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_wdt.regs)[offset];
 	switch (offset)
 	{
 		case S3C44B0_WTCNT :
@@ -1499,7 +1499,7 @@ READ32_MEMBER( s3c44b0_device::wdt_r )
 
 void s3c44b0_device::wdt_start()
 {
-	UINT32 mclk, prescaler, clock;
+	uint32_t mclk, prescaler, clock;
 	double freq, hz;
 	verboselog( *this, 1, "WDT start\n");
 	mclk = get_mclk();
@@ -1528,9 +1528,9 @@ void s3c44b0_device::wdt_recalc()
 
 WRITE32_MEMBER( s3c44b0_device::wdt_w )
 {
-	UINT32 old_value = ((UINT32*)&m_wdt.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C44B0_BASE_WDT + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_wdt.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_wdt.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_WTCON :
@@ -1562,7 +1562,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
 
 READ32_MEMBER( s3c44b0_device::cpuwrap_r )
 {
-	UINT32 data = ((UINT32*)&m_cpuwrap.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_cpuwrap.regs)[offset];
 	verboselog( *this, 9, "(CPUWRAP) %08X -> %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
 	return data;
 }
@@ -1570,21 +1570,21 @@ READ32_MEMBER( s3c44b0_device::cpuwrap_r )
 WRITE32_MEMBER( s3c44b0_device::cpuwrap_w )
 {
 	verboselog( *this, 9, "(CPUWRAP) %08X <- %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_cpuwrap.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_cpuwrap.regs)[offset]);
 }
 
 /* A/D Converter */
 
 READ32_MEMBER( s3c44b0_device::adc_r )
 {
-	UINT32 data = ((UINT32*)&m_adc.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_adc.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X -> %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::adc_start()
 {
-	UINT32 mclk, prescaler;
+	uint32_t mclk, prescaler;
 	double freq, hz;
 	verboselog( *this, 1, "ADC start\n");
 	mclk = get_mclk();
@@ -1611,9 +1611,9 @@ void s3c44b0_device::adc_recalc()
 
 WRITE32_MEMBER( s3c44b0_device::adc_w )
 {
-	UINT32 old_value = ((UINT32*)&m_wdt.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X <- %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_adc.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_adc.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_ADCCON :
@@ -1639,14 +1639,14 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
 
 READ32_MEMBER( s3c44b0_device::sio_r )
 {
-	UINT32 data = ((UINT32*)&m_sio.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_sio.regs)[offset];
 	verboselog( *this, 9, "(SIO) %08X -> %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::sio_start()
 {
-	UINT32 mclk, prescaler;
+	uint32_t mclk, prescaler;
 	double freq, hz;
 	verboselog( *this, 1, "SIO start\n");
 	mclk = get_mclk();
@@ -1675,9 +1675,9 @@ void s3c44b0_device::sio_recalc()
 
 WRITE32_MEMBER( s3c44b0_device::sio_w )
 {
-	UINT32 old_value = ((UINT32*)&m_sio.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_sio.regs)[offset];
 	verboselog( *this, 9, "(SIO) %08X <- %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_sio.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_sio.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_SIOCON :
@@ -1706,7 +1706,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
 
 /* IIS */
 
-inline void s3c44b0_device::iface_i2s_data_w(address_space &space, int ch, UINT16 data)
+inline void s3c44b0_device::iface_i2s_data_w(address_space &space, int ch, uint16_t data)
 {
 	if (!m_data_w_cb.isnull())
 		(m_data_w_cb)(ch, data, 0);
@@ -1714,7 +1714,7 @@ inline void s3c44b0_device::iface_i2s_data_w(address_space &space, int ch, UINT1
 
 void s3c44b0_device::iis_start()
 {
-	UINT32 mclk;
+	uint32_t mclk;
 	int prescaler;
 	double freq, hz;
 	const int div[] = { 2, 4, 6, 8, 10, 12, 14, 16, 1, 0, 3, 0, 5, 0, 7, 0 };
@@ -1735,16 +1735,16 @@ void s3c44b0_device::iis_stop()
 
 READ32_MEMBER( s3c44b0_device::iis_r )
 {
-	UINT32 data = ((UINT32*)&m_iis.regs)[offset];
+	uint32_t data = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X -> %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
 	return data;
 }
 
 WRITE32_MEMBER( s3c44b0_device::iis_w )
 {
-	UINT32 old_value = ((UINT32*)&m_iis.regs)[offset];
+	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X <- %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
-	COMBINE_DATA(&((UINT32*)&m_iis.regs)[offset]);
+	COMBINE_DATA(&((uint32_t*)&m_iis.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_IISCON :
@@ -1797,7 +1797,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::iis_timer_exp )
 void s3c44b0_device::zdma_trigger(int ch)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	UINT32 saddr, daddr;
+	uint32_t saddr, daddr;
 	int dal, dst, opt, das, cnt;
 	verboselog( *this, 5, "s3c44b0_zdma_trigger %d\n", ch);
 	dst = BITS(m_zdma->regs.dcsrc, 31, 30);
@@ -1853,16 +1853,16 @@ void s3c44b0_device::zdma_start(int ch)
 	zdma_trigger(ch);
 }
 
-UINT32 s3c44b0_device::zdma_r(int ch, UINT32 offset)
+uint32_t s3c44b0_device::zdma_r(int ch, uint32_t offset)
 {
-	UINT32 data = ((UINT32*)&m_zdma[ch].regs)[offset];
+	uint32_t data = ((uint32_t*)&m_zdma[ch].regs)[offset];
 	return data;
 }
 
-void s3c44b0_device::zdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void s3c44b0_device::zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	UINT32 old_value = ((UINT32*)&m_zdma[ch].regs)[offset];
-	COMBINE_DATA(&((UINT32*)&m_zdma[ch].regs)[offset]);
+	uint32_t old_value = ((uint32_t*)&m_zdma[ch].regs)[offset];
+	COMBINE_DATA(&((uint32_t*)&m_zdma[ch].regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_DCON :
@@ -1882,14 +1882,14 @@ void s3c44b0_device::zdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 READ32_MEMBER( s3c44b0_device::zdma_0_r )
 {
-	UINT32 data = zdma_r(0, offset);
+	uint32_t data = zdma_r(0, offset);
 	verboselog( *this, 9, "(ZDMA 0) %08X -> %08X\n", S3C44B0_BASE_ZDMA_0 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( s3c44b0_device::zdma_1_r )
 {
-	UINT32 data = zdma_r(1, offset);
+	uint32_t data = zdma_r(1, offset);
 	verboselog( *this, 9, "(ZDMA 1) %08X -> %08X\n", S3C44B0_BASE_ZDMA_1 + (offset << 2), data);
 	return data;
 }
@@ -1917,7 +1917,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::zdma_timer_exp )
 void s3c44b0_device::bdma_trigger(int ch)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	UINT32 saddr, daddr;
+	uint32_t saddr, daddr;
 	int dal, dst, tdm, das, cnt;
 	verboselog( *this, 5, "s3c44b0_bdma_trigger %d\n", ch);
 	dst = BITS(m_bdma->regs.dcsrc, 31, 30);
@@ -1967,9 +1967,9 @@ void s3c44b0_device::bdma_request_iis()
 	bdma_trigger(0);
 }
 
-UINT32 s3c44b0_device::bdma_r(int ch, UINT32 offset)
+uint32_t s3c44b0_device::bdma_r(int ch, uint32_t offset)
 {
-	UINT32 data = ((UINT32*)&m_bdma[ch].regs)[offset];
+	uint32_t data = ((uint32_t*)&m_bdma[ch].regs)[offset];
 	return data;
 }
 
@@ -1996,10 +1996,10 @@ void s3c44b0_device::bdma_stop(int ch)
 	m_bdma[ch].timer->adjust(attotime::never, ch);
 }
 
-void s3c44b0_device::bdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void s3c44b0_device::bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	UINT32 old_value = ((UINT32*)&m_bdma[ch].regs)[offset];
-	COMBINE_DATA(&((UINT32*)&m_bdma[ch].regs)[offset]);
+	uint32_t old_value = ((uint32_t*)&m_bdma[ch].regs)[offset];
+	COMBINE_DATA(&((uint32_t*)&m_bdma[ch].regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_DICNT :
@@ -2022,14 +2022,14 @@ void s3c44b0_device::bdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 READ32_MEMBER( s3c44b0_device::bdma_0_r )
 {
-	UINT32 data = bdma_r(0, offset);
+	uint32_t data = bdma_r(0, offset);
 	verboselog( *this, 9, "(BDMA 0) %08X -> %08X\n", S3C44B0_BASE_BDMA_0 + (offset << 2), data);
 	return data;
 }
 
 READ32_MEMBER( s3c44b0_device::bdma_1_r )
 {
-	UINT32 data = bdma_r(1, offset);
+	uint32_t data = bdma_r(1, offset);
 	verboselog( *this, 9, "(BDMA 1) %08X -> %08X\n", S3C44B0_BASE_BDMA_1 + (offset << 2), data);
 	return data;
 }

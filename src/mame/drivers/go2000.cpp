@@ -53,8 +53,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -190,7 +190,7 @@ void go2000_state::video_start()
 {
 }
 
-UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 
@@ -320,7 +320,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 
 void go2000_state::machine_start()
 {
-	UINT8 *SOUND = memregion("soundcpu")->base();
+	uint8_t *SOUND = memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)

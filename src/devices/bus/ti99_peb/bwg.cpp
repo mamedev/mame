@@ -84,7 +84,7 @@
     Modern implementation
 */
 
-snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__),
 	  m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0),
 	  m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false),
@@ -187,7 +187,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
     Access for debugger. This is a stripped-down version of the
     main methods below. We only allow ROM and RAM access.
 */
-void snug_bwg_device::debug_read(offs_t offset, UINT8* value)
+void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -201,7 +201,7 @@ void snug_bwg_device::debug_read(offs_t offset, UINT8* value)
 	}
 }
 
-void snug_bwg_device::debug_write(offs_t offset, UINT8 data)
+void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 */
 READ8Z_MEMBER(snug_bwg_device::crureadz)
 {
-	UINT8 reply;
+	uint8_t reply;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{

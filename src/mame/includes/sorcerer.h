@@ -83,11 +83,11 @@ public:
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_fe;
-	UINT8 m_keyboard_line;
-	const UINT8 *m_p_videoram;
+	uint8_t m_fe;
+	uint8_t m_keyboard_line;
+	const uint8_t *m_p_videoram;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;

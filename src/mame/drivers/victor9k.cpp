@@ -113,7 +113,7 @@ public:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
 	required_memory_region m_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -257,9 +257,9 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
-		UINT16 dc = (m_video_ram[aa + 1] << 8) | m_video_ram[aa];
+		uint16_t dc = (m_video_ram[aa + 1] << 8) | m_video_ram[aa];
 		offs_t ab = (dot_addr << 15) | ((dc & 0x7ff) << 4) | (ra & 0x0f);
-		UINT16 dd = program.read_word(ab << 1);
+		uint16_t dd = program.read_word(ab << 1);
 
 		int cursor = (sx == cursor_x) ? 1 : 0;
 		int undln = !((dc & DC_UNDLN) && BIT(dd, 15)) ? 2 : 0;

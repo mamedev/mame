@@ -100,9 +100,9 @@ public:
 	bool translate(address_spacenum spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
 	// read/write access
-	bool read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) { return memory_read(spacenum, offset, size, value); }
-	bool write(address_spacenum spacenum, offs_t offset, int size, UINT64 value) { return memory_write(spacenum, offset, size, value); }
-	bool readop(offs_t offset, int size, UINT64 &value) { return memory_readop(offset, size, value); }
+	bool read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) { return memory_read(spacenum, offset, size, value); }
+	bool write(address_spacenum spacenum, offs_t offset, int size, uint64_t value) { return memory_write(spacenum, offset, size, value); }
+	bool readop(offs_t offset, int size, uint64_t &value) { return memory_readop(offset, size, value); }
 
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
@@ -114,9 +114,9 @@ protected:
 
 	// optional operation overrides
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
-	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value);
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, uint64_t value);
+	virtual bool memory_readop(offs_t offset, int size, uint64_t &value);
 
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;

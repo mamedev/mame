@@ -115,7 +115,7 @@ done:
 
 
 
-void filter_eoln_getinfo(UINT32 state, union filterinfo *info)
+void filter_eoln_getinfo(uint32_t state, union filterinfo *info)
 {
 	switch(state)
 	{

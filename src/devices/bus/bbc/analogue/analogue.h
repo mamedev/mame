@@ -61,11 +61,11 @@ class bbc_analogue_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~bbc_analogue_slot_device() {}
 
-	UINT8 ch_r(int channel);
-	UINT8 pb_r();
+	uint8_t ch_r(int channel);
+	uint8_t pb_r();
 
 protected:
 	// device-level overrides
@@ -85,8 +85,8 @@ public:
 	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_analogue_interface();
 
-	virtual UINT8 ch_r(int channel) { return 0x00; };
-	virtual UINT8 pb_r() { return 0x30; };
+	virtual uint8_t ch_r(int channel) { return 0x00; };
+	virtual uint8_t pb_r() { return 0x30; };
 
 protected:
 	bbc_analogue_slot_device *m_slot;

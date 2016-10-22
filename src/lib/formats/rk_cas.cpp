@@ -22,7 +22,7 @@
 
 static int      data_size;
 
-static INT16 *rk_emit_level(INT16 *p, int count, int level)
+static int16_t *rk_emit_level(int16_t *p, int count, int level)
 {
 	int i;
 
@@ -33,7 +33,7 @@ static INT16 *rk_emit_level(INT16 *p, int count, int level)
 	return p;
 }
 
-static INT16* rk_output_bit(INT16 *p, UINT8 b,int bitsize)
+static int16_t* rk_output_bit(int16_t *p, uint8_t b,int bitsize)
 {
 	if (b)
 	{
@@ -49,7 +49,7 @@ static INT16* rk_output_bit(INT16 *p, UINT8 b,int bitsize)
 	return p;
 }
 
-static INT16* rk_output_byte(INT16 *p, UINT8 byte,int bitsize)
+static int16_t* rk_output_byte(int16_t *p, uint8_t byte,int bitsize)
 {
 	int i;
 	for (i=7; i>=0; i--)
@@ -59,29 +59,29 @@ static INT16* rk_output_byte(INT16 *p, UINT8 byte,int bitsize)
 }
 
 
-static int rk20_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int rk20_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	data_size = caslen;
 	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_20;
 }
 
-static int rk22_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int rk22_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	data_size = caslen;
 	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_22;
 }
 
-static int rk60_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int rk60_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	data_size = caslen;
 	return  (RK_HEADER_LEN  * 8 * 2 +  8*2 + caslen * 8 * 2) * RK_SIZE_60;
 }
 
-static int gam_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int gam_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	data_size = caslen;
 	return  (RK_HEADER_LEN  * 8 * 2 +  caslen * 8 * 2) * RK_SIZE_20;
 }
 
-static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int rk20_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i;
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 
 	for (i=0; i<RK_HEADER_LEN; i++) {
 		p = rk_output_byte (p, 0x00, RK_SIZE_20 );
@@ -95,9 +95,9 @@ static int rk20_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return p - buffer;
 }
 
-static int rk22_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int rk22_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i;
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 
 	for (i=0; i<RK_HEADER_LEN; i++) {
 		p = rk_output_byte (p, 0x00, RK_SIZE_22 );
@@ -111,9 +111,9 @@ static int rk22_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return p - buffer;
 }
 
-static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int rk60_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i;
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 
 	for (i=0; i<RK_HEADER_LEN; i++) {
 		p = rk_output_byte (p, 0x00, RK_SIZE_60 );
@@ -127,9 +127,9 @@ static int rk60_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	return p - buffer;
 }
 
-static int gam_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int gam_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i;
-	INT16 * p = buffer;
+	int16_t * p = buffer;
 
 	for (i=0; i<RK_HEADER_LEN; i++) {
 		p = rk_output_byte (p, 0x00, RK_SIZE_20 );

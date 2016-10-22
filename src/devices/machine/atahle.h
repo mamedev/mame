@@ -20,13 +20,13 @@ class ata_hle_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
 
-	virtual UINT16 read_dma() override;
+	virtual uint16_t read_dma() override;
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
 	virtual DECLARE_READ16_MEMBER(read_cs1) override;
 
-	virtual void write_dma(UINT16 data) override;
+	virtual void write_dma(uint16_t data) override;
 	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
 	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
@@ -49,7 +49,7 @@ protected:
 	int dev() { return (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
 	bool device_selected() { return m_csel == dev(); }
 
-	virtual UINT8 calculate_status() { return m_status; }
+	virtual uint8_t calculate_status() { return m_status; }
 	virtual void soft_reset();
 	virtual void process_command();
 	virtual void finished_command();
@@ -60,10 +60,10 @@ protected:
 	virtual bool is_ready() = 0;
 	virtual void perform_diagnostic() = 0;
 	virtual void signature() = 0;
-	virtual UINT16 read_data();
-	virtual void write_data(UINT16 data);
+	virtual uint16_t read_data();
+	virtual void write_data(uint16_t data);
 
-	int bit_to_mode(UINT16 word);
+	int bit_to_mode(uint16_t word);
 	int single_word_dma_mode();
 	int multi_word_dma_mode();
 	int ultra_dma_mode();
@@ -175,21 +175,21 @@ protected:
 
 	attotime MINIMUM_COMMAND_TIME;
 
-	std::vector<UINT8> m_buffer;
-	UINT16 m_buffer_offset;
-	UINT16 m_buffer_size;
-	UINT8 m_error;
-	UINT8 m_feature;
-	UINT16 m_sector_count;
-	UINT8 m_sector_number;
-	UINT8 m_cylinder_low;
-	UINT8 m_cylinder_high;
-	UINT8 m_device_head;
-	UINT8 m_status;
-	UINT8 m_command;
-	UINT8 m_device_control;
+	std::vector<uint8_t> m_buffer;
+	uint16_t m_buffer_offset;
+	uint16_t m_buffer_size;
+	uint8_t m_error;
+	uint8_t m_feature;
+	uint16_t m_sector_count;
+	uint8_t m_sector_number;
+	uint8_t m_cylinder_low;
+	uint8_t m_cylinder_high;
+	uint8_t m_device_head;
+	uint8_t m_status;
+	uint8_t m_command;
+	uint8_t m_device_control;
 
-	UINT16 m_identify_buffer[256];
+	uint16_t m_identify_buffer[256];
 	bool m_revert_to_defaults;
 	bool m_8bit_data_transfers;
 

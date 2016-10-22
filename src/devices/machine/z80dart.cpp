@@ -86,7 +86,7 @@ machine_config_constructor z80dart_device::device_mconfig_additions() const
 //  z80dart_device - constructor
 //-------------------------------------------------
 
-z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
@@ -116,7 +116,7 @@ z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, 
 		elem = 0;
 }
 
-z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80DART, "Z80 DART", tag, owner, clock, "z80dart", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_chanA(*this, CHANA_TAG),
@@ -146,37 +146,37 @@ z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, d
 		elem = 0;
 }
 
-z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO0, "Z80 SIO/0", tag, owner, clock, TYPE_SIO0, "z80sio0", __FILE__)
 {
 }
 
-z80sio1_device::z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sio1_device::z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO1, "Z80 SIO/1", tag, owner, clock, TYPE_SIO1, "z80sio1", __FILE__)
 {
 }
 
-z80sio2_device::z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sio2_device::z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO2, "Z80 SIO/2", tag, owner, clock, TYPE_SIO2, "z80sio2", __FILE__)
 {
 }
 
-z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO3, "Z80 SIO/3", tag, owner, clock, TYPE_SIO3, "z80sio3", __FILE__)
 {
 }
 
-z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO4, "Z80 SIO/4", tag, owner, clock, TYPE_SIO4, "z80sio4", __FILE__)
 {
 }
 
-i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, I8274, "I8274", tag, owner, clock, TYPE_I8274, "i8274", __FILE__)
 {
 }
 
-upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, UPD7201, "uPD7201", tag, owner, clock, TYPE_UPD7201, "upd7201", __FILE__)
 {
 }
@@ -353,7 +353,7 @@ void z80dart_device::reset_interrupts()
 
 void z80dart_device::trigger_interrupt(int index, int state)
 {
-	UINT8 vector = m_chanB->m_wr[2];
+	uint8_t vector = m_chanB->m_wr[2];
 	int priority;
 
 	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
@@ -499,7 +499,7 @@ WRITE8_MEMBER( z80dart_device::ba_cd_w )
 //  dart_channel - constructor
 //-------------------------------------------------
 
-z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80DART_CHANNEL, "Z80 DART channel", tag, owner, clock, "z80dart_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
@@ -784,9 +784,9 @@ int z80dart_channel::get_tx_word_length()
 //  control_read - read control register
 //-------------------------------------------------
 
-UINT8 z80dart_channel::control_read()
+uint8_t z80dart_channel::control_read()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	int reg = m_wr[0] & WR0_REGISTER_MASK;
 
@@ -820,7 +820,7 @@ UINT8 z80dart_channel::control_read()
 //  control_write - write control register
 //-------------------------------------------------
 
-void z80dart_channel::control_write(UINT8 data)
+void z80dart_channel::control_write(uint8_t data)
 {
 	int reg = m_wr[0] & WR0_REGISTER_MASK;
 
@@ -997,9 +997,9 @@ void z80dart_channel::control_write(UINT8 data)
 //  data_read - read data register
 //-------------------------------------------------
 
-UINT8 z80dart_channel::data_read()
+uint8_t z80dart_channel::data_read()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_rx_fifo >= 0)
 	{
@@ -1029,7 +1029,7 @@ UINT8 z80dart_channel::data_read()
 //  data_write - write data register
 //-------------------------------------------------
 
-void z80dart_channel::data_write(UINT8 data)
+void z80dart_channel::data_write(uint8_t data)
 {
 	m_tx_data = data;
 
@@ -1060,7 +1060,7 @@ void z80dart_channel::data_write(UINT8 data)
 //  receive_data - receive data word
 //-------------------------------------------------
 
-void z80dart_channel::receive_data(UINT8 data)
+void z80dart_channel::receive_data(uint8_t data)
 {
 	LOG(("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 

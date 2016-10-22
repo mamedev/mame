@@ -742,7 +742,7 @@ ioport_constructor abc850_floppy_device::device_input_ports() const
 //  luxor_55_21046_device - constructor
 //-------------------------------------------------
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock, "lux21046", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -762,7 +762,7 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 {
 }
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -782,27 +782,27 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, devi
 {
 }
 
-abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: luxor_55_21046_device(mconfig, ABC830, "ABC 830", tag, owner, clock, "abc830", __FILE__)
 {
 }
 
-abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: luxor_55_21046_device(mconfig, ABC832, "ABC 832", tag, owner, clock, "abc832", __FILE__)
 {
 }
 
-abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: luxor_55_21046_device(mconfig, ABC834, "ABC 834", tag, owner, clock, "abc834", __FILE__)
 {
 }
 
-abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: luxor_55_21046_device(mconfig, ABC838, "ABC 838", tag, owner, clock, "abc838", __FILE__)
 {
 }
 
-abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: luxor_55_21046_device(mconfig, ABC850_FLOPPY, "ABC 850 floppy", tag, owner, clock, "lux21046", __FILE__)
 {
 }
@@ -853,7 +853,7 @@ void luxor_55_21046_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_cs(UINT8 data)
+void luxor_55_21046_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == m_sw3->read());
 }
@@ -873,7 +873,7 @@ int luxor_55_21046_device::abcbus_csb()
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 luxor_55_21046_device::abcbus_stat()
+uint8_t luxor_55_21046_device::abcbus_stat()
 {
 	/*
 
@@ -890,7 +890,7 @@ UINT8 luxor_55_21046_device::abcbus_stat()
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cs)
 	{
@@ -906,9 +906,9 @@ UINT8 luxor_55_21046_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_55_21046_device::abcbus_inp()
+uint8_t luxor_55_21046_device::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -924,7 +924,7 @@ UINT8 luxor_55_21046_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_out(UINT8 data)
+void luxor_55_21046_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -938,7 +938,7 @@ void luxor_55_21046_device::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_c1(UINT8 data)
+void luxor_55_21046_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -952,7 +952,7 @@ void luxor_55_21046_device::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_c3(UINT8 data)
+void luxor_55_21046_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -965,7 +965,7 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 //  abcbus_c4 -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_c4(UINT8 data)
+void luxor_55_21046_device::abcbus_c4(uint8_t data)
 {
 	// TODO connected to PAL16R4 pin 2
 }
@@ -1138,7 +1138,7 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// busy
 	data |= m_busy;
@@ -1148,7 +1148,7 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 	//data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 4;
 
 	// SW2
-	UINT8 sw2 = m_sw2->read() & 0x0f;
+	uint8_t sw2 = m_sw2->read() & 0x0f;
 
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
 	int sw2_2 = BIT(sw2, 1) ? 1 : BIT(offset, 9);

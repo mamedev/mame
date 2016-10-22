@@ -19,8 +19,8 @@ struct reg
 			memset(&data, 0, sizeof(data));
 		}
 
-	UINT8 index;
-	UINT8 data[0x20];
+	uint8_t index;
+	uint8_t data[0x20];
 	/* see vgadoc
 	   0 mode control 1
 	   1 palette mask
@@ -36,7 +36,7 @@ class pc_t1t_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_PALETTE_INIT( pcjr );
 
@@ -53,27 +53,27 @@ public:
 
 protected:
 	required_device<mc6845_device> m_mc6845;
-	UINT8 m_mode_control, m_color_select;
-	UINT8 m_status;
+	uint8_t m_mode_control, m_color_select;
+	uint8_t m_status;
 
 	struct reg m_reg;
 
-	UINT16 m_bank;
+	uint16_t m_bank;
 
 	int m_pc_framecnt;
 
-	UINT8 *m_displayram;
+	uint8_t *m_displayram;
 
-	UINT8  *m_chr_gen;
-	UINT8  m_chr_size;
-	UINT16 m_ra_offset;
+	uint8_t  *m_chr_gen;
+	uint8_t  m_chr_size;
+	uint16_t m_ra_offset;
 
-	UINT8   m_address_data_ff;
+	uint8_t   m_address_data_ff;
 
 	int     m_update_row_type;
-	UINT8   m_display_enable;
-	UINT8   m_vsync;
-	UINT8   m_palette_base;
+	uint8_t   m_display_enable;
+	uint8_t   m_vsync;
+	uint8_t   m_palette_base;
 
 	int mode_control_r(void);
 	void color_select_w(int data);
@@ -93,7 +93,7 @@ class pcvideo_t1000_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
@@ -120,12 +120,12 @@ class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
-	UINT8   *m_jxkanji;
+	uint8_t   *m_jxkanji;
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );

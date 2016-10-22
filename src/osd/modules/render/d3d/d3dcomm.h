@@ -70,8 +70,8 @@ public:
 	void                    create_resources();
 	void                    delete_resources();
 
-	texture_info *          find_texinfo(const render_texinfo *texture, UINT32 flags);
-	UINT32                  texture_compute_hash(const render_texinfo *texture, UINT32 flags);
+	texture_info *          find_texinfo(const render_texinfo *texture, uint32_t flags);
+	uint32_t                  texture_compute_hash(const render_texinfo *texture, uint32_t flags);
 
 	bool                    is_dynamic_supported() const { return (bool)m_dynamic_supported; }
 	void                    set_dynamic_supported(bool dynamic_supported) { m_dynamic_supported = dynamic_supported; }
@@ -109,7 +109,7 @@ private:
 class texture_info
 {
 public:
-	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
+	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, uint32_t flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
@@ -119,11 +119,11 @@ public:
 	int                     get_xscale() const { return m_xprescale; }
 	int                     get_yscale() const { return m_yprescale; }
 
-	UINT32                  get_flags() const { return m_flags; }
+	uint32_t                  get_flags() const { return m_flags; }
 
-	void                    set_data(const render_texinfo *texsource, UINT32 flags);
+	void                    set_data(const render_texinfo *texsource, uint32_t flags);
 
-	UINT32                  get_hash() const { return m_hash; }
+	uint32_t                  get_hash() const { return m_hash; }
 
 	void                    increment_frame_count() { m_cur_frame++; }
 	void                    mask_frame_count(int mask) { m_cur_frame %= mask; }
@@ -147,8 +147,8 @@ private:
 
 	renderer_d3d9 *         m_renderer;                 // renderer pointer
 
-	UINT32                  m_hash;                     // hash value for the texture
-	UINT32                  m_flags;                    // rendering flags
+	uint32_t                  m_hash;                     // hash value for the texture
+	uint32_t                  m_flags;                    // rendering flags
 	render_texinfo          m_texinfo;                  // copy of the texture info
 	vec2f                   m_start;                    // beggining UV coordinates
 	vec2f                   m_stop;                     // ending UV coordinates
@@ -166,8 +166,8 @@ private:
 class poly_info
 {
 public:
-	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-				UINT32 flags, texture_info *texture, UINT32 modmode,
+	void init(D3DPRIMITIVETYPE type, uint32_t count, uint32_t numverts,
+				uint32_t flags, texture_info *texture, uint32_t modmode,
 				float prim_width, float prim_height)
 	{
 		m_type = type;
@@ -181,9 +181,9 @@ public:
 	}
 
 	D3DPRIMITIVETYPE        type() const { return m_type; }
-	UINT32                  count() const { return m_count; }
-	UINT32                  numverts() const { return m_numverts; }
-	UINT32                  flags() const { return m_flags; }
+	uint32_t                  count() const { return m_count; }
+	uint32_t                  numverts() const { return m_numverts; }
+	uint32_t                  flags() const { return m_flags; }
 
 	texture_info *          texture() const { return m_texture; }
 	DWORD                   modmode() const { return m_modmode; }
@@ -193,9 +193,9 @@ public:
 
 private:
 	D3DPRIMITIVETYPE        m_type;         // type of primitive
-	UINT32                  m_count;        // total number of primitives
-	UINT32                  m_numverts;     // total number of vertices
-	UINT32                  m_flags;        // rendering flags
+	uint32_t                  m_count;        // total number of primitives
+	uint32_t                  m_numverts;     // total number of vertices
+	uint32_t                  m_flags;        // rendering flags
 
 	texture_info *          m_texture;      // pointer to texture info
 	DWORD                   m_modmode;      // texture modulation mode

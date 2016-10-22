@@ -162,7 +162,7 @@ WRITE8_MEMBER(divebomb_state::fgcpu_roz_comm_w)
 
 READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	if (has_fromroz)
 		result |= 1;
@@ -249,7 +249,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
-	UINT32 bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
+	uint32_t bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_bank1->set_entry(bank);
 
 	if (data & 0x0f)

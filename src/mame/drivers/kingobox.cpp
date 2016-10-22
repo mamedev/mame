@@ -778,7 +778,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 {
 	int i;
-	UINT8 *RAM = memregion("proms")->base();
+	uint8_t *RAM = memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
 	for (i = 0; i < 0x100; i++)
@@ -789,8 +789,8 @@ DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 {
 	int i,j,k;
-	UINT8 *PROMS = memregion("proms")->base();
-	UINT8 *USER1 = memregion("user1")->base();
+	uint8_t *PROMS = memregion("proms")->base();
+	uint8_t *USER1 = memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
 	for(i = 0, j = 0; j < 0x40; i++, j++)

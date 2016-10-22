@@ -602,7 +602,7 @@ void namcos1_state::driver_init()
 	{
 		if ((i & 0x010000) == 0)
 		{
-			UINT8 t = m_rom[i];
+			uint8_t t = m_rom[i];
 			m_rom[i] = m_rom[i + 0x010000];
 			m_rom[i + 0x010000] = t;
 		}

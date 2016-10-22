@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
 
 	for (pal = 0; pal < 8; pal++)
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 
 		for (i = 0; i < 0x100; i++)
 		{
-			UINT8 ctabentry;
+			uint8_t ctabentry;
 
 			if (((pal & 0x01) == 0) && (color_prom[(clut << 8) | i] == 0))
 				ctabentry = 0;
@@ -62,7 +62,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 
 PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
 
 	for (pal = 0; pal < 8; pal++)
@@ -71,7 +71,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 
 		for (i = 0; i < 0x100; i++)
 		{
-			UINT8 ctabentry;
+			uint8_t ctabentry;
 
 			if ((pal & 1) == 0)
 				/* sprites */
@@ -95,8 +95,8 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 {
-	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
-	UINT8 attributes = m_page[0][tile_index];
+	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
+	uint8_t attributes = m_page[0][tile_index];
 	int bank = 4 * ((m_vreg & 0x0f) - 1);
 	int number, color;
 
@@ -128,8 +128,8 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 {
-	UINT8 ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
-	UINT8 attributes = m_page[1][tile_index];
+	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
+	uint8_t attributes = m_page[1][tile_index];
 	int bank = 4 * ((m_vreg >> 4) - 1);
 	int number, color;
 
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 {
-	UINT8 attributes = m_page[0][tile_index + 0x800];
+	uint8_t attributes = m_page[0][tile_index + 0x800];
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 {
-	UINT8 attributes = m_page[0][tile_index];
+	uint8_t attributes = m_page[0][tile_index];
 	int bank = 4 * ((m_vreg & 0x0f) - 1);
 	int number, pal, color;
 
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 {
-	UINT8 attributes = m_page[1][tile_index];
+	uint8_t attributes = m_page[1][tile_index];
 	int bank = 4*((m_vreg >> 4) - 1);
 	int number, pal, color;
 
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 {
-//  UINT8 attributes = m_page[0][tile_index + 0x800];
+//  uint8_t attributes = m_page[0][tile_index + 0x800];
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
@@ -258,8 +258,8 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
-	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
+	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
+	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
@@ -277,8 +277,8 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = make_unique_clear<UINT8[]>(0x800);
-	m_spriteram[1] = make_unique_clear<UINT8[]>(0x800);
+	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
+	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
@@ -354,7 +354,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 
 ***************************************************************************/
 
-void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, bitmap_ind8 &priority_bitmap, UINT32 pri_mask )
+void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask )
 {
 	k007121_device *k007121 = circuit ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
@@ -364,7 +364,7 @@ void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -484,13 +484,13 @@ byte #4:
 
 ***************************************************************************/
 
-void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
+void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	gfx_element *gfx = m_gfxdecode->gfx(circuit + 2);
 
 	int limit = circuit ? (space.read_byte(0xc2) * 256 + space.read_byte(0xc3)) : (space.read_byte(0xc0) * 256 + space.read_byte(0xc1));
-	const UINT8 *finish;
+	const uint8_t *finish;
 
 	source += 0x1000;
 	finish = source;
@@ -502,12 +502,12 @@ void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 	while (source > finish)
 	{
-		UINT8 attributes = source[3]; /* PBxF ?xxX */
+		uint8_t attributes = source[3]; /* PBxF ?xxX */
 		{
 			int number = source[0];
 			int x = source[2] - 71 + (attributes & 0x01)*256;
 			int y = 242 - source[1];
-			UINT8 color = source[4]; /* CCCC xxBB */
+			uint8_t color = source[4]; /* CCCC xxBB */
 
 			int bank = (color & 0x03) | ((attributes & 0x40) >> 4);
 
@@ -530,7 +530,7 @@ void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

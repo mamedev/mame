@@ -21,7 +21,7 @@ WRITE8_MEMBER(djboy_state::djboy_scrolly_w)
 
 TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 {
-	UINT8 attr = m_videoram[tile_index + 0x800];
+	uint8_t attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + (attr & 0xf) * 256;
 	int color = attr >> 4;
 
@@ -53,7 +53,7 @@ WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
 	m_palette->set_pen_color(offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
-UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/**
 	 * xx------ msb x

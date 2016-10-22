@@ -498,7 +498,7 @@ void menu_select_game::populate()
 	ui_globals::redraw_icon = true;
 	ui_globals::switch_image = true;
 	int old_item_selected = -1;
-	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
@@ -646,7 +646,7 @@ void menu_select_game::build_available_list()
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
-			*dst++ = tolower((UINT8) * src);
+			*dst++ = tolower((uint8_t) * src);
 
 		*dst = 0;
 		int drivnum = driver_list::find(drivername);
@@ -700,7 +700,7 @@ void menu_select_game::build_available_list()
 									if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
 										continue;
 
-									UINT64 lenght = ROM_GETLENGTH(rom);
+									uint64_t lenght = ROM_GETLENGTH(rom);
 									auto found = false;
 									auto parent_entries = rom_build_entries(drv->rom);
 									for (auto parentrom = parent_entries.data(); !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
@@ -1209,7 +1209,7 @@ void menu_select_game::populate_search()
 	}
 
 	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = nullptr : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = nullptr;
-	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	for (int curitem = 0; m_searchlist[curitem]; ++curitem)
 	{
 		bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");

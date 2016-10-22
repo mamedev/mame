@@ -319,12 +319,12 @@ public:
 	bool m_back_color;
 
 	/* memory */
-	UINT8    m_dw_ram[0x1000];
+	uint8_t    m_dw_ram[0x1000];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_region_ptr<UINT16> m_charmap;
+	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
 	DECLARE_READ8_MEMBER(dwarfd_ram_r);
@@ -580,7 +580,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 	int i;
 	int bank = ((gpa & 2) ? 0 : 2) + (gpa & 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -589,8 +589,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -604,7 +604,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	int i;
 	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -613,8 +613,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -628,7 +628,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	int i;
 	int bank = gpa;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
+	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
 		m_back_color = false;
 
@@ -637,8 +637,8 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 
 	for(i=0;i<8;i+=2)
 	{
-		UINT8 pixel = (pixels >> (i * 2)) & 0xf;
-		UINT8 value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
+		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
+		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
 		bitmap.pix32(y, x + i) = palette[value];
 		bitmap.pix32(y, x + i + 1) = palette[(pixel & 1) ? 0 : value];
 		if(m_back_color)
@@ -760,9 +760,9 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
-	UINT8 rgb[3];
+	uint8_t rgb[3];
 	int i,j;
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 
 	for (i = 0; i < 32; i++)
 	{
@@ -1054,7 +1054,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 {
 	/* expand gfx roms */
-	UINT8 *dst = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx2")->base();
 
 	for (int i = 0; i < 0x4000/2; i++)
 	{

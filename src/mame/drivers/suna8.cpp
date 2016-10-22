@@ -61,12 +61,12 @@ Notes:
 
 DRIVER_INIT_MEMBER(suna8_state,hardhead)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[8] =
+		static const uint8_t swaptable[8] =
 		{
 			1,1,0,1,1,1,1,0
 		};
@@ -91,27 +91,27 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
                                 Brick Zone
 ***************************************************************************/
 
-UINT8 *suna8_state::brickzn_decrypt()
+uint8_t *suna8_state::brickzn_decrypt()
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
+	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
-	UINT8   *decrypt = auto_alloc_array(machine(), UINT8, size);
+	uint8_t   *decrypt = auto_alloc_array(machine(), uint8_t, size);
 	int i;
 
 	/* Opcodes and data */
 	for (i = 0; i < 0x50000; i++)
 	{
-		static const UINT8 opcode_swaptable[8] =
+		static const uint8_t opcode_swaptable[8] =
 		{
 			1,1,1,0,0,1,1,0
 		};
-		static const UINT8 data_swaptable[16] =
+		static const uint8_t data_swaptable[16] =
 		{
 			1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1
 		};
 		int opcode_swap = opcode_swaptable[((i & 0x00c) >> 2) | ((i & 0x040) >> 4)];
 		int data_swap = (i >= 0x8000) ? 0 : data_swaptable[(i & 0x003) | ((i & 0x008) >> 1) | ((i & 0x400) >> 7)];
-		UINT8 x = RAM[i];
+		uint8_t x = RAM[i];
 
 		if (data_swap)
 		{
@@ -215,10 +215,10 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
 
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
+	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
-	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
-	UINT8 x;
+	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
+	uint8_t x;
 	int i;
 
 	m_bank0d->set_base(decrypt);
@@ -241,7 +241,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
         8?, 9n?,an, bn      y,y,?,? (player anims)
         cn, dy, en, fn      y,y,n,n
 */
-		static const UINT8 swaptable[0x50] =
+		static const uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,0,0,1,1,    0,0,0,0,0,0,0,0,    // 8000-ffff not used
 			1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
@@ -260,12 +260,12 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	/* Opcodes */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[32] =
+		static const uint8_t swaptable[32] =
 		{
 			1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
 			1,1,0,1,1,1,1,1,1,1,1,1,0,1,0,0
 		};
-		static const UINT8 xortable[32] =
+		static const uint8_t xortable[32] =
 		{
 			0x04,0x04,0x00,0x04,0x00,0x04,0x00,0x00,0x04,0x45,0x00,0x04,0x00,0x04,0x00,0x00,
 			0x04,0x45,0x00,0x04,0x00,0x04,0x00,0x00,0x04,0x04,0x00,0x04,0x00,0x04,0x00,0x00
@@ -284,14 +284,14 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	/* Data */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[8] = { 1,1,0,1,0,1,1,0 };
+		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), UINT8, 0x2000 * 2), 0x2000);
+	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), uint8_t, 0x2000 * 2), 0x2000);
 }
 
 DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
@@ -300,7 +300,7 @@ DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
 	// code/data split in first ROM?
 
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), UINT8, 0x2000 * 2), 0x2000);
+	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), uint8_t, 0x2000 * 2), 0x2000);
 }
 
 /***************************************************************************
@@ -309,10 +309,10 @@ DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
 
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
+	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
-	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
-	UINT8 x;
+	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
+	uint8_t x;
 	int i;
 
 	m_bank0d->set_base(decrypt);
@@ -321,7 +321,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	memcpy(decrypt, RAM, size);
 	for (i = 0; i < 0x50000; i++)
 	{
-		static const UINT8 swaptable[0x50] =
+		static const uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,    1,1,0,0,    0,0,0,0,    0,0,0,0,    // 8000-ffff not used
 			0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,
@@ -340,12 +340,12 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	/* Opcodes */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[32] =
+		static const uint8_t swaptable[32] =
 		{
 			0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
 			0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		};
-		static const UINT8 xortable[32] =
+		static const uint8_t xortable[32] =
 		{
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x01,0x41,0x01,0x00,0x00,0x00,0x00,
 			0x01,0x01,0x41,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
@@ -364,7 +364,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	/* Data */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[8] = { 1,1,0,1,0,1,1,0 };
+		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
@@ -394,10 +394,10 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
-	UINT8   *RAM    =   memregion("maincpu")->base();
+	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
-	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
-	UINT8 x;
+	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
+	uint8_t x;
 	int i;
 
 	m_bank0d->set_base(decrypt);
@@ -406,7 +406,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	memcpy(decrypt, RAM, size);
 	for (i = 0; i < 0x50000; i++)
 	{
-		static const UINT8 swaptable[0x50] =
+		static const uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,    0,0,1,1,    0,0,0,0,    0,0,0,0,    // 8000-ffff not used
 			0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,
@@ -425,12 +425,12 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	/* Opcodes */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[32] =
+		static const uint8_t swaptable[32] =
 		{
 			0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,
 			0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
 		};
-		static const UINT8 xortable[32] =
+		static const uint8_t xortable[32] =
 		{
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00
@@ -449,7 +449,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	/* Data */
 	for (i = 0; i < 0x8000; i++)
 	{
-		static const UINT8 swaptable[8] = { 1,1,1,0,1,1,0,1 };
+		static const uint8_t swaptable[8] = { 1,1,1,0,1,1,0,1 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
@@ -484,7 +484,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 
 READ8_MEMBER(suna8_state::hardhead_protection_r)
 {
-	UINT8 protection_val = m_protection_val;
+	uint8_t protection_val = m_protection_val;
 
 	if (protection_val & 0x80)
 		return  ((~offset & 0x20)           ?   0x20 : 0) |
@@ -658,7 +658,7 @@ ADDRESS_MAP_END
 */
 READ8_MEMBER(suna8_state::brickzn_cheats_r)
 {
-	static UINT8 bit2 = 0;
+	static uint8_t bit2 = 0;
 	bit2 = 1 - bit2;    // see code at 2b48
 	return
 		(ioport("CHEATS")->read() & (~(1 << 2))) |
@@ -782,7 +782,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		    56  coin in         OK?
 		    70  monster hit     NO?     58?
 		*/
-		UINT8 remap = (m_remap_sound ? BITSWAP8(data, 7,6,3,4,5,2,1,0) : data);
+		uint8_t remap = (m_remap_sound ? BITSWAP8(data, 7,6,3,4,5,2,1,0) : data);
 
 		m_soundlatch->write(space, 0, remap);
 

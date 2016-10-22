@@ -32,7 +32,7 @@ class p1_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Optional information overrides
 	virtual machine_config_constructor  device_mconfig_additions() const override;
@@ -54,7 +54,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8                           m_dac_data[16];
+	uint8_t                           m_dac_data[16];
 	int                             m_dac_ptr;
 
 	required_device<dac_byte_interface> m_dac;

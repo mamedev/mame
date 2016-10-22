@@ -4088,7 +4088,7 @@ ROM_END
 
 void megasys1_state::rodland_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = memregion(region)->base();
+	uint8_t *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
 	int i;
 
@@ -4099,7 +4099,7 @@ void megasys1_state::rodland_gfx_unmangle(const char *region)
 				| ((rom[i] & 0x48) << 1)
 				| ((rom[i] & 0x10) << 2);
 
-	std::vector<UINT8> buffer(size);
+	std::vector<uint8_t> buffer(size);
 
 	memcpy(&buffer[0],rom,size);
 
@@ -4117,7 +4117,7 @@ void megasys1_state::rodland_gfx_unmangle(const char *region)
 
 void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = memregion(region)->base();
+	uint8_t *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
 	int i;
 
@@ -4125,7 +4125,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
 
-	std::vector<UINT8> buffer(size);
+	std::vector<uint8_t> buffer(size);
 
 	memcpy(&buffer[0],rom,size);
 
@@ -4141,7 +4141,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = memregion(region)->base();
+	uint8_t *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
 	int i;
 
@@ -4149,7 +4149,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
 
-	std::vector<UINT8> buffer(size);
+	std::vector<uint8_t> buffer(size);
 
 	memcpy(&buffer[0],rom,size);
 
@@ -4187,7 +4187,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 DRIVER_INIT_MEMBER(megasys1_state,64street)
 {
-//  UINT16 *ROM = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *ROM = (uint16_t *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
 //  ROM[0x10EDE/2] = 0x6012;        // watchdog
 
@@ -4432,7 +4432,7 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
-	UINT8 *ROM = memregion("oki1")->base();
+	uint8_t *ROM = memregion("oki1")->base();
 	memory_bank *okibank = membank("okibank");
 
 	okibank->configure_entry(7, &ROM[0x20000]);
@@ -4572,7 +4572,7 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 	// convert bootleg priority format to standard
 	{
 		int i;
-		UINT8 *ROM = memregion("proms")->base();
+		uint8_t *ROM = memregion("proms")->base();
 
 		for (i = 0x1fe; i >= 0; i -= 2) {
 			ROM[i+0] = ROM[i+1] = (ROM[i/2] >> 4) & 0x0f;

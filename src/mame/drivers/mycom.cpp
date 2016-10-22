@@ -94,16 +94,16 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_0a;
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_chargen;
+	uint8_t m_0a;
 private:
-	UINT16 m_i_videoram;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_sn_we;
-	UINT32 m_upper_sw;
-	UINT8 *m_p_ram;
+	uint16_t m_i_videoram;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_sn_we;
+	uint32_t m_upper_sw;
+	uint8_t *m_p_ram;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -134,15 +134,15 @@ void mycom_state::video_start()
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx=0,z;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx=0,z;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	if (m_0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)                   // lores pixels
 		{
-			UINT8 dbit=1;
+			uint8_t dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
 			chr = m_p_videoram[mem];
@@ -162,7 +162,7 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	{
 		for (x = 0; x < x_count; x++)                   // text
 		{
-			UINT8 inv=0;
+			uint8_t inv=0;
 			if (x == cursor_x) inv=0xff;
 			mem = (ma + x) & 0x7ff;
 			if (ra > 7)
@@ -358,7 +358,7 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 	---- --x- keyboard shift
 	---- ---x keyboard strobe
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 	m_rtc->cs_w(BIT(data, 7));
 }
 
-static const UINT8 mycom_keyval[] = { 0,
+static const uint8_t mycom_keyval[] = { 0,
 0x1b,0x1b,0x7c,0x7c,0x18,0x18,0x0f,0x0f,0x09,0x09,0x1c,0x1c,0x30,0x00,0x50,0x70,0x3b,0x2b,
 0x00,0x00,0x31,0x21,0x51,0x71,0x41,0x61,0x5a,0x7a,0x17,0x17,0x2d,0x3d,0x40,0x60,0x3a,0x2a,
 0x0b,0x0b,0x32,0x22,0x57,0x77,0x53,0x73,0x58,0x78,0x03,0x03,0x5e,0x7e,0x5b,0x7b,0x5d,0x7d,
@@ -438,11 +438,11 @@ static const UINT8 mycom_keyval[] = { 0,
 
 TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 {
-	UINT8 x, y, scancode = 0;
-	UINT16 pressed[9];
+	uint8_t x, y, scancode = 0;
+	uint16_t pressed[9];
 	char kbdrow[3];
-	UINT8 modifiers = ioport("XX")->read();
-	UINT8 shift_pressed = (modifiers & 2) >> 1;
+	uint8_t modifiers = ioport("XX")->read();
+	uint8_t shift_pressed = (modifiers & 2) >> 1;
 	m_keyb_press_flag = 0;
 
 	/* see what is pressed */
@@ -497,7 +497,7 @@ void mycom_state::machine_reset()
 
 DRIVER_INIT_MEMBER(mycom_state,mycom)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 

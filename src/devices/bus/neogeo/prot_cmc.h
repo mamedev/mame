@@ -44,41 +44,41 @@ class cmc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void decrypt(UINT8 *r0, UINT8 *r1,
-		UINT8 c0, UINT8 c1,
-		const UINT8 *table0hi,
-		const UINT8 *table0lo,
-		const UINT8 *table1,
+	void decrypt(uint8_t *r0, uint8_t *r1,
+		uint8_t c0, uint8_t c1,
+		const uint8_t *table0hi,
+		const uint8_t *table0lo,
+		const uint8_t *table1,
 		int base,
 		int invert);
 
-	void gfx_decrypt(UINT8* rom, UINT32 rom_size, int extra_xor);
-	void kof99_neogeo_gfx_decrypt(UINT8* rom, UINT32 rom_size, UINT8* fixed, UINT32 fixed_size, int extra_xor);
-	void kof2000_neogeo_gfx_decrypt(UINT8* rom, UINT32 rom_size, UINT8* fixed, UINT32 fixed_size, int extra_xor);
-	void cmc42_gfx_decrypt(UINT8* rom, UINT32 rom_size, int extra_xor);
-	void cmc50_gfx_decrypt(UINT8* rom, UINT32 rom_size, int extra_xor);
+	void gfx_decrypt(uint8_t* rom, uint32_t rom_size, int extra_xor);
+	void kof99_neogeo_gfx_decrypt(uint8_t* rom, uint32_t rom_size, uint8_t* fixed, uint32_t fixed_size, int extra_xor);
+	void kof2000_neogeo_gfx_decrypt(uint8_t* rom, uint32_t rom_size, uint8_t* fixed, uint32_t fixed_size, int extra_xor);
+	void cmc42_gfx_decrypt(uint8_t* rom, uint32_t rom_size, int extra_xor);
+	void cmc50_gfx_decrypt(uint8_t* rom, uint32_t rom_size, int extra_xor);
 
-	void sfix_decrypt(UINT8* rom, UINT32 rom_size, UINT8* fixed, UINT32 fixed_size);
+	void sfix_decrypt(uint8_t* rom, uint32_t rom_size, uint8_t* fixed, uint32_t fixed_size);
 
-	UINT16 generate_cs16(UINT8 *rom, int size);
-	int m1_address_scramble(int address, UINT16 key);
-	void cmc50_m1_decrypt(UINT8* romcrypt, UINT32 romcrypt_size, UINT8* romaudio, UINT32 romaudio_size);
+	uint16_t generate_cs16(uint8_t *rom, int size);
+	int m1_address_scramble(int address, uint16_t key);
+	void cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size, uint8_t* romaudio, uint32_t romaudio_size);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	const UINT8 *type0_t03;
-	const UINT8 *type0_t12;
-	const UINT8 *type1_t03;
-	const UINT8 *type1_t12;
-	const UINT8 *address_8_15_xor1;
-	const UINT8 *address_8_15_xor2;
-	const UINT8 *address_16_23_xor1;
-	const UINT8 *address_16_23_xor2;
-	const UINT8 *address_0_7_xor;
+	const uint8_t *type0_t03;
+	const uint8_t *type0_t12;
+	const uint8_t *type1_t03;
+	const uint8_t *type1_t12;
+	const uint8_t *address_8_15_xor1;
+	const uint8_t *address_8_15_xor2;
+	const uint8_t *address_16_23_xor1;
+	const uint8_t *address_16_23_xor2;
+	const uint8_t *address_0_7_xor;
 };
 
 #endif

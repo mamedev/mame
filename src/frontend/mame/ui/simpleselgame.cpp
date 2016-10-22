@@ -74,7 +74,7 @@ void simple_menu_select_game::build_driver_list()
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
-			*dst++ = tolower((UINT8)*src);
+			*dst++ = tolower((uint8_t)*src);
 		*dst = 0;
 
 		int drivnum = m_drivlist->find(drivername);

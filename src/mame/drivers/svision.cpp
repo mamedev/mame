@@ -232,7 +232,7 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 			svision_w(space, offset,data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
-				UINT16 c;
+				uint16_t c;
 				if (offset == 0x803 && data == 0x07)
 				{
 					/* tron hack */
@@ -367,19 +367,19 @@ PALETTE_INIT_MEMBER(svision_state,svisionp)
 		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2]);
 }
 
-UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, i, j=XPOS/4+YPOS*0x30;
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	if (BANK&8)
 	{
 		for (y=0; y<160; y++)
 		{
-			UINT16 *line = &bitmap.pix16(y, 3 - (XPOS & 3));
+			uint16_t *line = &bitmap.pix16(y, 3 - (XPOS & 3));
 			for (x=3-(XPOS&3),i=0; x<160+3 && x<XSIZE+3; x+=4,i++)
 			{
-				UINT8 b=videoram[j+i];
+				uint8_t b=videoram[j+i];
 				line[3]=((b>>6)&3)+PALETTE_START;
 				line[2]=((b>>4)&3)+PALETTE_START;
 				line[1]=((b>>2)&3)+PALETTE_START;
@@ -398,19 +398,19 @@ UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y, i, j = XPOS/4+YPOS*0x30;
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	if (BANK & 8)
 	{
 		for (y = 0; y < 160; y++)
 		{
-			UINT32 *line = &bitmap.pix32(y, 3 - (XPOS & 3));
+			uint32_t *line = &bitmap.pix32(y, 3 - (XPOS & 3));
 			for (x = 3 - (XPOS & 3), i = 0; x < 160 + 3 && x < XSIZE + 3; x += 4, i++)
 			{
-				UINT8 b=videoram[j+i];
+				uint8_t b=videoram[j+i];
 				line[3]=m_tvlink.palette[(b>>6)&3];
 				line[2]=m_tvlink.palette[(b>>4)&3];
 				line[1]=m_tvlink.palette[(b>>2)&3];
@@ -454,7 +454,7 @@ DRIVER_INIT_MEMBER(svision_state, svisions)
 
 DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size > 0x80000)
 	{

@@ -67,7 +67,7 @@ Priority word (Midres):
 
 const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 
-deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_BAC06, "DECO BAC06 Tilemap", tag, owner, clock, "deco_bac06", __FILE__),
 		m_pf_data(nullptr),
 		m_pf_rowscroll(nullptr),
@@ -108,9 +108,9 @@ void deco_bac06_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_pf_data = make_unique_clear<UINT16[]>(0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	m_pf_rowscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
-	m_pf_colscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_pf_data = make_unique_clear<uint16_t[]>(0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
+	m_pf_rowscroll = make_unique_clear<uint16_t[]>(0x2000 / 2);
+	m_pf_colscroll = make_unique_clear<uint16_t[]>(0x2000 / 2);
 
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
@@ -221,23 +221,23 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 								const rectangle &cliprect,
 								tilemap_t *tilemap_ptr,
-								const UINT16 *rowscroll_ptr,
-								const UINT16 *colscroll_ptr,
-								const UINT16 *control0,
-								const UINT16 *control1,
+								const uint16_t *rowscroll_ptr,
+								const uint16_t *colscroll_ptr,
+								const uint16_t *control0,
+								const uint16_t *control1,
 								int flags,
-								UINT16 penmask,
-								UINT16 pencondition,
-								UINT16 colprimask,
-								UINT16 colpricondition
+								uint16_t penmask,
+								uint16_t pencondition,
+								uint16_t colprimask,
+								uint16_t colpricondition
 								)
 {
 	const bitmap_ind16 &src_bitmap = tilemap_ptr->pixmap();
 	const bitmap_ind8 &flags_bitmap = tilemap_ptr->flagsmap();
 	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
-	UINT32 scrollx = 0;
-	UINT32 scrolly = 0;
+	uint32_t scrollx = 0;
+	uint32_t scrolly = 0;
 
 	if (control1)
 	{
@@ -313,7 +313,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition)
 {
 	tilemap_t* tm = nullptr;
 

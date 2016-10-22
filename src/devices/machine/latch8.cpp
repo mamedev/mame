@@ -11,16 +11,16 @@
 #include "emu.h"
 #include "latch8.h"
 
-void latch8_device::update(UINT8 new_val, UINT8 mask)
+void latch8_device::update(uint8_t new_val, uint8_t mask)
 {
-	UINT8 old_val = m_value;
+	uint8_t old_val = m_value;
 
 	m_value = (m_value & ~mask) | (new_val & mask);
 
 	if (m_has_write)
 	{
 		int i;
-		UINT8 changed = old_val ^ m_value;
+		uint8_t changed = old_val ^ m_value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0)) {
 				if (i==0 && !m_write_0.isnull()) m_write_0(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
@@ -37,8 +37,8 @@ void latch8_device::update(UINT8 new_val, UINT8 mask)
 
 TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
 {
-	UINT8 new_val = param & 0xFF;
-	UINT8 mask = param >> 8;
+	uint8_t new_val = param & 0xFF;
+	uint8_t mask = param >> 8;
 
 	update( new_val, mask);
 }
@@ -47,7 +47,7 @@ TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
 
 READ8_MEMBER( latch8_device::read )
 {
-	UINT8 res;
+	uint8_t res;
 
 	assert(offset == 0);
 
@@ -92,7 +92,7 @@ WRITE8_MEMBER( latch8_device::reset_w )
 /* read bit x                 */
 /* return (latch >> x) & 0x01 */
 
-UINT8 latch8_device::bitx_r( offs_t offset, int bit)
+uint8_t latch8_device::bitx_r( offs_t offset, int bit)
 {
 	assert( offset == 0);
 
@@ -120,10 +120,10 @@ READ8_MEMBER( latch8_device::bit7_q_r) { return bitx_r(offset, 7) ^ 1; }
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-void latch8_device::bitx_w(int bit, offs_t offset, UINT8 data)
+void latch8_device::bitx_w(int bit, offs_t offset, uint8_t data)
 {
-	UINT8 mask = (1<<offset);
-	UINT8 masked_data = (((data >> bit) & 0x01) << offset);
+	uint8_t mask = (1<<offset);
+	uint8_t masked_data = (((data >> bit) & 0x01) << offset);
 
 	assert( offset < 8);
 
@@ -145,7 +145,7 @@ WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(7, offset, data); }
 
 const device_type LATCH8 = &device_creator<latch8_device>;
 
-latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__),
 		m_value(0),
 		m_has_write(0),

@@ -151,12 +151,12 @@ void media_identifier::identify_file(const char *name)
 	else
 	{
 		// load the file and process if it opens and has a valid length
-		UINT32 length;
+		uint32_t length;
 		void *data;
 		const osd_file::error filerr = util::core_file::load(name, &data, length);
 		if (filerr == osd_file::error::NONE && length > 0)
 		{
-			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
+			identify_data(name, reinterpret_cast<uint8_t *>(data), length);
 			osd_free(data);
 		}
 	}
@@ -169,10 +169,10 @@ void media_identifier::identify_file(const char *name)
 //  fusemap into raw data first
 //-------------------------------------------------
 
-void media_identifier::identify_data(const char *name, const UINT8 *data, int length)
+void media_identifier::identify_data(const char *name, const uint8_t *data, int length)
 {
 	// if this is a '.jed' file, process it into raw bits first
-	std::vector<UINT8> tempjed;
+	std::vector<uint8_t> tempjed;
 	jed_data jed;
 	if (core_filename_ends_with(name, ".jed") && jed_parse(data, length, &jed) == JEDERR_NONE)
 	{

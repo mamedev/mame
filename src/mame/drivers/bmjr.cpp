@@ -45,15 +45,15 @@ public:
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
 	bool m_tape_switch;
-	required_shared_ptr<UINT8> m_p_wram;
-	UINT8 *m_p_chargen;
-	UINT8 m_xor_display;
-	UINT8 m_key_mux;
+	required_shared_ptr<uint8_t> m_p_wram;
+	uint8_t *m_p_chargen;
+	uint8_t m_xor_display;
+	uint8_t m_key_mux;
 	DECLARE_DRIVER_INIT(bmjr);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -63,17 +63,17 @@ void bmjr_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,fg=4;
-	UINT16 sy=0,ma=0x100,x;
-	UINT8 inv = (m_xor_display) ? 0xff : 0;
+	uint8_t y,ra,chr,gfx,fg=4;
+	uint16_t sy=0,ma=0x100,x;
+	uint8_t inv = (m_xor_display) ? 0xff : 0;
 
 	for(y = 0; y < 24; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 32; x++)
 			{

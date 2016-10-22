@@ -157,25 +157,25 @@ public:
 		m_hopper(*this, "hopper") { }
 
 	tilemap_t *m_tmap;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_reeltiles_1_ram;
-	required_shared_ptr<UINT8> m_reeltiles_2_ram;
-	required_shared_ptr<UINT8> m_reeltiles_3_ram;
-	required_shared_ptr<UINT8> m_reeltiles_4_ram;
-	required_shared_ptr<UINT8> m_reeltileshigh_1_ram;
-	required_shared_ptr<UINT8> m_reeltileshigh_2_ram;
-	required_shared_ptr<UINT8> m_reeltileshigh_3_ram;
-	required_shared_ptr<UINT8> m_reeltileshigh_4_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_reeltiles_1_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_2_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_3_ram;
+	required_shared_ptr<uint8_t> m_reeltiles_4_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_1_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_2_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_3_ram;
+	required_shared_ptr<uint8_t> m_reeltileshigh_4_ram;
 	tilemap_t *m_reel_1_tilemap;
 	tilemap_t *m_reel_2_tilemap;
 	tilemap_t *m_reel_3_tilemap;
 	tilemap_t *m_reel_4_tilemap;
-	required_shared_ptr<UINT8> m_reelscroll1;
-	required_shared_ptr<UINT8> m_reelscroll2;
-	required_shared_ptr<UINT8> m_reelscroll3;
-	required_shared_ptr<UINT8> m_reelscroll4;
-	UINT8 m_nmi_enable;
+	required_shared_ptr<uint8_t> m_reelscroll1;
+	required_shared_ptr<uint8_t> m_reelscroll2;
+	required_shared_ptr<uint8_t> m_reelscroll3;
+	required_shared_ptr<uint8_t> m_reelscroll4;
+	uint8_t m_nmi_enable;
 	int m_color;
 	int m_color2;
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
@@ -205,7 +205,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -234,35 +234,35 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 {
-	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
+	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(0, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
-	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
+	uint16_t code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code&0x7fff, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
 {
-	UINT16 code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
+	uint16_t code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
 {
-	UINT16 code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
+	uint16_t code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 {
-	UINT16 code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
+	uint16_t code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
@@ -290,7 +290,7 @@ void skylncr_state::video_start()
 }
 
 
-UINT32 skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -1998,7 +1998,7 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
   00 04 02 06 01 05 03 07
 */
 {
-	UINT8 *const ROM = memregion("maincpu")->base();
+	uint8_t *const ROM = memregion("maincpu")->base();
 	for (unsigned x = 0; x < 0x10000; x += 8)
 	{
 		std::swap(ROM[x + 1], ROM[x + 4]);

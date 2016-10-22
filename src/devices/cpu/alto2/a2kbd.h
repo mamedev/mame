@@ -96,13 +96,13 @@
 #ifndef _A2KBD_H_
 #define _A2KBD_H_
 struct {
-	UINT16 bootkey;                         //!< boot key - key code pressed before power on
-	UINT16 matrix[4];                       //!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
+	uint16_t bootkey;                         //!< boot key - key code pressed before power on
+	uint16_t matrix[4];                       //!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
 }   m_kbd;
 
 DECLARE_READ16_MEMBER( kbd_ad_r );          //!< read the keyboard matrix
 
-void init_kbd(UINT16 bootkey = 0177777);    //!< initialize the keyboard hardware, optinally set the boot key
+void init_kbd(uint16_t bootkey = 0177777);    //!< initialize the keyboard hardware, optinally set the boot key
 void exit_kbd();                            //!< deinitialize the keyboard hardware
 void reset_kbd();                           //!< reset the keyboard hardware
 #endif // _A2KBD_H_

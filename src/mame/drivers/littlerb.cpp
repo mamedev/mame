@@ -90,14 +90,14 @@ public:
 
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
-	UINT8 m_sound_index_l,m_sound_index_r;
-	UINT16 m_sound_pointer_l,m_sound_pointer_r;
+	uint8_t m_sound_index_l,m_sound_index_r;
+	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
 	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
 	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
-	UINT8 sound_data_shift();
+	uint8_t sound_data_shift();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
@@ -106,7 +106,7 @@ public:
 
 
 /* could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ... */
-UINT8 littlerb_state::sound_data_shift()
+uint8_t littlerb_state::sound_data_shift()
 {
 	return ((m_soundframe % 16) == 0) ? 8 : 0;
 }
@@ -147,7 +147,7 @@ ADDRESS_MAP_END
 /* guess according to DASM code and checking the gameplay speed, could be different */
 CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
 {
-	UINT32 ret = m_soundframe;
+	uint32_t ret = m_soundframe;
 
 	return (ret) & 7;
 }
@@ -232,7 +232,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
 {
-	UINT8 *sample_rom = memregion("samples")->base();
+	uint8_t *sample_rom = memregion("samples")->base();
 
 	m_ldac->write(sample_rom[m_sound_pointer_l | (m_sound_index_l << 10) | 0x40000]);
 	m_rdac->write(sample_rom[m_sound_pointer_r | (m_sound_index_r << 10) | 0x00000]);

@@ -58,8 +58,8 @@ public:
 		m_riot(*this,"riot")
 	{ }
 
-	required_shared_ptr<UINT8> m_riot_ram;
-	UINT16 m_current_screen_height;
+	required_shared_ptr<uint8_t> m_riot_ram;
+	uint16_t m_current_screen_height;
 
 	DECLARE_MACHINE_START(a2600);
 	DECLARE_WRITE8_MEMBER(switch_A_w);
@@ -101,7 +101,7 @@ protected:
 #define MASTER_CLOCK_PAL    3546894
 #define CATEGORY_SELECT     16
 
-static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
+static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
 static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -122,7 +122,7 @@ READ8_MEMBER(a2600_state::cart_over_all_r)
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if (masked_offset < 0x80)
 	{
@@ -206,7 +206,7 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 
 READ8_MEMBER(a2600_state::switch_A_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
 	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
@@ -267,8 +267,8 @@ READ16_MEMBER(a2600_state::a2600_read_input_port)
 */
 READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 {
-	UINT16  last_address, prev_address;
-	UINT8   last_byte, prev_byte;
+	uint16_t  last_address, prev_address;
+	uint8_t   last_byte, prev_byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	last_address = m_maincpu->pc() + 1;
@@ -452,7 +452,7 @@ unsigned a2600_state::long detect_2600controllers()
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
-	UINT8 *cart;
+	uint8_t *cart;
 	static const unsigned char signatures[][5] =  {
 		{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
 		{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel

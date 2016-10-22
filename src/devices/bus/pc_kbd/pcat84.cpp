@@ -353,7 +353,7 @@ ioport_constructor ibm_3270pc_122_keyboard_device::device_input_ports() const
 //  ibm_pc_at_84_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_pc_kbd_interface(mconfig, *this),
 	m_maincpu(*this, I8048_TAG),
@@ -367,10 +367,10 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 {
 }
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_PC_AT_84, "IBM PC/AT Keyboard", tag, owner, clock, "kb_pcat84", __FILE__) { }
 
-ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_3270PC_122, "IBM 3270PC Keyboard", tag, owner, clock, "kb_3270pc", __FILE__) { }
 
 
@@ -451,7 +451,7 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_kbdida->read() << 2;
 
@@ -510,7 +510,7 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p2_r )
 
 	*/
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	data |= m_kbdidb->read();
 
@@ -574,7 +574,7 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
 
 int ibm_pc_at_84_keyboard_device::key_depressed()
 {
-	UINT8 data = m_dr[m_cnt]->read();
+	uint8_t data = m_dr[m_cnt]->read();
 
 	return m_t1 && BIT(data, m_sense);
 }

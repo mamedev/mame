@@ -37,12 +37,12 @@ TODO:
 
 
 /* prototypes of coprocessor functions */
-void arm7_dt_r_callback(arm_state *arm, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *arm, UINT32 addr));
-void arm7_dt_w_callback(arm_state *arm, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *arm, UINT32 addr, UINT32 data));
+void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
+void arm7_dt_w_callback(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 // holder for the co processor Data Transfer Read & Write Callback funcs
-void (*arm7_coproc_dt_r_callback)(arm_state *arm, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *arm, UINT32 addr));
-void (*arm7_coproc_dt_w_callback)(arm_state *arm, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *arm, UINT32 addr, UINT32 data));
+void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
+void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
 const device_type ARM7 = &device_creator<arm7_cpu_device>;
@@ -54,7 +54,7 @@ const device_type PXA255 = &device_creator<pxa255_cpu_device>;
 const device_type SA1110 = &device_creator<sa1110_cpu_device>;
 
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ARM7, "ARM7", tag, owner, clock, "arm7", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_endian(ENDIANNESS_LITTLE)
@@ -67,7 +67,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 archRev, UINT8 archFlags, endianness_t endianness)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", endianness, 32, 32, 0)
 	, m_endian(endianness)
@@ -80,20 +80,20 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 }
 
 
-arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7_BE, "ARM7 (big endian)", tag, owner, clock, "arm7_be", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
 {
 }
 
 
-arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7500, "ARM7500", tag, owner, clock, "arm7500", __FILE__, 3, eARM_ARCHFLAGS_MODE26)
 {
 	m_copro_id = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0);
 }
 
 
-arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM9, "ARM9", tag, owner, clock, "arm9", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E)
 	// ARMv5
 	// has TE extensions
@@ -101,7 +101,7 @@ arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
-arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM920T, "ARM920T", tag, owner, clock, "arm920t", __FILE__, 4, eARM_ARCHFLAGS_T)
 	// ARMv4
 	// has T extension
@@ -110,7 +110,7 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 }
 
 
-pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, PXA255, "PXA255", tag, owner, clock, "pxa255", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE)
 	// ARMv5
 	// has TE and XScale extensions
@@ -118,7 +118,7 @@ pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *
 }
 
 
-sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, SA1110, "SA1110", tag, owner, clock, "sa1110", __FILE__, 4, eARM_ARCHFLAGS_SA)
 	// ARMv4
 	// has StrongARM, no Thumb, no Enhanced DSP
@@ -130,9 +130,9 @@ void arm7_cpu_device::update_reg_ptr()
 	m_reg_group = sRegisterTable[GET_MODE];
 }
 
-void arm7_cpu_device::set_cpsr(UINT32 val)
+void arm7_cpu_device::set_cpsr(uint32_t val)
 {
-	UINT8 old_mode = GET_CPSR & MODE_FLAG;
+	uint8_t old_mode = GET_CPSR & MODE_FLAG;
 	if (m_archFlags & eARM_ARCHFLAGS_MODE26)
 	{
 		if ((val & 0x10) != (m_r[eCPSR] & 0x10))
@@ -189,9 +189,9 @@ enum
 
 
 // COARSE, desc_level1, vaddr
-UINT32 arm7_cpu_device::arm7_tlb_get_second_level_descriptor( UINT32 granularity, UINT32 first_desc, UINT32 vaddr )
+uint32_t arm7_cpu_device::arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr )
 {
-	UINT32 desc_lvl2 = vaddr;
+	uint32_t desc_lvl2 = vaddr;
 
 	switch( granularity )
 	{
@@ -294,7 +294,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 		addr += m_pid_offset;
 	}
 
-	UINT32 desc_lvl1 = m_program->read_dword(m_tlb_base_mask | ((addr & COPRO_TLB_VADDR_FLTI_MASK) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT));
+	uint32_t desc_lvl1 = m_program->read_dword(m_tlb_base_mask | ((addr & COPRO_TLB_VADDR_FLTI_MASK) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT));
 
 #if ARM7_MMU_ENABLE_HACK
 	if ((m_r[eR15] == (m_mmu_enable_addr + 4)) || (m_r[eR15] == (m_mmu_enable_addr + 8)))
@@ -308,7 +308,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 	}
 #endif
 
-	UINT8 tlb_type = desc_lvl1 & 3;
+	uint8_t tlb_type = desc_lvl1 & 3;
 	if (tlb_type == COPRO_TLB_SECTION_TABLE)
 	{
 		// Entry is a section
@@ -321,7 +321,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 		{
 			if (flags & ARM7_TLB_ABORT_D)
 			{
-				UINT8 domain = (desc_lvl1 >> 5) & 0xF;
+				uint8_t domain = (desc_lvl1 >> 5) & 0xF;
 				LOG( ( "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
 				m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
 				m_faultAddress = addr;
@@ -358,11 +358,11 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 	else
 	{
 		// Entry is the physical address of a coarse second-level table
-		UINT8 permission = (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3;
-		UINT32 desc_lvl2 = arm7_tlb_get_second_level_descriptor( (desc_lvl1 & 3) == COPRO_TLB_COARSE_TABLE ? TLB_COARSE : TLB_FINE, desc_lvl1, addr );
+		uint8_t permission = (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3;
+		uint32_t desc_lvl2 = arm7_tlb_get_second_level_descriptor( (desc_lvl1 & 3) == COPRO_TLB_COARSE_TABLE ? TLB_COARSE : TLB_FINE, desc_lvl1, addr );
 		if ((permission != 1) && (permission != 3))
 		{
-			UINT8 domain = (desc_lvl1 >> 5) & 0xF;
+			uint8_t domain = (desc_lvl1 >> 5) & 0xF;
 			fatalerror("ARM7: Not Yet Implemented: Coarse Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", addr, domain, m_r[eR15]);
 		}
 
@@ -372,7 +372,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 				// Unmapped, generate a translation fault
 				if (flags & ARM7_TLB_ABORT_D)
 				{
-					UINT8 domain = (desc_lvl1 >> 5) & 0xF;
+					uint8_t domain = (desc_lvl1 >> 5) & 0xF;
 					LOG( ( "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15] ) );
 					m_faultStatus[0] = (7 << 0) | (domain << 4); // 7 = page translation fault
 					m_faultAddress = addr;
@@ -391,7 +391,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 			case COPRO_TLB_SMALL_PAGE:
 				// Small page descriptor
 				{
-					UINT8 ap = ((((desc_lvl2 >> 4) & 0xFF) >> (((addr >> 10) & 3) << 1)) & 3);
+					uint8_t ap = ((((desc_lvl2 >> 4) & 0xFF) >> (((addr >> 10) & 3) << 1)) & 3);
 					int fault = detect_fault(desc_lvl1, ap, flags);
 					if (fault == FAULT_NONE)
 					{
@@ -401,7 +401,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 					{
 						if (flags & ARM7_TLB_ABORT_D)
 						{
-							UINT8 domain = (desc_lvl1 >> 5) & 0xF;
+							uint8_t domain = (desc_lvl1 >> 5) & 0xF;
 							// hapyfish expects a data abort when something tries to write to a read-only memory location from user mode
 							LOG( ( "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
 							m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
@@ -571,7 +571,7 @@ void arm7_cpu_device::device_reset()
 	m_fcsePID = 0;
 	m_pid_offset = 0;
 	m_domainAccessControl = 0;
-	memset(m_decoded_access_control, 0, sizeof(UINT8) * 16);
+	memset(m_decoded_access_control, 0, sizeof(uint8_t) * 16);
 
 	/* start up in SVC mode with interrupts disabled. */
 	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
@@ -588,11 +588,11 @@ void arm7_cpu_device::device_reset()
 
 void arm7_cpu_device::execute_run()
 {
-	UINT32 insn;
+	uint32_t insn;
 
 	do
 	{
-		UINT32 pc = GET_PC;
+		uint32_t pc = GET_PC;
 
 		debugger_instruction_hook(this, pc);
 
@@ -638,7 +638,7 @@ void arm7_cpu_device::execute_run()
 #if 0
 			if (MODE26)
 			{
-				UINT32 temp1, temp2;
+				uint32_t temp1, temp2;
 				temp1 = GET_CPSR & 0xF00000C3;
 				temp2 = (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> (26 - 6)) | (R15 & 0x00000003);
 				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)\n", pc, temp1, temp2);
@@ -756,7 +756,7 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-offs_t arm7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t arm7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm7arm );
 	extern CPU_DISASSEMBLE( arm7thumb );
@@ -789,12 +789,12 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_do_callback )
 
 READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 {
-	UINT32 opcode = offset;
-	UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
-	UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
-	UINT8 op3 =    opcode & INSN_COPRO_OP3;
-	UINT8 cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
-	UINT32 data = 0;
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint32_t data = 0;
 
 //    printf("cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, GET_REGISTER(arm, 15));
 
@@ -809,7 +809,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 			switch( cReg )
 			{
 				case 1: // clock counter
-					data = (UINT32)total_cycles();
+					data = (uint32_t)total_cycles();
 					break;
 
 				default:
@@ -952,11 +952,11 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 
 WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 {
-	UINT32 opcode = offset;
-	UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
-	UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
-	UINT8 op3 =    opcode & INSN_COPRO_OP3;
-	UINT8 cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 
 	// handle XScale specific CP14 - just eat writes for now
 	if (cpnum != 15)
@@ -1060,9 +1060,9 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 }
 
 
-void arm7_cpu_device::arm7_dt_r_callback(UINT32 insn, UINT32 *prn)
+void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 {
-	UINT8 cpn = (insn >> 8) & 0xF;
+	uint8_t cpn = (insn >> 8) & 0xF;
 	if ((m_archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
 	{
 		LOG( ( "arm7_dt_r_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
@@ -1074,9 +1074,9 @@ void arm7_cpu_device::arm7_dt_r_callback(UINT32 insn, UINT32 *prn)
 }
 
 
-void arm7_cpu_device::arm7_dt_w_callback(UINT32 insn, UINT32 *prn)
+void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 {
-	UINT8 cpn = (insn >> 8) & 0xF;
+	uint8_t cpn = (insn >> 8) & 0xF;
 	if ((m_archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
 	{
 		LOG( ( "arm7_dt_w_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
@@ -1091,7 +1091,7 @@ void arm7_cpu_device::arm7_dt_w_callback(UINT32 insn, UINT32 *prn)
 /***************************************************************************
  * Default Memory Handlers
  ***************************************************************************/
-void arm7_cpu_device::arm7_cpu_write32(UINT32 addr, UINT32 data)
+void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1106,7 +1106,7 @@ void arm7_cpu_device::arm7_cpu_write32(UINT32 addr, UINT32 data)
 }
 
 
-void arm7_cpu_device::arm7_cpu_write16(UINT32 addr, UINT16 data)
+void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1120,7 +1120,7 @@ void arm7_cpu_device::arm7_cpu_write16(UINT32 addr, UINT16 data)
 	m_program->write_word(addr, data);
 }
 
-void arm7_cpu_device::arm7_cpu_write8(UINT32 addr, UINT8 data)
+void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1133,9 +1133,9 @@ void arm7_cpu_device::arm7_cpu_write8(UINT32 addr, UINT8 data)
 	m_program->write_byte(addr, data);
 }
 
-UINT32 arm7_cpu_device::arm7_cpu_read32(UINT32 addr)
+uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 {
-	UINT32 result;
+	uint32_t result;
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1158,9 +1158,9 @@ UINT32 arm7_cpu_device::arm7_cpu_read32(UINT32 addr)
 	return result;
 }
 
-UINT16 arm7_cpu_device::arm7_cpu_read16(UINT32 addr)
+uint16_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 {
-	UINT16 result;
+	uint16_t result;
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -1180,7 +1180,7 @@ UINT16 arm7_cpu_device::arm7_cpu_read16(UINT32 addr)
 	return result;
 }
 
-UINT8 arm7_cpu_device::arm7_cpu_read8(UINT32 addr)
+uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{

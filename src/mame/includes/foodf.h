@@ -24,10 +24,10 @@ public:
 	double          m_rweights[3];
 	double          m_gweights[3];
 	double          m_bweights[2];
-	UINT8           m_playfield_flip;
+	uint8_t           m_playfield_flip;
 
-	UINT8           m_whichport;
-	required_shared_ptr<UINT16> m_spriteram;
+	uint8_t           m_whichport;
+	required_shared_ptr<uint16_t> m_spriteram;
 	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(digital_w);
@@ -40,6 +40,6 @@ public:
 	DECLARE_MACHINE_START(foodf);
 	DECLARE_MACHINE_RESET(foodf);
 	DECLARE_VIDEO_START(foodf);
-	UINT32 screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
 };

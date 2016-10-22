@@ -230,7 +230,7 @@ PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
 }
 
-UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

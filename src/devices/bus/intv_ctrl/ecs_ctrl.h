@@ -31,9 +31,9 @@ public:
 	device_intvecs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_intvecs_control_port_interface();
 
-	virtual UINT8 read_portA() { return 0xff; };
-	virtual UINT8 read_portB() { return 0xff; };
-	virtual void write_portA(UINT8 data) { };
+	virtual uint8_t read_portA() { return 0xff; };
+	virtual uint8_t read_portB() { return 0xff; };
+	virtual void write_portA(uint8_t data) { };
 
 protected:
 	intvecs_control_port_device *m_port;
@@ -46,7 +46,7 @@ class intvecs_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~intvecs_control_port_device();
 
 	DECLARE_READ8_MEMBER( portA_r ) { return read_portA(); }
@@ -56,9 +56,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	UINT8 read_portA();
-	UINT8 read_portB();
-	void write_portA(UINT8 data);
+	uint8_t read_portA();
+	uint8_t read_portB();
+	void write_portA(uint8_t data);
 
 	device_intvecs_control_port_interface *m_device;
 };
@@ -92,7 +92,7 @@ class intvecs_ctrls_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -102,8 +102,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_portA() override;
-	virtual UINT8 read_portB() override;
+	virtual uint8_t read_portA() override;
+	virtual uint8_t read_portB() override;
 
 private:
 	required_device<intv_control_port_device> m_hand1;
@@ -117,7 +117,7 @@ class intvecs_keybd_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -127,11 +127,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_portB() override;
-	virtual void write_portA(UINT8 data) override;
+	virtual uint8_t read_portB() override;
+	virtual void write_portA(uint8_t data) override;
 
 private:
-	UINT8 m_psg_portA;
+	uint8_t m_psg_portA;
 	required_ioport_array<7> m_keybd;
 };
 
@@ -142,7 +142,7 @@ class intvecs_synth_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -152,11 +152,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_portB() override;
-	virtual void write_portA(UINT8 data) override;
+	virtual uint8_t read_portB() override;
+	virtual void write_portA(uint8_t data) override;
 
 private:
-	UINT8 m_psg_portA;
+	uint8_t m_psg_portA;
 	required_ioport_array<7> m_synth;
 };
 

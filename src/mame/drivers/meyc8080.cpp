@@ -77,9 +77,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac") { }
 
-	required_shared_ptr<UINT8> m_videoram_0;
-	required_shared_ptr<UINT8> m_videoram_1;
-	required_shared_ptr<UINT8> m_videoram_2;
+	required_shared_ptr<uint8_t> m_videoram_0;
+	required_shared_ptr<uint8_t> m_videoram_1;
+	required_shared_ptr<uint8_t> m_videoram_2;
 
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
@@ -88,7 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
-	UINT32 screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 };
@@ -100,7 +100,7 @@ public:
  *
  *************************************/
 
-UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -108,18 +108,18 @@ UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
 
-		UINT8 data0 = m_videoram_0[offs];
-		UINT8 data1 = m_videoram_1[offs];
-		UINT8 data2 = m_videoram_2[offs];
+		uint8_t data0 = m_videoram_0[offs];
+		uint8_t data1 = m_videoram_1[offs];
+		uint8_t data2 = m_videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
 		   perhaphs they used a look-up PROM? */
-		UINT8 data_r = data0;
-		UINT8 data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
-		UINT8 data_b = data0 ^ data1;
+		uint8_t data_r = data0;
+		uint8_t data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
+		uint8_t data_b = data0 ^ data1;
 
 		for (i = 0; i < 8; i++)
 		{

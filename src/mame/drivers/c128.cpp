@@ -120,7 +120,7 @@ public:
 	required_device<generic_slot_device> m_from;
 	required_memory_region m_rom;
 	required_memory_region m_charom;
-	optional_shared_ptr<UINT8> m_color_ram;
+	optional_shared_ptr<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport_array<3> m_k;
 	required_ioport m_lock;
@@ -132,8 +132,8 @@ public:
 
 	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
-	void write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io);
+	uint8_t read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
+	void write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
 	DECLARE_READ8_MEMBER( z80_r );
@@ -231,7 +231,7 @@ public:
 	int m_iec_srq;
 
 	// keyboard state
-	UINT8 m_vic_k;
+	uint8_t m_vic_k;
 	int m_caps_lock;
 
 	int m_user_pa2;
@@ -326,7 +326,7 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_hiram);
 	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_hiram);
 
-	UINT32 input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
+	uint32_t input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
 		m_exrom << 15 | m_game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
 		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
@@ -339,13 +339,13 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
+uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 	offs_t ma = 0;
@@ -466,7 +466,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 //  write_memory -
 //-------------------------------------------------
 
-void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
+void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -1116,7 +1116,7 @@ WRITE8_MEMBER( c128_state::vic_k_w )
 
 READ8_MEMBER( c128_state::sid_potx_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
@@ -1143,7 +1143,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 
 READ8_MEMBER( c128_state::sid_poty_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
@@ -1197,17 +1197,17 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
-	UINT8 joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->joy_r();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	UINT8 cia1_pb = m_cia1->pb_r();
-	UINT32 row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
+	uint8_t cia1_pb = m_cia1->pb_r();
+	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
 	for (int i = 0; i < 8; i++)
@@ -1265,16 +1265,16 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
-	UINT8 joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->joy_r();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	UINT8 cia1_pa = m_cia1->pa_r();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1359,7 +1359,7 @@ READ8_MEMBER( c128_state::cia2_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// user port
 	data |= m_user_pa2 << 2;
@@ -1440,7 +1440,7 @@ READ8_MEMBER( c128_state::cpu_r)
 
 	*/
 
-	UINT8 data = 0x07;
+	uint8_t data = 0x07;
 
 	// cassette sense
 	data |= m_cassette->sense_r() << 4;
@@ -1608,7 +1608,7 @@ void c128_state::machine_start()
 	m_color_ram.allocate(0x800);
 
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

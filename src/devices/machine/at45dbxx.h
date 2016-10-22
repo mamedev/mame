@@ -41,15 +41,15 @@ class at45db041_device : public device_t,
 							public device_nvram_interface
 {
 public:
-	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(sck_w);
 	DECLARE_WRITE_LINE_MEMBER(si_w);
 	DECLARE_READ_LINE_MEMBER(so_r);
 
-	UINT8 *get_ptr() {  return &m_data[0];  }
+	uint8_t *get_ptr() {  return &m_data[0];  }
 
 	template<class _Object> static devcb_base &set_so_cb(device_t &device, _Object object) { return downcast<at45db041_device &>(device).write_so.set_callback(object); }
 	devcb_write_line write_so;
@@ -67,25 +67,25 @@ protected:
 protected:
 	virtual int num_pages() const { return 2048; }
 	virtual int page_size() const { return 264; }
-	virtual UINT8 device_id() const { return 0x18; }
+	virtual uint8_t device_id() const { return 0x18; }
 
-	UINT8 read_byte();
-	void flash_set_io(UINT8* data, UINT32 size, UINT32 pos);
-	virtual UINT32 flash_get_page_addr();
-	virtual UINT32 flash_get_byte_addr();
-	void write_byte(UINT8 data);
+	uint8_t read_byte();
+	void flash_set_io(uint8_t* data, uint32_t size, uint32_t pos);
+	virtual uint32_t flash_get_page_addr();
+	virtual uint32_t flash_get_byte_addr();
+	void write_byte(uint8_t data);
 
 	// internal state
-	std::vector<UINT8> m_data;
-	UINT32      m_size;
-	UINT8       m_mode;
-	UINT8       m_status;
-	std::vector<UINT8> m_buffer1;
-	//std::vector<UINT8> m_buffer2;
-	UINT8       m_si_byte;
-	UINT8       m_si_bits;
-	UINT8       m_so_byte;
-	UINT8       m_so_bits;
+	std::vector<uint8_t> m_data;
+	uint32_t      m_size;
+	uint8_t       m_mode;
+	uint8_t       m_status;
+	std::vector<uint8_t> m_buffer1;
+	//std::vector<uint8_t> m_buffer2;
+	uint8_t       m_si_byte;
+	uint8_t       m_si_bits;
+	uint8_t       m_so_byte;
+	uint8_t       m_so_bits;
 
 	struct AT45DBXX_PINS
 	{
@@ -100,15 +100,15 @@ protected:
 
 	struct AT45DBXX_IO
 	{
-		UINT8 *data;
-		UINT32 size;
-		UINT32 pos;
+		uint8_t *data;
+		uint32_t size;
+		uint32_t pos;
 	} m_io;
 
 	struct AT45DBXX_CMD
 	{
-		UINT8 data[8];
-		UINT8 size;
+		uint8_t data[8];
+		uint8_t size;
 	} m_cmd;
 };
 
@@ -117,14 +117,14 @@ protected:
 class at45db081_device : public at45db041_device
 {
 public:
-	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }
 	virtual int page_size() const override { return 264;  }
-	virtual UINT8 device_id() const override { return 0x20; }
+	virtual uint8_t device_id() const override { return 0x20; }
 
-	virtual UINT32 flash_get_page_addr() override;
+	virtual uint32_t flash_get_page_addr() override;
 };
 
 // ======================> at45db161_device
@@ -132,15 +132,15 @@ protected:
 class at45db161_device : public at45db041_device
 {
 public:
-	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }
 	virtual int page_size() const override { return 528;  }
-	virtual UINT8 device_id() const override { return 0x28; }
+	virtual uint8_t device_id() const override { return 0x28; }
 
-	virtual UINT32 flash_get_page_addr() override;
-	virtual UINT32 flash_get_byte_addr() override;
+	virtual uint32_t flash_get_page_addr() override;
+	virtual uint32_t flash_get_byte_addr() override;
 };
 
 

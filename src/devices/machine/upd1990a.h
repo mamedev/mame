@@ -53,8 +53,8 @@ class upd1990a_device : public device_t,
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
 	template<class _tp> void set_tp_callback(_tp tp) { m_write_tp.set_callback(tp); }
@@ -116,8 +116,8 @@ private:
 	devcb_write_line m_write_data;
 	devcb_write_line m_write_tp;
 
-	UINT8 m_time_counter[6];    // time counter
-	UINT8 m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)
+	uint8_t m_time_counter[6];    // time counter
+	uint8_t m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)
 
 	int m_oe;                   // output enable
 	int m_cs;                   // chip select
@@ -149,7 +149,7 @@ private:
 class upd4990a_device : public upd1990a_device
 {
 public:
-	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

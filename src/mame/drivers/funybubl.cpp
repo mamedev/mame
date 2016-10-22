@@ -201,7 +201,7 @@ GFXDECODE_END
 
 void funybubl_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 
 	save_item(NAME(m_banked_vram));

@@ -3,7 +3,7 @@
 class buggychl_mcu_device : public device_t
 {
 public:
-	buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~buggychl_mcu_device() {}
 
 	DECLARE_WRITE8_MEMBER( buggychl_mcu_w );
@@ -27,17 +27,17 @@ protected:
 
 private:
 	// internal state
-	UINT8       m_port_a_in;
-	UINT8       m_port_a_out;
-	UINT8       m_ddr_a;
-	UINT8       m_port_b_in;
-	UINT8       m_port_b_out;
-	UINT8       m_ddr_b;
-	UINT8       m_port_c_in;
-	UINT8       m_port_c_out;
-	UINT8       m_ddr_c;
-	UINT8       m_from_main;
-	UINT8       m_from_mcu;
+	uint8_t       m_port_a_in;
+	uint8_t       m_port_a_out;
+	uint8_t       m_ddr_a;
+	uint8_t       m_port_b_in;
+	uint8_t       m_port_b_out;
+	uint8_t       m_ddr_b;
+	uint8_t       m_port_c_in;
+	uint8_t       m_port_c_out;
+	uint8_t       m_ddr_c;
+	uint8_t       m_from_main;
+	uint8_t       m_from_mcu;
 	int         m_mcu_sent;
 	int         m_main_sent;
 	device_t *m_mcu;

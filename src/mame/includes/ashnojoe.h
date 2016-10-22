@@ -30,15 +30,15 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	UINT16 *    m_tileram_1;
-	required_shared_ptr<UINT16> m_tileram_3;
-	required_shared_ptr<UINT16> m_tileram_4;
-	required_shared_ptr<UINT16> m_tileram_5;
-	required_shared_ptr<UINT16> m_tileram_2;
-	required_shared_ptr<UINT16> m_tileram_6;
-	required_shared_ptr<UINT16> m_tileram_7;
-	required_shared_ptr<UINT16> m_tileram;
-	required_shared_ptr<UINT16> m_tilemap_reg;
+	uint16_t *    m_tileram_1;
+	required_shared_ptr<uint16_t> m_tileram_3;
+	required_shared_ptr<uint16_t> m_tileram_4;
+	required_shared_ptr<uint16_t> m_tileram_5;
+	required_shared_ptr<uint16_t> m_tileram_2;
+	required_shared_ptr<uint16_t> m_tileram_6;
+	required_shared_ptr<uint16_t> m_tileram_7;
+	required_shared_ptr<uint16_t> m_tileram;
+	required_shared_ptr<uint16_t> m_tilemap_reg;
 
 	/* video-related */
 	tilemap_t     *m_joetilemap;
@@ -50,7 +50,7 @@ public:
 	tilemap_t     *m_joetilemap7;
 
 	/* sound-related */
-	UINT8       m_adpcm_byte;
+	uint8_t       m_adpcm_byte;
 	int         m_soundlatch_status;
 	int         m_msm5205_vclk_toggle;
 
@@ -88,6 +88,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
 };

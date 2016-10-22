@@ -36,7 +36,7 @@ class hd61830_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
 
@@ -46,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -58,8 +58,8 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 
 private:
 	enum
@@ -81,9 +81,9 @@ private:
 
 	void set_busy_flag();
 
-	UINT16 draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra);
+	uint16_t draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t ra);
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
+	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	devcb_read8 m_read_rd;
@@ -93,12 +93,12 @@ private:
 
 	bool m_bf;                      // busy flag
 
-	UINT8 m_ir;                     // instruction register
-	UINT8 m_mcr;                    // mode control register
-	UINT8 m_dor;                    // data output register
+	uint8_t m_ir;                     // instruction register
+	uint8_t m_mcr;                    // mode control register
+	uint8_t m_dor;                    // data output register
 
-	UINT16 m_dsa;                   // display start address
-	UINT16 m_cac;                   // cursor address counter
+	uint16_t m_dsa;                   // display start address
+	uint16_t m_cac;                   // cursor address counter
 
 	int m_vp;                       // vertical character pitch
 	int m_hp;                       // horizontal character pitch
@@ -112,7 +112,7 @@ private:
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	required_region_ptr<UINT8> m_char_rom;
+	required_region_ptr<uint8_t> m_char_rom;
 };
 
 

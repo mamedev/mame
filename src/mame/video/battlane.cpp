@@ -226,7 +226,7 @@ void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 	}
 }
 
-UINT32 battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty(); // HACK
 

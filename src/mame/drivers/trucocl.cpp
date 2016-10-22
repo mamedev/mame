@@ -61,7 +61,7 @@ void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int dac_address = ( data & 0xf0 ) << 8;
 	int sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 

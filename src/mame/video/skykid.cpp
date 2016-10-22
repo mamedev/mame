@@ -19,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(skykid_state, skykid)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(skykid_state, skykid)
 	/* tiles/sprites */
 	for (i = 0x100; i < 0x500; i++)
 	{
-		UINT8 ctabentry = color_prom[i - 0x100];
+		uint8_t ctabentry = color_prom[i - 0x100];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -175,9 +175,9 @@ WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
 /* the sprite generator IC is the same as Mappy */
 void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram + 0x780;
-	UINT8 *spriteram_2 = spriteram + 0x0800;
-	UINT8 *spriteram_3 = spriteram_2 + 0x0800;
+	uint8_t *spriteram = m_spriteram + 0x780;
+	uint8_t *spriteram_2 = spriteram + 0x0800;
+	uint8_t *spriteram_3 = spriteram_2 + 0x0800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -225,7 +225,7 @@ void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 }
 
 
-UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 	{

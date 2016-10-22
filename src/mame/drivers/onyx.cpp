@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(portff05_r);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

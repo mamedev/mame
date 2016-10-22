@@ -31,8 +31,8 @@ class xt_hdc_device :
 {
 public:
 	// construction/destruction
-	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
@@ -47,10 +47,10 @@ public:
 	void reset_w(int data);
 	void select_w(int data);
 	void control_w(int data);
-	UINT8 data_r();
-	UINT8 status_r();
+	uint8_t data_r();
+	uint8_t status_r();
 	void set_ready();
-	UINT8 get_command() { return buffer[0]; }
+	uint8_t get_command() { return buffer[0]; }
 	bool install_rom() { return (m_type != EC1841); }
 
 protected:
@@ -70,8 +70,8 @@ protected:
 	void get_chsn();
 	int test_ready();
 
-	std::vector<UINT8> buffer;                  /* data buffer */
-	UINT8 *buffer_ptr;          /* data pointer */
+	std::vector<uint8_t> buffer;                  /* data buffer */
+	uint8_t *buffer_ptr;          /* data pointer */
 	int csb;                /* command status byte */
 	int status;         /* drive status */
 	int error;          /* error code */
@@ -82,7 +82,7 @@ protected:
 		ST11M
 	};
 	int m_type;
-	UINT8 m_current_cmd;
+	uint8_t m_current_cmd;
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
 
@@ -104,11 +104,11 @@ private:
 	emu_timer *timer;
 
 	int data_cnt;                /* data count */
-	UINT8 hdc_control;
+	uint8_t hdc_control;
 
-	UINT8 hdcdma_data[512];
-	UINT8 *hdcdma_src;
-	UINT8 *hdcdma_dst;
+	uint8_t hdcdma_data[512];
+	uint8_t *hdcdma_src;
+	uint8_t *hdcdma_dst;
 	int hdcdma_read;
 	int hdcdma_write;
 	int hdcdma_size;
@@ -117,7 +117,7 @@ private:
 class ec1841_device : public xt_hdc_device
 {
 public:
-	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -126,7 +126,7 @@ protected:
 class st11m_device : public xt_hdc_device
 {
 public:
-	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	devcb_write_line m_irq_handler;
@@ -145,8 +145,8 @@ class isa8_hdc_device :
 {
 public:
 		// construction/destruction
-		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		DECLARE_READ8_MEMBER(pc_hdc_r);
 		DECLARE_WRITE8_MEMBER(pc_hdc_w);
@@ -163,9 +163,9 @@ protected:
 		virtual void device_start() override;
 		virtual void device_reset() override;
 public:
-		virtual UINT8 dack_r(int line) override;
-		virtual void dack_w(int line,UINT8 data) override;
-		UINT8 pc_hdc_dipswitch_r();
+		virtual uint8_t dack_r(int line) override;
+		virtual void dack_w(int line,uint8_t data) override;
+		uint8_t pc_hdc_dipswitch_r();
 
 		int dip;                /* dip switches */
 };
@@ -174,7 +174,7 @@ public:
 class isa8_hdc_ec1841_device : public isa8_hdc_device
 {
 public:
-	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

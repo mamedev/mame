@@ -1390,7 +1390,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 {
 	seta_state *state = machine.driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->m_uPD71054;
-	UINT16 max = uPD71054->max[no]&0xffff;
+	uint16_t max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
 		attotime period = attotime::from_hz(machine.device("maincpu")->unscaled_clock()) * (16 * max);
@@ -1522,7 +1522,7 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 
 READ16_MEMBER(seta_state::sharedram_68000_r)
 {
-	return ((UINT16)m_sharedram[offset]) & 0xff;
+	return ((uint16_t)m_sharedram[offset]) & 0xff;
 }
 
 WRITE16_MEMBER(seta_state::sharedram_68000_w)
@@ -1573,7 +1573,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 /* DSW reading for 16 bit CPUs */
 READ16_MEMBER(seta_state::seta_dsw_r)
 {
-	UINT16 dsw = ioport("DSW")->read();
+	uint16_t dsw = ioport("DSW")->read();
 	if (offset == 0)    return (dsw >> 8) & 0xff;
 	else                return (dsw >> 0) & 0xff;
 }
@@ -2107,7 +2107,7 @@ ADDRESS_MAP_END
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static const UINT16 keroppi_protection_word[] = {
+static const uint16_t keroppi_protection_word[] = {
 	0x0000,
 	0x0000, 0x0000, 0x0000,
 	0x2000, 0x2000, 0x2000,
@@ -2119,7 +2119,7 @@ static const UINT16 keroppi_protection_word[] = {
 
 READ16_MEMBER(seta_state::keroppi_protection_r)
 {
-	UINT16 result = keroppi_protection_word[m_keroppi_protection_count];
+	uint16_t result = keroppi_protection_word[m_keroppi_protection_count];
 
 	m_keroppi_protection_count++;
 	if (m_keroppi_protection_count > 15)
@@ -2137,7 +2137,7 @@ READ16_MEMBER(seta_state::keroppi_protection_init_r)
 
 READ16_MEMBER(seta_state::keroppi_coin_r)
 {
-	UINT16 result = m_coins->read();
+	uint16_t result = m_coins->read();
 
 	if (m_keroppi_prize_hop == 2)
 	{
@@ -2358,7 +2358,7 @@ WRITE16_MEMBER(seta_state::setaroul_spritecode_w)
 
 READ16_MEMBER(seta_state::setaroul_spritecode_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	if ((offset&1)==1)
 		ret = m_seta001->spritecodelow_r8(space, offset>>1);
 	else
@@ -3124,7 +3124,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 {
-	UINT8 *rom = memregion("sub")->base();
+	uint8_t *rom = memregion("sub")->base();
 	int bank = data >> 4;
 
 	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
@@ -11411,7 +11411,7 @@ READ16_MEMBER(seta_state::downtown_protection_r)
 	{
 		case 0xa3:
 		{
-			static const UINT8 word[] = "WALTZ0";
+			static const uint8_t word[] = "WALTZ0";
 			if (offset >= 0x100/2 && offset <= 0x10a/2) return word[offset-0x100/2];
 			else                                        return 0;
 		}
@@ -11453,7 +11453,7 @@ DRIVER_INIT_MEMBER(seta_state,arbalest)
 
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
 //  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
@@ -11469,11 +11469,11 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int rpos;
 
 	rom_size = 0x80000;
-	std::vector<UINT8> buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx2")->base() + 0x40000;
 
@@ -11510,7 +11510,7 @@ DRIVER_INIT_MEMBER(seta_state,zombraid)
 
 DRIVER_INIT_MEMBER(seta_state,kiwame)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
 	   table. Lev 1 routine address is stored at $100 */
@@ -11527,9 +11527,9 @@ DRIVER_INIT_MEMBER(seta_state,rezon)
 
 DRIVER_INIT_MEMBER(seta_state,wiggie)
 {
-	UINT8 *src;
+	uint8_t *src;
 	int len;
-	UINT8 temp[16];
+	uint8_t temp[16];
 	int i,j;
 
 	src = memregion("maincpu")->base();
@@ -11561,7 +11561,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 
 DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
@@ -11578,7 +11578,7 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 
 DRIVER_INIT_MEMBER(seta_state,inttoote)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
 	m_vregs.allocate(3);
@@ -11592,7 +11592,7 @@ DRIVER_INIT_MEMBER(seta_state,inttoote)
 
 DRIVER_INIT_MEMBER(seta_state,inttootea)
 {
-	//UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	//uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
 	m_vregs.allocate(3);

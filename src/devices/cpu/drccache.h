@@ -30,7 +30,7 @@
 //**************************************************************************
 
 // generic code pointer
-typedef UINT8 *drccodeptr;
+typedef uint8_t *drccodeptr;
 
 
 // helper template for oob codegen
@@ -63,7 +63,7 @@ public:
 	void dealloc(void *memory, size_t bytes);
 
 	// codegen helpers
-	drccodeptr *begin_codegen(UINT32 reserve_bytes);
+	drccodeptr *begin_codegen(uint32_t reserve_bytes);
 	drccodeptr end_codegen();
 	void request_oob_codegen(drc_oob_delegate callback, void *param1 = nullptr, void *param2 = nullptr);
 

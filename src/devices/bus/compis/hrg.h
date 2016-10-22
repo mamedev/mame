@@ -28,8 +28,8 @@ class compis_hrg_t : public device_t,
 {
 public:
 	// construction/destruction
-	compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -42,14 +42,14 @@ protected:
 	virtual void device_reset() override;
 
 	// device_compis_graphics_card_interface overrides
-	virtual UINT8 pcs6_6_r(address_space &space, offs_t offset) override;
-	virtual void pcs6_6_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t pcs6_6_r(address_space &space, offs_t offset) override;
+	virtual void pcs6_6_w(address_space &space, offs_t offset, uint8_t data) override;
 
 	required_device<upd7220_device> m_crtc;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 
-	UINT8 m_unk_video;
+	uint8_t m_unk_video;
 };
 
 
@@ -59,7 +59,7 @@ class compis_uhrg_t : public compis_hrg_t
 {
 public:
 	// construction/destruction
-	compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

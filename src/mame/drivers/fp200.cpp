@@ -35,24 +35,24 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	UINT8 m_io_type;
-	UINT8 *m_chargen;
-	UINT8 m_keyb_mux;
+	uint8_t m_io_type;
+	uint8_t *m_chargen;
+	uint8_t m_keyb_mux;
 
 	struct{
-		UINT8 x;
-		UINT8 y;
-		UINT8 status;
-		std::unique_ptr<UINT8[]> vram;
-		std::unique_ptr<UINT8[]> attr;
+		uint8_t x;
+		uint8_t y;
+		uint8_t status;
+		std::unique_ptr<uint8_t[]> vram;
+		std::unique_ptr<uint8_t[]> attr;
 	}m_lcd;
-	UINT8 read_lcd_attr(UINT16 X, UINT16 Y);
-	UINT8 read_lcd_vram(UINT16 X, UINT16 Y);
-	void write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data);
-	void write_lcd_vram(UINT16 X, UINT16 Y,UINT8 data);
+	uint8_t read_lcd_attr(uint16_t X, uint16_t Y);
+	uint8_t read_lcd_vram(uint16_t X, uint16_t Y);
+	void write_lcd_attr(uint16_t X, uint16_t Y,uint8_t data);
+	void write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(fp200_io_r);
 	DECLARE_WRITE8_MEMBER(fp200_io_w);
@@ -76,14 +76,14 @@ protected:
 
 void fp200_state::video_start()
 {
-	m_lcd.vram = make_unique_clear<UINT8[]>(20*64);
-	m_lcd.attr = make_unique_clear<UINT8[]>(20*64);
+	m_lcd.vram = make_unique_clear<uint8_t[]>(20*64);
+	m_lcd.attr = make_unique_clear<uint8_t[]>(20*64);
 }
 
 /* TODO: Very preliminary, I actually believe that the LCDC writes in a blitter fashion ... */
-UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 l_offs, r_offs;
+	uint16_t l_offs, r_offs;
 
 	bitmap.fill(0, cliprect);
 
@@ -117,7 +117,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for(int x=0;x<80;x++)
 		{
-			UINT16 yoffs;
+			uint16_t yoffs;
 
 			yoffs = y + l_offs;
 
@@ -126,7 +126,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				UINT8 vram,pix;
+				uint8_t vram,pix;
 
 				vram = m_lcd.vram[x/8+yoffs*20];
 				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
@@ -135,7 +135,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			/*
 			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    UINT8 vram,pix;
+			    uint8_t vram,pix;
 
 			    vram = m_lcd.vram[x/8+yoffs*20];
 			    pix = (vram) >> (7-(yoffs & 7)) & 1;
@@ -148,7 +148,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for(int x=80;x<160;x++)
 		{
-			UINT16 yoffs;
+			uint16_t yoffs;
 
 			yoffs = y + r_offs;
 
@@ -157,7 +157,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				UINT8 vram,pix;
+				uint8_t vram,pix;
 
 				vram = m_lcd.vram[x/8+yoffs*20];
 				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
@@ -165,7 +165,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			}
 			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    UINT8 vram,pix;
+			    uint8_t vram,pix;
 
 			    vram = m_lcd.vram[x/8+yoffs*20];
 			    pix = (vram) >> (7-(yoffs & 7)) & 1;
@@ -184,10 +184,10 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 [8] SSSS --YY Status code (1=vram type/0xb=attr type) / upper part of Y address
 [9] YYYY XXXX lower part of Y address / X address
 */
-UINT8 fp200_state::read_lcd_attr(UINT16 X, UINT16 Y)
+uint8_t fp200_state::read_lcd_attr(uint16_t X, uint16_t Y)
 {
-	UINT16 base_offs;
-	UINT8 res = 0;
+	uint16_t base_offs;
+	uint8_t res = 0;
 
 	for(int yi=0;yi<8;yi++)
 	{
@@ -202,10 +202,10 @@ UINT8 fp200_state::read_lcd_attr(UINT16 X, UINT16 Y)
 	return res;
 }
 
-UINT8 fp200_state::read_lcd_vram(UINT16 X, UINT16 Y)
+uint8_t fp200_state::read_lcd_vram(uint16_t X, uint16_t Y)
 {
-	UINT16 base_offs;
-	UINT8 res = 0;
+	uint16_t base_offs;
+	uint8_t res = 0;
 
 	for(int yi=0;yi<8;yi++)
 	{
@@ -222,7 +222,7 @@ UINT8 fp200_state::read_lcd_vram(UINT16 X, UINT16 Y)
 
 READ8_MEMBER(fp200_state::fp200_lcd_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -256,9 +256,9 @@ READ8_MEMBER(fp200_state::fp200_lcd_r)
 	return res;
 }
 
-void fp200_state::write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data)
+void fp200_state::write_lcd_attr(uint16_t X, uint16_t Y,uint8_t data)
 {
-	UINT16 base_offs;
+	uint16_t base_offs;
 
 	for(int yi=0;yi<8;yi++)
 	{
@@ -274,9 +274,9 @@ void fp200_state::write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data)
 	}
 }
 
-void fp200_state::write_lcd_vram(UINT16 X, UINT16 Y,UINT8 data)
+void fp200_state::write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data)
 {
-	UINT16 base_offs;
+	uint16_t base_offs;
 
 	for(int yi=0;yi<8;yi++)
 	{
@@ -325,7 +325,7 @@ READ8_MEMBER(fp200_state::fp200_keyb_r)
 										"KEY4", "KEY5", "KEY6", "KEY7",
 										"KEY8", "KEY9", "UNUSED", "UNUSED",
 										"UNUSED", "UNUSED", "UNUSED", "UNUSED"};
-	UINT8 res;
+	uint8_t res;
 
 	if(offset == 0)
 		res = ioport(keynames[m_keyb_mux])->read();
@@ -366,7 +366,7 @@ SOD = 1
 */
 READ8_MEMBER(fp200_state::fp200_io_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(m_io_type == 0)
 	{
@@ -547,7 +547,7 @@ GFXDECODE_END
 
 void fp200_state::machine_start()
 {
-	UINT8 *raw_gfx = memregion("raw_gfx")->base();
+	uint8_t *raw_gfx = memregion("raw_gfx")->base();
 	m_chargen = memregion("chargen")->base();
 
 	for(int i=0;i<0x800;i++)

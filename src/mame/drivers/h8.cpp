@@ -78,11 +78,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 private:
-	UINT8 m_digit;
-	UINT8 m_segment;
-	UINT8 m_irq_ctl;
+	uint8_t m_digit;
+	uint8_t m_segment;
+	uint8_t m_irq_ctl;
 	bool m_ff_b;
-	UINT8 m_cass_data[4];
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_reset() override;
@@ -112,7 +112,7 @@ READ8_MEMBER( h8_state::portf0_r )
 	// - if 0 and RTM pressed, causes int10
 	// - if 0 and RST pressed, resets cpu
 
-	UINT8 i,keyin,data = 0xff;
+	uint8_t i,keyin,data = 0xff;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
@@ -294,7 +294,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{

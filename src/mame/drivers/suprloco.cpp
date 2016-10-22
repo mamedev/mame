@@ -272,7 +272,7 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 	/* convert graphics to 4bpp from 3bpp */
 
 	int i, j, k, color_source, color_dest;
-	UINT8 *source, *dest, *lookup;
+	uint8_t *source, *dest, *lookup;
 
 	source = memregion("gfx1")->base();
 	dest   = source + 0x6000;

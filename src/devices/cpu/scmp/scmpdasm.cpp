@@ -16,14 +16,14 @@
 CPU_DISASSEMBLE( scmp )
 {
 	unsigned PC = pc;
-	UINT8 op = OP(pc++);
-	UINT8 ptr = op & 3;
+	uint8_t op = OP(pc++);
+	uint8_t ptr = op & 3;
 
 	if (BIT(op,7)) {
 		// two bytes instructions
 		char as[10];
 		char aspr[10];
-		UINT8 arg = ARG(pc); pc++;
+		uint8_t arg = ARG(pc); pc++;
 		if (arg==0x80) {
 			sprintf(as,"E");
 		} else {

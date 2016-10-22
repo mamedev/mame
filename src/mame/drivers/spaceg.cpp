@@ -192,14 +192,14 @@ public:
 		m_sound3(0)
 	{ }
 
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_io9400;
-	required_shared_ptr<UINT8> m_io9401;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_io9400;
+	required_shared_ptr<uint8_t> m_io9401;
 	DECLARE_WRITE8_MEMBER(zvideoram_w);
 	DECLARE_READ8_MEMBER(spaceg_colorram_r);
 	DECLARE_PALETTE_INIT(spaceg);
-	UINT32 screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<samples_device> m_samples;
@@ -260,9 +260,9 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 {
 	int col = m_colorram[0x400];
 	int xoff = *m_io9400 >> 5 & 7;
-	UINT16 offset2 = (offset + 0x100) & 0x1fff;
-	UINT16 sdata = data << (8 - xoff);
-	UINT16 vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
+	uint16_t offset2 = (offset + 0x100) & 0x1fff;
+	uint16_t sdata = data << (8 - xoff);
+	uint16_t vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
 
 	if (col > 0x0f) popmessage("color > 0x0f = %2d", col);
 	col &= 0x0f;
@@ -328,14 +328,14 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 }
 
 
-UINT32 spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 		int y = offs & 0xff;
 		int x = (offs >> 8) << 3;
 

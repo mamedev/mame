@@ -190,7 +190,7 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	UINT8 temp;
+	uint8_t temp;
 	temp = upd7725->snesdsp_read(true);
 	fprintf(stderr, "dsp data read: %02x\n", temp);
 	return temp;
@@ -212,7 +212,7 @@ READ16_MEMBER( tsispch_state::dsp_status_r )
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
-	UINT8 temp;
+	uint8_t temp;
 	temp = upd7725->snesdsp_read(false);
 	fprintf(stderr, "dsp status read: %02x\n", temp);
 	return temp;
@@ -251,8 +251,8 @@ void tsispch_state::machine_reset()
 
 DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 {
-	UINT8 *dspsrc = (UINT8 *)(memregion("dspprgload")->base());
-	UINT32 *dspprg = (UINT32 *)(memregion("dspprg")->base());
+	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
+	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
 	fprintf(stderr,"driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
@@ -270,23 +270,23 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	UINT8 byte1t;
-	UINT16 byte23t;
+	uint8_t byte1t;
+	uint16_t byte23t;
 		for (int i = 0; i < 0x600; i+= 3)
 		{
 			byte1t = BITSWAP8(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
 			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
 			if ((byte1t&0x80) == 0x00) // op or rt instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if ((byte1t&0xC0) == 0x80) // jp instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
 			}
 			else // ld instruction
 			{
-				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+				byte23t = BITSWAP16( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
 			}
 
 			*dspprg = byte1t<<24 | byte23t<<8;

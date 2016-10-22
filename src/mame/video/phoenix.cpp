@@ -79,7 +79,7 @@ static const res_net_info survival_net_info =
 
 PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	std::vector<rgb_t> rgb;
 
@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 
 PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	std::vector<rgb_t> rgb;
 
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 
 PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	std::vector<rgb_t> rgb;
 
@@ -168,10 +168,10 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(phoenix_state,phoenix)
 {
-	m_videoram_pg[0] = std::make_unique<UINT8[]>(0x1000);
-	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(UINT8));
-	m_videoram_pg[1] = std::make_unique<UINT8[]>(0x1000);
-	memset(m_videoram_pg[1].get(), 0x00, 0x1000 * sizeof(UINT8));
+	m_videoram_pg[0] = std::make_unique<uint8_t[]>(0x1000);
+	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(uint8_t));
+	m_videoram_pg[1] = std::make_unique<uint8_t[]>(0x1000);
+	memset(m_videoram_pg[1].get(), 0x00, 0x1000 * sizeof(uint8_t));
 
 	membank("bank1")->configure_entry(0, m_videoram_pg[0].get());
 	membank("bank1")->configure_entry(1, m_videoram_pg[1].get());
@@ -221,7 +221,7 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	m_videoram_pg[m_videoram_pg_index][offset] = data;
 
@@ -360,7 +360,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 {
-	UINT8 ret = ~ioport("IN0")->read();
+	uint8_t ret = ~ioport("IN0")->read();
 
 	if( m_survival_input_readc++ == 2 )
 	{
@@ -439,7 +439,7 @@ READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
 
 ***************************************************************************/
 
-UINT32 phoenix_state::screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t phoenix_state::screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);

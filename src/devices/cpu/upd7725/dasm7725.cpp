@@ -15,22 +15,22 @@
 CPU_DISASSEMBLE( upd7725 )
 {
 	static char output[256];
-	UINT32 opcode = oprom[2] | (oprom[1] << 8) | (oprom[0] << 16);
-	UINT32 type = (opcode >> 22);
+	uint32_t opcode = oprom[2] | (oprom[1] << 8) | (oprom[0] << 16);
+	uint32_t type = (opcode >> 22);
 
 //  printf("dasm: PC %x opcode %08x\n", pc, opcode);
 
 	memset(output, 0, sizeof(output));
 
 	if(type == 0 || type == 1) {  //OP,RT
-		UINT8 pselect = (opcode >> 20)&0x3;  //P select
-		UINT8 alu     = (opcode >> 16)&0xf;  //ALU operation mode
-		UINT8 asl     = (opcode >> 15)&0x1;  //accumulator select
-		UINT8 dpl     = (opcode >> 13)&0x3;  //DP low modify
-		UINT8 dphm    = (opcode >>  9)&0xf;  //DP high XOR modify
-		UINT8 rpdcr   = (opcode >>  8)&0x1;  //RP decrement
-		UINT8 src     = (opcode >>  4)&0xf;  //move source
-		UINT8 dst     = (opcode >>  0)&0xf;  //move destination
+		uint8_t pselect = (opcode >> 20)&0x3;  //P select
+		uint8_t alu     = (opcode >> 16)&0xf;  //ALU operation mode
+		uint8_t asl     = (opcode >> 15)&0x1;  //accumulator select
+		uint8_t dpl     = (opcode >> 13)&0x3;  //DP low modify
+		uint8_t dphm    = (opcode >>  9)&0xf;  //DP high XOR modify
+		uint8_t rpdcr   = (opcode >>  8)&0x1;  //RP decrement
+		uint8_t src     = (opcode >>  4)&0xf;  //move source
+		uint8_t dst     = (opcode >>  0)&0xf;  //move destination
 
 	switch(alu) {
 		case  0: strcat(output, "nop  "); break;
@@ -147,8 +147,8 @@ CPU_DISASSEMBLE( upd7725 )
 	}
 
 	if(type == 2) {  //JP
-		UINT16 brch = (opcode >> 13) & 0x1ff;  //branch
-		UINT16 na  = (opcode >>  2) & 0x7ff;  //next address
+		uint16_t brch = (opcode >> 13) & 0x1ff;  //branch
+		uint16_t na  = (opcode >>  2) & 0x7ff;  //next address
 
 	switch(brch) {
 		case 0x000: strcat(output, "jmpso "); break;
@@ -201,8 +201,8 @@ CPU_DISASSEMBLE( upd7725 )
 
 	if(type == 3) {  //LD
 	strcat(output, "ld ");
-	UINT16 id = opcode >> 6;
-	UINT8 dst = (opcode >> 0) & 0xf;  //destination
+	uint16_t id = opcode >> 6;
+	uint8_t dst = (opcode >> 0) & 0xf;  //destination
 
 	char temp[16];
 	sprintf(temp, "$%x,", id);

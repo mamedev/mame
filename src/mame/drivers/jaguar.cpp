@@ -376,7 +376,7 @@ extern const device_type COJAG_HARDDISK;
 class cojag_hdd : public ide_hdd_device
 {
 public:
-	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: ide_hdd_device(mconfig, COJAG_HARDDISK, "HDD CoJag", tag, owner, clock, "cojag_hdd", __FILE__)
 	{
 	}
@@ -428,7 +428,7 @@ void jaguar_state::machine_reset()
 	/* configure banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
-		UINT8 *romboard = m_romboard_region->base();
+		uint8_t *romboard = m_romboard_region->base();
 
 		/* graphics banks */
 		if (m_is_r3000)
@@ -477,7 +477,7 @@ void jaguar_state::machine_reset()
 *
 ********************************************************************/
 /*
-emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
+emu_file jaguar_state::*jaguar_nvram_fopen( uint32_t openflags)
 {
     device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
     osd_file::error filerr;
@@ -675,8 +675,8 @@ WRITE32_MEMBER(jaguar_state::dspctrl_w)
 
 READ32_MEMBER(jaguar_state::joystick_r)
 {
-	UINT16 joystick_result = 0xfffe;
-	UINT16 joybuts_result = 0xffef;
+	uint16_t joystick_result = 0xfffe;
+	uint16_t joybuts_result = 0xffef;
 	int i;
 	static const char *const keynames[2][8] =
 	{
@@ -911,7 +911,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 
 READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 {
-	UINT64 curcycles = m_maincpu->total_cycles();
+	uint64_t curcycles = m_maincpu->total_cycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - m_main_speedup_last_cycles < m_main_speedup_max_cycles)
@@ -985,7 +985,7 @@ READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 
 WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 {
-	UINT64 curcycles = m_maincpu->total_cycles();
+	uint64_t curcycles = m_maincpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(m_main_speedup);
@@ -1019,7 +1019,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 
 WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 {
-	UINT64 curcycles = m_maincpu->total_cycles();
+	uint64_t curcycles = m_maincpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(&m_main_speedup[offset]);
@@ -1217,7 +1217,7 @@ WRITE32_MEMBER(jaguar_state::butch_regs_w)
 			switch((m_butch_regs[offset] & 0xff00) >> 8)
 			{
 				case 0x03: // Read TOC
-					UINT32 msf;
+					uint32_t msf;
 
 					if(m_butch_regs[offset] & 0xff) // Multi Session CD, TODO
 					{
@@ -1247,7 +1247,7 @@ WRITE32_MEMBER(jaguar_state::butch_regs_w)
 					break;
 				case 0x14: // Read Long TOC
 					{
-						UINT32 msf;
+						uint32_t msf;
 						int ntrks = cdrom_get_last_track(m_cd_file);
 
 						for(int i=0;i<ntrks;i++)
@@ -1917,11 +1917,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-void jaguar_state::fix_endian( UINT32 addr, UINT32 size )
+void jaguar_state::fix_endian( uint32_t addr, uint32_t size )
 {
-	UINT8 j[4];
-	UINT8 *ram = memregion("maincpu")->base();
-	UINT32 i;
+	uint8_t j[4];
+	uint8_t *ram = memregion("maincpu")->base();
+	uint32_t i;
 	size += addr;
 	logerror("File Loaded to address range %X to %X\n",addr,size-1);
 	for (i = addr; i < size; i+=4)
@@ -1999,7 +1999,7 @@ image_init_result jaguar_state::quickload(device_image_interface &image, const c
 	else    /* PRG */
 	if (((m_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (m_shared_ram[0x1007] == 0x4A414752))
 	{
-		UINT32 type = m_shared_ram[0x1008] >> 16;
+		uint32_t type = m_shared_ram[0x1008] >> 16;
 		start = ((m_shared_ram[0x1008] & 0xffff) << 16) | (m_shared_ram[0x1009] >> 16);
 		skip = 28;
 		if (type == 2) skip = 42;
@@ -2055,7 +2055,7 @@ void jaguar_state::cart_start()
 
 DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 {
-	UINT32 size, load_offset = 0;
+	uint32_t size, load_offset = 0;
 
 	if (image.software_entry() == nullptr)
 	{
@@ -2530,7 +2530,7 @@ ROM_END
  *
  *************************************/
 
-void jaguar_state::cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
+void jaguar_state::cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc)
 {
 	m_is_cojag = true;
 	m_is_jagcd = false;

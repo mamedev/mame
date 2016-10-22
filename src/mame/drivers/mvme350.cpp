@@ -201,7 +201,7 @@ void mvme350_state::machine_reset ()
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (mvme350_state::vme_a24_r){
 		LOG (logerror ("vme_a24_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme350_state::vme_a24_w){
@@ -210,7 +210,7 @@ WRITE16_MEMBER (mvme350_state::vme_a24_w){
 
 READ16_MEMBER (mvme350_state::vme_a16_r){
 		LOG (logerror ("vme_16_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme350_state::vme_a16_w){

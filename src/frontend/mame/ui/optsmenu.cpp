@@ -228,7 +228,7 @@ void menu_game_options::populate()
 		std::string fbuff;
 
 		// add filter item
-		UINT32 arrow_flags = get_arrow_flags<UINT16>(FILTER_FIRST, FILTER_LAST, m_main);
+		uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_FIRST, FILTER_LAST, m_main);
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(uintptr_t)FILTER_MENU);
 
 		// add category subitem
@@ -236,12 +236,12 @@ void menu_game_options::populate()
 		{
 			inifile_manager &inif = mame_machine_manager::instance()->inifile();
 
-			arrow_flags = get_arrow_flags(UINT16(0), UINT16(inif.total() - 1), inif.cur_file());
+			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(inif.total() - 1), inif.cur_file());
 			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, inif.get_file(), arrow_flags, (void *)(uintptr_t)FILE_CATEGORY_FILTER);
 
-			arrow_flags = get_arrow_flags(UINT16(0), UINT16(inif.cat_total() - 1), inif.cur_cat());
+			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(inif.cat_total() - 1), inif.cur_cat());
 			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, inif.get_category(), arrow_flags, (void *)(uintptr_t)CATEGORY_FILTER);
@@ -249,7 +249,7 @@ void menu_game_options::populate()
 		// add manufacturer subitem
 		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags(UINT16(0), UINT16(c_mnfct::ui.size() - 1), c_mnfct::actual);
+			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(c_mnfct::ui.size() - 1), c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_mnfct::ui[c_mnfct::actual], arrow_flags, (void *)(uintptr_t)MANUFACT_CAT_FILTER);
@@ -257,7 +257,7 @@ void menu_game_options::populate()
 		// add year subitem
 		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags(UINT16(0), UINT16(c_year::ui.size() - 1), c_year::actual);
+			arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(c_year::ui.size() - 1), c_year::actual);
 			fbuff.assign(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_year::ui[c_year::actual], arrow_flags, (void *)(uintptr_t)YEAR_CAT_FILTER);

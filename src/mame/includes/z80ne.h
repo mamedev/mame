@@ -59,8 +59,8 @@ struct z80ne_cass_data_t {
 struct wd17xx_state_t {
 	int drq;
 	int intrq;
-	UINT8 drive; /* current drive */
-	UINT8 head;  /* current head */
+	uint8_t drive; /* current drive */
+	uint8_t head;  /* current head */
 };
 
 
@@ -106,15 +106,15 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	optional_device<mc6847_base_device> m_vdg;
-	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_ay31015;
 	optional_device<kr2376_device> m_lx388_kr2376;
-	UINT8 m_lx383_scan_counter;
-	UINT8 m_lx383_key[LX383_KEYS];
+	uint8_t m_lx383_scan_counter;
+	uint8_t m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
 	int m_nmi_delay_counter;
 	int m_reset_delay_counter;
-	UINT8 m_lx385_ctrl;
+	uint8_t m_lx385_ctrl;
 	emu_timer *m_cassette_timer;
 	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;

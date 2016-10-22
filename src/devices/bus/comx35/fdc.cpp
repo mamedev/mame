@@ -122,7 +122,7 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 //  comx_fd_device - constructor
 //-------------------------------------------------
 
-comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock, "comx_fd", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
@@ -196,9 +196,9 @@ void comx_fd_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset >= 0x0dd0 && offset < 0x0de0)
 	{
@@ -218,9 +218,9 @@ UINT8 comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_fd_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset == 2)
 	{
@@ -243,7 +243,7 @@ UINT8 comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_fd_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_fd_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 2)
 	{

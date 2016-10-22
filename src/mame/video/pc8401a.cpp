@@ -22,7 +22,7 @@ void pc8500_state::video_start()
 {
 }
 
-UINT32 pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  m_lcdc->screen_update(screen, bitmap, cliprect);
 

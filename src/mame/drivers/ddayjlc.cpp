@@ -75,22 +75,22 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_mainram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	INT32    m_char_bank;
-	INT32    m_bgadr;
+	int32_t    m_char_bank;
+	int32_t    m_bgadr;
 
 	/* misc */
-	INT32    m_sound_nmi_enable;
-	INT32    m_main_nmi_enable;
-	INT32    m_e00x_l[4];
-	INT32    m_e00x_d[4][2];
-	UINT8    m_prot_addr;
+	int32_t    m_sound_nmi_enable;
+	int32_t    m_main_nmi_enable;
+	int32_t    m_e00x_l[4];
+	int32_t    m_e00x_d[4][2];
+	uint8_t    m_prot_addr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -118,7 +118,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ddayjlc);
-	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
 };
@@ -159,7 +159,7 @@ public:
 
 */
 
-static const UINT8 prot_data[0x10] =
+static const uint8_t prot_data[0x10] =
 {
 	0x02, 0x02, 0x02, 0x02,
 	0x02, 0x00, 0x02, 0x00,
@@ -242,10 +242,10 @@ WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 {
 	if (!data)
 	{
-		INT32 src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
-		INT32 dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
-		INT32 size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
-		INT32 i;
+		int32_t src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
+		int32_t dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
+		int32_t size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
+		int32_t i;
 
 		size++; //??
 
@@ -399,20 +399,20 @@ void ddayjlc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 i;
+	uint32_t i;
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		UINT8  flags = m_spriteram[i + 2];
-		UINT8  y = 256 - m_spriteram[i + 0] - 8;
-		UINT16 code = m_spriteram[i + 1];
-		UINT8  x = m_spriteram[i + 3] - 16;
-		UINT8  xflip = flags & 0x80;
-		UINT8  yflip = (code & 0x80);
-		UINT8  color = flags & 0xf;
+		uint8_t  flags = m_spriteram[i + 2];
+		uint8_t  y = 256 - m_spriteram[i + 0] - 8;
+		uint16_t code = m_spriteram[i + 1];
+		uint8_t  x = m_spriteram[i + 3] - 16;
+		uint8_t  xflip = flags & 0x80;
+		uint8_t  yflip = (code & 0x80);
+		uint8_t  color = flags & 0xf;
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
@@ -420,7 +420,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 	}
 
 	{
-		UINT32 x, y, c;
+		uint32_t x, y, c;
 		/* FIXME: where is/are the color offset(s)? I doubt it's hard-coded ... */
 		for (y = 0; y < 32; y++)
 			for (x = 0; x < 32; x++)
@@ -483,7 +483,7 @@ void ddayjlc_state::machine_reset()
 
 PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -667,9 +667,9 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		dst[newadr+31+n] = src[oldaddr+7+0x2008+n];
 
 	{
-		UINT32 oldaddr, newadr, length,j;
-		UINT8 *src, *dst;
-		std::vector<UINT8> temp(0x10000);
+		uint32_t oldaddr, newadr, length,j;
+		uint8_t *src, *dst;
+		std::vector<uint8_t> temp(0x10000);
 		src = &temp[0];
 		dst = memregion("gfx1")->base();
 		length = memregion("gfx1")->bytes();

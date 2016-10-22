@@ -443,7 +443,7 @@ READ8_MEMBER(tx1_state::tx1_ppi_portb_r)
 }
 
 
-static UINT8 bit_reverse8(UINT8 val)
+static uint8_t bit_reverse8(uint8_t val)
 {
 	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
 	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);

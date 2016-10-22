@@ -51,23 +51,23 @@ struct C140_VOICE
 		sample_end(0),
 		sample_loop(0) {}
 
-	INT32    ptoffset;
-	INT32    pos;
-	INT32    key;
+	int32_t    ptoffset;
+	int32_t    pos;
+	int32_t    key;
 	//--work
-	INT32    lastdt;
-	INT32    prevdt;
-	INT32    dltdt;
+	int32_t    lastdt;
+	int32_t    prevdt;
+	int32_t    dltdt;
 	//--reg
-	INT32    rvol;
-	INT32    lvol;
-	INT32    frequency;
-	INT32    bank;
-	INT32    mode;
+	int32_t    rvol;
+	int32_t    lvol;
+	int32_t    frequency;
+	int32_t    bank;
+	int32_t    mode;
 
-	INT32    sample_start;
-	INT32    sample_end;
-	INT32    sample_loop;
+	int32_t    sample_start;
+	int32_t    sample_end;
+	int32_t    sample_loop;
 };
 
 
@@ -77,7 +77,7 @@ class c140_device : public device_t,
 					public device_sound_interface
 {
 public:
-	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~c140_device() { }
 
 	// static configuration
@@ -106,15 +106,15 @@ private:
 	sound_stream *m_stream;
 	int m_banking_type;
 	/* internal buffers */
-	std::unique_ptr<INT16[]> m_mixer_buffer_left;
-	std::unique_ptr<INT16[]> m_mixer_buffer_right;
+	std::unique_ptr<int16_t[]> m_mixer_buffer_left;
+	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	optional_region_ptr<INT8> m_rom_ptr;
-	INT8 *m_pRom;
-	UINT8 m_REG[0x200];
+	optional_region_ptr<int8_t> m_rom_ptr;
+	int8_t *m_pRom;
+	uint8_t m_REG[0x200];
 
-	INT16 m_pcmtbl[8];        //2000.06.26 CAB
+	int16_t m_pcmtbl[8];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[C140_MAX_VOICE];
 };

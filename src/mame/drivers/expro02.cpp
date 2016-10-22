@@ -233,12 +233,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	required_shared_ptr<UINT16> m_paletteram;
-	required_shared_ptr<UINT16> m_fg_ind8_pixram;
-	required_shared_ptr<UINT16> m_bg_rgb555_pixram;
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_fg_ind8_pixram;
+	required_shared_ptr<uint16_t> m_bg_rgb555_pixram;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
 
@@ -246,9 +246,9 @@ public:
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 
-	UINT32 screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	// comad
@@ -274,7 +274,7 @@ PALETTE_INIT_MEMBER(expro02_state, expro02)
 		palette.set_pen_color(2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  kaneko16_fill_bitmap(machine(),bitmap,cliprect);
 	int y,x;
@@ -284,11 +284,11 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 	count = 0;
 	for (y=0;y<256;y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
 
 		for (x=0;x<256;x++)
 		{
-			UINT16 dat = (m_bg_rgb555_pixram[count] & 0xfffe)>>1;
+			uint16_t dat = (m_bg_rgb555_pixram[count] & 0xfffe)>>1;
 			dat+=2048;
 
 			// never seen to test
@@ -310,11 +310,11 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 	count = 0;
 	for (y=0;y<256;y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
 
 		for (x=0;x<256;x++)
 		{
-			UINT16 dat = (m_fg_ind8_pixram[count]);
+			uint16_t dat = (m_fg_ind8_pixram[count]);
 			dat &=0x7ff;
 			if (!(m_paletteram[(dat&0x7ff)] & 0x0001))
 				dest[x] = dat;
@@ -341,14 +341,14 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 	return 0;
 }
 
-UINT32 expro02_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t expro02_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
 	m_kaneko_spr->kaneko16_render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
-UINT32 expro02_state::screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t expro02_state::screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
 	m_kaneko_spr->bootleg_draw_sprites(bitmap,cliprect, m_spriteram, m_spriteram.bytes());
@@ -834,7 +834,7 @@ READ16_MEMBER(expro02_state::comad_timer_r)
 /* a kludge! */
 READ8_MEMBER(expro02_state::comad_okim6295_r)
 {
-	UINT16 retvalue;
+	uint16_t retvalue;
 //  retvalue = m_oki->read_status(); // doesn't work, causes lockups when girls change..
 	retvalue = machine().rand();
 	return retvalue;
@@ -1775,8 +1775,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(expro02_state,expro02)
 {
-	UINT32 *src = (UINT32 *)memregion("gfx3" )->base();
-	UINT32 *dst = (UINT32 *)memregion("gfx2" )->base();
+	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
+	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();
 	int x, offset;
 
 	// the VIEW2 tiledata is scrambled

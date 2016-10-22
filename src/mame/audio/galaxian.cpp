@@ -389,7 +389,7 @@ DISCRETE_SOUND_END
 
 const device_type GALAXIAN = &device_creator<galaxian_sound_device>;
 
-galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GALAXIAN, "Galaxian Audio Custom", tag, owner, clock, "galaxian_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_lfo_val(0)
@@ -433,7 +433,7 @@ WRITE8_MEMBER( galaxian_sound_device::pitch_w )
 
 WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
 {
-	UINT8 lfo_val_new = (m_lfo_val & ~(1<<offset)) | ((data & 0x01) << offset);
+	uint8_t lfo_val_new = (m_lfo_val & ~(1<<offset)) | ((data & 0x01) << offset);
 
 	if (m_lfo_val != lfo_val_new)
 	{

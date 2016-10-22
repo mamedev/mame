@@ -17,12 +17,12 @@
 enum { FRAC_SHIFT = 16 };
 enum { MOIRE = 0x01000000 };
 
-UINT32 model1_state::readi(int adr) const
+uint32_t model1_state::readi(int adr) const
 {
 	return m_display_list_current[(adr + 0)&0x7fff] | (m_display_list_current[(adr + 1)&0x7fff] << 16);
 }
 
-INT16 model1_state::readi16(int adr) const
+int16_t model1_state::readi16(int adr) const
 {
 	return m_display_list_current[(adr + 0)&0x7fff];
 }
@@ -91,7 +91,7 @@ void model1_state::view_t::project_point_direct(point_t *p) const
 
 void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	UINT32 *base = &bitmap.pix32(y);
+	uint32_t *base = &bitmap.pix32(y);
 	while(x1 <= x2)
 	{
 		base[x1] = color;
@@ -101,7 +101,7 @@ void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int c
 
 void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	UINT32 *base = &bitmap.pix32(y);
+	uint32_t *base = &bitmap.pix32(y);
 	while(x1 <= x2)
 	{
 		if((x1^y) & 1)
@@ -112,7 +112,7 @@ void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y
 	}
 }
 
-void model1_state::fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
+void model1_state::fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2)
 {
 	if(y1 > view->y2)
 	{
@@ -142,7 +142,7 @@ void model1_state::fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT
 
 	if (x1 > x2 || (x1 == x2 && sl1 > sl2))
 	{
-		INT32 t = x1;
+		int32_t t = x1;
 		x1 = x2;
 		x2 = t;
 
@@ -150,7 +150,7 @@ void model1_state::fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT
 		sl1 = sl2;
 		sl2 = t;
 
-		INT32 *tp = nx1;
+		int32_t *tp = nx1;
 		nx1 = nx2;
 		nx2 = tp;
 	}
@@ -191,7 +191,7 @@ void model1_state::fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT
 	*nx2 = x2;
 }
 
-void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 y, INT32 x1, INT32 x2)
+void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t y, int32_t x1, int32_t x2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
@@ -247,10 +247,10 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 		}
 	}
 
-	INT32 cury = p[pmin].y;
-	INT32 limy = p[pmax].y;
+	int32_t cury = p[pmin].y;
+	int32_t limy = p[pmax].y;
 
-	INT32 x1, x2;
+	int32_t x1, x2;
 	if (cury == limy)
 	{
 		x1 = p[0].x;
@@ -289,7 +289,7 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 
 	goto startup;
 
-	INT32 sl1, sl2;
+	int32_t sl1, sl2;
 	for(;;)
 	{
 		if (p[ps1 - 1].y == p[ps2 + 1].y)
@@ -502,7 +502,7 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	view->y2 = save_y2;
 }
 #if 0
-UINT16 model1_state::scale_color(UINT16 color, float level) const
+uint16_t model1_state::scale_color(uint16_t color, float level) const
 {
 	int r = ((color >> 10) & 31) * level;
 	int g = ((color >>  5) & 31) * level;
@@ -723,7 +723,7 @@ float model1_state::max4f(float a, float b, float c, float d)
 }
 
 #ifdef UNUSED_DEFINITION
-static const UINT8 num_of_times[]={1,1,1,1,2,2,2,3};
+static const uint8_t num_of_times[]={1,1,1,1,2,2,2,3};
 #endif
 float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode)
 {
@@ -755,7 +755,7 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 	return 0;
 }
 
-void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
+void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size) {
 #if 0
 	int dump;
 #endif
@@ -831,12 +831,12 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 	{
 #if 0
 		LOG_TGP(("VIDEO:     %08x (%f, %f, %f) (%f, %f, %f) (%f, %f, %f)\n",
-			*(UINT32 *)(poly_data + poly_adr) & ~(0x01800303),
+			*(uint32_t *)(poly_data + poly_adr) & ~(0x01800303),
 			poly_data[poly_adr + 1], poly_data[poly_adr + 2], poly_data[poly_adr + 3],
 			poly_data[poly_adr + 4], poly_data[poly_adr + 5], poly_data[poly_adr + 6],
 			poly_data[poly_adr + 7], poly_data[poly_adr + 8], poly_data[poly_adr + 9]));
 #endif
-		UINT32 flags = *reinterpret_cast<UINT32*>(poly_data + poly_adr);
+		uint32_t flags = *reinterpret_cast<uint32_t*>(poly_data + poly_adr);
 
 		int type = flags & 3;
 		if (!type)
@@ -884,7 +884,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 #if 0
 		if (dump)
 			LOG_TGP(("VIDEO:     %08x (%f, %f, %f) (%f, %f, %f)\n",
-				*(UINT32 *)(poly_data + poly_adr),
+				*(uint32_t *)(poly_data + poly_adr),
 				p0->x, p0->y, p0->z,
 				p1->x, p1->y, p1->z));
 #endif
@@ -893,7 +893,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 #if 0
 		if (true || dump) {
 			LOG_TGP(("VIDEO:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
-				*(UINT32 *)(poly_data + poly_adr),
+				*(uint32_t *)(poly_data + poly_adr),
 				old_p0->s.x, old_p0->s.y,
 				old_p1->s.x, old_p1->s.y,
 				p0->s.x, p0->s.y,
@@ -987,7 +987,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 
 
 int model1_state::push_direct(int list_offset) {
-	UINT32 tex_adr = readi(list_offset + 2);
+	uint32_t tex_adr = readi(list_offset + 2);
 	//  v1      = readi(list_offset+2+2);
 	//  v2      = readi(list_offset+2+10);
 
@@ -1029,7 +1029,7 @@ int model1_state::push_direct(int list_offset) {
 	list_offset += 18;
 
 	for (;;) {
-		UINT32 flags = readi(list_offset + 2);
+		uint32_t flags = readi(list_offset + 2);
 
 		int type = flags & 3;
 		if (!type)
@@ -1045,7 +1045,7 @@ int model1_state::push_direct(int list_offset) {
 		point_t *p0 = m_pointpt++;
 		point_t *p1 = m_pointpt++;
 
-		UINT32 lum = readi(list_offset + 2 + 2);
+		uint32_t lum = readi(list_offset + 2 + 2);
 		//      v1    = readi(list_offset+2+4);
 
 		float z = 0;
@@ -1159,7 +1159,7 @@ int model1_state::skip_direct(int list_offset) const
 	list_offset += 18;
 
 	while (true) {
-		UINT32 flags = readi(list_offset + 2);
+		uint32_t flags = readi(list_offset + 2);
 
 		int type = flags & 3;
 		if (!type)
@@ -1566,9 +1566,9 @@ VIDEO_START_MEMBER(model1_state, model1)
 {
 	m_view = auto_alloc_clear(machine(), <model1_state::view_t>());
 
-	m_poly_rom = (UINT32 *)memregion("user1")->base();
-	m_poly_ram = make_unique_clear<UINT32[]>(0x400000);
-	m_tgp_ram = make_unique_clear<UINT16[]>(0x100000-0x40000);
+	m_poly_rom = (uint32_t *)memregion("user1")->base();
+	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
+	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
 	m_pointdb = auto_alloc_array_clear(machine(), model1_state::point_t, 1000000*2);
 	m_quaddb  = auto_alloc_array_clear(machine(), model1_state::quad_t, 1000000);
 	m_quadind = auto_alloc_array_clear(machine(), model1_state::quad_t *, 1000000);
@@ -1591,7 +1591,7 @@ VIDEO_START_MEMBER(model1_state, model1)
 	save_item(NAME(m_listctl));
 }
 
-UINT32 model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	model1_state::view_t *view = m_view;
 #if 0

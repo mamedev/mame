@@ -371,7 +371,7 @@ GFXDECODE_END
 MACHINE_START_MEMBER(galivan_state,galivan)
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memregion("maincpu")->base();
+	uint8_t *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
@@ -385,7 +385,7 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 MACHINE_START_MEMBER(galivan_state,ninjemak)
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memregion("maincpu")->base();
+	uint8_t *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 

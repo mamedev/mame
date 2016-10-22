@@ -277,7 +277,7 @@ void menu::reset(reset_options options)
 
 	// reset all the pools and the item.size() back to 0
 	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
-		ppool->top = (UINT8 *)(ppool + 1);
+		ppool->top = (uint8_t *)(ppool + 1);
 	item.clear();
 	m_visible_items = 0;
 	selected = 0;
@@ -342,7 +342,7 @@ void menu::item_append(menu_item item)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item_type type, UINT32 flags)
+void menu::item_append(menu_item_type type, uint32_t flags)
 {
 	if (type == menu_item_type::SEPARATOR)
 		item_append(MENU_SEPARATOR_ITEM, "", flags, nullptr, menu_item_type::SEPARATOR);
@@ -353,7 +353,7 @@ void menu::item_append(menu_item_type type, UINT32 flags)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type)
+void menu::item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	item_append(std::string(text), std::string(subtext), flags, ref, type);
 }
@@ -363,7 +363,7 @@ void menu::item_append(const std::string &text, const std::string &subtext, UINT
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, void *ref, menu_item_type type)
+void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	// only allow multiline as the first item
 	if ((flags & FLAG_MULTILINE) != 0)
@@ -404,7 +404,7 @@ void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, 
 //  and returning any interesting events
 //-------------------------------------------------
 
-const menu::event *menu::process(UINT32 flags, float x0, float y0)
+const menu::event *menu::process(uint32_t flags, float x0, float y0)
 {
 	// reset the event
 	m_event.iptkey = IPT_INVALID;
@@ -461,12 +461,12 @@ void *menu::m_pool_alloc(size_t size)
 	}
 
 	// allocate a new pool
-	pool *ppool = (pool *)global_alloc_array_clear<UINT8>(sizeof(*ppool) + UI_MENU_POOL_SIZE);
+	pool *ppool = (pool *)global_alloc_array_clear<uint8_t>(sizeof(*ppool) + UI_MENU_POOL_SIZE);
 
 	// wire it up
 	ppool->next = m_pool;
 	m_pool = ppool;
-	ppool->top = (UINT8 *)(ppool + 1);
+	ppool->top = (uint8_t *)(ppool + 1);
 	ppool->end = ppool->top + UI_MENU_POOL_SIZE;
 	return m_pool_alloc(size);
 }
@@ -500,7 +500,7 @@ void menu::set_selection(void *selected_itemref)
 //  draw - draw a menu
 //-------------------------------------------------
 
-void menu::draw(UINT32 flags)
+void menu::draw(uint32_t flags)
 {
 	// first draw the FPS counter
 	if (ui().show_fps_counter())
@@ -593,7 +593,7 @@ void menu::draw(UINT32 flags)
 	mouse_button = false;
 	if (!customonly && !noinput)
 	{
-		INT32 mouse_target_x, mouse_target_y;
+		int32_t mouse_target_x, mouse_target_y;
 		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != nullptr)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
@@ -853,7 +853,7 @@ void menu::draw_text_box()
 //  input events for a menu
 //-------------------------------------------------
 
-void menu::handle_events(UINT32 flags, event &ev)
+void menu::handle_events(uint32_t flags, event &ev)
 {
 	bool stop = false;
 	ui_event local_menu_event;
@@ -967,7 +967,7 @@ void menu::handle_events(UINT32 flags, event &ev)
 //  keys for a menu
 //-------------------------------------------------
 
-void menu::handle_keys(UINT32 flags, int &iptkey)
+void menu::handle_keys(uint32_t flags, int &iptkey)
 {
 	bool ignorepause = stack_has_special_main_menu();
 	int code;
@@ -1149,7 +1149,7 @@ void menu::do_handle()
 //  and calls the menu handler
 //-------------------------------------------------
 
-UINT32 menu::ui_handler(render_container &container, mame_ui_manager &mui)
+uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 {
 	global_state_ptr const state(get_global_state(mui.machine()));
 
@@ -1189,7 +1189,7 @@ void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 //  draw_arrow
 //-------------------------------------------------
 
-void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation)
+void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation)
 {
 	container().add_quad(x0, y0, x1, y1, fgcolor, m_global_state->arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }

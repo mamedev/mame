@@ -33,7 +33,7 @@ MACHINE_CONFIG_END
 //  centronics_covox_device - constructor
 //-------------------------------------------------
 
-centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CENTRONICS_DIGIBLASTER, "Digiblaster (DIY)", tag, owner, clock, "digiblst", __FILE__),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac(*this, "dac"),

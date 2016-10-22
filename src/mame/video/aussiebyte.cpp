@@ -100,7 +100,7 @@ WRITE8_MEMBER( aussiebyte_state::address_w )
 WRITE8_MEMBER( aussiebyte_state::register_w )
 {
 	m_crtc->register_w( space, 0, data );
-	UINT16 temp = m_alpha_address;
+	uint16_t temp = m_alpha_address;
 
 	// Get transparent address
 	if (m_video_index == 18)
@@ -110,9 +110,9 @@ WRITE8_MEMBER( aussiebyte_state::register_w )
 		m_alpha_address = data | (temp & 0xff00);
 }
 
-UINT8 aussiebyte_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 ac_cnt, bool ac_curs)
+uint8_t aussiebyte_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs)
 {
-	UINT8 gfx = 0;
+	uint8_t gfx = 0;
 	switch (ac_attr & 3)
 	{
 		case 0: // lores gfx
@@ -166,9 +166,9 @@ UINT8 aussiebyte_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16
 MC6845_UPDATE_ROW( aussiebyte_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,attr;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,attr;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 	ra &= 15;
 	m_cnt++;
 

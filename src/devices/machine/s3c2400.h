@@ -352,7 +352,7 @@ enum
 class s3c2400_device : public device_t
 {
 public:
-	s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s3c2400_device();
 
 	// static configuration
@@ -375,22 +375,22 @@ private:
 	// internal state
 	required_device<palette_device> m_palette;
 public:
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void s3c24xx_reset();
 	inline int iface_core_pin_r(int pin);
 	void s3c24xx_lcd_reset();
-	rgb_t s3c24xx_get_color_tft_16(UINT16 data);
-	rgb_t s3c24xx_get_color_stn_12(UINT16 data);
-	rgb_t s3c24xx_get_color_stn_08( UINT8 data);
-	rgb_t s3c24xx_get_color_stn_01(UINT8 data);
-	rgb_t s3c24xx_get_color_stn_02(UINT8 data);
-	rgb_t s3c24xx_get_color_stn_04(UINT8 data);
+	rgb_t s3c24xx_get_color_tft_16(uint16_t data);
+	rgb_t s3c24xx_get_color_stn_12(uint16_t data);
+	rgb_t s3c24xx_get_color_stn_08( uint8_t data);
+	rgb_t s3c24xx_get_color_stn_01(uint8_t data);
+	rgb_t s3c24xx_get_color_stn_02(uint8_t data);
+	rgb_t s3c24xx_get_color_stn_04(uint8_t data);
 	rgb_t s3c24xx_get_color_tpal();
 	void s3c24xx_lcd_dma_reload();
 	void s3c24xx_lcd_dma_init();
-	UINT32 s3c24xx_lcd_dma_read();
-	UINT32 s3c24xx_lcd_dma_read_bits(int count);
+	uint32_t s3c24xx_lcd_dma_read();
+	uint32_t s3c24xx_lcd_dma_read_bits(int count);
 	void s3c24xx_lcd_render_tpal();
 	void s3c24xx_lcd_render_stn_01();
 	void s3c24xx_lcd_render_stn_02();
@@ -406,7 +406,7 @@ public:
 	TIMER_CALLBACK_MEMBER( s3c24xx_lcd_timer_exp );
 	void s3c24xx_video_start();
 	void bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2);
-	UINT32 s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	READ32_MEMBER( s3c24xx_lcd_r );
 	int s3c24xx_lcd_configure_tft();
 	int s3c24xx_lcd_configure_stn();
@@ -418,18 +418,18 @@ public:
 	READ32_MEMBER( s3c24xx_lcd_palette_r );
 	WRITE32_MEMBER( s3c24xx_lcd_palette_w );
 	void s3c24xx_clkpow_reset();
-	UINT32 s3c24xx_get_fclk();
-	UINT32 s3c24xx_get_hclk();
-	UINT32 s3c24xx_get_pclk();
+	uint32_t s3c24xx_get_fclk();
+	uint32_t s3c24xx_get_hclk();
+	uint32_t s3c24xx_get_pclk();
 	READ32_MEMBER( s3c24xx_clkpow_r );
 	WRITE32_MEMBER( s3c24xx_clkpow_w );
 	void s3c24xx_irq_reset();
 	void s3c24xx_check_pending_irq();
-	void s3c24xx_request_irq(UINT32 int_type);
+	void s3c24xx_request_irq(uint32_t int_type);
 	READ32_MEMBER( s3c24xx_irq_r );
 	WRITE32_MEMBER( s3c24xx_irq_w );
 	void s3c24xx_pwm_reset();
-	UINT16 s3c24xx_pwm_calc_observation(int ch);
+	uint16_t s3c24xx_pwm_calc_observation(int ch);
 	READ32_MEMBER( s3c24xx_pwm_r );
 	void s3c24xx_pwm_start(int timer);
 	void s3c24xx_pwm_stop(int timer);
@@ -444,8 +444,8 @@ public:
 	void s3c24xx_dma_start(int ch);
 	void s3c24xx_dma_stop(int ch);
 	void s3c24xx_dma_recalc(int ch);
-	UINT32 s3c24xx_dma_r(UINT32 ch, UINT32 offset);
-	void s3c24xx_dma_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	uint32_t s3c24xx_dma_r(uint32_t ch, uint32_t offset);
+	void s3c24xx_dma_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	READ32_MEMBER( s3c24xx_dma_0_r );
 	READ32_MEMBER( s3c24xx_dma_1_r );
 	READ32_MEMBER( s3c24xx_dma_2_r );
@@ -456,9 +456,9 @@ public:
 	WRITE32_MEMBER( s3c24xx_dma_3_w );
 	TIMER_CALLBACK_MEMBER( s3c24xx_dma_timer_exp );
 	void s3c24xx_gpio_reset();
-	inline UINT32 iface_gpio_port_r(int port, UINT32 mask);
-	inline void iface_gpio_port_w(int port, UINT32 mask, UINT32 data);
-	UINT16 s3c24xx_gpio_get_mask( UINT32 con, int val);
+	inline uint32_t iface_gpio_port_r(int port, uint32_t mask);
+	inline void iface_gpio_port_w(int port, uint32_t mask, uint32_t data);
+	uint16_t s3c24xx_gpio_get_mask( uint32_t con, int val);
 	READ32_MEMBER( s3c24xx_gpio_r );
 	WRITE32_MEMBER( s3c24xx_gpio_w );
 	void s3c24xx_memcon_reset();
@@ -468,18 +468,18 @@ public:
 	READ32_MEMBER( s3c24xx_usb_host_r );
 	WRITE32_MEMBER( s3c24xx_usb_host_w );
 	void s3c24xx_uart_reset();
-	UINT32 s3c24xx_uart_r(UINT32 ch, UINT32 offset);
-	void s3c24xx_uart_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	uint32_t s3c24xx_uart_r(uint32_t ch, uint32_t offset);
+	void s3c24xx_uart_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	READ32_MEMBER( s3c24xx_uart_0_r );
 	READ32_MEMBER( s3c24xx_uart_1_r );
 	WRITE32_MEMBER( s3c24xx_uart_0_w );
 	WRITE32_MEMBER( s3c24xx_uart_1_w );
-	void s3c24xx_uart_fifo_w(int uart, UINT8 data);
+	void s3c24xx_uart_fifo_w(int uart, uint8_t data);
 	void s3c24xx_usb_device_reset();
 	READ32_MEMBER( s3c24xx_usb_device_r );
 	WRITE32_MEMBER( s3c24xx_usb_device_w );
 	void s3c24xx_wdt_reset();
-	UINT16 s3c24xx_wdt_calc_current_count();
+	uint16_t s3c24xx_wdt_calc_current_count();
 	READ32_MEMBER( s3c24xx_wdt_r );
 	void s3c24xx_wdt_start();
 	void s3c24xx_wdt_stop();
@@ -492,8 +492,8 @@ public:
 	inline int iface_i2c_sda_r();
 	void i2c_send_start();
 	void i2c_send_stop();
-	UINT8 i2c_receive_byte(int ack);
-	int i2c_send_byte(UINT8 data);
+	uint8_t i2c_receive_byte(int ack);
+	int i2c_send_byte(uint8_t data);
 	void iic_start();
 	void iic_stop();
 	void iic_resume();
@@ -501,7 +501,7 @@ public:
 	WRITE32_MEMBER( s3c24xx_iic_w );
 	TIMER_CALLBACK_MEMBER( s3c24xx_iic_timer_exp );
 	void s3c24xx_iis_reset();
-	inline void iface_i2s_data_w(int ch, UINT16 data);
+	inline void iface_i2s_data_w(int ch, uint16_t data);
 	void s3c24xx_iis_start();
 	void s3c24xx_iis_stop();
 	void s3c24xx_iis_recalc();
@@ -517,13 +517,13 @@ public:
 	void s3c24xx_rtc_check_alarm();
 	TIMER_CALLBACK_MEMBER( s3c24xx_rtc_timer_update_exp );
 	void s3c24xx_adc_reset();
-	UINT32 iface_adc_data_r(int ch);
+	uint32_t iface_adc_data_r(int ch);
 	READ32_MEMBER( s3c24xx_adc_r );
 	void s3c24xx_adc_start();
 	WRITE32_MEMBER( s3c24xx_adc_w );
 	void s3c24xx_spi_reset();
-	UINT32 s3c24xx_spi_r(UINT32 ch, UINT32 offset);
-	void s3c24xx_spi_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	uint32_t s3c24xx_spi_r(uint32_t ch, uint32_t offset);
+	void s3c24xx_spi_w(uint32_t ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	READ32_MEMBER( s3c24xx_spi_0_r );
 	WRITE32_MEMBER( s3c24xx_spi_0_w );
 	void s3c24xx_mmc_reset();
@@ -533,7 +533,7 @@ public:
 	void s3c24xx_device_start();
 
 
-	void s3c2400_uart_fifo_w(int uart, UINT8 data);
+	void s3c2400_uart_fifo_w(int uart, uint8_t data);
 
 	/*******************************************************************************
 	    TYPE DEFINITIONS
@@ -541,201 +541,201 @@ public:
 
 	struct s3c24xx_memcon_regs_t
 	{
-		UINT32 data[0x34/4];
+		uint32_t data[0x34/4];
 	};
 
 	struct s3c24xx_usbhost_regs_t
 	{
-		UINT32 data[0x5C/4];
+		uint32_t data[0x5C/4];
 	};
 
 	struct s3c24xx_irq_regs_t
 	{
-		UINT32 srcpnd;
-		UINT32 intmod;
-		UINT32 intmsk;
-		UINT32 priority;
-		UINT32 intpnd;
-		UINT32 intoffset;
+		uint32_t srcpnd;
+		uint32_t intmod;
+		uint32_t intmsk;
+		uint32_t priority;
+		uint32_t intpnd;
+		uint32_t intoffset;
 	};
 
 	struct s3c24xx_dma_regs_t
 	{
-		UINT32 disrc;
-		UINT32 didst;
-		UINT32 dcon;
-		UINT32 dstat;
-		UINT32 dcsrc;
-		UINT32 dcdst;
-		UINT32 dmasktrig;
+		uint32_t disrc;
+		uint32_t didst;
+		uint32_t dcon;
+		uint32_t dstat;
+		uint32_t dcsrc;
+		uint32_t dcdst;
+		uint32_t dmasktrig;
 	};
 
 	struct s3c24xx_clkpow_regs_t
 	{
-		UINT32 locktime;
-		UINT32 mpllcon;
-		UINT32 upllcon;
-		UINT32 clkcon;
-		UINT32 clkslow;
-		UINT32 clkdivn;
+		uint32_t locktime;
+		uint32_t mpllcon;
+		uint32_t upllcon;
+		uint32_t clkcon;
+		uint32_t clkslow;
+		uint32_t clkdivn;
 	};
 
 	struct s3c24xx_lcd_regs_t
 	{
-		UINT32 lcdcon1;
-		UINT32 lcdcon2;
-		UINT32 lcdcon3;
-		UINT32 lcdcon4;
-		UINT32 lcdcon5;
-		UINT32 lcdsaddr1;
-		UINT32 lcdsaddr2;
-		UINT32 lcdsaddr3;
-		UINT32 redlut;
-		UINT32 greenlut;
-		UINT32 bluelut;
-		UINT32 reserved[8];
-		UINT32 dithmode;
-		UINT32 tpal;
+		uint32_t lcdcon1;
+		uint32_t lcdcon2;
+		uint32_t lcdcon3;
+		uint32_t lcdcon4;
+		uint32_t lcdcon5;
+		uint32_t lcdsaddr1;
+		uint32_t lcdsaddr2;
+		uint32_t lcdsaddr3;
+		uint32_t redlut;
+		uint32_t greenlut;
+		uint32_t bluelut;
+		uint32_t reserved[8];
+		uint32_t dithmode;
+		uint32_t tpal;
 	};
 
 	struct s3c24xx_lcdpal_regs_t
 	{
-		UINT32 data[0x400/4];
+		uint32_t data[0x400/4];
 	};
 
 	struct s3c24xx_uart_regs_t
 	{
-		UINT32 ulcon;
-		UINT32 ucon;
-		UINT32 ufcon;
-		UINT32 umcon;
-		UINT32 utrstat;
-		UINT32 uerstat;
-		UINT32 ufstat;
-		UINT32 umstat;
-		UINT32 utxh;
-		UINT32 urxh;
-		UINT32 ubrdiv;
+		uint32_t ulcon;
+		uint32_t ucon;
+		uint32_t ufcon;
+		uint32_t umcon;
+		uint32_t utrstat;
+		uint32_t uerstat;
+		uint32_t ufstat;
+		uint32_t umstat;
+		uint32_t utxh;
+		uint32_t urxh;
+		uint32_t ubrdiv;
 	};
 
 	struct s3c24xx_pwm_regs_t
 	{
-		UINT32 tcfg0;
-		UINT32 tcfg1;
-		UINT32 tcon;
-		UINT32 tcntb0;
-		UINT32 tcmpb0;
-		UINT32 tcnto0;
-		UINT32 tcntb1;
-		UINT32 tcmpb1;
-		UINT32 tcnto1;
-		UINT32 tcntb2;
-		UINT32 tcmpb2;
-		UINT32 tcnto2;
-		UINT32 tcntb3;
-		UINT32 tcmpb3;
-		UINT32 tcnto3;
-		UINT32 tcntb4;
-		UINT32 tcnto4;
+		uint32_t tcfg0;
+		uint32_t tcfg1;
+		uint32_t tcon;
+		uint32_t tcntb0;
+		uint32_t tcmpb0;
+		uint32_t tcnto0;
+		uint32_t tcntb1;
+		uint32_t tcmpb1;
+		uint32_t tcnto1;
+		uint32_t tcntb2;
+		uint32_t tcmpb2;
+		uint32_t tcnto2;
+		uint32_t tcntb3;
+		uint32_t tcmpb3;
+		uint32_t tcnto3;
+		uint32_t tcntb4;
+		uint32_t tcnto4;
 	};
 
 	struct s3c24xx_usbdev_regs_t
 	{
-		UINT32 data[0xBC/4];
+		uint32_t data[0xBC/4];
 	};
 
 	struct s3c24xx_wdt_regs_t
 	{
-		UINT32 wtcon;
-		UINT32 wtdat;
-		UINT32 wtcnt;
+		uint32_t wtcon;
+		uint32_t wtdat;
+		uint32_t wtcnt;
 	};
 
 	struct s3c24xx_iic_regs_t
 	{
-		UINT32 iiccon;
-		UINT32 iicstat;
-		UINT32 iicadd;
-		UINT32 iicds;
+		uint32_t iiccon;
+		uint32_t iicstat;
+		uint32_t iicadd;
+		uint32_t iicds;
 	};
 
 	struct s3c24xx_iis_regs_t
 	{
-		UINT32 iiscon;
-		UINT32 iismod;
-		UINT32 iispsr;
-		UINT32 iisfcon;
-		UINT32 iisfifo;
+		uint32_t iiscon;
+		uint32_t iismod;
+		uint32_t iispsr;
+		uint32_t iisfcon;
+		uint32_t iisfifo;
 	};
 
 	struct s3c24xx_gpio_regs_t
 	{
-		UINT32 gpacon;
-		UINT32 gpadat;
-		UINT32 gpbcon;
-		UINT32 gpbdat;
-		UINT32 gpbup;
-		UINT32 gpccon;
-		UINT32 gpcdat;
-		UINT32 gpcup;
-		UINT32 gpdcon;
-		UINT32 gpddat;
-		UINT32 gpdup;
-		UINT32 gpecon;
-		UINT32 gpedat;
-		UINT32 gpeup;
-		UINT32 gpfcon;
-		UINT32 gpfdat;
-		UINT32 gpfup;
-		UINT32 gpgcon;
-		UINT32 gpgdat;
-		UINT32 gpgup;
-		UINT32 opencr;
-		UINT32 misccr;
-		UINT32 extint;
+		uint32_t gpacon;
+		uint32_t gpadat;
+		uint32_t gpbcon;
+		uint32_t gpbdat;
+		uint32_t gpbup;
+		uint32_t gpccon;
+		uint32_t gpcdat;
+		uint32_t gpcup;
+		uint32_t gpdcon;
+		uint32_t gpddat;
+		uint32_t gpdup;
+		uint32_t gpecon;
+		uint32_t gpedat;
+		uint32_t gpeup;
+		uint32_t gpfcon;
+		uint32_t gpfdat;
+		uint32_t gpfup;
+		uint32_t gpgcon;
+		uint32_t gpgdat;
+		uint32_t gpgup;
+		uint32_t opencr;
+		uint32_t misccr;
+		uint32_t extint;
 	};
 
 	struct s3c24xx_rtc_regs_t
 	{
-		UINT32 rtccon;
-		UINT32 ticnt;
-		UINT32 reserved[2];
-		UINT32 rtcalm;
-		UINT32 almsec;
-		UINT32 almmin;
-		UINT32 almhour;
-		UINT32 almday;
-		UINT32 almmon;
-		UINT32 almyear;
-		UINT32 rtcrst;
-		UINT32 bcdsec;
-		UINT32 bcdmin;
-		UINT32 bcdhour;
-		UINT32 bcdday;
-		UINT32 bcddow;
-		UINT32 bcdmon;
-		UINT32 bcdyear;
+		uint32_t rtccon;
+		uint32_t ticnt;
+		uint32_t reserved[2];
+		uint32_t rtcalm;
+		uint32_t almsec;
+		uint32_t almmin;
+		uint32_t almhour;
+		uint32_t almday;
+		uint32_t almmon;
+		uint32_t almyear;
+		uint32_t rtcrst;
+		uint32_t bcdsec;
+		uint32_t bcdmin;
+		uint32_t bcdhour;
+		uint32_t bcdday;
+		uint32_t bcddow;
+		uint32_t bcdmon;
+		uint32_t bcdyear;
 	};
 
 	struct s3c24xx_adc_regs_t
 	{
-		UINT32 adccon;
-		UINT32 adcdat;
+		uint32_t adccon;
+		uint32_t adcdat;
 	};
 
 	struct s3c24xx_spi_regs_t
 	{
-		UINT32 spcon;
-		UINT32 spsta;
-		UINT32 sppin;
-		UINT32 sppre;
-		UINT32 sptdat;
-		UINT32 sprdat;
+		uint32_t spcon;
+		uint32_t spsta;
+		uint32_t sppin;
+		uint32_t sppre;
+		uint32_t sptdat;
+		uint32_t sprdat;
 	};
 
 	struct s3c24xx_mmc_regs_t
 	{
-		UINT32 data[0x40/4];
+		uint32_t data[0x40/4];
 	};
 
 	struct s3c24xx_memcon_t
@@ -770,18 +770,18 @@ public:
 		s3c24xx_lcd_regs_t regs;
 		emu_timer *timer;
 		std::unique_ptr<bitmap_rgb32> bitmap[2];
-		UINT32 vramaddr_cur;
-		UINT32 vramaddr_max;
-		UINT32 offsize;
-		UINT32 pagewidth_cur;
-		UINT32 pagewidth_max;
-		UINT32 bppmode;
-		UINT32 bswp, hwswp;
+		uint32_t vramaddr_cur;
+		uint32_t vramaddr_max;
+		uint32_t offsize;
+		uint32_t pagewidth_cur;
+		uint32_t pagewidth_max;
+		uint32_t bppmode;
+		uint32_t bswp, hwswp;
 		int vpos, hpos;
 		double framerate;
-		UINT32 tpal;
-		UINT32 hpos_min, hpos_max, vpos_min, vpos_max;
-		UINT32 dma_data, dma_bits;
+		uint32_t tpal;
+		uint32_t hpos_min, hpos_max, vpos_min, vpos_max;
+		uint32_t dma_data, dma_bits;
 	};
 
 	struct s3c24xx_lcdpal_t
@@ -798,9 +798,9 @@ public:
 	{
 		s3c24xx_pwm_regs_t regs;
 		emu_timer *timer[5];
-		UINT32 cnt[5];
-		UINT32 cmp[5];
-		UINT32 freq[5];
+		uint32_t cnt[5];
+		uint32_t cmp[5];
+		uint32_t freq[5];
 	};
 
 	struct s3c24xx_usbdev_t
@@ -825,7 +825,7 @@ public:
 	{
 		s3c24xx_iis_regs_t regs;
 		emu_timer *timer;
-		UINT16 fifo[16/2];
+		uint16_t fifo[16/2];
 		int fifo_index;
 	};
 

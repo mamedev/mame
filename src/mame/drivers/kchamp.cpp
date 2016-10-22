@@ -712,7 +712,7 @@ ROM_END
 
 void kchamp_state::decrypt_code()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	for (int A = 0; A < 0x10000; A++)
 		m_decrypted_opcodes[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);
 }
@@ -722,7 +722,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 {
 	decrypt_code();
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int A;
 
 	/*

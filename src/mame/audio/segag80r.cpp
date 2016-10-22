@@ -31,7 +31,7 @@
 
 const device_type SEGA005 = &device_creator<sega005_sound_device>;
 
-sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sega005_sound_timer(nullptr),
@@ -75,7 +75,7 @@ void sega005_sound_device::device_start()
 void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
-	const UINT8 *sound_prom = state->memregion("proms")->base();
+	const uint8_t *sound_prom = state->memregion("proms")->base();
 	int i;
 
 	/* no implementation yet */
@@ -264,7 +264,7 @@ WRITE8_MEMBER(segag80r_state::astrob_sound_w)
 	};
 	float freq_factor;
 
-	UINT8 diff = data ^ m_sound_state[offset];
+	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;
 
 	switch (offset)
@@ -453,7 +453,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
 {
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* LARGE EXPL: channel 0 */
@@ -483,8 +483,8 @@ WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
 
 inline void segag80r_state::sega005_update_sound_data()
 {
-	UINT8 newval = memregion("005")->base()[m_sound_addr];
-	UINT8 diff = newval ^ m_sound_data;
+	uint8_t newval = memregion("005")->base()[m_sound_addr];
+	uint8_t diff = newval ^ m_sound_data;
 
 	//osd_printf_debug("  [%03X] = %02X\n", m_sound_addr, newval);
 
@@ -515,7 +515,7 @@ WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
 	       D4: 1 = hold/reset address counter to 0
 	    D3-D0: upper 4 bits of ROM address
 	*/
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	//osd_printf_debug("sound[%d] = %02X\n", 1, data);
@@ -608,7 +608,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
 {
-	UINT8 diff = data ^ m_sound_state[offset];
+	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;
 
 	switch (offset)
@@ -764,7 +764,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_sound_a_w)
 
 WRITE8_MEMBER(segag80r_state::monsterb_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* SHOT: channel 0 */

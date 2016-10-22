@@ -137,7 +137,7 @@ INPUT_PORTS_END
 // Read from keyboard
 READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch( ( m_u2_port_b >> 1 ) & 0x0f )
 	{
@@ -157,7 +157,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 // Write to 7-Segment LEDs
 WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 {
-	UINT8 idx = ( m_u2_port_b >> 1 ) & 0x0f;
+	uint8_t idx = ( m_u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
@@ -210,7 +210,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 // Blank LEDs during cassette operations
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 {
-	UINT8 i;
+	uint8_t i;
 
 	for ( i = 0; i < 6; i++ )
 	{
@@ -231,7 +231,7 @@ void kim1_state::machine_start()
 
 void kim1_state::machine_reset()
 {
-	UINT8 i;
+	uint8_t i;
 
 	for ( i = 0; i < 6; i++ )
 		m_led_time[i] = 0;

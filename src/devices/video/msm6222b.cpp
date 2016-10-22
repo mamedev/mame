@@ -21,19 +21,19 @@ ROM_START( msm6222b_01 )
 	ROM_LOAD( "msm6222b-01.bin", 0x0000, 0x1000, CRC(8ffa8521) SHA1(e108b520e6d20459a7bbd5958bbfa1d551a690bd) )
 ROM_END
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0),
 	m_cgrom(*this, finder_base::DUMMY_TAG)
 {
 }
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0),
 	m_cgrom(*this, DEVICE_SELF)
 {
 }
 
-msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	msm6222b_device(mconfig, MSM6222B_01, "msm6222b-01", tag, owner, clock, "msm6222b", __FILE__)
 {
 	// load the fixed cgrom
@@ -61,7 +61,7 @@ void msm6222b_device::device_start()
 	shift = 0;
 }
 
-void msm6222b_device::control_w(UINT8 data)
+void msm6222b_device::control_w(uint8_t data)
 {
 	int cmd;
 	for(cmd = 7; cmd >= 0 && !(data & (1<<cmd)); cmd--) {};
@@ -109,12 +109,12 @@ void msm6222b_device::control_w(UINT8 data)
 	}
 }
 
-UINT8 msm6222b_device::control_r()
+uint8_t msm6222b_device::control_r()
 {
 	return adc & 0x7f;
 }
 
-void msm6222b_device::data_w(UINT8 data)
+void msm6222b_device::data_w(uint8_t data)
 {
 	if(adc & 0x80) {
 		int adr = adc & 0x7f;
@@ -196,14 +196,14 @@ bool msm6222b_device::blink_on() const
 {
 	if(!cursor_blinking)
 		return false;
-	UINT64 clocks = machine().time().as_ticks(250000);
+	uint64_t clocks = machine().time().as_ticks(250000);
 	if(double_height)
 		return clocks % 281600 >= 140800;
 	else
 		return clocks % 204800 >= 102400;
 }
 
-const UINT8 *msm6222b_device::render()
+const uint8_t *msm6222b_device::render()
 {
 	memset(render_buf, 0, 80*16);
 	if(!display_on)
@@ -212,7 +212,7 @@ const UINT8 *msm6222b_device::render()
 	int char_height = double_height ? 11 : 8;
 
 	for(int i=0; i<80; i++) {
-		UINT8 c = ddram[(i+shift) % 80];
+		uint8_t c = ddram[(i+shift) % 80];
 		if(c < 16)
 			memcpy(render_buf + 16*i, double_height ? cgram + 8*(c & 6) : cgram + 8*(c & 7), char_height);
 		else if (m_cgrom.found())

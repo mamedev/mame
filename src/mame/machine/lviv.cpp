@@ -28,7 +28,7 @@
 
 void lviv_state::lviv_update_memory ()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_ppi_port_outputs[0][2] & 0x02)
 	{
@@ -59,7 +59,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_0_portb_r)
 
 READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
 {
-	UINT8 data = m_ppi_port_outputs[0][2] & 0x0f;
+	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
 		data |= 0x10;
 	if (m_ppi_port_outputs[0][0] & ioport("JOY")->read())
@@ -159,7 +159,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
 	{
-		UINT8 *ram = m_ram->pointer();
+		uint8_t *ram = m_ram->pointer();
 
 		m_startup_mem_map = 0;
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *mem;
+	uint8_t *mem;
 
 	m_video_ram = m_ram->pointer() + 0xc000;
 
@@ -235,7 +235,7 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-void lviv_state::lviv_setup_snapshot (UINT8 * data)
+void lviv_state::lviv_setup_snapshot (uint8_t * data)
 {
 	unsigned char lo,hi;
 
@@ -281,7 +281,7 @@ void lviv_state::dump_registers()
 	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(I8085_HL));
 }
 
-image_verify_result lviv_state::lviv_verify_snapshot(UINT8 * data, UINT32 size)
+image_verify_result lviv_state::lviv_verify_snapshot(uint8_t * data, uint32_t size)
 {
 	const char* tag = "LVOV/DUMP/2.0/";
 
@@ -303,7 +303,7 @@ image_verify_result lviv_state::lviv_verify_snapshot(UINT8 * data, UINT32 size)
 
 SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
-	std::vector<UINT8> lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
+	std::vector<uint8_t> lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
 
 	image.fread( &lviv_snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 

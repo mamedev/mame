@@ -33,7 +33,7 @@ const device_type MSX_SLOT_CARTRIDGE = &device_creator<msx_slot_cartridge_device
 const device_type MSX_SLOT_YAMAHA_EXPANSION = &device_creator<msx_slot_yamaha_expansion_device>;
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_CARTRIDGE, "MSX Cartridge slot", tag, owner, clock, "msx_slot_cartridge", __FILE__)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
@@ -44,7 +44,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 }
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
@@ -108,14 +108,14 @@ image_init_result msx_slot_cartridge_device::call_load()
 	{
 		if ( software_entry() )
 		{
-			UINT32 length;
+			uint32_t length;
 
 			// Allocate and copy rom contents
 			length = get_software_region_length("rom");
 			m_cartridge->rom_alloc( length );
 			if (length > 0)
 			{
-				UINT8 *rom_base = m_cartridge->get_rom_base();
+				uint8_t *rom_base = m_cartridge->get_rom_base();
 				memcpy(rom_base, get_software_region("rom"), length);
 			}
 
@@ -124,7 +124,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 			m_cartridge->rom_vlm5030_alloc(length);
 			if (length > 0)
 			{
-				UINT8 *rom_base = m_cartridge->get_rom_vlm5030_base();
+				uint8_t *rom_base = m_cartridge->get_rom_vlm5030_base();
 				memcpy(rom_base, get_software_region("vlm5030"), length);
 			}
 
@@ -138,10 +138,10 @@ image_init_result msx_slot_cartridge_device::call_load()
 		}
 		else
 		{
-			UINT32 length = this->length();
+			uint32_t length = this->length();
 
 			// determine how much space to allocate
-			UINT32 length_aligned = 0x10000;
+			uint32_t length_aligned = 0x10000;
 
 			if (length <= 0x2000)
 				length_aligned = 0x2000;
@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(msx_slot_cartridge_device::irq_out)
 }
 
 
-int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
+int msx_slot_cartridge_device::get_cart_type(uint8_t *rom, uint32_t length)
 {
 	if (length < 0x2000)
 	{
@@ -276,8 +276,8 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nomapper";
-		UINT32 length = m_file->size();
-		std::vector<UINT8> rom(length);
+		uint32_t length = m_file->size();
+		std::vector<uint8_t> rom(length);
 		int type = NOMAPPER;
 
 		// Check if there's some mapper related information in the hashfiles
@@ -357,7 +357,7 @@ WRITE8_MEMBER(msx_slot_cartridge_device::write)
 
 
 
-msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, "MSX Yamaha Expansion slot", tag, owner, clock, "msx_slot_yamaha_expansion", __FILE__)
 {
 }

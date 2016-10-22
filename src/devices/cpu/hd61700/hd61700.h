@@ -67,7 +67,7 @@ class hd61700_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	template<class _Object> static devcb_base &set_lcd_ctrl_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_ctrl_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_lcd_write_callback(device_t &device, _Object object) { return downcast<hd61700_cpu_device &>(device).m_lcd_write_cb.set_callback(object); }
@@ -84,9 +84,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 52; }
-	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 52; }
+	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -98,31 +98,31 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 16; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 16; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// interrupts
 	bool check_irqs(void);
 
 	// inline helpers
-	inline void  set_pc(INT32 new_pc);
-	inline UINT8 read_op();
-	inline UINT8 mem_readbyte(UINT8 segment, UINT16 offset);
-	inline void  mem_writebyte(UINT8 segment, UINT16 offset, UINT8 data);
-	inline UINT32 make_18bit_addr(UINT8 segment, UINT16 offset);
-	inline int   check_cond( UINT32 op );
-	inline void  push(UINT16 &offset, UINT8 data);
-	inline UINT8 pop(UINT16 &offset);
-	inline UINT8 make_logic(UINT8 type, UINT8 d1, UINT8 d2);
-	inline void  check_optional_jr(UINT8 arg);
-	inline UINT8 get_sir_im8(UINT8 arg);
-	inline UINT8 get_sir_im8(UINT8 arg, UINT8 arg1);
-	inline int   get_sign_mreg(UINT8 op1);
-	inline int   get_sign_im8(UINT8 op1);
-	inline int   get_im_7(UINT8 data);
-	inline UINT16 make_bcd_sub(UINT8 arg1, UINT8 arg2);
-	inline UINT16 make_bcd_add(UINT8 arg1, UINT8 arg2);
+	inline void  set_pc(int32_t new_pc);
+	inline uint8_t read_op();
+	inline uint8_t mem_readbyte(uint8_t segment, uint16_t offset);
+	inline void  mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data);
+	inline uint32_t make_18bit_addr(uint8_t segment, uint16_t offset);
+	inline int   check_cond( uint32_t op );
+	inline void  push(uint16_t &offset, uint8_t data);
+	inline uint8_t pop(uint16_t &offset);
+	inline uint8_t make_logic(uint8_t type, uint8_t d1, uint8_t d2);
+	inline void  check_optional_jr(uint8_t arg);
+	inline uint8_t get_sir_im8(uint8_t arg);
+	inline uint8_t get_sir_im8(uint8_t arg, uint8_t arg1);
+	inline int   get_sign_mreg(uint8_t op1);
+	inline int   get_sign_im8(uint8_t op1);
+	inline int   get_im_7(uint8_t data);
+	inline uint16_t make_bcd_sub(uint8_t arg1, uint8_t arg2);
+	inline uint16_t make_bcd_add(uint8_t arg1, uint8_t arg2);
 
 protected:
 
@@ -133,16 +133,16 @@ protected:
 
 	offs_t         m_ppc;
 	offs_t         m_curpc;
-	UINT16         m_pc;
-	UINT8          m_flags;
-	UINT32         m_fetch_addr;
-	UINT8          m_regsir[3];                         // 5bit register (sx, sy, sz)
-	UINT8          m_reg8bit[8];                        // 8bit register (pe, pd, ib, ua, ia, ie, tm, tm)
-	UINT16         m_reg16bit[8];                       // 16bit register (ix, iy, iz, us, ss, ky, ky, ky)
-	UINT8          m_regmain[0x20];                     // main registers
-	UINT8          m_irq_status;
-	UINT8          m_state;
-	UINT8          prev_ua;
+	uint16_t         m_pc;
+	uint8_t          m_flags;
+	uint32_t         m_fetch_addr;
+	uint8_t          m_regsir[3];                         // 5bit register (sx, sy, sz)
+	uint8_t          m_reg8bit[8];                        // 8bit register (pe, pd, ib, ua, ia, ie, tm, tm)
+	uint16_t         m_reg16bit[8];                       // 16bit register (ix, iy, iz, us, ss, ky, ky, ky)
+	uint8_t          m_regmain[0x20];                     // main registers
+	uint8_t          m_irq_status;
+	uint8_t          m_state;
+	uint8_t          prev_ua;
 	int            m_lines_status[6];
 	int            m_icount;
 

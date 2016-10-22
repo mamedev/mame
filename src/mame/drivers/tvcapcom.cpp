@@ -22,7 +22,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 };
 
@@ -39,7 +39,7 @@ void tvcapcom_state::video_start()
 }
 
 
-UINT32 tvcapcom_state::screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tvcapcom_state::screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

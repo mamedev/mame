@@ -541,7 +541,7 @@ void cli_frontend::listcrc(const char *gamename)
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// if we have a CRC, display it
-					UINT32 crc;
+					uint32_t crc;
 					if (util::hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
 						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
 				}
@@ -712,7 +712,7 @@ void cli_frontend::listdevices(const char *gamename)
 			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
-			UINT32 clock = device->clock();
+			uint32_t clock = device->clock();
 			if (clock >= 1000000000)
 				printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
 			else if (clock >= 1000000)

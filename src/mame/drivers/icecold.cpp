@@ -46,10 +46,10 @@ public:
 	required_device<ay8910_device> m_ay8910_1;
 	required_device<pia6821_device> m_pia1;
 
-	UINT8   m_digit;            // scanlines from i8279
-	UINT8   m_sound_latch;      // sound bus latch
-	UINT8   m_ay_ctrl;          // ay controls line
-	UINT8   m_motors_ctrl;      // motors control
+	uint8_t   m_digit;            // scanlines from i8279
+	uint8_t   m_sound_latch;      // sound bus latch
+	uint8_t   m_ay_ctrl;          // ay controls line
+	uint8_t   m_motors_ctrl;      // motors control
 	int     m_sint;             // SINT line
 	int     m_motenbl;          // /MOTENBL line
 	int     m_ball_gate_sw;     // ball gate switch
@@ -174,7 +174,7 @@ void icecold_state::machine_reset()
 
 CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_rmotor <= 1)      data |= 0x01;   // right down limit
 	if (m_lmotor <= 1)      data |= 0x04;   // left down limit

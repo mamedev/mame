@@ -12,7 +12,7 @@ class nes_event_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,7 +33,7 @@ protected:
 	emu_timer *event_timer;
 	attotime timer_freq;
 
-	UINT32 m_timer_count;
+	uint32_t m_timer_count;
 	int m_timer_on, m_timer_enabled;
 };
 

@@ -25,7 +25,7 @@ class upd1771c_device : public device_t,
 						public device_sound_interface
 {
 public:
-	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~upd1771c_device() {}
 
 	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
@@ -50,33 +50,33 @@ private:
 
 	TIMER_CALLBACK_MEMBER(ack_callback);
 
-	UINT8   m_packet[MAX_PACKET_SIZE];
-	UINT32  m_index;
-	UINT8   m_expected_bytes;
+	uint8_t   m_packet[MAX_PACKET_SIZE];
+	uint32_t  m_index;
+	uint8_t   m_expected_bytes;
 
-	UINT8   m_state;//0:silence, 1 noise, 2 tone
-	UINT8   m_pc3;
+	uint8_t   m_state;//0:silence, 1 noise, 2 tone
+	uint8_t   m_pc3;
 
 	//tone
-	UINT8    m_t_timbre; //[0;  7]
-	UINT8    m_t_offset; //[0; 32]
-	UINT16   m_t_period; //[0;255]
-	UINT8    m_t_volume; //[0; 31]
-	UINT8    m_t_tpos;//timbre pos
-	UINT16   m_t_ppos;//period pos
+	uint8_t    m_t_timbre; //[0;  7]
+	uint8_t    m_t_offset; //[0; 32]
+	uint16_t   m_t_period; //[0;255]
+	uint8_t    m_t_volume; //[0; 31]
+	uint8_t    m_t_tpos;//timbre pos
+	uint16_t   m_t_ppos;//period pos
 
 	//noise wavetable LFSR
-	UINT8    m_nw_timbre; //[0;  7]
-	UINT8    m_nw_volume; //[0; 31]
-	UINT32   m_nw_period;
-	UINT32   m_nw_tpos;   //timbre pos
-	UINT32   m_nw_ppos;   //period pos
+	uint8_t    m_nw_timbre; //[0;  7]
+	uint8_t    m_nw_volume; //[0; 31]
+	uint32_t   m_nw_period;
+	uint32_t   m_nw_tpos;   //timbre pos
+	uint32_t   m_nw_ppos;   //period pos
 
 	//noise pulse components
-	UINT8    m_n_value[3];  //[0;1]
-	UINT16   m_n_volume[3]; //[0; 31]
-	UINT32   m_n_period[3];
-	UINT32   m_n_ppos[3];   //period pos
+	uint8_t    m_n_value[3];  //[0;1]
+	uint16_t   m_n_volume[3]; //[0; 31]
+	uint32_t   m_n_period[3];
+	uint32_t   m_n_ppos[3];   //period pos
 };
 
 extern const device_type UPD1771C;

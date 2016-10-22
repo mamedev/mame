@@ -25,7 +25,7 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 
 MACHINE_RESET_MEMBER(scramble_state,explorer)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
 	MACHINE_RESET_CALL_MEMBER(galaxold);
@@ -34,7 +34,7 @@ MACHINE_RESET_MEMBER(scramble_state,explorer)
 
 CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 {
-	static const UINT8 remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
+	static const uint8_t remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
 								0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,
 								0x17, 0x16, 0x14, 0x15, 0x35, 0x34, 0x36, 0x37,
 								0x3f, 0x3e, 0x3c, 0x3d, 0x1d, 0x1c, 0x1e, 0x1f,
@@ -42,7 +42,7 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 								0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
 								0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
 								0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
-	UINT8 val = ioport((const char *)param)->read();
+	uint8_t val = ioport((const char *)param)->read();
 
 	return remap[val >> 2];
 }
@@ -178,7 +178,7 @@ DRIVER_INIT_MEMBER(scramble_state,mariner)
 DRIVER_INIT_MEMBER(scramble_state,frogger)
 {
 	offs_t A;
-	UINT8 *ROM;
+	uint8_t *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("audiocpu")->base();
@@ -194,7 +194,7 @@ DRIVER_INIT_MEMBER(scramble_state,frogger)
 DRIVER_INIT_MEMBER(scramble_state,froggers)
 {
 	offs_t A;
-	UINT8 *ROM;
+	uint8_t *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memregion("audiocpu")->base();
@@ -206,7 +206,7 @@ DRIVER_INIT_MEMBER(scramble_state,froggers)
 DRIVER_INIT_MEMBER(scramble_state,devilfsh)
 {
 	offs_t i;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	/* Address lines are scrambled on the main CPU */
 
@@ -219,7 +219,7 @@ DRIVER_INIT_MEMBER(scramble_state,devilfsh)
 	for (i = 0; i < 0x10000; i += 16)
 	{
 		offs_t j;
-		UINT8 swapbuffer[16];
+		uint8_t swapbuffer[16];
 
 		for (j = 0; j < 16; j++)
 		{
@@ -246,7 +246,7 @@ DRIVER_INIT_MEMBER(scramble_state,hotshock)
 
 DRIVER_INIT_MEMBER(scramble_state,cavelon)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
@@ -271,7 +271,7 @@ DRIVER_INIT_MEMBER(scramble_state,darkplnt)
 
 DRIVER_INIT_MEMBER(scramble_state,mimonkey)
 {
-	static const UINT8 xortable[16][16] =
+	static const uint8_t xortable[16][16] =
 	{
 		{ 0x03,0x03,0x05,0x07,0x85,0x00,0x85,0x85,0x80,0x80,0x06,0x03,0x03,0x00,0x00,0x81 },
 		{ 0x83,0x87,0x03,0x87,0x06,0x00,0x06,0x04,0x02,0x00,0x84,0x84,0x04,0x00,0x01,0x83 },
@@ -291,7 +291,7 @@ DRIVER_INIT_MEMBER(scramble_state,mimonkey)
 		{ 0x80,0x87,0x81,0x87,0x83,0x00,0x84,0x01,0x01,0x86,0x86,0x80,0x86,0x00,0x86,0x86 }
 	};
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int A, ctr = 0, line, col;
 
 	for( A = 0; A < 0x4000; A++ )
@@ -325,8 +325,8 @@ inline int scramble_state::bit(int i,int n)
 DRIVER_INIT_MEMBER(scramble_state,anteater)
 {
 	offs_t i, len;
-	UINT8 *RAM;
-	UINT8 *scratch;
+	uint8_t *RAM;
+	uint8_t *scratch;
 
 
 	DRIVER_INIT_CALL(scobra);
@@ -339,7 +339,7 @@ DRIVER_INIT_MEMBER(scramble_state,anteater)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	scratch = alloc_array_or_die(UINT8, len);
+	scratch = alloc_array_or_die(uint8_t, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -363,7 +363,7 @@ DRIVER_INIT_MEMBER(scramble_state,anteater)
 DRIVER_INIT_MEMBER(scramble_state,rescue)
 {
 	offs_t i, len;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 
 	DRIVER_INIT_CALL(scobra);
@@ -376,7 +376,7 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	std::vector<UINT8> scratch(len);
+	std::vector<uint8_t> scratch(len);
 
 	memcpy(&scratch[0], RAM, len);
 
@@ -397,7 +397,7 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 DRIVER_INIT_MEMBER(scramble_state,minefld)
 {
 	offs_t i, len;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 
 	DRIVER_INIT_CALL(scobra);
@@ -409,7 +409,7 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	std::vector<UINT8> scratch(len);
+	std::vector<uint8_t> scratch(len);
 
 	memcpy(&scratch[0], RAM, len);
 
@@ -432,8 +432,8 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 DRIVER_INIT_MEMBER(scramble_state,losttomb)
 {
 	offs_t i, len;
-	UINT8 *RAM;
-	UINT8 *scratch;
+	uint8_t *RAM;
+	uint8_t *scratch;
 
 
 	DRIVER_INIT_CALL(scramble);
@@ -446,7 +446,7 @@ DRIVER_INIT_MEMBER(scramble_state,losttomb)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	scratch = alloc_array_or_die(UINT8, len);
+	scratch = alloc_array_or_die(uint8_t, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -470,12 +470,12 @@ DRIVER_INIT_MEMBER(scramble_state,losttomb)
 DRIVER_INIT_MEMBER(scramble_state,hustler)
 {
 	offs_t A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x4000;A++)
 	{
-		UINT8 xormask;
+		uint8_t xormask;
 		int bits[8];
 		int i;
 
@@ -510,7 +510,7 @@ DRIVER_INIT_MEMBER(scramble_state,hustlerd)
 {
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	offs_t A;
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 
 
 	for (A = 0;A < 0x0800;A++)
@@ -520,12 +520,12 @@ DRIVER_INIT_MEMBER(scramble_state,hustlerd)
 DRIVER_INIT_MEMBER(scramble_state,billiard)
 {
 	offs_t A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x4000;A++)
 	{
-		UINT8 xormask;
+		uint8_t xormask;
 		int bits[8];
 		int i;
 
@@ -577,9 +577,9 @@ DRIVER_INIT_MEMBER(scramble_state,mrkougb)
 
 DRIVER_INIT_MEMBER(scramble_state,ad2083)
 {
-	UINT8 c;
+	uint8_t c;
 	int i, len = memregion("maincpu")->bytes();
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<len; i++)
 	{
@@ -643,17 +643,17 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
 
 DRIVER_INIT_MEMBER(scramble_state,harem)
 {
-	UINT8 *ROM      =   memregion("maincpu")->base() + 0x8000;
+	uint8_t *ROM      =   memregion("maincpu")->base() + 0x8000;
 	size_t size     =   0x2000;
 
-	m_harem_decrypted_data      = std::make_unique<UINT8[]>(size * 3);
-	UINT8 *data = m_harem_decrypted_data.get();
-	m_harem_decrypted_opcodes   = std::make_unique<UINT8[]>(size * 3);
-	UINT8 *opcodes = m_harem_decrypted_opcodes.get();
+	m_harem_decrypted_data      = std::make_unique<uint8_t[]>(size * 3);
+	uint8_t *data = m_harem_decrypted_data.get();
+	m_harem_decrypted_opcodes   = std::make_unique<uint8_t[]>(size * 3);
+	uint8_t *opcodes = m_harem_decrypted_opcodes.get();
 	// decryption 03
 	for (int i = 0; i < size; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		opcodes[size * 0 + i]   =   BITSWAP8(x, 7,0,5,2,3,4,1,6);
 		data   [size * 0 + i]   =   BITSWAP8(x, 7,6,5,0,3,4,1,2);
 	}
@@ -661,7 +661,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	// decryption 09
 	for (int i = 0; i < size; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		opcodes[size * 1 + i]   =   BITSWAP8(x, 7,0,5,6,3,2,1,4);
 		data   [size * 1 + i]   =   BITSWAP8(x, 7,4,5,0,3,6,1,2);
 	}
@@ -669,7 +669,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	// decryption 0a
 	for (int i = 0; i < size; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		opcodes[size * 2 + i]   =   BITSWAP8(x, 7,2,5,6,3,0,1,4);
 		data   [size * 2 + i]   =   BITSWAP8(x, 7,2,5,4,3,0,1,6);
 	}
@@ -687,7 +687,7 @@ DRIVER_INIT_MEMBER(scramble_state,newsin7a)
 {
 	DRIVER_INIT_CALL(devilfsh); // decrypt
 
-//  UINT8 *ROM = memregion("maincpu")->base();
+//  uint8_t *ROM = memregion("maincpu")->base();
 //  ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */
 
 	// attempts to access port at c20x instead of 820x in one location, mirror or bitrot?

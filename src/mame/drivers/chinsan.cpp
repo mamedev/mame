@@ -61,14 +61,14 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video;
+	required_shared_ptr<uint8_t> m_video;
 
 	/* misc */
-	UINT8    m_port_select;
-	UINT32   m_adpcm_pos;
-	UINT8    m_adpcm_idle;
-	UINT8    m_adpcm_data;
-	UINT8    m_trigger;
+	uint8_t    m_port_select;
+	uint32_t   m_adpcm_pos;
+	uint8_t    m_adpcm_idle;
+	uint8_t    m_adpcm_data;
+	uint8_t    m_trigger;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
 	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
@@ -81,13 +81,13 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(chinsan);
-	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	std::unique_ptr<UINT8[]> m_decrypted_opcodes;
+	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 };
 
 
@@ -99,7 +99,7 @@ public:
 
 PALETTE_INIT_MEMBER(chinsan_state, chinsan)
 {
-	UINT8 *src = memregion( "color_proms" )->base();
+	uint8_t *src = memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -110,7 +110,7 @@ void chinsan_state::video_start()
 {
 }
 
-UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, count;
 	count = 0;
@@ -548,7 +548,7 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);
@@ -677,7 +677,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chinsan_state,chinsan)
 {
-	m_decrypted_opcodes = std::make_unique<UINT8[]>(0x18000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), memregion("user1")->base(), 0x18000);
 }
 

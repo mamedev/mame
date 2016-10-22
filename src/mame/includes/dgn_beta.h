@@ -74,7 +74,7 @@ enum BETA_VID_MODES
 struct PageReg
 {
 	int     value;          /* Value of the page register */
-	UINT8   *memory;        /* The memory it actually points to */
+	uint8_t   *memory;        /* The memory it actually points to */
 };
 
 
@@ -97,9 +97,9 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 *m_system_rom;
+	uint8_t *m_system_rom;
 	int m_LogDatWrites;
 	int m_Keyboard[NoKeyrows];
 	int m_RowShifter;
@@ -221,7 +221,7 @@ public:
 	required_device<floppy_connector> m_floppy3;
 	required_device<palette_device> m_palette;
 
-	offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 
 private:
 	void execute_beta_key_dump(int ref, int params, const char *param[]);

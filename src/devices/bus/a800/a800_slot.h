@@ -58,22 +58,22 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_80xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
-	void nvram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT8* get_nvram_base() { return &m_nvram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.size(); }
-	UINT32 get_nvram_size() { return m_nvram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	void nvram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t* get_nvram_base() { return &m_nvram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
+	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	std::vector<UINT8> m_ram;
-	std::vector<UINT8> m_nvram; // HiScore cart can save scores!
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
+	std::vector<uint8_t> m_nvram; // HiScore cart can save scores!
 	// helpers
 	int m_bank_mask;
 };
@@ -87,8 +87,8 @@ class a800_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a800_cart_slot_device();
 
 	// device-level overrides
@@ -101,7 +101,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(UINT8 *header);
+	int identify_cart_type(uint8_t *header);
 	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
@@ -137,7 +137,7 @@ class a5200_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
-	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a5200_cart_slot_device();
 
 	virtual const char *file_extensions() const override { return "bin,rom,car,a52"; }
@@ -152,7 +152,7 @@ class xegs_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
-	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~xegs_cart_slot_device();
 
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }

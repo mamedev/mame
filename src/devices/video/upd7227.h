@@ -36,7 +36,7 @@ class upd7227_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_offsets(device_t &device, int sx, int sy);
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_READ_LINE_MEMBER( so_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

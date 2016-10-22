@@ -11,7 +11,7 @@
 
 const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 
-tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock, "tc0180vcu", __FILE__),
 	m_ram(nullptr),
 	//m_scrollram(nullptr),
@@ -53,8 +53,8 @@ void tc0180vcu_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_ram = make_unique_clear<UINT16[]>(TC0180VCU_RAM_SIZE / 2);
-	m_scrollram = make_unique_clear<UINT16[]>(TC0180VCU_SCROLLRAM_SIZE / 2);
+	m_ram = make_unique_clear<uint16_t[]>(TC0180VCU_RAM_SIZE / 2);
+	m_scrollram = make_unique_clear<uint16_t[]>(TC0180VCU_SCROLLRAM_SIZE / 2);
 
 	save_pointer(NAME(m_ram.get()), TC0180VCU_RAM_SIZE / 2);
 	save_pointer(NAME(m_scrollram.get()), TC0180VCU_SCROLLRAM_SIZE / 2);
@@ -153,7 +153,7 @@ READ8_MEMBER( tc0180vcu_device::get_videoctrl )
 	return m_video_control;
 }
 
-void tc0180vcu_device::video_control( UINT8 data )
+void tc0180vcu_device::video_control( uint8_t data )
 {
 #if 0
 	if (data != m_video_control)
@@ -175,7 +175,7 @@ READ16_MEMBER( tc0180vcu_device::ctrl_r )
 
 WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
 {
-	UINT16 oldword = m_ctrl[offset];
+	uint16_t oldword = m_ctrl[offset];
 
 	COMBINE_DATA (&m_ctrl[offset]);
 

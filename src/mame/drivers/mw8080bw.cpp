@@ -174,7 +174,7 @@
 
 READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
-	UINT8 ret = m_mb14241->shift_result_r(space, 0);
+	uint8_t ret = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
 }
@@ -182,7 +182,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 
 READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (m_rev_shift_res)
 	{
@@ -286,7 +286,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 		"EXP_LAMP_C", "EXP_LAMP_D", "EXP_LAMP_E", "EXP_LAMP_F"
 	};
 
-	static const UINT8 bits_for_lamps[] =
+	static const uint8_t bits_for_lamps[] =
 	{
 		0x18, 0x14, 0x12, 0x11,
 		0x28, 0x24, 0x22, 0x21,
@@ -297,7 +297,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 	/* set each lamp */
 	for (i = 0; i < 16; i++)
 	{
-		UINT8 bits_for_lamp = bits_for_lamps[i];
+		uint8_t bits_for_lamp = bits_for_lamps[i];
 
 		output().set_value(lamp_names[i], (data & bits_for_lamp) == bits_for_lamp);
 	}
@@ -553,7 +553,7 @@ MACHINE_CONFIG_END
 #define TORNBASE_CAB_TYPE_PORT_TAG      ("CAB")
 
 
-UINT8 mw8080bw_state::tornbase_get_cabinet_type()
+uint8_t mw8080bw_state::tornbase_get_cabinet_type()
 {
 	return ioport(TORNBASE_CAB_TYPE_PORT_TAG)->read();
 }
@@ -567,7 +567,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_left_input_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	switch (tornbase_get_cabinet_type())
 	{
@@ -588,7 +588,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	switch (tornbase_get_cabinet_type())
 	{
@@ -1184,7 +1184,7 @@ MACHINE_START_MEMBER(mw8080bw_state,desertgu)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	if (m_desertgun_controller_select)
 		ret = ioport(DESERTGU_GUN_X_PORT_TAG)->read();
@@ -1197,7 +1197,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	if (m_desertgun_controller_select)
 		ret = ioport(DESERTGU_DIP_SW_0_1_SET_2_TAG)->read();
@@ -1315,7 +1315,7 @@ MACHINE_CONFIG_END
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	if (ioport(DPLAY_CAB_TYPE_PORT_TAG)->read() == DPLAY_CAB_TYPE_UPRIGHT)
 		ret = ioport(DPLAY_L_PITCH_PORT_TAG)->read();
@@ -1706,7 +1706,7 @@ MACHINE_START_MEMBER(mw8080bw_state,clowns)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	if (m_clowns_controller_select)
 	{
@@ -2166,7 +2166,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 
 	else if ((offset & 0x07) == 0x03)
 	{                                           /*  -  -  -  -  -  0  1  1 */
-		UINT8 addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
+		uint8_t addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
 		m_spcenctr_trench_slope[addr] = data;
 	}
 	else if ((offset & 0x07) == 0x04)
@@ -2524,7 +2524,7 @@ MACHINE_START_MEMBER(mw8080bw_state,invaders)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
 {
-	UINT32 ret = ioport(INVADERS_COIN_INPUT_PORT_TAG)->read();
+	uint32_t ret = ioport(INVADERS_COIN_INPUT_PORT_TAG)->read();
 
 	machine().bookkeeping().coin_counter_w(0, !ret);
 
@@ -2534,7 +2534,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* upright PCB : switches visible
 	   cocktail PCB: HI */
@@ -2550,7 +2550,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* upright PCB : switch visible
 	   cocktail PCB: HI */
@@ -2566,7 +2566,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* upright PCB : P1 controls
 	   cocktail PCB: HI */
@@ -2588,7 +2588,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in1_control_r)
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* upright PCB : P1 controls
 	   cocktail PCB: P2 controls */
@@ -2733,7 +2733,7 @@ MACHINE_CONFIG_END
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 {
-	UINT32 ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
+	uint32_t ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
 
 	machine().bookkeeping().coin_counter_w(0, !ret);
 
@@ -2812,9 +2812,9 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_FUNCTION
-UINT32 mw8080bw_state::invad2ct_coin_input_r(void *param)
+uint32_t mw8080bw_state::invad2ct_coin_input_r(void *param)
 {
-	UINT32 ret = ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
+	uint32_t ret = ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
 
 	coin_counter_w(machine, 0, !ret);
 

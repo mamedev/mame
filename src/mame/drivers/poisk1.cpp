@@ -43,7 +43,7 @@
 	} while (0)
 
 #define POISK1_UPDATE_ROW(name) \
-	void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *videoram, UINT16 ma, UINT8 ra, UINT8 stride)
+	void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride)
 
 class p1_state : public driver_device
 {
@@ -78,7 +78,7 @@ public:
 
 	DECLARE_PALETTE_INIT(p1);
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_palette_luts();
 	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
 	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
@@ -86,21 +86,21 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
-	UINT8 m_p1_spkrdata;
-	UINT8 m_p1_input;
+	uint8_t m_p1_spkrdata;
+	uint8_t m_p1_input;
 
-	UINT8 m_kbpoll_mask;
+	uint8_t m_kbpoll_mask;
 
 	struct
 	{
-		UINT8 trap[4];
-		std::unique_ptr<UINT8[]> videoram_base;
-		UINT8 *videoram;
-		UINT8 mode_control_6a;
-		UINT8 color_select_68;
-		UINT8 palette_lut_2bpp[4];
+		uint8_t trap[4];
+		std::unique_ptr<uint8_t[]> videoram_base;
+		uint8_t *videoram;
+		uint8_t mode_control_6a;
+		uint8_t color_select_68;
+		uint8_t palette_lut_2bpp[4];
 		int stride;
-		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *videoram, UINT16 ma, UINT8 ra, UINT8 stride);
+		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 
 	DECLARE_READ8_MEMBER(p1_trap_r);
@@ -137,7 +137,7 @@ public:
 
 READ8_MEMBER(p1_state::p1_trap_r)
 {
-	UINT8 data = m_video.trap[offset];
+	uint8_t data = m_video.trap[offset];
 	DBG_LOG(1,"trap",("R %.2x $%02x\n", 0x28+offset, data));
 	if (offset == 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -151,7 +151,7 @@ WRITE8_MEMBER(p1_state::p1_trap_w)
 
 READ8_MEMBER(p1_state::p1_cga_r)
 {
-	UINT16 port = offset + 0x3d0;
+	uint16_t port = offset + 0x3d0;
 
 	DBG_LOG(1,"cga",("R %.4x\n", port));
 	m_video.trap[1] = 0x40 | ((port >> 8) & 0x3f);
@@ -162,7 +162,7 @@ READ8_MEMBER(p1_state::p1_cga_r)
 
 WRITE8_MEMBER(p1_state::p1_cga_w)
 {
-	UINT16 port = offset + 0x3d0;
+	uint16_t port = offset + 0x3d0;
 
 	DBG_LOG(1,"cga",("W %.4x $%02x\n", port, data));
 	m_video.trap[2] = data;
@@ -287,8 +287,8 @@ void p1_state::set_palette_luts(void)
 POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(ra);
-	UINT16  odd, offset;
+	uint32_t  *p = &bitmap.pix32(ra);
+	uint16_t  odd, offset;
 	int i;
 
 	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
@@ -296,7 +296,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 	offset = ( ma & 0x1fff ) | odd;
 	for ( i = 0; i < stride; i++ )
 	{
-		UINT8 data = videoram[ offset++ ];
+		uint8_t data = videoram[ offset++ ];
 
 		*p = palette[m_video.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
 		*p = palette[m_video.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
@@ -314,9 +314,9 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(ra);
-	UINT8   fg = 15, bg = BG_COLOR(m_video.color_select_68);
-	UINT16  odd, offset;
+	uint32_t  *p = &bitmap.pix32(ra);
+	uint8_t   fg = 15, bg = BG_COLOR(m_video.color_select_68);
+	uint16_t  odd, offset;
 	int i;
 
 	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_1bpp_update_row",("bg %d\n", bg));
@@ -324,7 +324,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 	offset = ( ma & 0x1fff ) | odd;
 	for ( i = 0; i < stride; i++ )
 	{
-		UINT8 data = videoram[ offset++ ];
+		uint8_t data = videoram[ offset++ ];
 
 		*p = palette[( data & 0x80 ) ? fg : bg ]; p++;
 		*p = palette[( data & 0x40 ) ? fg : bg ]; p++;
@@ -346,9 +346,9 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(ra);
-	UINT8   fg, bg = BG_COLOR(m_video.color_select_68);
-	UINT16  odd, offset;
+	uint32_t  *p = &bitmap.pix32(ra);
+	uint8_t   fg, bg = BG_COLOR(m_video.color_select_68);
+	uint16_t  odd, offset;
 	int i;
 
 	if ( ra == 0 ) DBG_LOG(1,"poisk1_gfx_1bpp_update_row",("bg %d\n", bg));
@@ -356,7 +356,7 @@ POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 	offset = ( ma & 0x1fff ) | odd;
 	for ( i = 0; i < stride; i++ )
 	{
-		UINT8 data = videoram[ offset++ ];
+		uint8_t data = videoram[ offset++ ];
 
 		fg = (data & 0x80) ? ( (m_video.color_select_68 & 0x20) ? 10 : 11 ) : 15; // XXX
 		*p = palette[bg]; p++;
@@ -390,7 +390,7 @@ void p1_state::video_start()
 	DBG_LOG(0,"init",("video_start()\n"));
 
 	memset(&m_video, 0, sizeof(m_video));
-	m_video.videoram_base = std::make_unique<UINT8[]>(0x8000);
+	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
 
@@ -400,9 +400,9 @@ void p1_state::video_start()
 	machine().root_device().membank("bank12")->set_base(m_video.videoram + 0x4000);
 }
 
-UINT32 p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 ra, ma = 0;
+	uint16_t ra, ma = 0;
 
 	if (!m_video.stride || !m_video.videoram) return 0;
 
@@ -448,7 +448,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
 
 READ8_MEMBER(p1_state::p1_ppi_porta_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	ret = m_kbpoll_mask;
 	DBG_LOG(1,"p1_ppi_porta_r",("= %02X\n", ret));
@@ -457,8 +457,8 @@ READ8_MEMBER(p1_state::p1_ppi_porta_r)
 
 READ8_MEMBER(p1_state::p1_ppi_portb_r)
 {
-	UINT16 key = 0xffff;
-	UINT8 ret = 0;
+	uint16_t key = 0xffff;
+	uint8_t ret = 0;
 
 	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
 	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
@@ -475,8 +475,8 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 
 READ8_MEMBER(p1_state::p1_ppi_portc_r)
 {
-	UINT16 key = 0xffff;
-	UINT8 ret = 0;
+	uint16_t key = 0xffff;
+	uint8_t ret = 0;
 
 	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
 	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }

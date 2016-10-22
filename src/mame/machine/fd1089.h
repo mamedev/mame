@@ -39,36 +39,36 @@ class fd1089_base_device : public m68000_device
 {
 public:
 	// construction/destruction
-	fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// explicit decryption helpers
-	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT16 *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
+	void decrypt(offs_t baseaddr, uint32_t size, offs_t regionoffs, uint16_t *opcodesptr, uint16_t *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
 
 protected:
 	// device overrides
 	virtual void device_start() override;
 
 	// internal helpers
-	UINT8 rearrange_key(UINT8 table, bool opcode);
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) = 0;
-	UINT16 decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode);
-	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr);
+	uint8_t rearrange_key(uint8_t table, bool opcode);
+	virtual uint8_t decode(uint8_t val, uint8_t key, bool opcode) = 0;
+	uint16_t decrypt_one(offs_t addr, uint16_t val, const uint8_t *key, bool opcode);
+	void decrypt(offs_t baseaddr, uint32_t size, const uint16_t *srcptr, uint16_t *opcodesptr, uint16_t *dataptr);
 
 	// internal state
 	required_memory_region       m_region;
-	required_region_ptr<UINT8>   m_key;
-	std::vector<UINT16>          m_plaintext;
-	required_shared_ptr<UINT16>  m_decrypted_opcodes;
+	required_region_ptr<uint8_t>   m_key;
+	std::vector<uint16_t>          m_plaintext;
+	required_shared_ptr<uint16_t>  m_decrypted_opcodes;
 
 	// internal types
 	struct decrypt_parameters
 	{
-		UINT8 xorval;
-		UINT8 s7,s6,s5,s4,s3,s2,s1,s0;
+		uint8_t xorval;
+		uint8_t s7,s6,s5,s4,s3,s2,s1,s0;
 	};
 
 	// static tables
-	static const UINT8 s_basetable_fd1089[0x100];
+	static const uint8_t s_basetable_fd1089[0x100];
 	static const decrypt_parameters s_addr_params[16];
 	static const decrypt_parameters s_data_params_a[16];
 };
@@ -81,10 +81,10 @@ class fd1089a_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
+	virtual uint8_t decode(uint8_t val, uint8_t key, bool opcode) override;
 };
 
 
@@ -95,10 +95,10 @@ class fd1089b_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual UINT8 decode(UINT8 val, UINT8 key, bool opcode) override;
+	virtual uint8_t decode(uint8_t val, uint8_t key, bool opcode) override;
 };
 
 

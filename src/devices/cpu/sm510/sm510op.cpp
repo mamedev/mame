@@ -8,17 +8,17 @@
 
 // internal helpers
 
-inline UINT8 sm510_base_device::ram_r()
+inline uint8_t sm510_base_device::ram_r()
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
+	uint8_t address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline void sm510_base_device::ram_w(UINT8 data)
+inline void sm510_base_device::ram_w(uint8_t data)
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
-	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
+	uint8_t address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -36,13 +36,13 @@ void sm510_base_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-void sm510_base_device::do_branch(UINT8 pu, UINT8 pm, UINT8 pl)
+void sm510_base_device::do_branch(uint8_t pu, uint8_t pm, uint8_t pl)
 {
 	// set new PC(Pu/Pm/Pl)
 	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;
 }
 
-inline UINT8 sm510_base_device::bitmask(UINT16 param)
+inline uint8_t sm510_base_device::bitmask(uint16_t param)
 {
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);
@@ -64,7 +64,7 @@ void sm510_base_device::op_lb()
 	m_bl = (m_op >> 2 & 3);
 
 	// bl(high) is still unclear, official doc is confusing
-	UINT8 hi = 0;
+	uint8_t hi = 0;
 	switch (m_bl)
 	{
 		case 0: hi = 0; break;
@@ -90,7 +90,7 @@ void sm510_base_device::op_sbm()
 void sm510_base_device::op_exbla()
 {
 	// EXBLA: exchange BL with ACC
-	UINT8 a = m_acc;
+	uint8_t a = m_acc;
 	m_acc = m_bl;
 	m_bl = a;
 }
@@ -155,7 +155,7 @@ void sm510_base_device::op_tm()
 	// TM x: indirect subroutine call, pointers(IDX) are in page 0
 	m_icount--;
 	push_stack();
-	UINT8 idx = m_program->read_byte(m_op & 0x3f);
+	uint8_t idx = m_program->read_byte(m_op & 0x3f);
 	do_branch(idx >> 6 & 3, 4, idx & 0x3f);
 }
 
@@ -166,7 +166,7 @@ void sm510_base_device::op_tm()
 void sm510_base_device::op_exc()
 {
 	// EXC x: exchange ACC with RAM, xor BM with x
-	UINT8 a = m_acc;
+	uint8_t a = m_acc;
 	m_acc = ram_r();
 	ram_w(a);
 	m_bm ^= (m_op & 3);
@@ -304,7 +304,7 @@ void sm510_base_device::op_coma()
 void sm510_base_device::op_rot()
 {
 	// ROT: rotate ACC right through carry
-	UINT8 c = m_acc & 1;
+	uint8_t c = m_acc & 1;
 	m_acc = m_acc >> 1 | m_c << 3;
 	m_c = c;
 }

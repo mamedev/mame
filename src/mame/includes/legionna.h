@@ -21,17 +21,17 @@ public:
 			m_palette(*this, "palette"),
 			m_raiden2cop(*this, "raiden2cop")
 	{
-		memset(scrollvals, 0, sizeof(UINT16)*6);
+		memset(scrollvals, 0, sizeof(uint16_t)*6);
 	}
 
-	required_shared_ptr<UINT16> m_spriteram;
-	std::unique_ptr<UINT16[]> m_back_data;
-	std::unique_ptr<UINT16[]> m_fore_data;
-	std::unique_ptr<UINT16[]> m_mid_data;
-	std::unique_ptr<UINT16[]> m_textram;
-	std::unique_ptr<UINT16[]> m_scrollram16;
-	UINT16 m_layer_disable;
-	std::unique_ptr<UINT16[]> m_layer_config;
+	required_shared_ptr<uint16_t> m_spriteram;
+	std::unique_ptr<uint16_t[]> m_back_data;
+	std::unique_ptr<uint16_t[]> m_fore_data;
+	std::unique_ptr<uint16_t[]> m_mid_data;
+	std::unique_ptr<uint16_t[]> m_textram;
+	std::unique_ptr<uint16_t[]> m_scrollram16;
+	uint16_t m_layer_disable;
+	std::unique_ptr<uint16_t[]> m_layer_config;
 	int m_sprite_xoffs;
 	int m_sprite_yoffs;
 	tilemap_t *m_background_layer;
@@ -40,11 +40,11 @@ public:
 	tilemap_t *m_text_layer;
 	int m_has_extended_banking;
 	int m_has_extended_priority;
-	UINT16 m_sprite_pri_mask[4];
-	UINT16 m_back_gfx_bank;
-	UINT16 m_fore_gfx_bank;
-	UINT16 m_mid_gfx_bank;
-	UINT16 scrollvals[6];
+	uint16_t m_sprite_pri_mask[4];
+	uint16_t m_back_gfx_bank;
+	uint16_t m_fore_gfx_bank;
+	uint16_t m_mid_gfx_bank;
+	uint16_t scrollvals[6];
 	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_base_w);
@@ -80,12 +80,12 @@ public:
 	DECLARE_VIDEO_START(denjinmk);
 	DECLARE_VIDEO_START(grainbow);
 	DECLARE_VIDEO_START(cupsoc);
-	UINT32 screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void descramble_legionnaire_gfx(UINT8* src);
+	void descramble_legionnaire_gfx(uint8_t* src);
 	void common_video_start();
 	void common_video_allocate_ptr();
 	required_device<cpu_device> m_maincpu;

@@ -26,7 +26,7 @@ const device_type ECBBUS_SLOT = &device_creator<ecbbus_slot_device>;
 //  ecbbus_slot_device - constructor
 //-------------------------------------------------
 
-ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ECBBUS_SLOT, "ECB bus slot", tag, owner, clock, "ecbbus_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_bus_tag(nullptr), m_bus_num(0), m_bus(nullptr)
 {
@@ -90,7 +90,7 @@ device_ecbbus_card_interface::device_ecbbus_card_interface(const machine_config 
 //  ecbbus_device - constructor
 //-------------------------------------------------
 
-ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECBBUS, "ECB bus", tag, owner, clock, "ecbbus", __FILE__),
 	m_write_irq(*this),
 	m_write_nmi(*this)
@@ -128,7 +128,7 @@ void ecbbus_device::add_card(device_ecbbus_card_interface *card, int pos)
 
 READ8_MEMBER( ecbbus_device::mem_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for (auto & elem : m_ecbbus_device)
 	{
@@ -164,7 +164,7 @@ WRITE8_MEMBER( ecbbus_device::mem_w )
 
 READ8_MEMBER( ecbbus_device::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for (auto & elem : m_ecbbus_device)
 	{

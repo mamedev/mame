@@ -45,7 +45,7 @@ device_scv_cart_interface::~device_scv_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_scv_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_scv_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -59,7 +59,7 @@ void device_scv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_scv_cart_interface::ram_alloc(UINT32 size)
+void device_scv_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 }
@@ -72,7 +72,7 @@ void device_scv_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  scv_cart_slot_device - constructor
 //-------------------------------------------------
-scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, SCV_CART_SLOT, "SCV Cartridge Slot", tag, owner, clock, "scv_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -164,8 +164,8 @@ image_init_result scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM;
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
+		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		bool has_ram = (software_entry() != nullptr) && get_software_region("ram");
 
 		if (len > 0x20000)
@@ -215,7 +215,7 @@ image_init_result scv_cart_slot_device::call_load()
  fullpath
  -------------------------------------------------*/
 
-int scv_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int scv_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
 	int type = SCV_8K;
 
@@ -252,8 +252,8 @@ std::string scv_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = m_file->size();
-		std::vector<UINT8> rom(len);
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
 		int type;
 
 		m_file->read(&rom[0], len);

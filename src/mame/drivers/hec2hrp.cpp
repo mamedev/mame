@@ -305,7 +305,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 /*****************************************************************************/
 {
-	UINT8 *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
@@ -339,7 +339,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 /*****************************************************************************/
 //minidisc
 {
-	UINT8 *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
 
 	// Memory install for bank switching
 	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram

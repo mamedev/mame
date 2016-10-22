@@ -161,7 +161,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tx0);
-	UINT32 screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tx0(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(tx0_interrupt);
 	TIMER_CALLBACK_MEMBER(reader_callback);
@@ -170,7 +170,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dis_callback);
 	void tx0_machine_stop();
 	required_device<tx0_device> m_maincpu;
-	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void tx0_plot(int x, int y);
 	void tx0_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
 	void tx0_draw_multipleled(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
@@ -183,10 +183,10 @@ public:
 	void tx0_draw_panel(bitmap_ind16 &bitmap);
 	void tx0_typewriter_linefeed();
 	void tx0_typewriter_drawchar(int character);
-	int tape_read(UINT8 *reply);
-	void tape_write(UINT8 data);
+	int tape_read(uint8_t *reply);
+	void tape_write(uint8_t data);
 	void begin_tape_read(int binary);
-	void typewriter_out(UINT8 data);
+	void typewriter_out(uint8_t data);
 	void schedule_select();
 	void schedule_unselect();
 	void tx0_keyboard();

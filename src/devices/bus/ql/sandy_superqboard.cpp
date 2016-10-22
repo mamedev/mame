@@ -212,7 +212,7 @@ ioport_constructor sandy_superqmouse_512k_t::device_input_ports() const
 //  sandy_superqboard_t - constructor
 //-------------------------------------------------
 
-sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SANDY_SUPERQBOARD, "Sandy SuperQBoard 256K", tag, owner, clock, "ql_sqboard256", __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -230,7 +230,7 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, const ch
 {
 }
 
-sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size) :
+sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int ram_size) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -248,13 +248,13 @@ sandy_superqboard_t::sandy_superqboard_t(const machine_config &mconfig, device_t
 {
 }
 
-sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqboard_512k_t::sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQBOARD_512K, "Sandy SuperQBoard 512K", tag, owner, clock, "ql_sqboard512", __FILE__, 512*1024) { }
 
-sandy_superqmouse_t::sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqmouse_t::sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE, "Sandy SuperQMouse", tag, owner, clock, "ql_sqmouse", __FILE__, 256*1024) { }
 
-sandy_superqmouse_512k_t::sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sandy_superqmouse_512k_t::sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sandy_superqboard_t(mconfig, SANDY_SUPERQMOUSE_512K, "Sandy SuperQMouse 512K", tag, owner, clock, "ql_sqmouse512", __FILE__, 512*1024) { }
 
 
@@ -299,7 +299,7 @@ void sandy_superqboard_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t sandy_superqboard_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{
@@ -359,7 +359,7 @@ UINT8 sandy_superqboard_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void sandy_superqboard_t::write(address_space &space, offs_t offset, UINT8 data)
+void sandy_superqboard_t::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{

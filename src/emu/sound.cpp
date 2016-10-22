@@ -265,7 +265,7 @@ void sound_stream::update()
 {
 	// determine the number of samples since the start of this second
 	attotime time = m_device.machine().time();
-	INT32 update_sampindex = INT32(time.attoseconds() / m_attoseconds_per_sample);
+	int32_t update_sampindex = int32_t(time.attoseconds() / m_attoseconds_per_sample);
 
 	// if we're ahead of the last update, then adjust upwards
 	attotime last_update = m_device.machine().sound().last_update();
@@ -294,7 +294,7 @@ void sound_stream::update()
 }
 
 
-void sound_stream::sync_update(void *, INT32)
+void sound_stream::sync_update(void *, int32_t)
 {
 	update();
 	attotime time = m_device.machine().time();
@@ -384,7 +384,7 @@ void sound_stream::update_with_accounting(bool second_tick)
 
 	// if we've ticked over another second, adjust all the counters that are relative to
 	// the current second
-	INT32 output_bufindex = m_output_sampindex - m_output_base_sampindex;
+	int32_t output_bufindex = m_output_sampindex - m_output_base_sampindex;
 	if (second_tick)
 	{
 		m_output_sampindex -= m_sample_rate;
@@ -398,7 +398,7 @@ void sound_stream::update_with_accounting(bool second_tick)
 	// we need to shuffle things down
 	if (m_output_bufalloc - output_bufindex < 2 * m_max_samples_per_update)
 	{
-		INT32 samples_to_lose = output_bufindex - m_max_samples_per_update;
+		int32_t samples_to_lose = output_bufindex - m_max_samples_per_update;
 		if (samples_to_lose > 0)
 		{
 			// if we have samples to move, do so for each output
@@ -427,7 +427,7 @@ void sound_stream::apply_sample_rate_changes()
 		return;
 
 	// update to the new rate and remember the old rate
-	UINT32 old_rate = m_sample_rate;
+	uint32_t old_rate = m_sample_rate;
 	m_sample_rate = m_new_sample_rate;
 	m_new_sample_rate = 0;
 
@@ -435,8 +435,8 @@ void sound_stream::apply_sample_rate_changes()
 	recompute_sample_rate_data();
 
 	// reset our sample indexes to the current time
-	m_output_sampindex = (INT64)m_output_sampindex * (INT64)m_sample_rate / old_rate;
-	m_output_update_sampindex = (INT64)m_output_update_sampindex * (INT64)m_sample_rate / old_rate;
+	m_output_sampindex = (int64_t)m_output_sampindex * (int64_t)m_sample_rate / old_rate;
+	m_output_update_sampindex = (int64_t)m_output_update_sampindex * (int64_t)m_sample_rate / old_rate;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 
 	// clear out the buffer
@@ -527,7 +527,7 @@ void sound_stream::recompute_sample_rate_data()
 void sound_stream::allocate_resample_buffers()
 {
 	// compute the target number of samples
-	INT32 bufsize = 2 * m_max_samples_per_update;
+	int32_t bufsize = 2 * m_max_samples_per_update;
 
 	// if we don't have enough room, allocate more
 	if (m_resample_bufalloc < bufsize)
@@ -553,7 +553,7 @@ void sound_stream::allocate_resample_buffers()
 void sound_stream::allocate_output_buffers()
 {
 	// if we don't have enough room, allocate more
-	INT32 bufsize = OUTPUT_BUFFER_UPDATES * m_max_samples_per_update;
+	int32_t bufsize = OUTPUT_BUFFER_UPDATES * m_max_samples_per_update;
 	if (m_output_bufalloc < bufsize)
 	{
 		// this becomes the new allocation size
@@ -647,7 +647,7 @@ void sound_stream::generate_samples(int samples)
 //  resample buffer for a given input
 //-------------------------------------------------
 
-stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT32 numsamples)
+stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, uint32_t numsamples)
 {
 	// if we don't have an output to pull data from, generate silence
 	stream_sample_t *dest = &input.m_resample[0];
@@ -660,14 +660,14 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 	// grab data from the output
 	stream_output &output = *input.m_source;
 	sound_stream &input_stream = *output.m_stream;
-	INT64 gain = (input.m_gain * input.m_user_gain * output.m_gain) >> 16;
+	int64_t gain = (input.m_gain * input.m_user_gain * output.m_gain) >> 16;
 
 	// determine the time at which the current sample begins, accounting for the
 	// latency we calculated between the input and output streams
 	attoseconds_t basetime = m_output_sampindex * m_attoseconds_per_sample - input.m_latency_attoseconds;
 
 	// now convert that time into a sample in the input stream
-	INT32 basesample;
+	int32_t basesample;
 	if (basetime >= 0)
 		basesample = basetime / input_stream.m_attoseconds_per_sample;
 	else
@@ -679,11 +679,11 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 
 	// determine the current fraction of a sample, expressed as a fraction of FRAC_ONE
 	// (Note: this formula is valid as long as input_stream.m_attoseconds_per_sample signficantly exceeds FRAC_ONE > attoseconds = 4.2E-12 s)
-	UINT32 basefrac = (basetime - basesample * input_stream.m_attoseconds_per_sample) / ((input_stream.m_attoseconds_per_sample + FRAC_ONE - 1) >> FRAC_BITS);
+	uint32_t basefrac = (basetime - basesample * input_stream.m_attoseconds_per_sample) / ((input_stream.m_attoseconds_per_sample + FRAC_ONE - 1) >> FRAC_BITS);
 	assert(basefrac < FRAC_ONE);
 
 	// compute the stepping fraction
-	UINT32 step = (UINT64(input_stream.m_sample_rate) << FRAC_BITS) / m_sample_rate;
+	uint32_t step = (uint64_t(input_stream.m_sample_rate) << FRAC_BITS) / m_sample_rate;
 
 	// if we have equal sample rates, we just need to copy
 	if (step == FRAC_ONE)
@@ -691,7 +691,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 		while (numsamples--)
 		{
 			// compute the sample
-			INT64 sample = *source++;
+			int64_t sample = *source++;
 			*dest++ = (sample * gain) >> 8;
 		}
 	}
@@ -710,7 +710,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 			}
 
 			// if we're done, we're done
-			if (INT32(numsamples--) < 0)
+			if (int32_t(numsamples--) < 0)
 				break;
 
 			// compute starting and ending fractional positions
@@ -718,7 +718,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 			int endfrac = nextfrac >> (FRAC_BITS - 12);
 
 			// blend between the two samples accordingly
-			INT64 sample = ((INT64) source[0] * (0x1000 - startfrac) + (INT64) source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
+			int64_t sample = ((int64_t) source[0] * (0x1000 - startfrac) + (int64_t) source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
 			*dest++ = (sample * gain) >> 8;
 
 			// advance
@@ -734,19 +734,19 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 		int smallstep = step >> (FRAC_BITS - 8);
 		while (numsamples--)
 		{
-			INT64 remainder = smallstep;
+			int64_t remainder = smallstep;
 			int tpos = 0;
 
 			// compute the sample
-			INT64 scale = (FRAC_ONE - basefrac) >> (FRAC_BITS - 8);
-			INT64 sample = (INT64) source[tpos++] * scale;
+			int64_t scale = (FRAC_ONE - basefrac) >> (FRAC_BITS - 8);
+			int64_t sample = (int64_t) source[tpos++] * scale;
 			remainder -= scale;
 			while (remainder > 0x100)
 			{
-				sample += (INT64) source[tpos++] * (INT64) 0x100;
+				sample += (int64_t) source[tpos++] * (int64_t) 0x100;
 				remainder -= 0x100;
 			}
-			sample += (INT64) source[tpos] * remainder;
+			sample += (int64_t) source[tpos] * remainder;
 			sample /= smallstep;
 
 			*dest++ = (sample * gain) >> 8;
@@ -941,7 +941,7 @@ bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 //  mute - mute sound output
 //-------------------------------------------------
 
-void sound_manager::mute(bool mute, UINT8 reason)
+void sound_manager::mute(bool mute, uint8_t reason)
 {
 	if (mute)
 		m_muted |= reason;
@@ -1063,16 +1063,16 @@ void sound_manager::update(void *ptr, int param)
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM)!=0);
 
 	// now downmix the final result
-	UINT32 finalmix_step = machine().video().speed_factor();
-	UINT32 finalmix_offset = 0;
-	INT16 *finalmix = &m_finalmix[0];
+	uint32_t finalmix_step = machine().video().speed_factor();
+	uint32_t finalmix_offset = 0;
+	int16_t *finalmix = &m_finalmix[0];
 	int sample;
 	for (sample = m_finalmix_leftover; sample < samples_this_update * 1000; sample += finalmix_step)
 	{
 		int sampindex = sample / 1000;
 
 		// clamp the left side
-		INT32 samp = m_leftmix[sampindex];
+		int32_t samp = m_leftmix[sampindex];
 		if (samp < -32768)
 			samp = -32768;
 		else if (samp > 32767)

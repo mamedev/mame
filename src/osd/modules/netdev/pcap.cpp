@@ -92,11 +92,11 @@ static pcap_module *module = nullptr;
 
 #ifdef SDLMAME_MACOSX
 struct netdev_pcap_context {
-	UINT8 *pkt;
+	uint8_t *pkt;
 	int len;
 	pcap_t *p;
 
-	UINT8 packets[32][1600];
+	uint8_t packets[32][1600];
 	int packetlens[32];
 	int head;
 	int tail;
@@ -109,10 +109,10 @@ public:
 	netdev_pcap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_pcap();
 
-	virtual int send(UINT8 *buf, int len) override;
+	virtual int send(uint8_t *buf, int len) override;
 	virtual void set_mac(const char *mac) override;
 protected:
-	virtual int recv_dev(UINT8 **buf) override;
+	virtual int recv_dev(uint8_t **buf) override;
 private:
 	pcap_t *m_p;
 #ifdef SDLMAME_MACOSX
@@ -196,7 +196,7 @@ void netdev_pcap::set_mac(const char *mac)
 	}
 }
 
-int netdev_pcap::send(UINT8 *buf, int len)
+int netdev_pcap::send(uint8_t *buf, int len)
 {
 	int ret;
 	if(!m_p) {
@@ -209,10 +209,10 @@ int netdev_pcap::send(UINT8 *buf, int len)
 	//return (!pcap_sendpacket_dl(m_p, buf, len))?len:0;
 }
 
-int netdev_pcap::recv_dev(UINT8 **buf)
+int netdev_pcap::recv_dev(uint8_t **buf)
 {
 #ifdef SDLMAME_MACOSX
-	UINT8 pktbuf[2048];
+	uint8_t pktbuf[2048];
 	int ret;
 
 	// Empty

@@ -24,7 +24,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439hx_host_device)
 	AM_INHERIT_FROM(pci_host_device::config_map)
 ADDRESS_MAP_END
 
-i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82439HX, "i82439hx northbridge", tag, owner, clock, "i82439hx", __FILE__)
 {
 }
@@ -81,8 +81,8 @@ void i82439hx_host_device::device_reset()
 	errsyn = 0x00;
 }
 
-void i82439hx_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									 UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 

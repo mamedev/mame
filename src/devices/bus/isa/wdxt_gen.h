@@ -39,7 +39,7 @@ class wdxt_gen_device : public device_t,
 {
 public:
 	// construction/destruction
-	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -65,17 +65,17 @@ protected:
 	virtual void device_reset() override;
 
 	// device_isa8_card_interface
-	virtual UINT8 dack_r(int line) override;
-	virtual void dack_w(int line, UINT8 data) override;
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;
 	required_device<wd2010_device> m_hdc;
 
-	UINT8 m_ram[0x800];
+	uint8_t m_ram[0x800];
 
-	//UINT8 m_hdc_addr;
+	//uint8_t m_hdc_addr;
 };
 
 

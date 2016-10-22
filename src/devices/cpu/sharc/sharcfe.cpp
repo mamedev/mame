@@ -68,7 +68,7 @@
 #define DM_L_MODIFIED(desc,x)       do { (desc).regout[2] |= 1 << ((x) + 24); } while(0)
 
 
-sharc_frontend::sharc_frontend(adsp21062_device *sharc, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
+sharc_frontend::sharc_frontend(adsp21062_device *sharc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend(*sharc, window_start, window_end, max_sequence),
 		m_sharc(sharc)
 {
@@ -84,16 +84,16 @@ void sharc_frontend::flush()
 	memset(map, 0, sizeof(LOOP_ENTRY) * 0x20000);
 }
 
-void sharc_frontend::add_loop_entry(UINT32 pc, UINT8 type, UINT32 start_pc, UINT8 looptype, UINT8 condition)
+void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc, uint8_t looptype, uint8_t condition)
 {
-	UINT32 l2 = pc >> 17;
-	UINT32 l1 = pc & 0x1ffff;
+	uint32_t l2 = pc >> 17;
+	uint32_t l1 = pc & 0x1ffff;
 
 	if (l2 != 0x1)
 		fatalerror("sharc_frontend::add_loop_entry: PC = %08X", pc);
 
 	LOOP_ENTRY* map = m_loopmap.get();
-	UINT32 current_type = map[l1].entrytype;
+	uint32_t current_type = map[l1].entrytype;
 	if (current_type & type)
 	{
 		// check for mismatch if the entry is already used
@@ -121,10 +121,10 @@ void sharc_frontend::insert_loop(const LOOP_DESCRIPTOR &loopdesc)
 		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
 }
 
-bool sharc_frontend::is_loop_evaluation(UINT32 pc)
+bool sharc_frontend::is_loop_evaluation(uint32_t pc)
 {
-	UINT32 l2 = pc >> 17;
-	UINT32 l1 = pc & 0x1ffff;
+	uint32_t l2 = pc >> 17;
+	uint32_t l1 = pc & 0x1ffff;
 
 	if (l2 != 0x1)
 		return false;
@@ -136,10 +136,10 @@ bool sharc_frontend::is_loop_evaluation(UINT32 pc)
 	return false;
 }
 
-bool sharc_frontend::is_loop_start(UINT32 pc)
+bool sharc_frontend::is_loop_start(uint32_t pc)
 {
-	UINT32 l2 = pc >> 17;
-	UINT32 l1 = pc & 0x1ffff;
+	uint32_t l2 = pc >> 17;
+	uint32_t l1 = pc & 0x1ffff;
 
 	if (l2 != 0x1)
 		return false;
@@ -151,10 +151,10 @@ bool sharc_frontend::is_loop_start(UINT32 pc)
 	return false;
 }
 
-bool sharc_frontend::is_astat_delay_check(UINT32 pc)
+bool sharc_frontend::is_astat_delay_check(uint32_t pc)
 {
-	UINT32 l2 = pc >> 17;
-	UINT32 l1 = pc & 0x1ffff;
+	uint32_t l2 = pc >> 17;
+	uint32_t l1 = pc & 0x1ffff;
 
 	if (l2 != 0x1)
 		return false;
@@ -169,7 +169,7 @@ bool sharc_frontend::is_astat_delay_check(UINT32 pc)
 
 bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	UINT64 opcode = desc.opptr.q[0] = m_sharc->pm_read48(desc.physpc);
+	uint64_t opcode = desc.opptr.q[0] = m_sharc->pm_read48(desc.physpc);
 
 	desc.length = 1;
 	desc.cycles = 1;
@@ -182,7 +182,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
 		{
-			UINT32 flags = m_sharc->do_condition_astat_bits(map[index].condition);
+			uint32_t flags = m_sharc->do_condition_astat_bits(map[index].condition);
 			if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; AZ_USED(desc); }
 			if (flags & adsp21062_device::ASTAT_FLAGS::AN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; AN_USED(desc); }
 			if (flags & adsp21062_device::ASTAT_FLAGS::AV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; AV_USED(desc); }
@@ -223,7 +223,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	{
 		case 0:             // subops
 		{
-			UINT32 subop = (opcode >> 40) & 0x1f;
+			uint32_t subop = (opcode >> 40) & 0x1f;
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
@@ -296,7 +296,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
-					UINT32 address = opcode & 0xffffff;
+					uint32_t address = opcode & 0xffffff;
 
 					if (m_sharc->if_condition_always_true(cond))
 						desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
@@ -317,7 +317,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
-					UINT32 address = opcode & 0xffffff;
+					uint32_t address = opcode & 0xffffff;
 
 					if (m_sharc->if_condition_always_true(cond))
 						desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
@@ -522,7 +522,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				{
 					int bop = (opcode >> 37) & 0x7;
 					int sreg = (opcode >> 32) & 0xf;
-					UINT32 data = (UINT32)(opcode);
+					uint32_t data = (uint32_t)(opcode);
 
 					switch (bop)
 					{
@@ -637,7 +637,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 
 				default:
-					fatalerror("sharc_frontend::describe: unknown subop %02X in opcode %04X%08X", subop, (UINT16)(opcode >> 32), (UINT32)(opcode));
+					fatalerror("sharc_frontend::describe: unknown subop %02X in opcode %04X%08X", subop, (uint16_t)(opcode >> 32), (uint32_t)(opcode));
 					return false;
 			}
 			break;
@@ -978,7 +978,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	return true;
 }
 
-bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
+bool sharc_frontend::describe_compute(opcode_desc &desc, uint64_t opcode)
 {
 	// skip if no-op
 	if ((opcode & 0x7fffff) == 0)
@@ -992,7 +992,7 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 
 	if (opcode & 0x400000)      // multi-function operation
 	{
-		UINT32 multiop = (opcode >> 16) & 0x3f;
+		uint32_t multiop = (opcode >> 16) & 0x3f;
 		int fm = rs;
 		int fa = rn;
 		int fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
@@ -1135,13 +1135,13 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				break;
 
 			default:
-				fatalerror("sharc_frontend::describe_compute: unknown multiop %02X in opcode %04X%08X at %08X", multiop, (UINT16)(opcode >> 32), (UINT32)(opcode), desc.pc);
+				fatalerror("sharc_frontend::describe_compute: unknown multiop %02X in opcode %04X%08X at %08X", multiop, (uint16_t)(opcode >> 32), (uint32_t)(opcode), desc.pc);
 				return false;
 		}
 	}
 	else                            // single-function operation
 	{
-		UINT32 operation = (opcode >> 12) & 0xff;
+		uint32_t operation = (opcode >> 12) & 0xff;
 
 		switch ((opcode >> 20) & 3)
 		{
@@ -1242,7 +1242,7 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 					}
 
 					default:
-						fatalerror("sharc_frontend::describe_compute: unknown ALU op %02X in opcode %04X%08X at %08X", operation, (UINT16)(opcode >> 32), (UINT32)(opcode), desc.pc);
+						fatalerror("sharc_frontend::describe_compute: unknown ALU op %02X in opcode %04X%08X at %08X", operation, (uint16_t)(opcode >> 32), (uint32_t)(opcode), desc.pc);
 						return false;
 				}
 				break;
@@ -1526,7 +1526,7 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 						break;
 
 					default:
-						fatalerror("sharc_frontend::describe_compute: unknown mult op %02X in opcode %04X%08X at %08X", operation, (UINT16)(opcode >> 32), (UINT32)(opcode), desc.pc);
+						fatalerror("sharc_frontend::describe_compute: unknown mult op %02X in opcode %04X%08X at %08X", operation, (uint16_t)(opcode >> 32), (uint32_t)(opcode), desc.pc);
 				}
 				break;
 			}
@@ -1579,13 +1579,13 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 						break;
 
 					default:
-						fatalerror("sharc_frontend::describe_compute: unknown shift op %02X in opcode %04X%08X at %08X", operation, (UINT16)(opcode >> 32), (UINT32)(opcode), desc.pc);
+						fatalerror("sharc_frontend::describe_compute: unknown shift op %02X in opcode %04X%08X at %08X", operation, (uint16_t)(opcode >> 32), (uint32_t)(opcode), desc.pc);
 				}
 				break;
 			}
 
 			default:
-				fatalerror("sharc_frontend::describe_compute: unknown operation type in opcode %04X%08X at %08X", (UINT16)(opcode >> 32), (UINT32)(opcode), desc.pc);
+				fatalerror("sharc_frontend::describe_compute: unknown operation type in opcode %04X%08X at %08X", (uint16_t)(opcode >> 32), (uint32_t)(opcode), desc.pc);
 				return false;
 		}
 	}

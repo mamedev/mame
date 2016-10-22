@@ -79,7 +79,7 @@ class pc1512_mouse_port_t : public device_t,
 {
 public:
 	// construction/destruction
-	pc1512_mouse_port_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc1512_mouse_port_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_x_wr_callback(device_t &device, _Object object) { return downcast<pc1512_mouse_port_t &>(device).m_write_x.set_callback(object); }
@@ -88,8 +88,8 @@ public:
 	template<class _Object> static devcb_base &set_m2_wr_callback(device_t &device, _Object object) { return downcast<pc1512_mouse_port_t &>(device).m_write_m2.set_callback(object); }
 
 	// peripheral interface
-	void x_w(UINT8 data) { m_write_x(data); }
-	void y_w(UINT8 data) { m_write_y(data); }
+	void x_w(uint8_t data) { m_write_x(data); }
+	void y_w(uint8_t data) { m_write_y(data); }
 	void m1_w(int state) { m_write_m1(state); }
 	void m2_w(int state) { m_write_m2(state); }
 
@@ -113,7 +113,7 @@ class pc1512_mouse_t : public device_t,
 {
 public:
 	// construction/destruction
-	pc1512_mouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc1512_mouse_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

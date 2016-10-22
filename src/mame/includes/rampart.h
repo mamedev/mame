@@ -25,7 +25,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;
 
-	required_shared_ptr<UINT16> m_bitmap;
+	required_shared_ptr<uint16_t> m_bitmap;
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -34,7 +34,7 @@ public:
 	DECLARE_MACHINE_START(rampart);
 	DECLARE_MACHINE_RESET(rampart);
 	DECLARE_VIDEO_START(rampart);
-	UINT32 screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

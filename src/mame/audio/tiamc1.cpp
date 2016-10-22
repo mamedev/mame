@@ -57,7 +57,7 @@ const device_type TIAMC1 = &device_creator<tiamc1_sound_device>;
 //  tiamc1_sound_device - constructor
 //-------------------------------------------------
 
-tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TIAMC1, "TIA-MC1 Audio Custom", tag, owner, clock, "tiamc1_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -194,7 +194,7 @@ void tiamc1_sound_device::timer8253_tick(struct timer8253struct *t, int chn)
 
 
 
-void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8 val)
+void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, uint8_t val)
 {
 	int chn;
 
@@ -307,7 +307,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 	}
 }
 
-void tiamc1_sound_device::timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate)
+void tiamc1_sound_device::timer8253_set_gate(struct timer8253struct *t, int chn, uint8_t gate)
 {
 	t->channel[chn].gate = gate;
 }

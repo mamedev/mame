@@ -23,7 +23,7 @@
 
 const device_type NAOMI_M4_BOARD = &device_creator<naomi_m4_board>;
 
-const UINT8 naomi_m4_board::k_sboxes[4][16] = {
+const uint8_t naomi_m4_board::k_sboxes[4][16] = {
 	{9,8,2,11,1,14,5,15,12,6,0,3,7,13,10,4},
 	{2,10,0,15,14,1,11,3,7,12,13,8,4,9,5,6},
 	{4,11,3,8,7,2,15,13,1,5,14,9,6,12,0,10},
@@ -31,7 +31,7 @@ const UINT8 naomi_m4_board::k_sboxes[4][16] = {
 };
 
 // from S29GL512N datasheet
-static UINT8 cfidata[] = {
+static uint8_t cfidata[] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x51,0x00,0x52,0x00,0x59,0x00,0x02,0x00,0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x27,0x00,0x36,0x00,0x00,0x00,0x00,0x00,0x07,0x00,
 0x07,0x00,0x0a,0x00,0x00,0x00,0x01,0x00,0x05,0x00,0x04,0x00,0x00,0x00,0x1a,0x00,0x02,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x01,0x00,0xff,0x00,0x01,0x00,0x00,0x00,
@@ -46,7 +46,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m4_board)
 	AM_INHERIT_FROM(naomi_board::submap)
 ADDRESS_MAP_END
 
-naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_M4_BOARD, "Sega NAOMI M4 Board", tag, owner, clock, "naomi_m4_board", __FILE__)
 	, m_region(*this, DEVICE_SELF)
 	, m_key_data(*this, finder_base::DUMMY_TAG)
@@ -75,7 +75,7 @@ void naomi_m4_board::device_start()
 	subkey1 = (m_key_data[0x5e2] << 8) | m_key_data[0x5e0];
 	subkey2 = (m_key_data[0x5e6] << 8) | m_key_data[0x5e4];
 
-	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
+	buffer = std::make_unique<uint8_t[]>(BUFFER_SIZE);
 	enc_init();
 
 	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
@@ -88,25 +88,25 @@ void naomi_m4_board::device_start()
 
 void naomi_m4_board::enc_init()
 {
-	one_round = std::make_unique<UINT16[]>(0x10000);
+	one_round = std::make_unique<uint16_t[]>(0x10000);
 
 	for(int round_input = 0; round_input < 0x10000; round_input++) {
-		UINT8 input_nibble[4];
-		UINT8 output_nibble[4];
+		uint8_t input_nibble[4];
+		uint8_t output_nibble[4];
 
 		for (int nibble_idx = 0; nibble_idx < 4; ++nibble_idx) {
 			input_nibble[nibble_idx] = (round_input >> (nibble_idx*4)) & 0xf;
 			output_nibble[nibble_idx] = 0;
 		}
 
-		UINT8 aux_nibble = input_nibble[3];
+		uint8_t aux_nibble = input_nibble[3];
 		for (int nibble_idx = 0; nibble_idx < 4; ++nibble_idx) { // 4 s-boxes per round
 			aux_nibble ^= k_sboxes[nibble_idx][input_nibble[nibble_idx]];
 			for (int i = 0; i < 4; ++i)  // diffusion of the bits
 				output_nibble[(nibble_idx - i) & 3] |= aux_nibble & (1 << i);
 		}
 
-		UINT16 result = 0;
+		uint16_t result = 0;
 		for (int nibble_idx = 0; nibble_idx < 4; ++nibble_idx)
 			result |= (output_nibble[nibble_idx] << (4 * nibble_idx));
 
@@ -125,7 +125,7 @@ void naomi_m4_board::device_reset()
 	iv = 0;
 }
 
-void naomi_m4_board::board_setup_address(UINT32 address, bool is_dma)
+void naomi_m4_board::board_setup_address(uint32_t address, bool is_dma)
 {
 	rom_cur_address = address & 0x1ffffffe;
 	encryption = rom_offset & 0x40000000;
@@ -136,9 +136,9 @@ void naomi_m4_board::board_setup_address(UINT32 address, bool is_dma)
 	}
 }
 
-void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
+void naomi_m4_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
-	static UINT8 retzero[2] = { 0, 0 };
+	static uint8_t retzero[2] = { 0, 0 };
 
 	if (cfi_mode) {
 		int fpr_num = m4id & 0x7f;
@@ -155,7 +155,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 		limit = BUFFER_SIZE;
 
 	} else {
-		UINT32 size = m_region->bytes();
+		uint32_t size = m_region->bytes();
 		if (rom_cur_address < size)
 		{
 			base = m_region->base() + rom_cur_address;
@@ -167,7 +167,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	}
 }
 
-void naomi_m4_board::board_advance(UINT32 size)
+void naomi_m4_board::board_advance(uint32_t size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
@@ -188,17 +188,17 @@ void naomi_m4_board::enc_reset()
 	counter = 0;
 }
 
-UINT16 naomi_m4_board::decrypt_one_round(UINT16 word, UINT16 subkey)
+uint16_t naomi_m4_board::decrypt_one_round(uint16_t word, uint16_t subkey)
 {
 	return one_round[word ^ subkey] ^ subkey ;
 }
 
 void naomi_m4_board::enc_fill()
 {
-	const UINT8 *base = m_region->base() + rom_cur_address;
+	const uint8_t *base = m_region->base() + rom_cur_address;
 	while(buffer_actual_size < BUFFER_SIZE) {
-		UINT16 enc = base[0] | (base[1] << 8);
-		UINT16 dec = iv;
+		uint16_t enc = base[0] | (base[1] << 8);
+		uint16_t dec = iv;
 		iv = decrypt_one_round(enc ^ iv, subkey1);
 		dec ^= decrypt_one_round(iv, subkey2);
 
@@ -221,7 +221,7 @@ READ16_MEMBER(naomi_m4_board::m4_id_r)
 	return m4id & 0xff80;
 }
 
-void naomi_m4_board::board_write(offs_t offset, UINT16 data)
+void naomi_m4_board::board_write(offs_t offset, uint16_t data)
 {
 	if (((offset&0xffff) == 0x00aa) && (data == 0x0098))
 		cfi_mode = true;

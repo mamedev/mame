@@ -15,7 +15,7 @@ class centronics_printer_device : public device_t,
 {
 public:
 	// construction/destruction
-	centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override;
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; }
@@ -46,7 +46,7 @@ private:
 	};
 
 	int m_strobe;
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_busy;
 
 	required_device<printer_image_device> m_printer;

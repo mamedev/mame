@@ -30,33 +30,33 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_charram;
-	required_shared_ptr<UINT8> m_bgram0;
-	required_shared_ptr<UINT8> m_bgram1;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_bgram0;
+	required_shared_ptr<uint8_t> m_bgram1;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_vblank;
 	int m_from_main;
 	int m_from_mcu;
-	UINT8 m_ddr_a;
-	UINT8 m_ddr_b;
-	UINT8 m_ddr_c;
-	UINT8 m_port_a_out;
-	UINT8 m_port_b_out;
-	UINT8 m_port_c_out;
-	UINT8 m_port_a_in;
-	UINT8 m_port_b_in;
-	UINT8 m_port_c_in;
+	uint8_t m_ddr_a;
+	uint8_t m_ddr_b;
+	uint8_t m_ddr_c;
+	uint8_t m_port_a_out;
+	uint8_t m_port_b_out;
+	uint8_t m_port_c_out;
+	uint8_t m_port_a_in;
+	uint8_t m_port_b_in;
+	uint8_t m_port_c_in;
 	int m_mcu_ready;
 	int m_mcu_accept;
-	UINT8 m_pri;
+	uint8_t m_pri;
 	tilemap_t *m_char_tilemap;
 	tilemap_t *m_bgram0_tilemap;
 	tilemap_t *m_bgram1_tilemap;
-	UINT8 m_scrollxP0[2];
-	UINT8 m_scrollyP0[2];
-	UINT8 m_scrollxP1[2];
-	UINT8 m_scrollyP1[2];
+	uint8_t m_scrollxP0[2];
+	uint8_t m_scrollyP0[2];
+	uint8_t m_scrollxP1[2];
+	uint8_t m_scrollyP1[2];
 
 	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
@@ -96,7 +96,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
 

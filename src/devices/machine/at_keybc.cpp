@@ -58,7 +58,7 @@ ROM_END
 //  at_keyboard_controller_device - constructor
 //-------------------------------------------------
 
-at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock, "at_keybc", __FILE__),
 		m_cpu(nullptr),
 		m_system_reset_cb(*this),

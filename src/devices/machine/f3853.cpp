@@ -49,7 +49,7 @@ const device_type F3853 = &device_creator<f3853_device>;
 //  f3853_device - constructor
 //-------------------------------------------------
 
-f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, F3853, "F3853", tag, owner, clock, "f3853", __FILE__)
 {
 }
@@ -60,13 +60,13 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 
 void f3853_device::device_start()
 {
-	UINT8 reg = 0xfe;
-	for(INT32 i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
+	uint8_t reg = 0xfe;
+	for(int32_t i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
 	{
-		INT32 o7 = (reg & 0x80) ? TRUE : FALSE;
-		INT32 o5 = (reg & 0x20) ? TRUE : FALSE;
-		INT32 o4 = (reg & 0x10) ? TRUE : FALSE;
-		INT32 o3 = (reg & 0x08) ? TRUE : FALSE;
+		int32_t o7 = (reg & 0x80) ? TRUE : FALSE;
+		int32_t o5 = (reg & 0x20) ? TRUE : FALSE;
+		int32_t o4 = (reg & 0x10) ? TRUE : FALSE;
+		int32_t o3 = (reg & 0x08) ? TRUE : FALSE;
 		m_value_to_cycle[reg] = i;
 		reg <<= 1;
 		if (!((o7 != o5) != (o4 != o3)))
@@ -121,7 +121,7 @@ void f3853_device::set_interrupt_request_line()
 }
 
 
-void f3853_device::timer_start(UINT8 value)
+void f3853_device::timer_start(uint8_t value)
 {
 	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value]*31) : attotime::never;
 
@@ -157,7 +157,7 @@ void f3853_device::set_priority_in_line(int level)
 
 READ8_MEMBER(f3853_device::read)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{

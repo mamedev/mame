@@ -1546,7 +1546,7 @@ DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 
 DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program rom */
@@ -1557,7 +1557,7 @@ DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	machine().device<konami1_device>("maincpu")->set_encryption_boundary(0x6000);
 
@@ -1577,7 +1577,7 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 
 DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 {
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1599,7 +1599,7 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 
 DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 {
-	UINT8 *ROM = memregion("maincpu")->base() + 0xe000;
+	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
 	int i;
 
 	/* decrypt program rom */

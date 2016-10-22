@@ -37,13 +37,13 @@ public:
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
 private:
-	UINT8 m_dispcmd;
-	UINT8 m_port2a;
-	UINT8 m_port2b;
-	UINT8 m_lamprow;
-	UINT8 m_swrow;
+	uint8_t m_dispcmd;
+	uint8_t m_port2a;
+	uint8_t m_port2b;
+	uint8_t m_lamprow;
+	uint8_t m_swrow;
 	bool m_in_cmd_mode[2];
-	UINT8 m_digit[2];
+	uint8_t m_digit[2];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( gts80b )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
-static const UINT16 patterns[] = {
+static const uint16_t patterns[] = {
 	/* 0x00-0x07 */ 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
 	/* 0x08-0x0f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
 	/* 0x10-0x17 */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
@@ -273,7 +273,7 @@ static const UINT16 patterns[] = {
 READ8_MEMBER( gts80b_state::port1a_r )
 {
 	char kbdrow[8];
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if ((m_lamprow < 4) && (m_port2b==0x80))
 	{
 		sprintf(kbdrow,"DSW.%d",m_lamprow);
@@ -312,10 +312,10 @@ WRITE8_MEMBER( gts80b_state::port2a_w )
 WRITE8_MEMBER( gts80b_state::port2b_w )
 {
 	m_port2b = data & 15;
-	UINT16 segment;
+	uint16_t segment;
 
 	// crude approximation of the Rockwell display chips
-	for (UINT8 i = 0; i < 2; i++) // 2 chips
+	for (uint8_t i = 0; i < 2; i++) // 2 chips
 	{
 		if (!BIT(data, i+4)) // are we addressing the chip?
 		{
@@ -350,7 +350,7 @@ WRITE8_MEMBER( gts80b_state::port3a_w )
 //pb0-3 = sound; pb4-7 = lamprow
 WRITE8_MEMBER( gts80b_state::port3b_w )
 {
-	UINT8 sndcmd = data & 15;
+	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);

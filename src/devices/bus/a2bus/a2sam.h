@@ -25,7 +25,7 @@ class a2bus_sam_device:
 {
 public:
 	// construction/destruction
-	a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
 };
 

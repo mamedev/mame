@@ -43,7 +43,7 @@
 
 const device_type STEPPER = &device_creator<stepper_device>;
 
-stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
 		m_optic_cb(*this)
 	{
@@ -121,7 +121,7 @@ void stepper_device::device_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-int stepper_device::update(UINT8 pattern)
+int stepper_device::update(uint8_t pattern)
 {
 	int changed = 0;
 

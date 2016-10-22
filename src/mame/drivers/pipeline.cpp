@@ -89,17 +89,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_vram1;
-	required_shared_ptr<UINT8> m_vram2;
+	required_shared_ptr<uint8_t> m_vram1;
+	required_shared_ptr<uint8_t> m_vram2;
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 
-	UINT8 m_vidctrl;
-	std::unique_ptr<UINT8[]> m_palram;
-	UINT8 m_toMCU;
-	UINT8 m_fromMCU;
-	UINT8 m_ddrA;
+	uint8_t m_vidctrl;
+	std::unique_ptr<uint8_t[]> m_palram;
+	uint8_t m_toMCU;
+	uint8_t m_fromMCU;
+	uint8_t m_ddrA;
 
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
@@ -117,7 +117,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pipeline);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 };
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 
 void pipeline_state::video_start()
 {
-	m_palram=std::make_unique<UINT8[]>(0x1000);
+	m_palram=std::make_unique<uint8_t[]>(0x1000);
 	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2->set_transparent_pen(0);
@@ -160,7 +160,7 @@ void pipeline_state::video_start()
 	save_pointer(NAME(m_palram.get()), 0x1000);
 }
 
-UINT32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap1->draw(screen, bitmap, cliprect, 0,0);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0,0);
@@ -345,8 +345,8 @@ static const z80_daisy_config daisy_chain_sound[] =
 PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 {
 	int r,g,b,i,c;
-	UINT8 *prom1 = &memregion("proms")->base()[0x000];
-	UINT8 *prom2 = &memregion("proms")->base()[0x100];
+	uint8_t *prom1 = &memregion("proms")->base()[0x000];
+	uint8_t *prom2 = &memregion("proms")->base()[0x100];
 
 	for(i=0;i<0x100;i++)
 	{

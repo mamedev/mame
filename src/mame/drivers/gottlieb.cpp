@@ -237,7 +237,7 @@ void gottlieb_state::machine_start()
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = std::make_unique<UINT8[]>(AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<uint8_t[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -385,7 +385,7 @@ READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 	}
 	else
 	{
-		UINT8 result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
+		uint8_t result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
 		m_laserdisc_audio_address %= AUDIORAM_SIZE;
 		return result;
 	}
@@ -421,7 +421,7 @@ WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 {
-	UINT32 newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
 	   board receives notification and latches the most recent frame number */
@@ -448,8 +448,8 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 {
-	UINT8 bitsleft = param >> 16;
-	UINT8 data = param;
+	uint8_t bitsleft = param >> 16;
+	uint8_t data = param;
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
@@ -579,7 +579,7 @@ void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int lo
 }
 
 
-void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
 {
 	int logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
@@ -599,7 +599,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 	/* iterate over samples */
 	for (cursamp = 0; cursamp < samples; cursamp++)
 	{
-		INT16 sample = ch1[cursamp];
+		int16_t sample = ch1[cursamp];
 
 		/* start by logging the current sample and time */
 		if (logit)
@@ -652,7 +652,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 //   a real kicker/knocker, hook it up via output "knocker0")
 //-------------------------------------------------
 
-void gottlieb_state::qbert_knocker(UINT8 knock)
+void gottlieb_state::qbert_knocker(uint8_t knock)
 {
 	output().set_value("knocker0", knock);
 

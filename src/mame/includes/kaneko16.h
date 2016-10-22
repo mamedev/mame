@@ -59,10 +59,10 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_mainram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_mainram;
 
-	UINT16 m_disp_enable;
+	uint16_t m_disp_enable;
 
 	int m_VIEW2_2_pri;
 
@@ -90,10 +90,10 @@ public:
 	DECLARE_MACHINE_RESET(gtmr);
 	DECLARE_VIDEO_START(kaneko16);
 	DECLARE_MACHINE_RESET(mgcrystl);
-	UINT32 screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template<class _BitmapClass>
-	UINT32 screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
@@ -143,9 +143,9 @@ public:
 	{
 	}
 
-	optional_shared_ptr<UINT16> m_bg15_select;
-	optional_shared_ptr<UINT16> m_bg15_scroll;
-	optional_shared_ptr<UINT16> m_bg15_bright;
+	optional_shared_ptr<uint16_t> m_bg15_select;
+	optional_shared_ptr<uint16_t> m_bg15_scroll;
+	optional_shared_ptr<uint16_t> m_bg15_bright;
 	required_device<palette_device> m_bgpalette;
 
 	bitmap_ind16 m_bg15_bitmap[32];
@@ -166,7 +166,7 @@ public:
 	DECLARE_DRIVER_INIT(berlwall);
 	DECLARE_PALETTE_INIT(berlwall);
 	DECLARE_VIDEO_START(berlwall);
-	UINT32 screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

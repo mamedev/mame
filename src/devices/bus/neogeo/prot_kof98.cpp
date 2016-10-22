@@ -8,7 +8,7 @@
 extern const device_type KOF98_PROT = &device_creator<kof98_prot_device>;
 
 
-kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KOF98_PROT, "Neo Geo KOF 98 Protection", tag, owner, clock, "kof98_prot", __FILE__),
 	m_prot_state(0)
 {}
@@ -25,13 +25,13 @@ void kof98_prot_device::device_reset()
 
 
 /* Kof98 uses an early encryption, quite different from the others */
-void kof98_prot_device::decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
+void kof98_prot_device::decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size)
 {
-	UINT8 *src = cpurom;
-	std::vector<UINT8> dst(0x200000);
+	uint8_t *src = cpurom;
+	std::vector<uint8_t> dst(0x200000);
 	int i, j, k;
-	static const UINT32 sec[]={ 0x000000, 0x100000, 0x000004, 0x100004, 0x10000a, 0x00000a, 0x10000e, 0x00000e };
-	static const UINT32 pos[]={ 0x000, 0x004, 0x00a, 0x00e };
+	static const uint32_t sec[]={ 0x000000, 0x100000, 0x000004, 0x100004, 0x10000a, 0x00000a, 0x10000e, 0x00000e };
+	static const uint32_t pos[]={ 0x000, 0x004, 0x00a, 0x00e };
 
 	memcpy(&dst[0], src, 0x200000);
 	for (i = 0x800; i < 0x100000; i += 0x200)
@@ -67,7 +67,7 @@ void kof98_prot_device::decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	}
 	memmove(&src[0x100000], &src[0x200000], 0x400000);
 
-	UINT16* mem16 = (UINT16*)cpurom;
+	uint16_t* mem16 = (uint16_t*)cpurom;
 	m_default_rom[0] = mem16[0x100/2];
 	m_default_rom[1] = mem16[0x102/2];
 }

@@ -31,16 +31,16 @@ public:
 
 	optional_ioport m_debug_port;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_row_scroll;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_row_scroll;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	UINT8 m_portb;
+	uint8_t m_portb;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
@@ -57,7 +57,7 @@ public:
 	DECLARE_PALETTE_INIT(seicross);
 	DECLARE_DRIVER_INIT(friskytb);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);

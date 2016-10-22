@@ -137,10 +137,10 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_romh_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
-	UINT32 videochip_r(offs_t address);
-	void videochip_w(offs_t address, UINT32 data);
+	uint32_t videochip_r(offs_t address);
+	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
 	void print_display_list();
 	TILE_GET_INFO_MEMBER(tile_get_info);
@@ -149,17 +149,17 @@ public:
 
 	DECLARE_DRIVER_INIT(optiger);
 
-	UINT16 m_dsp_ram[0x1000];
-	UINT16 m_io_share_ram[0x2000];
+	uint16_t m_dsp_ram[0x1000];
+	uint16_t m_io_share_ram[0x2000];
 
-	std::unique_ptr<UINT32[]> m_screen_ram;
-	std::unique_ptr<UINT32[]> m_pal_ram;
+	std::unique_ptr<uint32_t[]> m_screen_ram;
+	std::unique_ptr<uint32_t[]> m_pal_ram;
 
 	tilemap_t *m_tilemap[2];
 
-	UINT32 m_video_address;
+	uint32_t m_video_address;
 
-	UINT32 m_dsp_rom_address;
+	uint32_t m_dsp_rom_address;
 };
 
 void taitopjc_state::video_exit()
@@ -171,20 +171,20 @@ void taitopjc_state::video_exit()
 	file = fopen("pjc_screen_ram.bin","wb");
 	for (i=0; i < 0x40000; i++)
 	{
-		fputc((UINT8)(m_screen_ram[i] >> 24), file);
-		fputc((UINT8)(m_screen_ram[i] >> 16), file);
-		fputc((UINT8)(m_screen_ram[i] >> 8), file);
-		fputc((UINT8)(m_screen_ram[i] >> 0), file);
+		fputc((uint8_t)(m_screen_ram[i] >> 24), file);
+		fputc((uint8_t)(m_screen_ram[i] >> 16), file);
+		fputc((uint8_t)(m_screen_ram[i] >> 8), file);
+		fputc((uint8_t)(m_screen_ram[i] >> 0), file);
 	}
 	fclose(file);
 
 	file = fopen("pjc_pal_ram.bin","wb");
 	for (i=0; i < 0x8000; i++)
 	{
-		fputc((UINT8)(m_pal_ram[i] >> 24), file);
-		fputc((UINT8)(m_pal_ram[i] >> 16), file);
-		fputc((UINT8)(m_pal_ram[i] >> 8), file);
-		fputc((UINT8)(m_pal_ram[i] >> 0), file);
+		fputc((uint8_t)(m_pal_ram[i] >> 24), file);
+		fputc((uint8_t)(m_pal_ram[i] >> 16), file);
+		fputc((uint8_t)(m_pal_ram[i] >> 8), file);
+		fputc((uint8_t)(m_pal_ram[i] >> 0), file);
 	}
 	fclose(file);
 #endif
@@ -192,7 +192,7 @@ void taitopjc_state::video_exit()
 
 TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
 {
-	UINT32 val = m_screen_ram[0x3f000 + (tile_index/2)];
+	uint32_t val = m_screen_ram[0x3f000 + (tile_index/2)];
 
 	if (!(tile_index & 1))
 		val >>= 16;
@@ -229,20 +229,20 @@ void taitopjc_state::video_start()
 		8*256
 	};
 
-	m_screen_ram = std::make_unique<UINT32[]>(0x40000);
-	m_pal_ram = std::make_unique<UINT32[]>(0x8000);
+	m_screen_ram = std::make_unique<uint32_t[]>(0x40000);
+	m_pal_ram = std::make_unique<uint32_t[]>(0x8000);
 
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (UINT8*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
-UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x000000, cliprect);
 
@@ -253,9 +253,9 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 taitopjc_state::videochip_r( offs_t address)
+uint32_t taitopjc_state::videochip_r( offs_t address)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (address >= 0x10000000 && address < 0x10040000)
 	{
@@ -265,7 +265,7 @@ UINT32 taitopjc_state::videochip_r( offs_t address)
 	return r;
 }
 
-void taitopjc_state::videochip_w(offs_t address, UINT32 data)
+void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 {
 	if (address >= 0x20000000 && address < 0x20008000)
 	{
@@ -278,12 +278,12 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 	}
 	else if (address >= 0x10000000 && address < 0x10040000)
 	{
-		UINT32 addr = address - 0x10000000;
+		uint32_t addr = address - 0x10000000;
 		m_screen_ram[addr] = data;
 
 		if (address >= 0x1003f000)
 		{
-			UINT32 a = address - 0x1003f000;
+			uint32_t a = address - 0x1003f000;
 			m_tilemap[0]->mark_tile_dirty((a*2));
 			m_tilemap[0]->mark_tile_dirty((a*2)+1);
 		}
@@ -300,13 +300,13 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 
 READ64_MEMBER(taitopjc_state::video_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			r |= (UINT64)(videochip_r(m_video_address)) << 32;
+			r |= (uint64_t)(videochip_r(m_video_address)) << 32;
 		}
 	}
 
@@ -319,35 +319,35 @@ WRITE64_MEMBER(taitopjc_state::video_w)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			//printf("Address %08X = %08X\n", video_address, (UINT32)(data >> 32));
-			videochip_w(m_video_address, (UINT32)(data >> 32));
+			//printf("Address %08X = %08X\n", video_address, (uint32_t)(data >> 32));
+			videochip_w(m_video_address, (uint32_t)(data >> 32));
 		}
 	}
 	if (offset == 1)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			m_video_address = (UINT32)(data >> 32);
+			m_video_address = (uint32_t)(data >> 32);
 		}
 	}
 }
 
 READ64_MEMBER(taitopjc_state::ppc_common_r)
 {
-	UINT64 r = 0;
-	UINT32 address;
+	uint64_t r = 0;
+	uint32_t address;
 
-	//logerror("ppc_common_r: %08X, %08X%08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//logerror("ppc_common_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 
 	address = offset * 2;
 
 	if (ACCESSING_BITS_48_63)
 	{
-		r |= (UINT64)(m_io_share_ram[address]) << 48;
+		r |= (uint64_t)(m_io_share_ram[address]) << 48;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		r |= (UINT64)(m_io_share_ram[address+1]) << 16;
+		r |= (uint64_t)(m_io_share_ram[address+1]) << 16;
 	}
 
 	return r;
@@ -355,17 +355,17 @@ READ64_MEMBER(taitopjc_state::ppc_common_r)
 
 WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 {
-	UINT32 address = offset * 2;
+	uint32_t address = offset * 2;
 
 //  logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_48_63)
 	{
-		m_io_share_ram[address] = (UINT16)(data >> 48);
+		m_io_share_ram[address] = (uint16_t)(data >> 48);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		m_io_share_ram[address+1] = (UINT16)(data >> 16);
+		m_io_share_ram[address+1] = (uint16_t)(data >> 16);
 	}
 
 	if (offset == 0x7ff && ACCESSING_BITS_48_63)
@@ -384,17 +384,17 @@ WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 
 READ64_MEMBER(taitopjc_state::dsp_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_48_63)
 	{
 		int addr = offset * 2;
-		r |= (UINT64)(m_dsp_ram[addr+0]) << 48;
+		r |= (uint64_t)(m_dsp_ram[addr+0]) << 48;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		int addr = offset * 2;
-		r |= (UINT64)(m_dsp_ram[addr+1]) << 16;
+		r |= (uint64_t)(m_dsp_ram[addr+1]) << 16;
 	}
 
 	return r;
@@ -404,21 +404,21 @@ void taitopjc_state::print_display_list()
 {
 	int ptr = 0;
 
-	UINT16 cmd = m_dsp_ram[0xffe];
+	uint16_t cmd = m_dsp_ram[0xffe];
 	if (cmd == 0x5245)
 	{
 		printf("DSP command RE\n");
 		bool end = false;
 		do
 		{
-			UINT16 w = m_dsp_ram[ptr++];
+			uint16_t w = m_dsp_ram[ptr++];
 			if (w & 0x8000)
 			{
 				int count = (w & 0x7fff) + 1;
-				UINT16 d = m_dsp_ram[ptr++];
+				uint16_t d = m_dsp_ram[ptr++];
 				for (int i=0; i < count; i++)
 				{
-					UINT16 s = m_dsp_ram[ptr++];
+					uint16_t s = m_dsp_ram[ptr++];
 					printf("   %04X -> [%04X]\n", s, d);
 					d++;
 				}
@@ -475,7 +475,7 @@ void taitopjc_state::print_display_list()
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), space.device().safe_pc());
+	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), space.device().safe_pc());
 
 	if (offset == 0x7fe)
 	{
@@ -535,11 +535,11 @@ READ8_MEMBER(taitopjc_state::tlcs_common_r)
 {
 	if (offset & 1)
 	{
-		return (UINT8)(m_io_share_ram[offset / 2] >> 8);
+		return (uint8_t)(m_io_share_ram[offset / 2] >> 8);
 	}
 	else
 	{
-		return (UINT8)(m_io_share_ram[offset / 2]);
+		return (uint8_t)(m_io_share_ram[offset / 2]);
 	}
 }
 
@@ -548,7 +548,7 @@ WRITE8_MEMBER(taitopjc_state::tlcs_common_w)
 	if (offset & 1)
 	{
 		m_io_share_ram[offset / 2] &= 0x00ff;
-		m_io_share_ram[offset / 2] |= (UINT16)(data) << 8;
+		m_io_share_ram[offset / 2] |= (uint16_t)(data) << 8;
 	}
 	else
 	{
@@ -611,7 +611,7 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 // 0xfc00f7: INT5 (dummy)
 // 0xfc00f8: INT6 PPC command
 // 0xfc00fd: INT7 (dummy)
-// 0xfc00fe: INT8 (dummy)
+// 0xfc00fe: int8_t (dummy)
 // 0xfc0663: INTT1
 // 0xfc0f7d: INTRX0
 // 0xfc0f05: INTTX0
@@ -651,7 +651,7 @@ READ16_MEMBER(taitopjc_state::dsp_rom_r)
 {
 	assert(m_dsp_rom_address < 0x800000);
 
-	UINT16 data = ((UINT16*)m_polyrom->base())[m_dsp_rom_address];
+	uint16_t data = ((uint16_t*)m_polyrom->base())[m_dsp_rom_address];
 	m_dsp_rom_address++;
 	return data;
 }
@@ -665,7 +665,7 @@ WRITE16_MEMBER(taitopjc_state::dsp_roml_w)
 WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
 {
 	m_dsp_rom_address &= 0xffff;
-	m_dsp_rom_address |= (UINT32)(data) << 16;
+	m_dsp_rom_address |= (uint32_t)(data) << 16;
 }
 
 
@@ -801,14 +801,14 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(taitopjc_state, optiger)
 {
-	UINT8 *rom = (UINT8*)memregion("io_cpu")->base();
+	uint8_t *rom = (uint8_t*)memregion("io_cpu")->base();
 
 	// skip sound check
 	rom[0x217] = 0x00;
 	rom[0x218] = 0x00;
 
 #if 0
-	UINT32 *mr = (UINT32*)memregion("user1")->base();
+	uint32_t *mr = (uint32_t*)memregion("user1")->base();
 	//mr[(0x23a5c^4)/4] = 0x60000000;
 	mr[((0x513b0-0x40000)^4)/4] = 0x38600001;
 #endif

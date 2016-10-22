@@ -116,13 +116,13 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_bg_videoram;
-	required_shared_ptr<UINT32> m_bg2_videoram;
-	required_shared_ptr<UINT32> m_vregs;
-	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_bg_videoram;
+	required_shared_ptr<uint32_t> m_bg2_videoram;
+	required_shared_ptr<uint32_t> m_vregs;
+	required_shared_ptr<uint32_t> m_workram;
 
-	std::unique_ptr<UINT16[]> m_lineram16;
+	std::unique_ptr<uint16_t[]> m_lineram16;
 
 	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
 	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
@@ -133,8 +133,8 @@ public:
 	int      m_tilebank[2];
 	int      m_tilebankold[2];
 
-	std::unique_ptr<UINT32[]> m_spritebuf1;
-	std::unique_ptr<UINT32[]> m_spritebuf2;
+	std::unique_ptr<uint32_t[]> m_spritebuf1;
+	std::unique_ptr<uint32_t[]> m_spritebuf2;
 
 	/* misc */
 	int      m_protindex;
@@ -148,7 +148,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_dreamwld(screen_device &screen, bool state);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
@@ -161,9 +161,9 @@ public:
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 *source = m_spritebuf1.get();
-	UINT32 *finish = m_spritebuf1.get() + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
+	uint32_t *source = m_spritebuf1.get();
+	uint32_t *finish = m_spritebuf1.get() + 0x1000 / 4;
+	uint16_t *redirect = (uint16_t *)memregion("spritelut")->base();
 	int xoffset = 4;
 
 	while (source < finish)
@@ -252,7 +252,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 
 TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 {
-	UINT16 tileno, colour;
+	uint16_t tileno, colour;
 	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
@@ -271,10 +271,10 @@ void dreamwld_state::video_start()
 	m_bg2_tilemap->set_scroll_rows(64*16);    // line scrolling
 	m_bg2_tilemap->set_scroll_cols(1);
 
-	m_spritebuf1 = std::make_unique<UINT32[]>(0x2000 / 4);
-	m_spritebuf2 = std::make_unique<UINT32[]>(0x2000 / 4);
+	m_spritebuf1 = std::make_unique<uint32_t[]>(0x2000 / 4);
+	m_spritebuf2 = std::make_unique<uint32_t[]>(0x2000 / 4);
 
-	m_lineram16 = make_unique_clear<UINT16[]>(0x400 / 2);
+	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
 	save_pointer(NAME(m_lineram16.get()), 0x400/2);
 
 }
@@ -290,7 +290,7 @@ void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
 }
 
 
-UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  int tm0size, tm1size;
 
@@ -305,8 +305,8 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	int layer0_scrollx = m_vregs[(0x004 / 4)] + 0;
 	int layer1_scrollx = m_vregs[(0x00c / 4)] + 2;
 
-	UINT32 layer0_ctrl = m_vregs[0x010 / 4];
-	UINT32 layer1_ctrl = m_vregs[0x014 / 4];
+	uint32_t layer0_ctrl = m_vregs[0x010 / 4];
+	uint32_t layer1_ctrl = m_vregs[0x014 / 4];
 
 	m_tilebank[0] = (layer0_ctrl >> 6) & 1;
 	m_tilebank[1] = (layer1_ctrl >> 6) & 1;
@@ -352,7 +352,7 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	{
 		int x0 = 0, x1 = 0;
 
-		UINT16* linebase;
+		uint16_t* linebase;
 
 
 
@@ -410,9 +410,9 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
 	//static int count = 0;
 
-	UINT8 *protdata = memregion("user1")->base();
+	uint8_t *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
-	UINT8 dat = protdata[(m_protindex++) % protsize];
+	uint8_t dat = protdata[(m_protindex++) % protsize];
 
 	//printf("protection read %04x %02x\n", count, dat);
 	//count++;

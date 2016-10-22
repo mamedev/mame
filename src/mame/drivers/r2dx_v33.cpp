@@ -83,7 +83,7 @@ public:
 	{ }
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_region_ptr<UINT8> m_math;
+	required_region_ptr<uint8_t> m_math;
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -122,10 +122,10 @@ public:
 
 	int m_r2dxbank;
 	int m_r2dxgameselect;
-	INT16 m_r2dx_angle;
+	int16_t m_r2dx_angle;
 
-	UINT16 r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
-	UINT32 r2dx_i_sdist;
+	uint16_t r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
+	uint32_t r2dx_i_sdist;
 
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 
@@ -208,7 +208,7 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
 
-static UINT16 mcu_prog[0x800];
+static uint16_t mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
 WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
@@ -248,7 +248,7 @@ READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
 }
 
 
-static UINT16 mcu_xval,mcu_yval;
+static uint16_t mcu_xval,mcu_yval;
 
 /* something sent to the MCU for X/Y global screen calculating ... */
 WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
@@ -263,7 +263,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
 }
 
-static UINT16 mcu_data[9];
+static uint16_t mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
 WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
@@ -329,12 +329,12 @@ READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | UINT16(~mem_mask))) | (data & mem_mask);
+	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
 {
-	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (UINT16(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
+	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 // these DMA operations seem to use hardcoded addresses on this hardware
@@ -344,7 +344,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_tilemapdma_w)
 
 	for (int i = 0; i < 0x2800 / 2; i++)
 	{
-		UINT16 tileval = space.read_word(src);
+		uint16_t tileval = space.read_word(src);
 		src += 2;
 		m_videoram_private_w(space, i, tileval, 0xffff);
 	}
@@ -356,7 +356,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 
 	for (int i = 0; i < 0x1000 / 2; i++)
 	{
-		UINT16 palval = space.read_word(src);
+		uint16_t palval = space.read_word(src);
 		src += 2;
 		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
@@ -881,10 +881,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	// no sprite encryption(!)
 
 	// BG tile rom has 2 lines swapped
-	UINT8 *src = memregion("gfx2")->base()+0x100000;
+	uint8_t *src = memregion("gfx2")->base()+0x100000;
 	int len = 0x080000;
 
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	int i;
 	for (i = 0; i < len; i ++)
 		buffer[i] = src[BITSWAP32(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];

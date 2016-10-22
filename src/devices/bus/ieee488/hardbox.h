@@ -31,7 +31,7 @@ class hardbox_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

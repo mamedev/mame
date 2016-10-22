@@ -2574,7 +2574,7 @@ ROM_END
  *
  *************************************/
 
-void leland_state::init_master_ports(UINT8 mvram_base, UINT8 io_base)
+void leland_state::init_master_ports(uint8_t mvram_base, uint8_t io_base)
 {
 	/* set up the master CPU VRAM I/O */
 	m_master->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8_delegate(FUNC(leland_state::leland_mvram_port_r),this), write8_delegate(FUNC(leland_state::leland_mvram_port_w),this));

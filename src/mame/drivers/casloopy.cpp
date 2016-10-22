@@ -168,23 +168,23 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT32> m_bios_rom;
-	required_shared_ptr<UINT32> m_vregs;
+	required_shared_ptr<uint32_t> m_bios_rom;
+	required_shared_ptr<uint32_t> m_vregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<UINT16[]> m_paletteram;
-	std::unique_ptr<UINT8[]> m_vram;
-	std::unique_ptr<UINT8[]> m_bitmap_vram;
-	UINT16 sh7021_regs[0x100];
+	std::unique_ptr<uint16_t[]> m_paletteram;
+	std::unique_ptr<uint8_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_bitmap_vram;
+	uint16_t sh7021_regs[0x100];
 	int m_gfx_index;
 	DECLARE_DRIVER_INIT(casloopy);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(vregs_r);
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_READ16_MEMBER(pal_r);
@@ -225,9 +225,9 @@ static const gfx_layout casloopy_8bpp_layout =
 void casloopy_state::video_start()
 {
 	/* TODO: proper sizes */
-	m_paletteram = make_unique_clear<UINT16[]>(0x1000);
-	m_vram = make_unique_clear<UINT8[]>(0x10000);
-	m_bitmap_vram = make_unique_clear<UINT8[]>(0x20000);
+	m_paletteram = make_unique_clear<uint16_t[]>(0x1000);
+	m_vram = make_unique_clear<uint8_t[]>(0x10000);
+	m_bitmap_vram = make_unique_clear<uint8_t[]>(0x20000);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
 		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
@@ -240,7 +240,7 @@ void casloopy_state::video_start()
 	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(*m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
-UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 	int x,y;
@@ -271,7 +271,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = (m_vram[count+1])|(m_vram[count]<<8);
+			uint16_t tile = (m_vram[count+1])|(m_vram[count]<<8);
 
 			tile &= 0x7ff; //???
 
@@ -287,7 +287,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	{
 		for(x=0;x<256;x++)
 		{
-			UINT8 pix;
+			uint8_t pix;
 
 			pix = m_bitmap_vram[count];
 			if(pix)
@@ -366,7 +366,7 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 
 	if(offset == 0x4e/2)
 	{
-		UINT32 src,dst,size,type;
+		uint32_t src,dst,size,type;
 
 		src = (sh7021_regs[0x40/2]<<16)|(sh7021_regs[0x42/2]&0xffff);
 		dst = (sh7021_regs[0x44/2]<<16)|(sh7021_regs[0x46/2]&0xffff);
@@ -380,7 +380,7 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 
 	if(offset == 0x7e/2)
 	{
-		UINT32 src,dst,size,type;
+		uint32_t src,dst,size,type;
 
 		src = (sh7021_regs[0x70/2]<<16)|(sh7021_regs[0x72/2]&0xffff);
 		dst = (sh7021_regs[0x74/2]<<16)|(sh7021_regs[0x76/2]&0xffff);
@@ -476,9 +476,9 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 
 DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
-	UINT8 *SRC, *DST;
-	std::vector<UINT8> temp;
+	uint32_t size = m_cart->common_get_size("rom");
+	uint8_t *SRC, *DST;
+	std::vector<uint8_t> temp;
 	temp.resize(size);
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
@@ -490,8 +490,8 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	// fix endianness
 	for (int i = 0; i < size; i += 4)
 	{
-		UINT8 tempa = SRC[i + 0];
-		UINT8 tempb = SRC[i + 1];
+		uint8_t tempa = SRC[i + 0];
+		uint8_t tempb = SRC[i + 1];
 		DST[i + 0] = SRC[i + 2];
 		DST[i + 1] = SRC[i + 3];
 		DST[i + 2] = tempa;

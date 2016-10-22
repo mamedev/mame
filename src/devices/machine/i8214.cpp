@@ -86,7 +86,7 @@ void i8214_device::check_interrupt()
 //  i8214_device - constructor
 //-------------------------------------------------
 
-i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8214, "I8214", tag, owner, clock, "i8214", __FILE__)
 	, m_write_irq(*this)
 	, m_write_enlg(*this)
@@ -129,9 +129,9 @@ void i8214_device::device_start()
 //  a_r -
 //-------------------------------------------------
 
-UINT8 i8214_device::a_r()
+uint8_t i8214_device::a_r()
 {
-	UINT8 a = m_a & 0x07;
+	uint8_t a = m_a & 0x07;
 
 	if (LOG) logerror("I8214 '%s' A: %01x\n", tag(), a);
 
@@ -143,7 +143,7 @@ UINT8 i8214_device::a_r()
 //  b_w -
 //-------------------------------------------------
 
-void i8214_device::b_w(UINT8 data)
+void i8214_device::b_w(uint8_t data)
 {
 	m_current_status = data & 0x07;
 

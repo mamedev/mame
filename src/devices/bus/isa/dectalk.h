@@ -13,7 +13,7 @@ class dectalk_isa_device : public device_t,
 						public device_isa8_card_interface
 {
 public:
-	dectalk_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dectalk_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -43,8 +43,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT16 m_cmd, m_stat, m_data, m_dsp_dma, m_ctl;
-	UINT8 m_dma, m_vol, m_bio;
+	uint16_t m_cmd, m_stat, m_data, m_dsp_dma, m_ctl;
+	uint8_t m_dma, m_vol, m_bio;
 
 	required_device<i80186_cpu_device> m_cpu;
 	required_device<dac_12bit_r2r_device> m_dac;

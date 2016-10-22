@@ -38,12 +38,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_pixelram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_protdata;
-	optional_shared_ptr<UINT16> m_bitmap_mode;
+	required_shared_ptr<uint16_t> m_pixelram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_protdata;
+	optional_shared_ptr<uint16_t> m_bitmap_mode;
 
 	// driver init configuration
 	int m_bitmap_type;
@@ -60,9 +60,9 @@ public:
 	int m_sound_irq;
 
 	// funystrp specific
-	UINT8 m_funystrp_val;
-	UINT8 m_funystrp_ff3cc7_val;
-	UINT8 m_funystrp_ff3cc8_val;
+	uint8_t m_funystrp_val;
+	uint8_t m_funystrp_ff3cc7_val;
+	uint8_t m_funystrp_ff3cc8_val;
 	int m_msm_data1;
 	int m_msm_data2;
 	int m_msm_toggle1;
@@ -119,8 +119,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

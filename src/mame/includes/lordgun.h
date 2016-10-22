@@ -12,7 +12,7 @@
 struct lordgun_gun_data
 {
 	int     scr_x,  scr_y;
-	UINT16  hw_x,   hw_y;
+	uint16_t  hw_x,   hw_y;
 };
 
 class lordgun_state : public driver_device
@@ -47,23 +47,23 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT16> m_priority_ram;
-	required_shared_ptr<UINT16> m_scrollram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr_array<UINT16, 4> m_vram;
-	required_shared_ptr_array<UINT16, 4> m_scroll_x;
-	required_shared_ptr_array<UINT16, 4> m_scroll_y;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_priority_ram;
+	required_shared_ptr<uint16_t> m_scrollram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr_array<uint16_t, 4> m_vram;
+	required_shared_ptr_array<uint16_t, 4> m_scroll_x;
+	required_shared_ptr_array<uint16_t, 4> m_scroll_y;
 
-	UINT8 m_old;
-	UINT8 m_aliencha_dip_sel;
-	UINT16 m_priority;
+	uint8_t m_old;
+	uint8_t m_aliencha_dip_sel;
+	uint16_t m_priority;
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];
 	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
 
-	UINT16 m_protection_data;
+	uint16_t m_protection_data;
 	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
 	DECLARE_READ16_MEMBER(lordgun_protection_r);
 	DECLARE_WRITE16_MEMBER(aliencha_protection_w);
@@ -99,9 +99,9 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void lordgun_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
+	inline void lordgun_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 	void lorddgun_calc_gun_scr(int i);
 	void lordgun_update_gun(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -58,7 +58,7 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 VIDEO_START_MEMBER(leland_state,leland)
 {
 	/* allocate memory */
-	m_video_ram = make_unique_clear<UINT8[]>(VRAM_SIZE);
+	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
 
 	/* scanline timer */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
@@ -68,10 +68,10 @@ VIDEO_START_MEMBER(leland_state,leland)
 VIDEO_START_MEMBER(leland_state,ataxx)
 {
 	/* first do the standard stuff */
-	m_video_ram = make_unique_clear<UINT8[]>(VRAM_SIZE);
+	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
 
 	/* allocate memory */
-	m_ataxx_qram = make_unique_clear<UINT8[]>(QRAM_SIZE);
+	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
 }
 
 
@@ -197,7 +197,7 @@ int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
 
 void leland_state::leland_vram_port_w(address_space &space, int offset, int data, int num)
 {
-	UINT8 *video_ram = m_video_ram.get();
+	uint8_t *video_ram = m_video_ram.get();
 	struct vram_state_data *state = m_vram_state + num;
 	int addr = state->m_addr;
 	int inc = (offset >> 2) & 2;
@@ -381,10 +381,10 @@ READ8_MEMBER(leland_state::ataxx_svram_port_r)
  *
  *************************************/
 
-UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *bg_prom = memregion("user1")->base();
-	const UINT8 *bg_gfx = memregion("gfx1")->base();
+	const uint8_t *bg_prom = memregion("user1")->base();
+	const uint8_t *bg_gfx = memregion("gfx1")->base();
 	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 3;
 	offs_t char_bank = (((m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
 	offs_t prom_bank = ((m_gfxbank >> 3) & 0x01) * 0x2000;
@@ -392,17 +392,17 @@ UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &b
 	/* for each scanline in the visible region */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 fg_data = 0;
+		uint8_t fg_data = 0;
 
-		UINT16 *dst = &bitmap.pix16(y);
-		UINT8 *fg_src = &m_video_ram[y << 8];
+		uint16_t *dst = &bitmap.pix16(y);
+		uint8_t *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
 		for (int x = 0; x < VIDEO_WIDTH; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
-			UINT16 sx = (x + m_xscroll) & 0x07ff;
-			UINT16 sy = (y + m_yscroll) & 0x07ff;
+			uint16_t sx = (x + m_xscroll) & 0x07ff;
+			uint16_t sy = (y + m_yscroll) & 0x07ff;
 
 			/* get the byte address this background pixel comes from */
 			offs_t bg_prom_offs = (sx >> 3) |
@@ -445,26 +445,26 @@ UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &b
  *
  *************************************/
 
-UINT32 leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *bg_gfx = memregion("gfx1")->base();
+	const uint8_t *bg_gfx = memregion("gfx1")->base();
 	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 fg_data = 0;
+		uint8_t fg_data = 0;
 
-		UINT16 *dst = &bitmap.pix16(y);
-		UINT8 *fg_src = &m_video_ram[y << 8];
+		uint16_t *dst = &bitmap.pix16(y);
+		uint8_t *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
 		for (int x = 0; x < VIDEO_WIDTH; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
-			UINT16 sx = (x + m_xscroll) & 0x07ff;
-			UINT16 sy = (y + m_yscroll) & 0x07ff;
+			uint16_t sx = (x + m_xscroll) & 0x07ff;
+			uint16_t sy = (y + m_yscroll) & 0x07ff;
 
 			/* get the byte address this background pixel comes from */
 			offs_t qram_offs = (sx >> 3) |

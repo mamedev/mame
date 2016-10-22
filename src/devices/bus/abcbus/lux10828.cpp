@@ -233,10 +233,10 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0x04;
+	uint8_t data = 0x04;
 
 	// single/double sided drive
-	UINT8 sw1 = m_sw1->read() & 0x0f;
+	uint8_t sw1 = m_sw1->read() & 0x0f;
 	int ds0 = m_sel0 ? BIT(sw1, 0) : 1;
 	int ds1 = m_sel1 ? BIT(sw1, 1) : 1;
 	data |= !(ds0 & ds1);
@@ -403,7 +403,7 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //  luxor_55_10828_device - constructor
 //-------------------------------------------------
 
-luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock, "lux10828", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
@@ -440,7 +440,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_sel1));
 
 	// patch out protection checks
-	UINT8 *rom = memregion(Z80_TAG)->base();
+	uint8_t *rom = memregion(Z80_TAG)->base();
 	rom[0x00fa] = 0xff;
 	rom[0x0336] = 0xff;
 	rom[0x0718] = 0xff;
@@ -469,9 +469,9 @@ void luxor_55_10828_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_55_10828_device::abcbus_cs(UINT8 data)
+void luxor_55_10828_device::abcbus_cs(uint8_t data)
 {
-	UINT8 address = 0x2c | BIT(m_s1->read(), 0);
+	uint8_t address = 0x2c | BIT(m_s1->read(), 0);
 
 	m_cs = (data == address);
 }
@@ -481,9 +481,9 @@ void luxor_55_10828_device::abcbus_cs(UINT8 data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 luxor_55_10828_device::abcbus_stat()
+uint8_t luxor_55_10828_device::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -498,9 +498,9 @@ UINT8 luxor_55_10828_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_55_10828_device::abcbus_inp()
+uint8_t luxor_55_10828_device::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -521,7 +521,7 @@ UINT8 luxor_55_10828_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_10828_device::abcbus_out(UINT8 data)
+void luxor_55_10828_device::abcbus_out(uint8_t data)
 {
 	if (!m_cs) return;
 
@@ -539,7 +539,7 @@ void luxor_55_10828_device::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_55_10828_device::abcbus_c1(UINT8 data)
+void luxor_55_10828_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -553,7 +553,7 @@ void luxor_55_10828_device::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_55_10828_device::abcbus_c3(UINT8 data)
+void luxor_55_10828_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{

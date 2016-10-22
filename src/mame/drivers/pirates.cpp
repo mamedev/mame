@@ -351,16 +351,16 @@ ROM_END
 
 void pirates_state::decrypt_68k()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	size_t rom_size = memregion("maincpu")->bytes();
-	std::vector<UINT16> buf(rom_size/2);
+	std::vector<uint16_t> buf(rom_size/2);
 
 	memcpy (&buf[0], rom, rom_size);
 
 	for (int i=0; i<rom_size/2; i++)
 	{
 		int adrl, adrr;
-		UINT8 vl, vr;
+		uint8_t vl, vr;
 
 		adrl = BITSWAP24(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
 		vl = BITSWAP8(buf[adrl],    4,2,7,1,6,5,0,3);
@@ -375,12 +375,12 @@ void pirates_state::decrypt_68k()
 void pirates_state::decrypt_p()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("gfx1")->bytes();
 
-	std::vector<UINT8> buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx1")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -398,12 +398,12 @@ void pirates_state::decrypt_p()
 void pirates_state::decrypt_s()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("gfx2")->bytes();
 
-	std::vector<UINT8> buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx2")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -422,12 +422,12 @@ void pirates_state::decrypt_s()
 void pirates_state::decrypt_oki()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("oki")->bytes();
 
-	std::vector<UINT8> buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("oki")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -442,7 +442,7 @@ void pirates_state::decrypt_oki()
 
 DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	decrypt_68k();
 	decrypt_p();

@@ -175,10 +175,10 @@ public:
 	}
 
 private:
-	UINT8 m_IPLK;
-	UINT8 m_GMODE;
-	UINT16 m_page;
-	std::unique_ptr<UINT8[]> m_work_ram;
+	uint8_t m_IPLK;
+	uint8_t m_GMODE;
+	uint16_t m_page;
+	std::unique_ptr<uint8_t[]> m_work_ram;
 	attotime m_time;
 	bool m_centronics_busy;
 	virtual void machine_start() override;
@@ -187,7 +187,7 @@ private:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
 	required_device<centronics_device> m_centronics;
@@ -384,8 +384,8 @@ INPUT_PORTS_END
 
 void spc1000_state::machine_start()
 {
-	UINT8 *mem = memregion("maincpu")->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *mem = memregion("maincpu")->base();
+	uint8_t *ram = m_ram->pointer();
 
 	// configure and intialize banks 1 & 3 (read banks)
 	membank("bank1")->configure_entry(0, ram);
@@ -404,7 +404,7 @@ void spc1000_state::machine_start()
 
 void spc1000_state::machine_reset()
 {
-	m_work_ram = make_unique_clear<UINT8[]>(0x10000);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
 	m_IPLK = 1;
 }
 
@@ -416,7 +416,7 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	if (!BIT(m_GMODE, 3))
 	{   // text mode (~A/G set to A)
-		UINT8 data = m_p_videoram[offset + m_page + 0x800];
+		uint8_t data = m_p_videoram[offset + m_page + 0x800];
 		m_vdg->inv_w(BIT(data, 0));
 		m_vdg->css_w(BIT(data, 1));
 		m_vdg->as_w (BIT(data, 2));
@@ -431,7 +431,7 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 
 READ8_MEMBER( spc1000_state::porta_r )
 {
-	UINT8 data = 0x3f;
+	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED)) ? 0x40 : 0;
 	data &= ~(m_io_joy->read() & 0x3f);

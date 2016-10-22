@@ -341,7 +341,7 @@ void esq2x16_sq1_t::write_char(int data)
 	#endif
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-esq2x16_sq1_t::esq2x16_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : esqvfd_t(mconfig, ESQ2x16_SQ1, "Ensoniq 2x16 VFD (SQ-1 variant)", tag, owner, clock, "esq2x16_sq1", __FILE__)
+esq2x16_sq1_t::esq2x16_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_t(mconfig, ESQ2x16_SQ1, "Ensoniq 2x16 VFD (SQ-1 variant)", tag, owner, clock, "esq2x16_sq1", __FILE__)
 {
 	m_rows = 2;
 	m_cols = 16;
@@ -393,7 +393,7 @@ void esq2x16_sq1_t::page_reset()
 	m_lcdPos = m_LcdCommand = 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-char esq2x16_sq1_t::RotateLcdChar(UINT8 lcdChar, int charRow)
+char esq2x16_sq1_t::RotateLcdChar(uint8_t lcdChar, int charRow)
 {
 	char lcdCharRow = 0;
 	for (int cc=0; cc<5; cc++){

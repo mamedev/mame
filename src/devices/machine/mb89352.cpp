@@ -115,7 +115,7 @@ const device_type MB89352A = &device_creator<mb89352_device>;
  * Device
  */
 
-mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	legacy_scsi_host_adapter(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
 	m_irq_cb(*this),
 	m_drq_cb(*this)
@@ -161,7 +161,7 @@ void mb89352_device::device_stop()
 }
 
 // get the length of a SCSI command based on it's command byte type
-int mb89352_device::get_scsi_cmd_len(UINT8 cbyte)
+int mb89352_device::get_scsi_cmd_len(uint8_t cbyte)
 {
 	int group;
 
@@ -247,7 +247,7 @@ void mb89352_device::set_phase(int phase)
 
 READ8_MEMBER( mb89352_device::mb89352_r )
 {
-	UINT8 ret;
+	uint8_t ret;
 	switch(offset & 0x0f)
 	{
 	case 0x00:  // BDID - Bus Device ID

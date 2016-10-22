@@ -84,16 +84,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
-	UINT32 m_player_score[6];
-	UINT8 m_display;
-	UINT8 m_bit_counter;
+	uint32_t m_player_score[6];
+	uint8_t m_display;
+	uint8_t m_bit_counter;
 	bool m_disp_data;
-	UINT8 m_ic5a;
-	UINT8 m_ic6a0;
-	UINT8 m_ic6a1;
-	UINT8 m_ic6a2;
-	UINT8 m_ic6b4;
-	UINT8 m_ic6b7;
+	uint8_t m_ic5a;
+	uint8_t m_ic6a0;
+	uint8_t m_ic6a1;
+	uint8_t m_ic6a2;
+	uint8_t m_ic6b4;
+	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
@@ -402,8 +402,8 @@ READ8_MEMBER( allied_state::ic4_a_r )
 
 WRITE8_MEMBER( allied_state::ic4_b_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
-	UINT8 segment, i;
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
+	uint8_t segment, i;
 	for (i = 0; i < 4; i++)
 	{
 		if (!BIT(data, i+4))
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( allied_state::ic8_cb2_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 {
-	UINT8 data = ioport("X6A")->read();
+	uint8_t data = ioport("X6A")->read();
 
 	m_ic8->ca1_w(BIT(data, 4));
 	m_ic8->cb1_w(BIT(data, 5));

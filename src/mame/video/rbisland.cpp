@@ -39,7 +39,7 @@ WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
 
 /***************************************************************************/
 
-UINT32 rbisland_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rbisland_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[2];
 
@@ -81,9 +81,9 @@ VIDEO_START_MEMBER(rbisland_state,jumping)
 }
 
 
-UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, layer[2];
 	int sprite_colbank = (m_sprite_ctrl & 0xe0) >> 1;
 

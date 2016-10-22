@@ -49,7 +49,7 @@ class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 
 	// static configuration helpers
 	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }
@@ -59,9 +59,9 @@ protected:
 	virtual void device_start() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; } /* FIXME */
-	virtual UINT32 execute_max_cycles() const override { return 1; } /* FIXME */
-	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const override { return 1; } /* FIXME */
+	virtual uint32_t execute_max_cycles() const override { return 1; } /* FIXME */
+	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -74,20 +74,20 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 7; } /* FIXME */
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 7; } /* FIXME */
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	int m_am8_16;
 	address_space_config m_program_config;
 
-	UINT8 RDMEM(offs_t addr) { return m_program->read_byte( addr ); }
-	UINT16 RDMEMW(offs_t addr) { return m_program->read_word( addr ); }
-	UINT32 RDMEML(offs_t addr) { return m_program->read_dword( addr ); }
-	void WRMEM(offs_t addr, UINT8 data) { m_program->write_byte( addr, data ); }
-	void WRMEMW(offs_t addr,UINT16 data) { m_program->write_word( addr, data ); }
-	void WRMEML(offs_t addr,UINT32 data) { m_program->write_dword( addr, data ); }
+	uint8_t RDMEM(offs_t addr) { return m_program->read_byte( addr ); }
+	uint16_t RDMEMW(offs_t addr) { return m_program->read_word( addr ); }
+	uint32_t RDMEML(offs_t addr) { return m_program->read_dword( addr ); }
+	void WRMEM(offs_t addr, uint8_t data) { m_program->write_byte( addr, data ); }
+	void WRMEMW(offs_t addr,uint16_t data) { m_program->write_word( addr, data ); }
+	void WRMEML(offs_t addr,uint32_t data) { m_program->write_dword( addr, data ); }
 
 	/* registers */
 	PAIR    m_xwa[4];
@@ -109,13 +109,13 @@ protected:
 	PAIR    m_dmam[4];
 
 	/* Internal timers, irqs, etc */
-	UINT8   m_reg[0xa0];
-	UINT32  m_timer_pre;
-	UINT8   m_timer[6];
+	uint8_t   m_reg[0xa0];
+	uint32_t  m_timer_pre;
+	uint8_t   m_timer[6];
 	int     m_timer_change[4];
 	bool    m_prefetch_clear;
-	UINT8   m_prefetch_index;
-	UINT8   m_prefetch[4];
+	uint8_t   m_prefetch_index;
+	uint8_t   m_prefetch[4];
 
 	/* Current state of input levels */
 	int     m_level[TLCS900_NUM_INPUTS];
@@ -125,13 +125,13 @@ protected:
 
 	/* used during execution */
 	PAIR    m_dummy; /* for illegal register references */
-	UINT8   m_op;
+	uint8_t   m_op;
 	PAIR    m_ea1, m_ea2;
 	PAIR    m_imm1, m_imm2;
 	int m_cycles;
-	UINT8   *m_p1_reg8, *m_p2_reg8;
-	UINT16  *m_p1_reg16, *m_p2_reg16;
-	UINT32  *m_p1_reg32, *m_p2_reg32;
+	uint8_t   *m_p1_reg8, *m_p2_reg8;
+	uint16_t  *m_p1_reg16, *m_p2_reg16;
+	uint32_t  *m_p1_reg32, *m_p2_reg32;
 
 	int m_halted;
 	int m_icount;
@@ -162,77 +162,77 @@ protected:
 	static const tlcs900inst s_mnemonic_f0[256];
 	static const tlcs900inst s_mnemonic[256];
 
-	inline UINT8 RDOP();
+	inline uint8_t RDOP();
 	virtual void tlcs900_check_hdma() = 0;
 	virtual void tlcs900_check_irqs() = 0;
 	virtual void tlcs900_handle_ad() = 0;
 	virtual void tlcs900_handle_timers() = 0;
 
-	int condition_true( UINT8 cond );
-	UINT8 *get_reg8_current( UINT8 reg );
-	UINT16 *get_reg16_current( UINT8 reg );
-	UINT32 *get_reg32_current( UINT8 reg );
-	PAIR *get_reg( UINT8 reg );
-	UINT8 *get_reg8( UINT8 reg );
-	UINT16 *get_reg16( UINT8 reg );
-	UINT32 *get_reg32( UINT8 reg );
-	void parity8( UINT8 a );
-	void parity16( UINT16 a );
-	void parity32( UINT32 a );
-	UINT8 adc8( UINT8 a, UINT8 b);
-	UINT16 adc16( UINT16 a, UINT16 b);
-	UINT32 adc32( UINT32 a, UINT32 b);
-	UINT8 add8( UINT8 a, UINT8 b);
-	UINT16 add16( UINT16 a, UINT16 b);
-	UINT32 add32( UINT32 a, UINT32 b);
-	UINT8 sbc8( UINT8 a, UINT8 b);
-	UINT16 sbc16( UINT16 a, UINT16 b);
-	UINT32 sbc32( UINT32 a, UINT32 b);
-	UINT8 sub8( UINT8 a, UINT8 b);
-	UINT16 sub16( UINT16 a, UINT16 b);
-	UINT32 sub32( UINT32 a, UINT32 b);
-	UINT8 and8( UINT8 a, UINT8 b);
-	UINT16 and16( UINT16 a, UINT16 b);
-	UINT32 and32( UINT32 a, UINT32 b);
-	UINT8 or8( UINT8 a, UINT8 b);
-	UINT16 or16( UINT16 a, UINT16 b);
-	UINT32 or32( UINT32 a, UINT32 b);
-	UINT8 xor8( UINT8 a, UINT8 b);
-	UINT16 xor16( UINT16 a, UINT16 b);
-	UINT32 xor32( UINT32 a, UINT32 b);
-	void ldcf8( UINT8 a, UINT8 b );
-	void ldcf16( UINT8 a, UINT8 b );
-	void andcf8( UINT8 a, UINT8 b );
-	void andcf16( UINT8 a, UINT8 b );
-	void orcf8( UINT8 a, UINT8 b );
-	void orcf16( UINT8 a, UINT8 b );
-	void xorcf8( UINT8 a, UINT8 b );
-	void xorcf16( UINT8 a, UINT8 b );
-	UINT8 rl8( UINT8 a, UINT8 s );
-	UINT16 rl16( UINT16 a, UINT8 s );
-	UINT32 rl32( UINT32 a, UINT8 s );
-	UINT8 rlc8( UINT8 a, UINT8 s );
-	UINT16 rlc16( UINT16 a, UINT8 s );
-	UINT32 rlc32( UINT32 a, UINT8 s );
-	UINT8 rr8( UINT8 a, UINT8 s );
-	UINT16 rr16( UINT16 a, UINT8 s );
-	UINT32 rr32( UINT32 a, UINT8 s );
-	UINT8 rrc8( UINT8 a, UINT8 s );
-	UINT16 rrc16( UINT16 a, UINT8 s );
-	UINT32 rrc32( UINT32 a, UINT8 s );
-	UINT8 sla8( UINT8 a, UINT8 s );
-	UINT16 sla16( UINT16 a, UINT8 s );
-	UINT32 sla32( UINT32 a, UINT8 s );
-	UINT8 sra8( UINT8 a, UINT8 s );
-	UINT16 sra16( UINT16 a, UINT8 s );
-	UINT32 sra32( UINT32 a, UINT8 s );
-	UINT8 srl8( UINT8 a, UINT8 s );
-	UINT16 srl16( UINT16 a, UINT8 s );
-	UINT32 srl32( UINT32 a, UINT8 s );
-	UINT16 div8( UINT16 a, UINT8 b );
-	UINT32 div16( UINT32 a, UINT16 b );
-	UINT16 divs8( INT16 a, INT8 b );
-	UINT32 divs16( INT32 a, INT16 b );
+	int condition_true( uint8_t cond );
+	uint8_t *get_reg8_current( uint8_t reg );
+	uint16_t *get_reg16_current( uint8_t reg );
+	uint32_t *get_reg32_current( uint8_t reg );
+	PAIR *get_reg( uint8_t reg );
+	uint8_t *get_reg8( uint8_t reg );
+	uint16_t *get_reg16( uint8_t reg );
+	uint32_t *get_reg32( uint8_t reg );
+	void parity8( uint8_t a );
+	void parity16( uint16_t a );
+	void parity32( uint32_t a );
+	uint8_t adc8( uint8_t a, uint8_t b);
+	uint16_t adc16( uint16_t a, uint16_t b);
+	uint32_t adc32( uint32_t a, uint32_t b);
+	uint8_t add8( uint8_t a, uint8_t b);
+	uint16_t add16( uint16_t a, uint16_t b);
+	uint32_t add32( uint32_t a, uint32_t b);
+	uint8_t sbc8( uint8_t a, uint8_t b);
+	uint16_t sbc16( uint16_t a, uint16_t b);
+	uint32_t sbc32( uint32_t a, uint32_t b);
+	uint8_t sub8( uint8_t a, uint8_t b);
+	uint16_t sub16( uint16_t a, uint16_t b);
+	uint32_t sub32( uint32_t a, uint32_t b);
+	uint8_t and8( uint8_t a, uint8_t b);
+	uint16_t and16( uint16_t a, uint16_t b);
+	uint32_t and32( uint32_t a, uint32_t b);
+	uint8_t or8( uint8_t a, uint8_t b);
+	uint16_t or16( uint16_t a, uint16_t b);
+	uint32_t or32( uint32_t a, uint32_t b);
+	uint8_t xor8( uint8_t a, uint8_t b);
+	uint16_t xor16( uint16_t a, uint16_t b);
+	uint32_t xor32( uint32_t a, uint32_t b);
+	void ldcf8( uint8_t a, uint8_t b );
+	void ldcf16( uint8_t a, uint8_t b );
+	void andcf8( uint8_t a, uint8_t b );
+	void andcf16( uint8_t a, uint8_t b );
+	void orcf8( uint8_t a, uint8_t b );
+	void orcf16( uint8_t a, uint8_t b );
+	void xorcf8( uint8_t a, uint8_t b );
+	void xorcf16( uint8_t a, uint8_t b );
+	uint8_t rl8( uint8_t a, uint8_t s );
+	uint16_t rl16( uint16_t a, uint8_t s );
+	uint32_t rl32( uint32_t a, uint8_t s );
+	uint8_t rlc8( uint8_t a, uint8_t s );
+	uint16_t rlc16( uint16_t a, uint8_t s );
+	uint32_t rlc32( uint32_t a, uint8_t s );
+	uint8_t rr8( uint8_t a, uint8_t s );
+	uint16_t rr16( uint16_t a, uint8_t s );
+	uint32_t rr32( uint32_t a, uint8_t s );
+	uint8_t rrc8( uint8_t a, uint8_t s );
+	uint16_t rrc16( uint16_t a, uint8_t s );
+	uint32_t rrc32( uint32_t a, uint8_t s );
+	uint8_t sla8( uint8_t a, uint8_t s );
+	uint16_t sla16( uint16_t a, uint8_t s );
+	uint32_t sla32( uint32_t a, uint8_t s );
+	uint8_t sra8( uint8_t a, uint8_t s );
+	uint16_t sra16( uint16_t a, uint8_t s );
+	uint32_t sra32( uint32_t a, uint8_t s );
+	uint8_t srl8( uint8_t a, uint8_t s );
+	uint16_t srl16( uint16_t a, uint8_t s );
+	uint32_t srl32( uint32_t a, uint8_t s );
+	uint16_t div8( uint16_t a, uint8_t b );
+	uint32_t div16( uint32_t a, uint16_t b );
+	uint16_t divs8( int16_t a, int8_t b );
+	uint32_t divs16( int32_t a, int16_t b );
 	void _ADCBMI();
 	void _ADCBMR();
 	void _ADCBRI();
@@ -636,7 +636,7 @@ class tmp95c061_device : public tlcs900h_device
 {
 public:
 	// construction/destruction
-	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_port1_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port1_read.set_callback(object); }
@@ -674,8 +674,8 @@ protected:
 	void update_porta();
 
 private:
-	UINT8   m_to1;
-	UINT8   m_to3;
+	uint8_t   m_to1;
+	uint8_t   m_to3;
 
 	// Port 1: 8 bit I/O. Shared with D8-D15
 	devcb_read8    m_port1_read;
@@ -756,7 +756,7 @@ class tmp95c063_device : public tlcs900h_device
 {
 public:
 	// construction/destruction
-	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
@@ -843,7 +843,7 @@ private:
 	// Port C: 8 bit input only. Shared with analogue inputs
 	devcb_read8    m_portc_read;
 
-	// Port D: 5 bit I/O. Shared with INT8
+	// Port D: 5 bit I/O. Shared with int8_t
 	devcb_read8    m_portd_read;
 	devcb_write8   m_portd_write;
 

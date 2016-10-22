@@ -84,10 +84,10 @@ class mcs51_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 	// configuration helpers
-	static void set_port_forced_input(device_t &device, UINT8 port, UINT8 forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
+	static void set_port_forced_input(device_t &device, uint8_t port, uint8_t forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
 	template<class _Object> static devcb_base & set_serial_rx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(object); }
 	template<class _Object> static devcb_base & set_serial_tx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(object); }
 
@@ -97,12 +97,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 12 - 1) / 12; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 12); }
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 20; }
-	virtual UINT32 execute_input_lines() const override { return 6; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 12 - 1) / 12; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 12); }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 20; }
+	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -118,9 +118,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 5; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 5; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -128,46 +128,46 @@ protected:
 	address_space_config m_io_config;
 
 	//Internal stuff
-	UINT16  m_ppc;            //previous pc
-	UINT16  m_pc;             //current pc
-	UINT16  m_features;       //features of this cpu
-	UINT8   m_rwm;            //Signals that the current instruction is a read/write/modify instruction
+	uint16_t  m_ppc;            //previous pc
+	uint16_t  m_pc;             //current pc
+	uint16_t  m_features;       //features of this cpu
+	uint8_t   m_rwm;            //Signals that the current instruction is a read/write/modify instruction
 
 	int     m_inst_cycles;        /* cycles for the current instruction */
 	int     m_ram_mask;           /* second ram bank for indirect access available ? */
 	int     m_num_interrupts;     /* number of interrupts supported */
 	int     m_recalc_parity;      /* recalculate parity before next instruction */
-	UINT32  m_last_line_state;    /* last state of input lines line */
+	uint32_t  m_last_line_state;    /* last state of input lines line */
 	int     m_t0_cnt;             /* number of 0->1 transistions on T0 line */
 	int     m_t1_cnt;             /* number of 0->1 transistions on T1 line */
 	int     m_t2_cnt;             /* number of 0->1 transistions on T2 line */
 	int     m_t2ex_cnt;           /* number of 0->1 transistions on T2EX line */
 	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
-	UINT8   m_irq_active;         /* mask which irq levels are serviced */
-	UINT8   m_irq_prio[8];        /* interrupt priority */
+	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
+	uint8_t   m_irq_prio[8];        /* interrupt priority */
 
-	UINT8   m_forced_inputs[4];   /* allow read even if configured as output */
+	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
 
 	int     m_icount;
 
 	struct mcs51_uart
 	{
-		UINT8   data_out;       //Data to send out
-		UINT8   bits_to_send;   //How many bits left to send when transmitting out the serial port
+		uint8_t   data_out;       //Data to send out
+		uint8_t   bits_to_send;   //How many bits left to send when transmitting out the serial port
 
 		int     smod_div;       /* signal divided by 2^SMOD */
 		int     rx_clk;         /* rx clock */
 		int     tx_clk;         /* tx clock */
-		UINT8   delay_cycles;   //Gross Hack;
+		uint8_t   delay_cycles;   //Gross Hack;
 	} m_uart;            /* internal uart */
 
 	/* Internal Ram */
-	UINT8   *m_internal_ram;      /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
-	UINT8   *m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
+	uint8_t   *m_internal_ram;      /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
+	uint8_t   *m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data);
-	virtual UINT8 sfr_read(size_t offset);
+	virtual void sfr_write(size_t offset, uint8_t data);
+	virtual uint8_t sfr_read(size_t offset);
 
 	/* Memory spaces */
 	address_space *m_program;
@@ -181,161 +181,161 @@ protected:
 
 	/* DS5002FP */
 	struct {
-		UINT8   previous_ta;        /* Previous Timed Access value */
-		UINT8   ta_window;          /* Limed Access window */
-		UINT8   range;              /* Memory Range */
+		uint8_t   previous_ta;        /* Previous Timed Access value */
+		uint8_t   ta_window;          /* Limed Access window */
+		uint8_t   range;              /* Memory Range */
 		/* Bootstrap Configuration */
-		UINT8   mcon;                   /* bootstrap loader MCON register */
-		UINT8   rpctl;                  /* bootstrap loader RPCTL register */
-		UINT8   crc;                    /* bootstrap loader CRC register */
+		uint8_t   mcon;                   /* bootstrap loader MCON register */
+		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
+		uint8_t   crc;                    /* bootstrap loader CRC register */
 	} m_ds5002fp;
 
 	// for the debugger
-	UINT8 m_rtemp;
+	uint8_t m_rtemp;
 
-	static const UINT8 mcs51_cycles[256];
+	static const uint8_t mcs51_cycles[256];
 
-	UINT8 iram_iread(offs_t a);
-	void iram_iwrite(offs_t a, UINT8 d);
+	uint8_t iram_iread(offs_t a);
+	void iram_iwrite(offs_t a, uint8_t d);
 	void clear_current_irq();
-	UINT8 r_acc();
-	UINT8 r_psw();
+	uint8_t r_acc();
+	uint8_t r_psw();
 	void update_ptrs();
 	offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
-	UINT8 iram_read(size_t offset);
-	void iram_write(size_t offset, UINT8 data);
+	uint8_t iram_read(size_t offset);
+	void iram_write(size_t offset, uint8_t data);
 	void push_pc();
 	void pop_pc();
 	void set_parity();
-	UINT8 bit_address_r(UINT8 offset);
-	void bit_address_w(UINT8 offset, UINT8 bit);
-	void do_add_flags(UINT8 a, UINT8 data, UINT8 c);
-	void do_sub_flags(UINT8 a, UINT8 data, UINT8 c);
+	uint8_t bit_address_r(uint8_t offset);
+	void bit_address_w(uint8_t offset, uint8_t bit);
+	void do_add_flags(uint8_t a, uint8_t data, uint8_t c);
+	void do_sub_flags(uint8_t a, uint8_t data, uint8_t c);
 	void transmit_receive(int source);
 	void update_timer_t0(int cycles);
 	void update_timer_t1(int cycles);
 	void update_timer_t2(int cycles);
 	void update_timers(int cycles);
-	void serial_transmit(UINT8 data);
+	void serial_transmit(uint8_t data);
 	void serial_receive();
 	void update_serial(int cycles);
-	void update_irq_prio(UINT8 ipl, UINT8 iph);
-	void execute_op(UINT8 op);
+	void update_irq_prio(uint8_t ipl, uint8_t iph);
+	void execute_op(uint8_t op);
 	void check_irqs();
 	void burn_cycles(int cycles);
-	void acall(UINT8 r);
-	void add_a_byte(UINT8 r);
-	void add_a_mem(UINT8 r);
-	void add_a_ir(UINT8 r);
-	void add_a_r(UINT8 r);
-	void addc_a_byte(UINT8 r);
-	void addc_a_mem(UINT8 r);
-	void addc_a_ir(UINT8 r);
-	void addc_a_r(UINT8 r);
-	void ajmp(UINT8 r);
-	void anl_mem_a(UINT8 r);
-	void anl_mem_byte(UINT8 r);
-	void anl_a_byte(UINT8 r);
-	void anl_a_mem(UINT8 r);
-	void anl_a_ir(UINT8 r);
-	void anl_a_r(UINT8 r);
-	void anl_c_bitaddr(UINT8 r);
-	void anl_c_nbitaddr(UINT8 r);
-	void cjne_a_byte(UINT8 r);
-	void cjne_a_mem(UINT8 r);
-	void cjne_ir_byte(UINT8 r);
-	void cjne_r_byte(UINT8 r);
-	void clr_bitaddr(UINT8 r);
-	void clr_c(UINT8 r);
-	void clr_a(UINT8 r);
-	void cpl_bitaddr(UINT8 r);
-	void cpl_c(UINT8 r);
-	void cpl_a(UINT8 r);
-	void da_a(UINT8 r);
-	void dec_a(UINT8 r);
-	void dec_mem(UINT8 r);
-	void dec_ir(UINT8 r);
-	void dec_r(UINT8 r);
-	void div_ab(UINT8 r);
-	void djnz_mem(UINT8 r);
-	void djnz_r(UINT8 r);
-	void inc_a(UINT8 r);
-	void inc_mem(UINT8 r);
-	void inc_ir(UINT8 r);
-	void inc_r(UINT8 r);
-	void inc_dptr(UINT8 r);
-	void jb(UINT8 r);
-	void jbc(UINT8 r);
-	void jc(UINT8 r);
-	void jmp_iadptr(UINT8 r);
-	void jnb(UINT8 r);
-	void jnc(UINT8 r);
-	void jnz(UINT8 r);
-	void jz(UINT8 r);
-	void lcall(UINT8 r);
-	void ljmp(UINT8 r);
-	void mov_a_byte(UINT8 r);
-	void mov_a_mem(UINT8 r);
-	void mov_a_ir(UINT8 r);
-	void mov_a_r(UINT8 r);
-	void mov_mem_byte(UINT8 r);
-	void mov_mem_mem(UINT8 r);
-	void mov_ir_byte(UINT8 r);
-	void mov_r_byte(UINT8 r);
-	void mov_mem_ir(UINT8 r);
-	void mov_mem_r(UINT8 r);
-	void mov_dptr_byte(UINT8 r);
-	void mov_bitaddr_c(UINT8 r);
-	void mov_ir_mem(UINT8 r);
-	void mov_r_mem(UINT8 r);
-	void mov_mem_a(UINT8 r);
-	void mov_ir_a(UINT8 r);
-	void mov_r_a(UINT8 r);
-	void movc_a_iapc(UINT8 r);
-	void mov_c_bitaddr(UINT8 r);
-	void movc_a_iadptr(UINT8 r);
-	void movx_a_idptr(UINT8 r);
-	void movx_a_ir(UINT8 r);
-	void movx_idptr_a(UINT8 r);
-	void movx_ir_a(UINT8 r);
-	void mul_ab(UINT8 r);
-	void nop(UINT8 r);
-	void orl_mem_a(UINT8 r);
-	void orl_mem_byte(UINT8 r);
-	void orl_a_byte(UINT8 r);
-	void orl_a_mem(UINT8 r);
-	void orl_a_ir(UINT8 r);
-	void orl_a_r(UINT8 r);
-	void orl_c_bitaddr(UINT8 r);
-	void orl_c_nbitaddr(UINT8 r);
-	void pop(UINT8 r);
-	void push(UINT8 r);
-	void ret(UINT8 r);
-	void reti(UINT8 r);
-	void rl_a(UINT8 r);
-	void rlc_a(UINT8 r);
-	void rr_a(UINT8 r);
-	void rrc_a(UINT8 r);
-	void setb_c(UINT8 r);
-	void setb_bitaddr(UINT8 r);
-	void sjmp(UINT8 r);
-	void subb_a_byte(UINT8 r);
-	void subb_a_mem(UINT8 r);
-	void subb_a_ir(UINT8 r);
-	void subb_a_r(UINT8 r);
-	void swap_a(UINT8 r);
-	void xch_a_mem(UINT8 r);
-	void xch_a_ir(UINT8 r);
-	void xch_a_r(UINT8 r);
-	void xchd_a_ir(UINT8 r);
-	void xrl_mem_a(UINT8 r);
-	void xrl_mem_byte(UINT8 r);
-	void xrl_a_byte(UINT8 r);
-	void xrl_a_mem(UINT8 r);
-	void xrl_a_ir(UINT8 r);
-	void xrl_a_r(UINT8 r);
-	void illegal(UINT8 r);
-	UINT8 ds5002fp_protected(size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask);
+	void acall(uint8_t r);
+	void add_a_byte(uint8_t r);
+	void add_a_mem(uint8_t r);
+	void add_a_ir(uint8_t r);
+	void add_a_r(uint8_t r);
+	void addc_a_byte(uint8_t r);
+	void addc_a_mem(uint8_t r);
+	void addc_a_ir(uint8_t r);
+	void addc_a_r(uint8_t r);
+	void ajmp(uint8_t r);
+	void anl_mem_a(uint8_t r);
+	void anl_mem_byte(uint8_t r);
+	void anl_a_byte(uint8_t r);
+	void anl_a_mem(uint8_t r);
+	void anl_a_ir(uint8_t r);
+	void anl_a_r(uint8_t r);
+	void anl_c_bitaddr(uint8_t r);
+	void anl_c_nbitaddr(uint8_t r);
+	void cjne_a_byte(uint8_t r);
+	void cjne_a_mem(uint8_t r);
+	void cjne_ir_byte(uint8_t r);
+	void cjne_r_byte(uint8_t r);
+	void clr_bitaddr(uint8_t r);
+	void clr_c(uint8_t r);
+	void clr_a(uint8_t r);
+	void cpl_bitaddr(uint8_t r);
+	void cpl_c(uint8_t r);
+	void cpl_a(uint8_t r);
+	void da_a(uint8_t r);
+	void dec_a(uint8_t r);
+	void dec_mem(uint8_t r);
+	void dec_ir(uint8_t r);
+	void dec_r(uint8_t r);
+	void div_ab(uint8_t r);
+	void djnz_mem(uint8_t r);
+	void djnz_r(uint8_t r);
+	void inc_a(uint8_t r);
+	void inc_mem(uint8_t r);
+	void inc_ir(uint8_t r);
+	void inc_r(uint8_t r);
+	void inc_dptr(uint8_t r);
+	void jb(uint8_t r);
+	void jbc(uint8_t r);
+	void jc(uint8_t r);
+	void jmp_iadptr(uint8_t r);
+	void jnb(uint8_t r);
+	void jnc(uint8_t r);
+	void jnz(uint8_t r);
+	void jz(uint8_t r);
+	void lcall(uint8_t r);
+	void ljmp(uint8_t r);
+	void mov_a_byte(uint8_t r);
+	void mov_a_mem(uint8_t r);
+	void mov_a_ir(uint8_t r);
+	void mov_a_r(uint8_t r);
+	void mov_mem_byte(uint8_t r);
+	void mov_mem_mem(uint8_t r);
+	void mov_ir_byte(uint8_t r);
+	void mov_r_byte(uint8_t r);
+	void mov_mem_ir(uint8_t r);
+	void mov_mem_r(uint8_t r);
+	void mov_dptr_byte(uint8_t r);
+	void mov_bitaddr_c(uint8_t r);
+	void mov_ir_mem(uint8_t r);
+	void mov_r_mem(uint8_t r);
+	void mov_mem_a(uint8_t r);
+	void mov_ir_a(uint8_t r);
+	void mov_r_a(uint8_t r);
+	void movc_a_iapc(uint8_t r);
+	void mov_c_bitaddr(uint8_t r);
+	void movc_a_iadptr(uint8_t r);
+	void movx_a_idptr(uint8_t r);
+	void movx_a_ir(uint8_t r);
+	void movx_idptr_a(uint8_t r);
+	void movx_ir_a(uint8_t r);
+	void mul_ab(uint8_t r);
+	void nop(uint8_t r);
+	void orl_mem_a(uint8_t r);
+	void orl_mem_byte(uint8_t r);
+	void orl_a_byte(uint8_t r);
+	void orl_a_mem(uint8_t r);
+	void orl_a_ir(uint8_t r);
+	void orl_a_r(uint8_t r);
+	void orl_c_bitaddr(uint8_t r);
+	void orl_c_nbitaddr(uint8_t r);
+	void pop(uint8_t r);
+	void push(uint8_t r);
+	void ret(uint8_t r);
+	void reti(uint8_t r);
+	void rl_a(uint8_t r);
+	void rlc_a(uint8_t r);
+	void rr_a(uint8_t r);
+	void rrc_a(uint8_t r);
+	void setb_c(uint8_t r);
+	void setb_bitaddr(uint8_t r);
+	void sjmp(uint8_t r);
+	void subb_a_byte(uint8_t r);
+	void subb_a_mem(uint8_t r);
+	void subb_a_ir(uint8_t r);
+	void subb_a_r(uint8_t r);
+	void swap_a(uint8_t r);
+	void xch_a_mem(uint8_t r);
+	void xch_a_ir(uint8_t r);
+	void xch_a_r(uint8_t r);
+	void xchd_a_ir(uint8_t r);
+	void xrl_mem_a(uint8_t r);
+	void xrl_mem_byte(uint8_t r);
+	void xrl_a_byte(uint8_t r);
+	void xrl_a_mem(uint8_t r);
+	void xrl_a_ir(uint8_t r);
+	void xrl_a_r(uint8_t r);
+	void illegal(uint8_t r);
+	uint8_t ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask);
 
 };
 
@@ -367,21 +367,21 @@ class i8031_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8051_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8751_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -389,39 +389,39 @@ class i8052_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
+	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data) override;
-	virtual UINT8 sfr_read(size_t offset) override;
+	virtual void sfr_write(size_t offset, uint8_t data) override;
+	virtual uint8_t sfr_read(size_t offset) override;
 };
 
 class i8032_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8752_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i80c31_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 
@@ -429,18 +429,18 @@ class i80c51_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 class i87c51_device : public i80c51_device
 {
 public:
 	// construction/destruction
-	i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -448,36 +448,36 @@ class i80c52_device : public i8052_device
 {
 public:
 	// construction/destruction
-	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
+	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data) override;
-	virtual UINT8 sfr_read(size_t offset) override;
+	virtual void sfr_write(size_t offset, uint8_t data) override;
+	virtual uint8_t sfr_read(size_t offset) override;
 };
 
 class i80c32_device : public i80c52_device
 {
 public:
 	// construction/destruction
-	i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i87c52_device : public i80c52_device
 {
 public:
 	// construction/destruction
-	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at89c4051_device : public i80c51_device
 {
 public:
 	// construction/destruction
-	at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 /*
@@ -505,18 +505,18 @@ class ds5002fp_device : public mcs51_cpu_device
 {
 public:
 	// construction/destruction
-	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_mcon(device_t &device, UINT8 mcon) { downcast<ds5002fp_device &>(device).m_ds5002fp.mcon = mcon; }
-	static void set_rpctl(device_t &device, UINT8 rpctl) { downcast<ds5002fp_device &>(device).m_ds5002fp.rpctl = rpctl; }
-	static void set_crc(device_t &device, UINT8 crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
+	static void set_mcon(device_t &device, uint8_t mcon) { downcast<ds5002fp_device &>(device).m_ds5002fp.mcon = mcon; }
+	static void set_rpctl(device_t &device, uint8_t rpctl) { downcast<ds5002fp_device &>(device).m_ds5002fp.rpctl = rpctl; }
+	static void set_crc(device_t &device, uint8_t crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data) override;
-	virtual UINT8 sfr_read(size_t offset) override;
+	virtual void sfr_write(size_t offset, uint8_t data) override;
+	virtual uint8_t sfr_read(size_t offset) override;
 };
 
 

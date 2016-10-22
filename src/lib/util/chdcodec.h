@@ -36,7 +36,7 @@
 class chd_file;
 
 // base types
-typedef UINT32 chd_codec_type;
+typedef uint32_t chd_codec_type;
 
 
 // ======================> chd_codec
@@ -46,7 +46,7 @@ class chd_codec
 {
 protected:
 	// can't create these directly
-	chd_codec(chd_file &file, UINT32 hunkbytes, bool lossy);
+	chd_codec(chd_file &file, uint32_t hunkbytes, bool lossy);
 
 public:
 	// allow public deletion
@@ -54,7 +54,7 @@ public:
 
 	// accessors
 	chd_file &chd() const { return m_chd; }
-	UINT32 hunkbytes() const { return m_hunkbytes; }
+	uint32_t hunkbytes() const { return m_hunkbytes; }
 	bool lossy() const { return m_lossy; }
 
 	// implementation
@@ -63,7 +63,7 @@ public:
 private:
 	// internal state
 	chd_file &          m_chd;
-	UINT32              m_hunkbytes;
+	uint32_t              m_hunkbytes;
 	bool                m_lossy;
 };
 
@@ -75,11 +75,11 @@ class chd_compressor : public chd_codec
 {
 protected:
 	// can't create these directly
-	chd_compressor(chd_file &file, UINT32 hunkbytes, bool lossy);
+	chd_compressor(chd_file &file, uint32_t hunkbytes, bool lossy);
 
 public:
 	// implementation
-	virtual UINT32 compress(const UINT8 *src, UINT32 srclen, UINT8 *dest) = 0;
+	virtual uint32_t compress(const uint8_t *src, uint32_t srclen, uint8_t *dest) = 0;
 };
 
 
@@ -90,11 +90,11 @@ class chd_decompressor : public chd_codec
 {
 protected:
 	// can't create these directly
-	chd_decompressor(chd_file &file, UINT32 hunkbytes, bool lossy);
+	chd_decompressor(chd_file &file, uint32_t hunkbytes, bool lossy);
 
 public:
 	// implementation
-	virtual void decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen) = 0;
+	virtual void decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen) = 0;
 };
 
 
@@ -119,18 +119,18 @@ private:
 		chd_codec_type      m_type;
 		bool                m_lossy;
 		const char *        m_name;
-		chd_compressor *    (*m_construct_compressor)(chd_file &, UINT32, bool);
-		chd_decompressor *  (*m_construct_decompressor)(chd_file &, UINT32, bool);
+		chd_compressor *    (*m_construct_compressor)(chd_file &, uint32_t, bool);
+		chd_decompressor *  (*m_construct_decompressor)(chd_file &, uint32_t, bool);
 	};
 
 	// internal helper functions
 	static const codec_entry *find_in_list(chd_codec_type type);
 
 	template<class _CompressorClass>
-	static chd_compressor *construct_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy) { return new _CompressorClass(chd, hunkbytes, lossy); }
+	static chd_compressor *construct_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy) { return new _CompressorClass(chd, hunkbytes, lossy); }
 
 	template<class _DecompressorClass>
-	static chd_decompressor *construct_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy) { return new _DecompressorClass(chd, hunkbytes, lossy); }
+	static chd_decompressor *construct_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy) { return new _DecompressorClass(chd, hunkbytes, lossy); }
 
 	// the static list
 	static const codec_entry s_codec_list[];
@@ -148,16 +148,16 @@ public:
 	~chd_compressor_group();
 
 	// find the best compressor
-	INT8 find_best_compressor(const UINT8 *src, UINT8 *compressed, UINT32 &complen);
+	int8_t find_best_compressor(const uint8_t *src, uint8_t *compressed, uint32_t &complen);
 
 private:
 	// internal state
-	UINT32                  m_hunkbytes;        // number of bytes in a hunk
+	uint32_t                  m_hunkbytes;        // number of bytes in a hunk
 	chd_compressor *        m_compressor[4];    // array of active codecs
-	std::vector<UINT8>          m_compress_test;    // test buffer for compression
+	std::vector<uint8_t>          m_compress_test;    // test buffer for compression
 #if CHDCODEC_VERIFY_COMPRESSION
 	chd_decompressor *      m_decompressor[4];  // array of active codecs
-	std::vector<UINT8>          m_decompressed;     // verification buffer
+	std::vector<uint8_t>          m_decompressed;     // verification buffer
 #endif
 };
 

@@ -101,7 +101,7 @@ machine_config_constructor abc_sio_device::device_mconfig_additions() const
 //  abc_sio_device - constructor
 //-------------------------------------------------
 
-abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ABC_SIO, "ABC SIO", tag, owner, clock, "abcsio", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),
@@ -138,7 +138,7 @@ void abc_sio_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_sio_device::abcbus_cs(UINT8 data)
+void abc_sio_device::abcbus_cs(uint8_t data)
 {
 }
 
@@ -147,9 +147,9 @@ void abc_sio_device::abcbus_cs(UINT8 data)
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-UINT8 abc_sio_device::abcbus_xmemfl(offs_t offset)
+uint8_t abc_sio_device::abcbus_xmemfl(offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
 	{

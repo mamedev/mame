@@ -72,7 +72,7 @@ machine_config_constructor al_magicsound_device::device_mconfig_additions() cons
 //  LIVE DEVICE
 //**************************************************************************
 
-al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AL_MAGICSOUND, "Magic Sound Board", tag, owner, clock, "al_magicsound", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_dac(*this,"dac"),
@@ -142,8 +142,8 @@ WRITE8_MEMBER(al_magicsound_device::volume_w)
 
 WRITE8_MEMBER(al_magicsound_device::mapper_w)
 {
-	UINT8 channel = (offset & 0x0c) >> 2;
-	UINT8 page = offset & 0x03;
+	uint8_t channel = (offset & 0x0c) >> 2;
+	uint8_t page = offset & 0x03;
 	m_page[channel][page] = (~(data) & 0x3f) * 0x4000;
 	set_timer_gate(true);
 }
@@ -167,8 +167,8 @@ WRITE_LINE_MEMBER(al_magicsound_device::sam3_w) { m_current_channel = 3; if(m_da
 
 READ8_MEMBER(al_magicsound_device::dma_read_byte)
 {
-	UINT8 ret = 0xff;
-	UINT8 page = (offset & 0xc000) >> 14;
+	uint8_t ret = 0xff;
+	uint8_t page = (offset & 0xc000) >> 14;
 
 	if(m_current_channel != -1)
 		ret = m_ramptr->read(m_page[m_current_channel][page] + (offset & 0x3fff));

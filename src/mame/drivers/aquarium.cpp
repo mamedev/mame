@@ -78,9 +78,9 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 	membank("bank1")->set_entry(data & 0x7);
 }
 
-UINT8 aquarium_state::aquarium_snd_bitswap( UINT8 scrambled_data )
+uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= ((scrambled_data & 0x01) << 7);
 	data |= ((scrambled_data & 0x02) << 5);
@@ -244,13 +244,13 @@ static const gfx_layout tilelayout =
 
 DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	/* The BG tiles are 5bpp, this rearranges the data from
 	   the roms containing the 1bpp data so we can decode it
 	   correctly */
-	UINT8 *DAT2 = memregion("gfx1")->base() + 0x080000;
-	UINT8 *DAT = memregion("user1")->base();
+	uint8_t *DAT2 = memregion("gfx1")->base() + 0x080000;
+	uint8_t *DAT = memregion("user1")->base();
 	int len = 0x0200000;
 
 	for (len = 0; len < 0x020000; len++)

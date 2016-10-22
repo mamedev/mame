@@ -61,7 +61,7 @@ const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
 // apollo_kbd_device - constructor
 //-------------------------------------------------
 
-apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_tx_w(*this),
@@ -269,7 +269,7 @@ void apollo_kbd_device::mouse::read_mouse()
 		}
 		else if (b != m_last_b || x != m_last_x || y != m_last_y)
 		{
-			UINT8 mouse_data[4];
+			uint8_t mouse_data[4];
 			int mouse_data_size;
 
 			int dx = x - m_last_x;
@@ -321,7 +321,7 @@ int apollo_kbd_device::keyboard_is_german()
 	return (m_german_r() == ASSERT_LINE) ? true : false;
 }
 
-void apollo_kbd_device::set_mode(UINT16 mode)
+void apollo_kbd_device::set_mode(uint16_t mode)
 {
 	xmit_char(0xff);
 	xmit_char(mode);
@@ -348,7 +348,7 @@ void apollo_kbd_device::tra_complete()    // Tx completed sending byte
 void apollo_kbd_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-	UINT8 data = get_received_char();
+	uint8_t data = get_received_char();
 
 	kgetchar(data);
 }
@@ -359,11 +359,11 @@ void apollo_kbd_device::tra_callback()    // Tx send bit
 	m_tx_w(bit);
 }
 
-void apollo_kbd_device::input_callback(UINT8 state)
+void apollo_kbd_device::input_callback(uint8_t state)
 {
 }
 
-void apollo_kbd_device::xmit_char(UINT8 data)
+void apollo_kbd_device::xmit_char(uint8_t data)
 {
 	// if tx is busy it'll pick this up automatically when it completes
 	if (!m_tx_busy)
@@ -386,7 +386,7 @@ void apollo_kbd_device::xmit_char(UINT8 data)
  putdata - put keyboard data to sio
  -------------------------------------------------*/
 
-void apollo_kbd_device::putdata(const UINT8 *data, int data_length)
+void apollo_kbd_device::putdata(const uint8_t *data, int data_length)
 {
 	// send data only if no real Apollo keyboard has been connected
 	if (m_mode > KBD_MODE_1_KEYSTATE)
@@ -406,12 +406,12 @@ void apollo_kbd_device::putdata(const UINT8 *data, int data_length)
 
 void apollo_kbd_device::putstring(const char *data)
 {
-	putdata((UINT8 *) data, strlen(data));
+	putdata((uint8_t *) data, strlen(data));
 }
 
-void apollo_kbd_device::kgetchar(UINT8 data)
+void apollo_kbd_device::kgetchar(uint8_t data)
 {
-	static const UINT8 ff1116_data[] = { 0x00, 0xff, 0x00 };
+	static const uint8_t ff1116_data[] = { 0x00, 0xff, 0x00 };
 
 	LOG1(("getchar <- %02x", data));
 
@@ -502,15 +502,15 @@ void apollo_kbd_device::kgetchar(UINT8 data)
 	}
 }
 
-int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
+int apollo_kbd_device::push_scancode(uint8_t code, uint8_t repeat)
 {
 	int n_chars = 0;
-	UINT16 key_code = 0;
-	UINT8 caps = BIT(machine().root_device().ioport("keyboard4")->read(),0);
-	UINT8 shift = BIT(machine().root_device().ioport("keyboard4")->read(),1) | BIT(machine().root_device().ioport("keyboard4")->read(),5);
-	UINT8 ctrl = BIT(machine().root_device().ioport("keyboard4")->read(),2);
-	UINT8 numlock = BIT(machine().root_device().ioport("keyboard4")->read(),6);
-	UINT16 index;
+	uint16_t key_code = 0;
+	uint8_t caps = BIT(machine().root_device().ioport("keyboard4")->read(),0);
+	uint8_t shift = BIT(machine().root_device().ioport("keyboard4")->read(),1) | BIT(machine().root_device().ioport("keyboard4")->read(),5);
+	uint8_t ctrl = BIT(machine().root_device().ioport("keyboard4")->read(),2);
+	uint8_t numlock = BIT(machine().root_device().ioport("keyboard4")->read(),6);
+	uint16_t index;
 
 	if (keyboard_is_german())
 	{
@@ -672,7 +672,7 @@ TIMER_CALLBACK_MEMBER(apollo_kbd_device::kbd_scan_timer)
 	}
 }
 
-UINT16 apollo_kbd_device::m_code_table[] = {
+uint16_t apollo_kbd_device::m_code_table[] = {
 		/* Key   | Keycap      | Down | Up  |Unshifted|Shifted|Control|Caps Lock|Up Trans|Auto  */
 		/* Number| Legend      | Code | Code|Code     | Code  | Code  |Code     | Code   |Repeat*/
 

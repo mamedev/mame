@@ -17,7 +17,7 @@ class msx_cart_sfg : public device_t
 					, public msx_cart_interface
 {
 public:
-	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -38,7 +38,7 @@ private:
 	required_device<ym2148_device> m_ym2148;
 	int m_ym2151_irq_state;
 	int m_ym2148_irq_state;
-	UINT32 m_rom_mask;
+	uint32_t m_rom_mask;
 
 	void check_irq();
 };
@@ -47,7 +47,7 @@ private:
 class msx_cart_sfg01 : public msx_cart_sfg
 {
 public:
-	msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -56,7 +56,7 @@ public:
 class msx_cart_sfg05 : public msx_cart_sfg
 {
 public:
-	msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };

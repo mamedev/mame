@@ -56,12 +56,12 @@ public:
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
-	const UINT8 *m_p_chargen;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -88,7 +88,7 @@ READ8_MEMBER( cd2650_state::cass_r )
 
 READ8_MEMBER( cd2650_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = ret | 0x80;
 	return ret;
 }
@@ -122,22 +122,22 @@ void cd2650_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
     Further, the letters have bit 6 set low, thus the range is 01 to 1A.
     When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
-	UINT16 offset = 0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,x,mem;
+	uint16_t offset = 0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,x,mem;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{
@@ -212,7 +212,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	}
 	else
 	{
-		std::vector<UINT8> quick_data(quick_length);
+		std::vector<uint8_t> quick_data(quick_length);
 		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{

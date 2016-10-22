@@ -16,7 +16,7 @@ All rights reserved.
 
 */
 
-unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag);
+unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag);
 
 
 #endif /* __G65816DS_H__ */

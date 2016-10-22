@@ -27,7 +27,7 @@ class bbc_opusfdc_device:
 {
 public:
 	// construction/destruction
-	bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -54,7 +54,7 @@ private:
 class bbc_opus2791_device : public bbc_opusfdc_device
 {
 public:
-	bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -63,7 +63,7 @@ public:
 class bbc_opus2793_device : public bbc_opusfdc_device
 {
 public:
-	bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -72,7 +72,7 @@ public:
 class bbc_opus1770_device : public bbc_opusfdc_device
 {
 public:
-	bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

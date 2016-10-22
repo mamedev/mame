@@ -70,7 +70,7 @@ class i960_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// call from any read/write handler for a memory area that can't be bursted
 	// on the real hardware (e.g. Model 2's interrupt control registers)
@@ -84,10 +84,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
-	virtual UINT32 execute_max_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
-	virtual UINT32 execute_input_lines() const override { return 4; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xffffffff; }
+	virtual uint32_t execute_min_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
+	virtual uint32_t execute_max_cycles() const override { return 1; } /* ???? TODO: Exact timing unknown */
+	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xffffffff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -98,29 +98,29 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
-	UINT32 m_r[0x20];
-	UINT32 m_rcache[I960_RCACHE_SIZE][0x10];
-	UINT32 m_rcache_frame_addr[I960_RCACHE_SIZE];
+	uint32_t m_r[0x20];
+	uint32_t m_rcache[I960_RCACHE_SIZE][0x10];
+	uint32_t m_rcache_frame_addr[I960_RCACHE_SIZE];
 	// rcache_pos = how deep in the stack we are.  0-(I960_RCACHE_SIZE-1) means in-cache.
 	// I960_RCACHE_SIZE or greater means out of cache, must save to memory.
-	INT32 m_rcache_pos;
+	int32_t m_rcache_pos;
 
 	double m_fp[4];
 
-	UINT32 m_SAT;
-	UINT32 m_PRCB;
-	UINT32 m_PC;
-	UINT32 m_AC;
-	UINT32 m_IP;
-	UINT32 m_PIP;
-	UINT32 m_ICR;
+	uint32_t m_SAT;
+	uint32_t m_PRCB;
+	uint32_t m_PC;
+	uint32_t m_AC;
+	uint32_t m_IP;
+	uint32_t m_PIP;
+	uint32_t m_ICR;
 	int m_bursting;
 
 	int m_immediate_irq;
@@ -132,40 +132,40 @@ private:
 
 	int m_icount;
 
-	UINT32 i960_read_dword_unaligned(UINT32 address);
-	UINT16 i960_read_word_unaligned(UINT32 address);
-	void i960_write_dword_unaligned(UINT32 address, UINT32 data);
-	void i960_write_word_unaligned(UINT32 address, UINT16 data);
-	void send_iac(UINT32 adr);
-	UINT32 get_ea(UINT32 opcode);
-	UINT32 get_1_ri(UINT32 opcode);
-	UINT32 get_2_ri(UINT32 opcode);
-	UINT64 get_2_ri64(UINT32 opcode);
-	void set_ri(UINT32 opcode, UINT32 val);
-	void set_ri2(UINT32 opcode, UINT32 val, UINT32 val2);
-	void set_ri64(UINT32 opcode, UINT64 val);
-	double get_1_rif(UINT32 opcode);
-	double get_2_rif(UINT32 opcode);
-	void set_rif(UINT32 opcode, double val);
-	double get_1_rifl(UINT32 opcode);
-	double get_2_rifl(UINT32 opcode);
-	void set_rifl(UINT32 opcode, double val);
-	UINT32 get_1_ci(UINT32 opcode);
-	UINT32 get_2_ci(UINT32 opcode);
-	UINT32 get_disp(UINT32 opcode);
-	UINT32 get_disp_s(UINT32 opcode);
-	void cmp_s(INT32 v1, INT32 v2);
-	void cmp_u(UINT32 v1, UINT32 v2);
-	void concmp_s(INT32 v1, INT32 v2);
-	void concmp_u(UINT32 v1, UINT32 v2);
+	uint32_t i960_read_dword_unaligned(uint32_t address);
+	uint16_t i960_read_word_unaligned(uint32_t address);
+	void i960_write_dword_unaligned(uint32_t address, uint32_t data);
+	void i960_write_word_unaligned(uint32_t address, uint16_t data);
+	void send_iac(uint32_t adr);
+	uint32_t get_ea(uint32_t opcode);
+	uint32_t get_1_ri(uint32_t opcode);
+	uint32_t get_2_ri(uint32_t opcode);
+	uint64_t get_2_ri64(uint32_t opcode);
+	void set_ri(uint32_t opcode, uint32_t val);
+	void set_ri2(uint32_t opcode, uint32_t val, uint32_t val2);
+	void set_ri64(uint32_t opcode, uint64_t val);
+	double get_1_rif(uint32_t opcode);
+	double get_2_rif(uint32_t opcode);
+	void set_rif(uint32_t opcode, double val);
+	double get_1_rifl(uint32_t opcode);
+	double get_2_rifl(uint32_t opcode);
+	void set_rifl(uint32_t opcode, double val);
+	uint32_t get_1_ci(uint32_t opcode);
+	uint32_t get_2_ci(uint32_t opcode);
+	uint32_t get_disp(uint32_t opcode);
+	uint32_t get_disp_s(uint32_t opcode);
+	void cmp_s(int32_t v1, int32_t v2);
+	void cmp_u(uint32_t v1, uint32_t v2);
+	void concmp_s(int32_t v1, int32_t v2);
+	void concmp_u(uint32_t v1, uint32_t v2);
 	void cmp_d(double v1, double v2);
-	void bxx(UINT32 opcode, int mask);
-	void bxx_s(UINT32 opcode, int mask);
-	void test(UINT32 opcode, int mask);
-	void execute_op(UINT32 opcode);
+	void bxx(uint32_t opcode, int mask);
+	void bxx_s(uint32_t opcode, int mask);
+	void test(uint32_t opcode, int mask);
+	void execute_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);
 	void check_irqs();
-	void do_call(UINT32 adr, int type, UINT32 stack);
+	void do_call(uint32_t adr, int type, uint32_t stack);
 	void do_ret_0();
 	void do_ret();
 };

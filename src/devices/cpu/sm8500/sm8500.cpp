@@ -27,12 +27,12 @@ they are internally.
 const device_type SM8500 = &device_creator<sm8500_cpu_device>;
 
 
-static const UINT8 sm8500_b2w[8] = {
+static const uint8_t sm8500_b2w[8] = {
 		0, 8, 2, 10, 4, 12, 6, 14
 };
 
 
-sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SM8500, "SM8500", tag, owner, clock, "sm8500", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_dma_func(*this)
@@ -53,7 +53,7 @@ void sm8500_cpu_device::get_sp()
 }
 
 
-UINT8 sm8500_cpu_device::mem_readbyte( UINT32 offset ) const
+uint8_t sm8500_cpu_device::mem_readbyte( uint32_t offset ) const
 {
 	offset &= 0xffff;
 	if ( offset < 0x10)
@@ -65,9 +65,9 @@ UINT8 sm8500_cpu_device::mem_readbyte( UINT32 offset ) const
 }
 
 
-void sm8500_cpu_device::mem_writebyte( UINT32 offset, UINT8 data )
+void sm8500_cpu_device::mem_writebyte( uint32_t offset, uint8_t data )
 {
-	UINT8 i;
+	uint8_t i;
 	offset &= 0xffff;
 	if (offset < 0x10)
 	{
@@ -227,7 +227,7 @@ void sm8500_cpu_device::device_reset()
 			mem_writebyte( m_SP, X );
 
 
-void sm8500_cpu_device::take_interrupt(UINT16 vector)
+void sm8500_cpu_device::take_interrupt(uint16_t vector)
 {
 	/* Get regs from ram */
 	get_sp();
@@ -341,7 +341,7 @@ void sm8500_cpu_device::process_interrupts()
 }
 
 
-offs_t sm8500_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sm8500_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sm8500 );
 	return CPU_DISASSEMBLE_NAME(sm8500)(this, buffer, pc, oprom, opram, options);
@@ -353,16 +353,16 @@ void sm8500_cpu_device::execute_run()
 	do
 	{
 		int     mycycles = 0;
-		UINT8   r1,r2;
-		UINT16  s1,s2;
-		UINT32  d1,d2;
-		UINT32  res;
+		uint8_t   r1,r2;
+		uint16_t  s1,s2;
+		uint32_t  d1,d2;
+		uint32_t  res;
 
 		debugger_instruction_hook(this, m_PC);
 		m_oldpc = m_PC;
 		process_interrupts();
 		if ( !m_halted ) {
-			UINT8 op = mem_readbyte( m_PC++ );
+			uint8_t op = mem_readbyte( m_PC++ );
 			m_SYS = m_program->read_byte(0x19);
 			m_PS0 = m_program->read_byte(0x1e);
 			m_PS1 = m_program->read_byte(0x1f);

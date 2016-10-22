@@ -21,11 +21,11 @@
 
 PALETTE_INIT_MEMBER(m52_state, m52)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	const UINT8 *char_pal = color_prom + 0x000;
-	const UINT8 *back_pal = color_prom + 0x200;
-	const UINT8 *sprite_pal = color_prom + 0x220;
-	const UINT8 *sprite_table = color_prom + 0x240;
+	const uint8_t *color_prom = memregion("proms")->base();
+	const uint8_t *char_pal = color_prom + 0x000;
+	const uint8_t *back_pal = color_prom + 0x200;
+	const uint8_t *sprite_pal = color_prom + 0x220;
+	const uint8_t *sprite_table = color_prom + 0x240;
 	static const int resistances_3[3] = { 1000, 470, 220 };
 	static const int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
@@ -40,7 +40,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 	/* character palette */
 	for (i = 0; i < 512; i++)
 	{
-		UINT8 promval = char_pal[i];
+		uint8_t promval = char_pal[i];
 		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 	/* background palette */
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 promval = back_pal[i];
+		uint8_t promval = back_pal[i];
 		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
@@ -68,7 +68,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 	/* sprite palette */
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 promval = sprite_pal[i];
+		uint8_t promval = sprite_pal[i];
 		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
@@ -83,7 +83,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 	/* sprite lookup table */
 	for (i = 0; i < 16 * 4; i++)
 	{
-		UINT8 promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
+		uint8_t promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
 		palette.set_pen_indirect(512 + i, 512 + 32 + promval);
 	}
 
@@ -117,8 +117,8 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 
 TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 {
-	UINT8 video = m_videoram[tile_index];
-	UINT8 color = m_colorram[tile_index];
+	uint8_t video = m_videoram[tile_index];
+	uint8_t color = m_colorram[tile_index];
 
 	int flag = 0;
 	int code = 0;
@@ -348,7 +348,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
  *
  *************************************/
 
-UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

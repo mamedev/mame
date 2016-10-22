@@ -34,7 +34,7 @@ class comx_eb_device : public device_t,
 {
 public:
 	// construction/destruction
-	comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( slot1_irq_w ) { m_irq[0] = state; set_irq(); }
 	DECLARE_WRITE_LINE_MEMBER( slot2_irq_w ) { m_irq[1] = state; set_irq(); }
@@ -53,10 +53,10 @@ protected:
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r() override;
 	virtual void comx_q_w(int state) override;
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 comx_io_r(address_space &space, offs_t offset) override;
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t comx_io_r(address_space &space, offs_t offset) override;
+	virtual void comx_io_w(address_space &space, offs_t offset, uint8_t data) override;
 
 	void set_irq() { m_slot->irq_w(m_irq[0] || m_irq[1] || m_irq[2] || m_irq[3]); }
 
@@ -66,7 +66,7 @@ private:
 	comx_expansion_slot_device  *m_expansion_slot[MAX_EB_SLOTS];
 	int m_irq[MAX_EB_SLOTS];
 
-	UINT8 m_select;
+	uint8_t m_select;
 };
 
 

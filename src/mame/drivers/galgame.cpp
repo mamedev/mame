@@ -24,18 +24,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	UINT16 m_clk;
+	uint16_t m_clk;
 
-	UINT16 m_x;
-	UINT16 m_y;
+	uint16_t m_x;
+	uint16_t m_y;
 
-	INT16 m_mq;
-	INT16 m_ac;
+	int16_t m_mq;
+	int16_t m_ac;
 
 	struct
 	{
-		UINT16 x;
-		UINT16 y;
+		uint16_t x;
+		uint16_t y;
 	} m_point_work_list[MAX_POINTS], m_point_display_list[MAX_POINTS];
 
 	int m_point_work_list_index;
@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE16_MEMBER(clk_w);
 	DECLARE_DRIVER_INIT(galaxygame);
 	virtual void machine_reset() override;
-	UINT32 screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ public:
 
 READ16_MEMBER(galaxygame_state::ke_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	switch( offset )
 	{
@@ -97,9 +97,9 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 			{
 				if ( data != 0 )
 				{
-					INT32 dividend = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
-					m_mq = dividend / (INT16)data;
-					m_ac = dividend % (INT16)data;
+					int32_t dividend = (int32_t)((uint32_t)((uint16_t)m_ac << 16) | (uint16_t)(m_mq));
+					m_mq = dividend / (int16_t)data;
+					m_ac = dividend % (int16_t)data;
 				}
 				else
 				{
@@ -109,10 +109,10 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 			}
 			break;
 		case 1: // AC
-			m_ac = (INT16)data;
+			m_ac = (int16_t)data;
 			break;
 		case 2: // MQ
-			m_mq = (INT16)data;
+			m_mq = (int16_t)data;
 			if (m_mq < 0)
 			{
 				m_ac = -1;
@@ -124,7 +124,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 			break;
 		case 3: // X
 			{
-				INT32 mulres = (INT32)m_mq*(INT32)(INT16)data;
+				int32_t mulres = (int32_t)m_mq*(int32_t)(int16_t)data;
 				m_ac = mulres >> 16;
 				m_mq = mulres & 0xffff;
 			}
@@ -132,7 +132,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 		case 6: // LSH
 			{
 				data &= 63;
-				INT32 val = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
+				int32_t val = (int32_t)((uint32_t)((uint16_t)m_ac << 16) | (uint16_t)(m_mq));
 				if ( data < 32 )
 				{
 					val = val << data;
@@ -148,7 +148,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 		case 7: // ASH
 			{
 				data &= 63;
-				INT32 val = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
+				int32_t val = (int32_t)((uint32_t)((uint16_t)m_ac << 16) | (uint16_t)(m_mq));
 				if ( data < 32 )
 				{
 					val = val << data;
@@ -174,7 +174,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
  *
  *************************************/
 
-UINT32 galaxygame_state::screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaxygame_state::screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	for (int i = 0; i < m_point_display_list_index; i++ )
@@ -351,7 +351,7 @@ ROM_END
  *
  *************************************/
 
-static UINT8 read_uint16(UINT16 *pval, int pos, const UINT8* line, int linelen)
+static uint8_t read_uint16(uint16_t *pval, int pos, const uint8_t* line, int linelen)
 {
 	int i;
 
@@ -369,7 +369,7 @@ static UINT8 read_uint16(UINT16 *pval, int pos, const UINT8* line, int linelen)
 	return 1;
 }
 
-static UINT8 read_uint8(UINT8 *pval, int pos, const UINT8* line, int linelen)
+static uint8_t read_uint8(uint8_t *pval, int pos, const uint8_t* line, int linelen)
 {
 	int i;
 
@@ -390,13 +390,13 @@ static UINT8 read_uint8(UINT8 *pval, int pos, const UINT8* line, int linelen)
 DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	UINT8 *code = memregion("code")->base();
+	uint8_t *code = memregion("code")->base();
 
 	int filepos = 0, linepos, linelen;
-	UINT8 line[256];
-	UINT16 address;
-	UINT16 val;
-	UINT8 val8;
+	uint8_t line[256];
+	uint16_t address;
+	uint16_t val;
+	uint8_t val8;
 
 	//load lst file
 	while( code[filepos] != 0 )

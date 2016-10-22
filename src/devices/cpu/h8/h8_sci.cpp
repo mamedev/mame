@@ -15,7 +15,7 @@ const device_type H8_SCI = &device_creator<h8_sci_device>;
 
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 
-h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_SCI, "H8 Serial Communications Interface", tag, owner, clock, "h8_sci", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER),
 	tx_cb(*this),
@@ -95,7 +95,7 @@ WRITE8_MEMBER(h8_sci_device::scr_w)
 						data & SCR_CKE,
 						cpu->pc());
 
-	UINT8 delta = scr ^ data;
+	uint8_t delta = scr ^ data;
 	scr = data;
 	clock_update();
 
@@ -356,15 +356,15 @@ WRITE_LINE_MEMBER(h8_sci_device::clk_w)
 	}
 }
 
-UINT64 h8_sci_device::internal_update(UINT64 current_time)
+uint64_t h8_sci_device::internal_update(uint64_t current_time)
 {
-	UINT64 event = 0;
+	uint64_t event = 0;
 	switch(clock_mode) {
 	case CLKM_INTERNAL_SYNC_OUT:
 		if(clock_state || !clock_value) {
-			UINT64 fp = divider*2;
+			uint64_t fp = divider*2;
 			if(current_time >= clock_base) {
-				UINT64 delta = current_time - clock_base;
+				uint64_t delta = current_time - clock_base;
 				if(delta >= fp) {
 					delta -= fp;
 					clock_base += fp;
@@ -392,9 +392,9 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 	case CLKM_INTERNAL_ASYNC:
 	case CLKM_INTERNAL_ASYNC_OUT:
 		if(clock_state || !clock_value) {
-			UINT64 fp = divider*16;
+			uint64_t fp = divider*16;
 			if(current_time >= clock_base) {
-				UINT64 delta = current_time - clock_base;
+				uint64_t delta = current_time - clock_base;
 				if(delta >= fp) {
 					delta -= fp;
 					clock_base += fp;
@@ -421,9 +421,9 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 
 	case CLKM_EXTERNAL_RATE_SYNC:
 		if(clock_state || !clock_value) {
-			UINT64 ctime = UINT64(current_time*internal_to_external_ratio*2);
+			uint64_t ctime = uint64_t(current_time*internal_to_external_ratio*2);
 			if(ctime >= clock_base) {
-				UINT64 delta = ctime - clock_base;
+				uint64_t delta = ctime - clock_base;
 				clock_base += delta & ~1;
 				delta &= 1;
 				bool new_clock = delta >= 1;
@@ -439,15 +439,15 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 				}
 			}
 
-			event = UINT64((clock_base + (clock_value ? 2 : 1))*external_to_internal_ratio)+1;
+			event = uint64_t((clock_base + (clock_value ? 2 : 1))*external_to_internal_ratio)+1;
 		}
 		break;
 
 	case CLKM_EXTERNAL_RATE_ASYNC:
 		if(clock_state || !clock_value) {
-			UINT64 ctime = UINT64(current_time*internal_to_external_ratio);
+			uint64_t ctime = uint64_t(current_time*internal_to_external_ratio);
 			if(ctime >= clock_base) {
-				UINT64 delta = ctime - clock_base;
+				uint64_t delta = ctime - clock_base;
 				clock_base += delta & ~15;
 				delta &= 15;
 				bool new_clock = delta >= 8;
@@ -463,7 +463,7 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 				}
 			}
 
-			event = UINT64((clock_base + (clock_value ? 16 : 8))*external_to_internal_ratio)+1;
+			event = uint64_t((clock_base + (clock_value ? 16 : 8))*external_to_internal_ratio)+1;
 		}
 		break;
 
@@ -503,13 +503,13 @@ void h8_sci_device::clock_start(int mode)
 
 		case CLKM_EXTERNAL_RATE_ASYNC:
 			if(V>=2) logerror("Simulating external clock async\n");
-			clock_base = UINT64(cpu->total_cycles()*internal_to_external_ratio);
+			clock_base = uint64_t(cpu->total_cycles()*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 
 		case CLKM_EXTERNAL_RATE_SYNC:
 			if(V>=2) logerror("Simulating external clock sync\n");
-			clock_base = UINT64(cpu->total_cycles()*2*internal_to_external_ratio);
+			clock_base = uint64_t(cpu->total_cycles()*2*internal_to_external_ratio);
 			cpu->internal_update();
 			break;
 

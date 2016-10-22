@@ -78,7 +78,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 class object
 {
 public:
-	object(device_t &device, UINT16 *oam, int index)
+	object(device_t &device, uint16_t *oam, int index)
 		: m_device(device)
 	{
 		m_attr0 = oam[(4 * index) + 0];
@@ -89,7 +89,7 @@ public:
 	int    pos_y()       { return  m_attr0 & 0x00ff; }
 	bool   roz()         { return  m_attr0 & 0x0100; }
 	bool   roz_double()  { return  m_attr0 & 0x0200; }
-	UINT16 mode_mask()   { return  m_attr0 & 0x0c00; }
+	uint16_t mode_mask()   { return  m_attr0 & 0x0c00; }
 	bool   mosaic()      { return  m_attr0 & 0x1000; }
 	bool   palette_256() { return  m_attr0 & 0x2000; }
 
@@ -102,7 +102,7 @@ public:
 	int    priority()    { return (m_attr2 & 0x0c00) >> 10; }
 	int    palette()     { return (m_attr2 & 0xf000) >> 8; }
 
-	enum class mode : UINT16
+	enum class mode : uint16_t
 	{
 		normal = 0x0000,
 		alpha  = 0x0400,
@@ -133,14 +133,14 @@ public:
 private:
 	device_t &m_device;
 
-	UINT16 m_attr0;
-	UINT16 m_attr1;
-	UINT16 m_attr2;
+	uint16_t m_attr0;
+	uint16_t m_attr1;
+	uint16_t m_attr2;
 };
 
 const device_type GBA_LCD = &device_creator<gba_lcd_device>;
 
-gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_int_hblank_cb(*this)
@@ -151,9 +151,9 @@ gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-inline UINT8 gba_lcd_device::bg_video_mode()
+inline uint8_t gba_lcd_device::bg_video_mode()
 {
-	UINT8 mode = DISPCNT & 0x0007;
+	uint8_t mode = DISPCNT & 0x0007;
 
 	if (mode > 5)
 	{
@@ -184,27 +184,27 @@ inline bool gba_lcd_device::is_set(dispstat flag)
 	return DISPSTAT & underlying_value(flag);
 }
 
-inline bool gba_lcd_device::is_set(UINT16 bgxcnt, bgcnt flag)
+inline bool gba_lcd_device::is_set(uint16_t bgxcnt, bgcnt flag)
 {
 	return bgxcnt & underlying_value(flag);
 }
 
-inline UINT8 gba_lcd_device::bg_priority(UINT16 bgxcnt)
+inline uint8_t gba_lcd_device::bg_priority(uint16_t bgxcnt)
 {
 	return bgxcnt & 0x0003;
 }
 
-inline UINT32 gba_lcd_device::bg_char_base(UINT16 bgxcnt)
+inline uint32_t gba_lcd_device::bg_char_base(uint16_t bgxcnt)
 {
 	return ((bgxcnt & 0x003c) >> 2) * 0x4000;
 }
 
-inline UINT32 gba_lcd_device::bg_screen_base(UINT16 bgxcnt)
+inline uint32_t gba_lcd_device::bg_screen_base(uint16_t bgxcnt)
 {
 	return ((bgxcnt & 0x1f00) >> 8) * 0x800;
 }
 
-inline void gba_lcd_device::bg_screen_size(UINT16 bgxcnt, bool text, int &width, int &height)
+inline void gba_lcd_device::bg_screen_size(uint16_t bgxcnt, bool text, int &width, int &height)
 {
 	static const int size_table[2][4][2] =
 	{
@@ -219,7 +219,7 @@ inline void gba_lcd_device::bg_screen_size(UINT16 bgxcnt, bool text, int &width,
 	height = size_table[mode][size][1];
 }
 
-inline UINT16 gba_lcd_device::mosaic_size(size_type type)
+inline uint16_t gba_lcd_device::mosaic_size(size_type type)
 {
 	return ((MOSAIC >> (4 * underlying_value(type))) & 0xf) + 1;
 }
@@ -229,12 +229,12 @@ inline gba_lcd_device::sfx gba_lcd_device::color_sfx()
 	return enum_value<sfx>(BLDCNT & 0x00c0);
 }
 
-inline UINT8 gba_lcd_device::color_sfx_target(target id)
+inline uint8_t gba_lcd_device::color_sfx_target(target id)
 {
 	return (BLDCNT >> (8 * underlying_value(id))) & 0x3f;
 }
 
-inline void gba_lcd_device::update_mask(UINT8* mask, int y)
+inline void gba_lcd_device::update_mask(uint8_t* mask, int y)
 {
 	bool inwin0 = false;
 	bool inwin1 = false;
@@ -262,7 +262,7 @@ inline void gba_lcd_device::update_mask(UINT8* mask, int y)
 
 void gba_lcd_device::draw_scanline(int y)
 {
-	UINT16 *scanline = &m_bitmap.pix16(y);
+	uint16_t *scanline = &m_bitmap.pix16(y);
 
 	if (is_set(dispcnt::forced_blank))
 	{
@@ -273,9 +273,9 @@ void gba_lcd_device::draw_scanline(int y)
 		return;
 	}
 
-	UINT8 mode = bg_video_mode();
+	uint8_t mode = bg_video_mode();
 
-	UINT8 submode;
+	uint8_t submode;
 	if (is_set(dispcnt::win0_en) || is_set(dispcnt::win1_en) || is_set(dispcnt::obj_win_en))
 		submode = 2;
 	else if (color_sfx() != sfx::none)
@@ -325,7 +325,7 @@ void gba_lcd_device::draw_scanline(int y)
 		break;
 	}
 
-	UINT8 mask[240];
+	uint8_t mask[240];
 
 	// draw objects
 	draw_oam(m_scanline[4], y);
@@ -340,12 +340,12 @@ void gba_lcd_device::draw_scanline(int y)
 		memset(mask, 0xff, sizeof(mask));
 	}
 
-	UINT32 backdrop = ((UINT16 *)m_pram.get())[0] | 0x30000000;
+	uint32_t backdrop = ((uint16_t *)m_pram.get())[0] | 0x30000000;
 
 	for (auto x = 0; x < 240; x++)
 	{
-		UINT32 color = backdrop;
-		UINT8 top = 0x20;
+		uint32_t color = backdrop;
+		uint8_t top = 0x20;
 
 		for (auto l = 0; l < 5; l++)
 		{
@@ -360,8 +360,8 @@ void gba_lcd_device::draw_scanline(int y)
 		{
 			if (submode != 0 || top == 0x10)
 			{
-				UINT32 back = backdrop;
-				UINT8 top2 = 0x20;
+				uint32_t back = backdrop;
+				uint8_t top2 = 0x20;
 
 				for (auto l = 0; l < 4; l++)
 				{
@@ -402,8 +402,8 @@ void gba_lcd_device::draw_scanline(int y)
 					break;
 				case sfx::alpha:
 				{
-					UINT32 back = backdrop;
-					UINT8 top2 = 0x20;
+					uint32_t back = backdrop;
+					uint8_t top2 = 0x20;
 
 					for (auto l = 0; l < 5; l++)
 					{
@@ -435,17 +435,17 @@ void gba_lcd_device::draw_scanline(int y)
 	}
 }
 
-void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty, int depth)
+void gba_lcd_device::draw_roz_bitmap_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty, int depth)
 {
 	if (!is_set(bg_enable))
 		return;
 
-	UINT8 *src8 = (UINT8 *)m_vram.get();
-	UINT16 *src16 = (UINT16 *)m_vram.get();
-	UINT16 *palette = (UINT16 *)m_pram.get();
-	INT32 sx = (depth == 4) ? 160 : 240;
-	INT32 sy = (depth == 4) ? 128 : 160;
-	UINT32 prio = (bg_priority(ctrl) << 25) + 0x1000000;
+	uint8_t *src8 = (uint8_t *)m_vram.get();
+	uint16_t *src16 = (uint16_t *)m_vram.get();
+	uint16_t *palette = (uint16_t *)m_pram.get();
+	int32_t sx = (depth == 4) ? 160 : 240;
+	int32_t sy = (depth == 4) ? 128 : 160;
+	uint32_t prio = (bg_priority(ctrl) << 25) + 0x1000000;
 
 	if (is_set(dispcnt::alt_frame_sel))
 	{
@@ -484,19 +484,19 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcn
 		currenty.status += PD;
 	}
 
-	INT32 cx = currentx.status;
-	INT32 cy = currenty.status;
+	int32_t cx = currentx.status;
+	int32_t cy = currenty.status;
 
 	if (is_set(ctrl, bgcnt::mosaic_en))
 	{
-		UINT16 mosaic_line = mosaic_size(size_type::bg_v);
-		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		uint16_t mosaic_line = mosaic_size(size_type::bg_v);
+		int32_t tempy = (ypos / mosaic_line) * mosaic_line;
 		cx = X + tempy * PB;
 		cy = Y + tempy * PD;
 	}
 
-	INT32 pixx = cx >> 8;
-	INT32 pixy = cy >> 8;
+	int32_t pixx = cx >> 8;
+	int32_t pixy = cy >> 8;
 
 	for (auto x = 0; x < 240; x++)
 	{
@@ -504,7 +504,7 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcn
 		{
 			if (depth == 8)
 			{
-				UINT8 color = src8[pixy * sx + pixx];
+				uint8_t color = src8[pixy * sx + pixx];
 				if (color)
 					scanline[x] = palette[color] | prio;
 			}
@@ -523,10 +523,10 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcn
 
 	if (is_set(ctrl, bgcnt::mosaic_en))
 	{
-		UINT16 mosaicx = mosaic_size(size_type::bg_h);
+		uint16_t mosaicx = mosaic_size(size_type::bg_h);
 		if (mosaicx > 1)
 		{
-			INT32 m = 1;
+			int32_t m = 1;
 			for (auto x = 0; x < 239; x++)
 			{
 				scanline[x + 1] = scanline[x];
@@ -541,16 +541,16 @@ void gba_lcd_device::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, dispcn
 	}
 }
 
-void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, internal_reg &currentx, internal_reg &currenty)
+void gba_lcd_device::draw_roz_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, int32_t X, int32_t Y, int32_t PA, int32_t PB, int32_t PC, int32_t PD, internal_reg &currentx, internal_reg &currenty)
 {
 	if (!is_set(bg_enable))
 		return;
 
-	UINT8 *mgba_vram = (UINT8 *)m_vram.get();
-	UINT16 *pgba_pram = (UINT16 *)m_pram.get();
-	UINT32 priority = (bg_priority(ctrl) << 25) + 0x1000000;
-	UINT32 base = bg_char_base(ctrl);
-	UINT32 mapbase = bg_screen_base(ctrl);
+	uint8_t *mgba_vram = (uint8_t *)m_vram.get();
+	uint16_t *pgba_pram = (uint16_t *)m_pram.get();
+	uint32_t priority = (bg_priority(ctrl) << 25) + 0x1000000;
+	uint32_t base = bg_char_base(ctrl);
+	uint32_t mapbase = bg_screen_base(ctrl);
 
 	// size of map in submaps
 	int width, height;
@@ -584,19 +584,19 @@ void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_en
 		currenty.status += PD;
 	}
 
-	INT32 cx = currentx.status;
-	INT32 cy = currenty.status;
+	int32_t cx = currentx.status;
+	int32_t cy = currenty.status;
 
 	if (is_set(ctrl, bgcnt::mosaic_en))
 	{
-		UINT16 mosaic_line = mosaic_size(size_type::bg_v);
+		uint16_t mosaic_line = mosaic_size(size_type::bg_v);
 		int y = ypos % mosaic_line;
 		cx -= y * PB;
 		cy -= y * PD;
 	}
 
-	INT32 pixx = cx >> 8;
-	INT32 pixy = cy >> 8;
+	int32_t pixx = cx >> 8;
+	int32_t pixy = cy >> 8;
 
 	if (is_set(ctrl, bgcnt::wraparound_en))
 	{
@@ -618,8 +618,8 @@ void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_en
 			int tiley = pixy & 7;
 
 			// shall we shift for is_set(ctrl, bgcnt::palette_256)? or is not effective for ROZ?
-			UINT32 tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (width >> 3)];
-			UINT16 pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
+			uint32_t tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (width >> 3)];
+			uint16_t pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
 
 			// plot it
 			if (pixel)
@@ -647,7 +647,7 @@ void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_en
 
 	if (is_set(ctrl, bgcnt::mosaic_en))
 	{
-		UINT16 mosaicx = mosaic_size(size_type::bg_h);
+		uint16_t mosaicx = mosaic_size(size_type::bg_h);
 		if (mosaicx > 1)
 		{
 			int m = 1;
@@ -665,24 +665,24 @@ void gba_lcd_device::draw_roz_scanline(UINT32 *scanline, int ypos, dispcnt bg_en
 	}
 }
 
-void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_enable, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
+void gba_lcd_device::draw_bg_scanline(uint32_t *scanline, int ypos, dispcnt bg_enable, uint32_t ctrl, uint32_t hofs, uint32_t vofs)
 {
 	if (!is_set(bg_enable))
 		return;
 
-	UINT8 *vram = (UINT8*)m_vram.get();
-	UINT16 *palette = (UINT16 *)m_pram.get();
-	UINT8 *chardata = &vram[bg_char_base(ctrl)];
-	UINT16 *screendata = (UINT16 *)&vram[bg_screen_base(ctrl)];
-	UINT32 priority = (bg_priority(ctrl) << 25) + 0x1000000;
-	UINT16 mosaicx = mosaic_size(size_type::bg_h);
-	UINT16 mosaicy = mosaic_size(size_type::bg_v);
+	uint8_t *vram = (uint8_t*)m_vram.get();
+	uint16_t *palette = (uint16_t *)m_pram.get();
+	uint8_t *chardata = &vram[bg_char_base(ctrl)];
+	uint16_t *screendata = (uint16_t *)&vram[bg_screen_base(ctrl)];
+	uint32_t priority = (bg_priority(ctrl) << 25) + 0x1000000;
+	uint16_t mosaicx = mosaic_size(size_type::bg_h);
+	uint16_t mosaicy = mosaic_size(size_type::bg_v);
 
 	int width, height;
 	bg_screen_size(ctrl, true, width, height);
 
-	INT32 pixx = hofs % width;
-	INT32 pixy = (vofs + ypos) % height;
+	int32_t pixx = hofs % width;
+	int32_t pixy = (vofs + ypos) % height;
 
 	if (is_set(ctrl, bgcnt::mosaic_en) && ypos % mosaicy)
 	{
@@ -700,18 +700,18 @@ void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_ena
 		}
 	}
 
-	INT32 stride = (pixy >> 3) << 5;
+	int32_t stride = (pixy >> 3) << 5;
 
-	UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
+	uint16_t *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
 
 	for (auto x = 0; x < 240; x++)
 	{
-		UINT16 data = *src;
-		INT32 tile = tile_number(data);
-		INT32 tilex = pixx & 7;
-		INT32 tiley = pixy & 7;
-		UINT8 color;
-		UINT8 palindex;
+		uint16_t data = *src;
+		int32_t tile = tile_number(data);
+		int32_t tilex = pixx & 7;
+		int32_t tiley = pixy & 7;
+		uint8_t color;
+		uint8_t palindex;
 
 		if (tile_hflip(data))
 			tilex = 7 - tilex;
@@ -770,7 +770,7 @@ void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_ena
 
 	if (is_set(ctrl, bgcnt::mosaic_en) && mosaicx > 1)
 	{
-		INT32 m = 1;
+		int32_t m = 1;
 		for (auto x = 0; x < 239; x++)
 		{
 			scanline[x+1] = scanline[x];
@@ -784,13 +784,13 @@ void gba_lcd_device::draw_bg_scanline(UINT32 *scanline, int ypos, dispcnt bg_ena
 	}
 }
 
-void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
+void gba_lcd_device::draw_oam_window(uint32_t *scanline, int y)
 {
 	if (!is_set(dispcnt::obj_win_en))
 		return;
 
-	UINT16 *oam = (UINT16 *)m_oam.get();
-	UINT8 *src = (UINT8 *)m_vram.get();
+	uint16_t *oam = (uint16_t *)m_oam.get();
+	uint8_t *src = (uint8_t *)m_vram.get();
 
 	for (auto obj_index = 127; obj_index >= 0; obj_index--)
 	{
@@ -799,13 +799,13 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 		if (obj.mode_enum() != object::mode::window)
 			continue;
 
-		UINT32 tile_number = obj.tile_number();
+		uint32_t tile_number = obj.tile_number();
 
 		if (bg_video_mode() > 2 && tile_number < 0x200)
 			continue;
 
-		INT32 sx = obj.pos_x();
-		INT32 sy = obj.pos_y();
+		int32_t sx = obj.pos_x();
+		int32_t sy = obj.pos_y();
 
 		if (sy > 160)
 			sy -= 256;
@@ -815,8 +815,8 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 
 		if (obj.roz())
 		{
-			INT32 fx = width;
-			INT32 fy = height;
+			int32_t fx = width;
+			int32_t fy = height;
 
 			if (obj.roz_double())
 			{
@@ -824,7 +824,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 				fy *= 2;
 			}
 
-			INT32 cury = y - sy;
+			int32_t cury = y - sy;
 
 			if (cury < 0 || cury >= fy)
 				continue;
@@ -833,13 +833,13 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 				continue;
 
 			int rot = obj.roz_param();
-			INT16 dx  = (INT16)oam[(rot << 4) + 3];
-			INT16 dmx = (INT16)oam[(rot << 4) + 7];
-			INT16 dy  = (INT16)oam[(rot << 4) + 11];
-			INT16 dmy = (INT16)oam[(rot << 4) + 15];
+			int16_t dx  = (int16_t)oam[(rot << 4) + 3];
+			int16_t dmx = (int16_t)oam[(rot << 4) + 7];
+			int16_t dy  = (int16_t)oam[(rot << 4) + 11];
+			int16_t dmy = (int16_t)oam[(rot << 4) + 15];
 
-			INT32 rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
-			INT32 ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
+			int32_t rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
+			int32_t ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
 
 			int inc = 32;
 
@@ -852,12 +852,12 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 
 				for (auto x = 0; x < fx; x++)
 				{
-					INT32 ax = rx >> 8;
-					INT32 ay = ry >> 8;
+					int32_t ax = rx >> 8;
+					int32_t ay = ry >> 8;
 
 					if (ax >= 0 && ax < sx && ay >= 0 && ay < sy)
 					{
-						UINT8 color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 3) + ((ax >> 3) << 6) + (ax & 0x07)) & 0x7fff)];
+						uint8_t color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 3) + ((ax >> 3) << 6) + (ax & 0x07)) & 0x7fff)];
 
 						if (color)
 							scanline[sx] = 1;
@@ -875,12 +875,12 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 
 				for (auto x = 0; x < fx; x++)
 				{
-					INT32 ax = rx >> 8;
-					INT32 ay = ry >> 8;
+					int32_t ax = rx >> 8;
+					int32_t ay = ry >> 8;
 
 					if (ax >= 0 && ax < sx && ay >= 0 && ay < sy)
 					{
-						UINT8 color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff)];
+						uint8_t color = src[0x10000 + ((((tile_number + (ay >> 3) * inc) << 5) + ((ay & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff)];
 
 						if (ax & 1)
 							color >>= 4;
@@ -903,7 +903,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 			if (obj.roz_double())
 				continue;
 
-			INT32 cury = y - sy;
+			int32_t cury = y - sy;
 
 			if (cury < 0 || cury >= height)
 				continue;
@@ -916,7 +916,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 			if (obj.vflip())
 				cury = height - cury - 1;
 
-			INT32 ax = obj.hflip() ? (width - 1) : 0;
+			int32_t ax = obj.hflip() ? (width - 1) : 0;
 
 			if (obj.palette_256())
 			{
@@ -925,7 +925,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 				else
 					tile_number &= 0x3fe;
 
-				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
+				uint32_t address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
 
 				if (obj.hflip())
 					ax = 7;
@@ -934,7 +934,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 				{
 					if (sx < 240)
 					{
-						UINT8 color = src[address];
+						uint8_t color = src[address];
 
 						if (color)
 							scanline[sx] = 1;
@@ -977,7 +977,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 				if (is_set(dispcnt::vram_map_1d))
 					inc = width >> 3;
 
-				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
+				uint32_t address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
 
 				if (obj.hflip())
 				{
@@ -987,7 +987,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 					{
 						if (sx < 240)
 						{
-							UINT8 color = src[address];
+							uint8_t color = src[address];
 							if (x & 1)
 								color >>= 4;
 							else
@@ -1019,7 +1019,7 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 					{
 						if (sx < 240)
 						{
-							UINT8 color = src[address];
+							uint8_t color = src[address];
 
 							if (x & 1)
 								color >>= 4;
@@ -1051,17 +1051,17 @@ void gba_lcd_device::draw_oam_window(UINT32 *scanline, int y)
 	}
 }
 
-void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
+void gba_lcd_device::draw_oam(uint32_t *scanline, int y)
 {
 	if (!is_set(dispcnt::obj_en))
 		return;
 
-	INT32 mosaiccnt = 0;
-	UINT16 mosaicx = mosaic_size(size_type::obj_h);
-	UINT16 mosaicy = mosaic_size(size_type::obj_v);
-	UINT16 *oam = (UINT16 *)m_oam.get();
-	UINT8 *src = (UINT8 *)m_vram.get();
-	UINT16 *palette = (UINT16 *)m_pram.get();
+	int32_t mosaiccnt = 0;
+	uint16_t mosaicx = mosaic_size(size_type::obj_h);
+	uint16_t mosaicy = mosaic_size(size_type::obj_v);
+	uint16_t *oam = (uint16_t *)m_oam.get();
+	uint8_t *src = (uint8_t *)m_vram.get();
+	uint16_t *palette = (uint16_t *)m_pram.get();
 
 	for (auto obj_index = 0; obj_index < 128; obj_index++)
 	{
@@ -1070,27 +1070,27 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 		if (obj.mode_enum() == object::mode::window)
 			continue;
 
-		UINT32 priority = obj.priority();
-		UINT32 prio = (priority << 25) | (obj.mode_mask() << 6);
+		uint32_t priority = obj.priority();
+		uint32_t prio = (priority << 25) | (obj.mode_mask() << 6);
 
 		int width, height;
 		obj.size(width, height);
 
-		UINT32 tile_number = obj.tile_number();
+		uint32_t tile_number = obj.tile_number();
 
 		if (bg_video_mode() > 2 && tile_number < 0x200)
 			continue;
 
 		if (obj.roz())
 		{
-			INT32 sx = obj.pos_x();
-			INT32 sy = obj.pos_y();
+			int32_t sx = obj.pos_x();
+			int32_t sy = obj.pos_y();
 
 			if (sy > 160)
 				sy -= 256;
 
-			INT32 fx = width;
-			INT32 fy = height;
+			int32_t fx = width;
+			int32_t fy = height;
 
 			if (obj.roz_double())
 			{
@@ -1098,7 +1098,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 				fy *= 2;
 			}
 
-			INT32 cury = y - sy;
+			int32_t cury = y - sy;
 
 			if (cury < 0 || cury >= fy)
 				continue;
@@ -1106,20 +1106,20 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 			if (sx >= 240 && ((sx + fx) % 512) >= 240)
 				continue;
 
-			INT32 oamparam = obj.roz_param();
+			int32_t oamparam = obj.roz_param();
 
-			INT16 dx  = (INT16)oam[(oamparam << 4) + 3];
-			INT16 dmx = (INT16)oam[(oamparam << 4) + 7];
-			INT16 dy  = (INT16)oam[(oamparam << 4) + 11];
-			INT16 dmy = (INT16)oam[(oamparam << 4) + 15];
+			int16_t dx  = (int16_t)oam[(oamparam << 4) + 3];
+			int16_t dmx = (int16_t)oam[(oamparam << 4) + 7];
+			int16_t dy  = (int16_t)oam[(oamparam << 4) + 11];
+			int16_t dmy = (int16_t)oam[(oamparam << 4) + 15];
 
 			if (obj.mosaic())
 				cury -= (cury % mosaicy);
 
-			INT32 rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
-			INT32 ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
+			int32_t rx = (width << 7) - (fx >> 1) * dx - (fy >> 1) * dmx + cury * dmx;
+			int32_t ry = (height << 7) - (fx >> 1) * dy - (fy >> 1) * dmy + cury * dmy;
 
-			INT32 inc = 32;
+			int32_t inc = 32;
 
 			if (obj.palette_256())
 			{
@@ -1130,12 +1130,12 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 
 				for (auto x = 0; x < fx; x++)
 				{
-					INT32 pixx = rx >> 8;
-					INT32 pixy = ry >> 8;
+					int32_t pixx = rx >> 8;
+					int32_t pixy = ry >> 8;
 
 					if (!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
 					{
-						UINT8 color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff)];
+						uint8_t color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff)];
 
 						if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
 						{
@@ -1170,12 +1170,12 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 
 				for (auto x = 0; x < fx; x++)
 				{
-					INT32 pixx = rx >> 8;
-					INT32 pixy = ry >> 8;
+					int32_t pixx = rx >> 8;
+					int32_t pixy = ry >> 8;
 
 					if (!(pixx < 0 || pixx >= width || pixy < 0 || pixy >= height || sx >= 240))
 					{
-						UINT8 color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff)];
+						uint8_t color = src[0x10000 + ((((tile_number + (pixy >> 3) * inc) << 5) + ((pixy & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff)];
 
 						if (pixx & 1)
 							color >>= 4;
@@ -1215,13 +1215,13 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 			if (obj.roz_double())
 				continue;
 
-			INT32 sx = obj.pos_x();
-			INT32 sy = obj.pos_y();
+			int32_t sx = obj.pos_x();
+			int32_t sy = obj.pos_y();
 
 			if (sy > 160)
 				sy -= 256;
 
-			INT32 cury = y - sy;
+			int32_t cury = y - sy;
 
 			if (cury < 0 || cury >= height)
 				continue;
@@ -1229,12 +1229,12 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 			if (sx >= 240 && ((sx + width) % 512) >= 240)
 				continue;
 
-			INT32 inc = 32;
+			int32_t inc = 32;
 
 			if (obj.vflip())
 				cury = height - cury - 1;
 
-			INT32 pixx = obj.hflip() ? (width - 1) : 0;
+			int32_t pixx = obj.hflip() ? (width - 1) : 0;
 
 			if (obj.mosaic())
 				cury -= (cury % mosaicy);
@@ -1246,7 +1246,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 				else
 					tile_number &= 0x3fe;
 
-				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff);
+				uint32_t address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((pixx >> 3) << 6) + (pixx & 7)) & 0x7fff);
 
 				if (obj.hflip())
 					pixx = 7;
@@ -1255,7 +1255,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 				{
 					if (sx < 240)
 					{
-						UINT8 color = src[address];
+						uint8_t color = src[address];
 
 						if (color == 0 && priority < ((scanline[sx] >> 25) & 3))
 						{
@@ -1315,7 +1315,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 				if (is_set(dispcnt::vram_map_1d))
 					inc = width >> 3;
 
-				UINT32 address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff);
+				uint32_t address = 0x10000 + ((((tile_number + (cury >> 3) * inc) << 5) + ((cury & 7) << 2) + ((pixx >> 3) << 5) + ((pixx & 7) >> 1)) & 0x7fff);
 
 				if (obj.hflip())
 				{
@@ -1324,7 +1324,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 					{
 						if (sx < 240)
 						{
-							UINT8 color = src[address];
+							uint8_t color = src[address];
 
 							if (x & 1)
 								color >>= 4;
@@ -1371,7 +1371,7 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 					{
 						if (sx < 240)
 						{
-							UINT8 color = src[address];
+							uint8_t color = src[address];
 
 							if (x & 1)
 								color >>= 4;
@@ -1422,10 +1422,10 @@ void gba_lcd_device::draw_oam(UINT32 *scanline, int y)
 
 inline bool gba_lcd_device::is_in_window_h(int x, int window)
 {
-	UINT16 reg = (window == 0) ? WIN0H : WIN1H;
+	uint16_t reg = (window == 0) ? WIN0H : WIN1H;
 
-	UINT8 x0 = reg >> 8;
-	UINT8 x1 = reg & 0x00ff;
+	uint8_t x0 = reg >> 8;
+	uint8_t x1 = reg & 0x00ff;
 
 	if (x0 <= x1)
 	{
@@ -1443,10 +1443,10 @@ inline bool gba_lcd_device::is_in_window_h(int x, int window)
 
 inline bool gba_lcd_device::is_in_window_v(int y, int window)
 {
-	UINT16 reg = (window == 0) ? WIN0V : WIN1V;
+	uint16_t reg = (window == 0) ? WIN0V : WIN1V;
 
-	UINT8 v0 = reg >> 8;
-	UINT8 v1 = reg & 0x00ff;
+	uint8_t v0 = reg >> 8;
+	uint8_t v1 = reg & 0x00ff;
 
 	if ((v0 == v1) && (v0 >= 0xe8))
 		return true;
@@ -1470,7 +1470,7 @@ static const int coeff[32] = {
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
-inline UINT32 gba_lcd_device::alpha_blend(UINT32 color0, UINT32 color1)
+inline uint32_t gba_lcd_device::alpha_blend(uint32_t color0, uint32_t color1)
 {
 	int ca = coeff[BLDALPHA & 0x1f];
 	int cb = coeff[(BLDALPHA >> 8) & 0x1f];
@@ -1497,7 +1497,7 @@ inline UINT32 gba_lcd_device::alpha_blend(UINT32 color0, UINT32 color1)
 	return color0;
 }
 
-inline UINT32 gba_lcd_device::increase_brightness(UINT32 color)
+inline uint32_t gba_lcd_device::increase_brightness(uint32_t color)
 {
 	int cc = coeff[BLDY & 0x1f];
 
@@ -1516,7 +1516,7 @@ inline UINT32 gba_lcd_device::increase_brightness(UINT32 color)
 	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
-inline UINT32 gba_lcd_device::decrease_brightness(UINT32 color)
+inline uint32_t gba_lcd_device::decrease_brightness(uint32_t color)
 {
 	int cc = coeff[BLDY & 0x1f];
 
@@ -1553,7 +1553,7 @@ static const char *reg_names[] = {
 
 READ32_MEMBER(gba_lcd_device::video_r)
 {
-	UINT32 retval = 0;
+	uint32_t retval = 0;
 
 	switch (offset)
 	{
@@ -1618,7 +1618,7 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 	}
 }
 
-static inline UINT32 combine_data_32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
+static inline uint32_t combine_data_32_16(uint32_t prev, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&prev);
 
@@ -1757,11 +1757,11 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 
 PALETTE_INIT_MEMBER(gba_lcd_device, gba)
 {
-	for (UINT8 b = 0; b < 32; b++)
+	for (uint8_t b = 0; b < 32; b++)
 	{
-		for (UINT8 g = 0; g < 32; g++)
+		for (uint8_t g = 0; g < 32; g++)
 		{
-			for (UINT8 r = 0; r < 32; r++)
+			for (uint8_t r = 0; r < 32; r++)
 			{
 				palette.set_pen_color((b << 10) | (g << 5) | r, pal5bit(r), pal5bit(g), pal5bit(b));
 			}
@@ -1769,7 +1769,7 @@ PALETTE_INIT_MEMBER(gba_lcd_device, gba)
 	}
 }
 
-UINT32 gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
@@ -1785,9 +1785,9 @@ void gba_lcd_device::device_start()
 	m_dma_hblank_cb.resolve();
 	m_dma_vblank_cb.resolve();
 
-	m_pram = make_unique_clear<UINT32[]>(0x400 / 4);
-	m_vram = make_unique_clear<UINT32[]>(0x18000 / 4);
-	m_oam = make_unique_clear<UINT32[]>(0x400 / 4);
+	m_pram = make_unique_clear<uint32_t[]>(0x400 / 4);
+	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
+	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);
 
 	m_screen->register_screen_bitmap(m_bitmap);
 

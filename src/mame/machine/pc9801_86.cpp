@@ -127,7 +127,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //  pc9801_86_device - constructor
 //-------------------------------------------------
 
-pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
 		m_opna(*this, "opna"),
 		m_ldac(*this, "ldac"),
@@ -182,7 +182,7 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
+	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
 	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
 	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
@@ -305,11 +305,11 @@ int pc9801_86_device::queue_count()
 	return m_count;
 }
 
-UINT8 pc9801_86_device::queue_pop()
+uint8_t pc9801_86_device::queue_pop()
 {
 	if(!queue_count())
 		return 0;
-	UINT8 ret = m_queue[m_tail++];
+	uint8_t ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
 	m_count--;
 	return ret;
@@ -317,7 +317,7 @@ UINT8 pc9801_86_device::queue_pop()
 
 void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr)
 {
-	INT16 lsample, rsample;
+	int16_t lsample, rsample;
 
 	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80) || !queue_count())
 		return;

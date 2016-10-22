@@ -34,7 +34,7 @@ const device_type HD44352 = &device_creator<hd44352_device>;
 //  hd44352_device - constructor
 //-------------------------------------------------
 
-hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
+hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__),
 	m_on_cb(*this),
 	m_char_rom(*this, DEVICE_SELF)
@@ -133,9 +133,9 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  device interface
 //**************************************************************************
 
-UINT32 hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cw = m_char_width;
+	uint8_t cw = m_char_width;
 
 	bitmap.fill(0, cliprect);
 
@@ -149,7 +149,7 @@ UINT32 hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 						//draw the cursor
 						for (int c=0; c<cw; c++)
 						{
-							UINT8 d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
+							uint8_t d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
 							for (int b=0; b<8; b++)
 							{
 								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
@@ -160,7 +160,7 @@ UINT32 hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					{
 						for (int c=0; c<cw; c++)
 						{
-							UINT8 d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
+							uint8_t d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
 							for (int b=0; b<8; b++)
 							{
 								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
@@ -173,7 +173,7 @@ UINT32 hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void hd44352_device::control_write(UINT8 data)
+void hd44352_device::control_write(uint8_t data)
 {
 	if(m_control_lines == data)
 		m_state = 0;
@@ -181,7 +181,7 @@ void hd44352_device::control_write(UINT8 data)
 	m_control_lines = data;
 }
 
-UINT8 hd44352_device::compute_newval(UINT8 type, UINT8 oldval, UINT8 newval)
+uint8_t hd44352_device::compute_newval(uint8_t type, uint8_t oldval, uint8_t newval)
 {
 	switch(type & 0x07)
 	{
@@ -204,9 +204,9 @@ UINT8 hd44352_device::compute_newval(UINT8 type, UINT8 oldval, UINT8 newval)
 	}
 }
 
-UINT8 hd44352_device::get_char(UINT16 pos)
+uint8_t hd44352_device::get_char(uint16_t pos)
 {
-	switch ((UINT8)pos/8)
+	switch ((uint8_t)pos/8)
 	{
 		case 0xcf:
 			return m_custom_char[0][pos%8];
@@ -221,7 +221,7 @@ UINT8 hd44352_device::get_char(UINT16 pos)
 	}
 }
 
-void hd44352_device::data_write(UINT8 data)
+void hd44352_device::data_write(uint8_t data)
 {
 	// verify that controller is active
 	if (!(m_control_lines&0x80))
@@ -315,7 +315,7 @@ void hd44352_device::data_write(UINT8 data)
 				{
 					if (m_state == 1)
 					{
-						UINT32 on_timer_rate;
+						uint32_t on_timer_rate;
 
 						switch((data>>4) & 0x0f)
 						{
@@ -409,7 +409,7 @@ void hd44352_device::data_write(UINT8 data)
 			case LCD_CURSOR_CHAR:
 				if (m_byte_count<1)
 				{
-					UINT8 char_code = ((data<<4)&0xf0) | ((data>>4)&0x0f);
+					uint8_t char_code = ((data<<4)&0xf0) | ((data>>4)&0x0f);
 
 					for (int i=0; i<8; i++)
 						m_cursor[i] = get_char(char_code*8 + i);
@@ -434,7 +434,7 @@ void hd44352_device::data_write(UINT8 data)
 	}
 }
 
-UINT8 hd44352_device::data_read()
+uint8_t hd44352_device::data_read()
 {
 	return m_data_bus;
 }

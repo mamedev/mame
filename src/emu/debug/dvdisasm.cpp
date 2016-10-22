@@ -133,8 +133,8 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 void debug_view_disasm::view_char(int chval)
 {
 	debug_view_xy origcursor = m_cursor;
-	UINT8 end_buffer = 3;
-	INT32 temp;
+	uint8_t end_buffer = 3;
+	int32_t temp;
 
 	switch (chval)
 	{
@@ -250,7 +250,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 	{
 		// fill the buffer up to the target
 		offs_t curpcbyte = source.m_space.address_to_byte(curpc) & source.m_space.logbytemask();
-		UINT8 opbuf[1024], argbuf[1024];
+		uint8_t opbuf[1024], argbuf[1024];
 		while (curpcbyte < fillpcbyte)
 		{
 			fillpcbyte--;
@@ -397,7 +397,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		offs_t physpcbyte = pcbyte;
 		if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH_DEBUG, physpcbyte))
 		{
-			UINT8 opbuf[64], argbuf[64];
+			uint8_t opbuf[64], argbuf[64];
 
 			// fetch the bytes up to the maximum
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
@@ -466,14 +466,14 @@ void debug_view_disasm::view_update()
 		m_recompute = true;
 
 	// if we're tracking a value, make sure it is visible
-	UINT64 previous = m_expression.last_value();
-	UINT64 result = m_expression.value();
+	uint64_t previous = m_expression.last_value();
+	uint64_t result = m_expression.value();
 	if (result != previous)
 	{
 		offs_t resultbyte = source.m_space.address_to_byte(result) & source.m_space.logbytemask();
 
 		// see if the new result is an address we already have
-		UINT32 row;
+		uint32_t row;
 		for (row = 0; row < m_byteaddress.size(); row++)
 			if (m_byteaddress[row] == resultbyte)
 				break;
@@ -512,7 +512,7 @@ recompute:
 		else
 		{
 			// determine the addresses of what we will display
-			offs_t backpc = find_pc_backwards((UINT32)m_expression.value(), m_backwards_steps);
+			offs_t backpc = find_pc_backwards((uint32_t)m_expression.value(), m_backwards_steps);
 
 			// put ourselves back in the top left
 			m_topleft.y = 0;
@@ -527,9 +527,9 @@ recompute:
 	if (pcbyte != m_last_pcbyte)
 	{
 		// find the row with the PC on it
-		for (UINT32 row = 0; row < m_visible.y; row++)
+		for (uint32_t row = 0; row < m_visible.y; row++)
 		{
-			UINT32 effrow = m_topleft.y + row;
+			uint32_t effrow = m_topleft.y + row;
 			if (effrow >= m_byteaddress.size())
 				break;
 			if (pcbyte == m_byteaddress[effrow])
@@ -552,13 +552,13 @@ recompute:
 
 	// loop over visible rows
 	debug_view_char *dest = &m_viewdata[0];
-	for (UINT32 row = 0; row < m_visible.y; row++)
+	for (uint32_t row = 0; row < m_visible.y; row++)
 	{
-		UINT32 effrow = m_topleft.y + row;
-		UINT32 col = 0;
+		uint32_t effrow = m_topleft.y + row;
+		uint32_t col = 0;
 
 		// if this visible row is valid, add it to the buffer
-		UINT8 attrib = DCA_NORMAL;
+		uint8_t attrib = DCA_NORMAL;
 		if (effrow < m_byteaddress.size())
 		{
 			// if we're on the line with the PC, recompute and hilight it
@@ -583,10 +583,10 @@ recompute:
 
 			// get the effective string
 			const char *data = &m_dasm.vec()[effrow * m_total.x];
-			UINT32 len = (UINT32)strlen(data);
+			uint32_t len = (uint32_t)strlen(data);
 
 			// copy data
-			UINT32 effcol = m_topleft.x;
+			uint32_t effcol = m_topleft.x;
 			while (col < m_visible.x && effcol < len)
 			{
 				dest->byte = data[effcol++];
@@ -658,7 +658,7 @@ void debug_view_disasm::set_right_column(disasm_right_column contents)
 //  instructions displayed before the home address
 //-------------------------------------------------
 
-void debug_view_disasm::set_backward_steps(UINT32 steps)
+void debug_view_disasm::set_backward_steps(uint32_t steps)
 {
 	begin_update();
 	m_backwards_steps = steps;
@@ -672,7 +672,7 @@ void debug_view_disasm::set_backward_steps(UINT32 steps)
 //  of the main disassembly section
 //-------------------------------------------------
 
-void debug_view_disasm::set_disasm_width(UINT32 width)
+void debug_view_disasm::set_disasm_width(uint32_t width)
 {
 	begin_update();
 	m_dasm_width = width;

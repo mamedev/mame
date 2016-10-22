@@ -151,7 +151,7 @@ VIDEO_START_MEMBER(williams2_state,williams2)
  *
  *************************************/
 
-UINT32 williams_state::screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t williams_state::screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
 	int x, y;
@@ -163,8 +163,8 @@ UINT32 williams_state::screen_update_williams(screen_device &screen, bitmap_rgb3
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 *source = &m_videoram[y];
-		UINT32 *dest = &bitmap.pix32(y);
+		uint8_t *source = &m_videoram[y];
+		uint32_t *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -178,7 +178,7 @@ UINT32 williams_state::screen_update_williams(screen_device &screen, bitmap_rgb3
 }
 
 
-UINT32 blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
 	int x, y;
@@ -195,8 +195,8 @@ UINT32 blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int erase_behind = m_blaster_video_control & m_blaster_scanline_control[y] & 2;
-		UINT8 *source = &m_videoram[y];
-		UINT32 *dest = &bitmap.pix32(y);
+		uint8_t *source = &m_videoram[y];
+		uint32_t *dest = &bitmap.pix32(y);
 
 		/* latch a new color0 pen? */
 		if (m_blaster_video_control & m_blaster_scanline_control[y] & 1)
@@ -220,7 +220,7 @@ UINT32 blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 
 }
 
 
-UINT32 williams2_state::screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
 	int x, y;
@@ -235,8 +235,8 @@ UINT32 williams2_state::screen_update_williams2(screen_device &screen, bitmap_rg
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 *source = &m_videoram[y];
-		UINT32 *dest = &bitmap.pix32(y);
+		uint8_t *source = &m_videoram[y];
+		uint32_t *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -290,12 +290,12 @@ void williams_state::create_palette_lookup()
 
 WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
 {
-	static const UINT8 ztable[16] =
+	static const uint8_t ztable[16] =
 	{
 		0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,  0x9,
 		0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11
 	};
-	UINT8 entry_lo, entry_hi, i, r, g, b;
+	uint8_t entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
 	m_generic_paletteram_8[offset] = data;
@@ -449,9 +449,9 @@ WRITE8_MEMBER(blaster_state::blaster_video_control_w)
  *
  *************************************/
 
-void williams_state::blitter_init(int blitter_config, const UINT8 *remap_prom)
+void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 {
-	static const UINT8 dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+	static const uint8_t dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	int i,j;
 
 	/* by default, there is no clipping window - this will be touched only by games that have one */
@@ -461,12 +461,12 @@ void williams_state::blitter_init(int blitter_config, const UINT8 *remap_prom)
 	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
-	m_blitter_remap_lookup = std::make_unique<UINT8[]>(256 * 256);
+	m_blitter_remap_lookup = std::make_unique<uint8_t[]>(256 * 256);
 	m_blitter_remap_index = 0;
 	m_blitter_remap = m_blitter_remap_lookup.get();
 	for (i = 0; i < 256; i++)
 	{
-		const UINT8 *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;
+		const uint8_t *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;
 		for (j = 0; j < 256; j++)
 			m_blitter_remap_lookup[i * 256 + j] = (table[j >> 4] << 4) | table[j & 0x0f];
 	}

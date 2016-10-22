@@ -47,7 +47,7 @@ class cem3394_device : public device_t,
 						public device_sound_interface
 {
 public:
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~cem3394_device() { }
 
 	static void set_ext_input_callback(device_t &device, cem3394_ext_input_delegate callback) { downcast<cem3394_device &>(device).m_ext_cb = callback; }
@@ -78,7 +78,7 @@ public:
 
 private:
 	double compute_db(double voltage);
-	UINT32 compute_db_volume(double voltage);
+	uint32_t compute_db_volume(double voltage);
 
 private:
 	cem3394_ext_input_delegate m_ext_cb; /* callback to generate external samples */
@@ -88,27 +88,27 @@ private:
 	double m_filter_zero_freq;        /* frequency of filter at 0.0V */
 
 	double m_values[8];               /* raw values of registers */
-	UINT8 m_wave_select;              /* flags which waveforms are enabled */
+	uint8_t m_wave_select;              /* flags which waveforms are enabled */
 
-	UINT32 m_volume;                  /* linear overall volume (0-256) */
-	UINT32 m_mixer_internal;          /* linear internal volume (0-256) */
-	UINT32 m_mixer_external;          /* linear external volume (0-256) */
+	uint32_t m_volume;                  /* linear overall volume (0-256) */
+	uint32_t m_mixer_internal;          /* linear internal volume (0-256) */
+	uint32_t m_mixer_external;          /* linear external volume (0-256) */
 
-	UINT32 m_position;                /* current VCO frequency position (0.FRACTION_BITS) */
-	UINT32 m_step;                    /* per-sample VCO step (0.FRACTION_BITS) */
+	uint32_t m_position;                /* current VCO frequency position (0.FRACTION_BITS) */
+	uint32_t m_step;                    /* per-sample VCO step (0.FRACTION_BITS) */
 
-	UINT32 m_filter_position;         /* current filter frequency position (0.FRACTION_BITS) */
-	UINT32 m_filter_step;             /* per-sample filter step (0.FRACTION_BITS) */
-	UINT32 m_modulation_depth;        /* fraction of total by which we modulate (0.FRACTION_BITS) */
-	INT16 m_last_ext;                 /* last external sample we read */
+	uint32_t m_filter_position;         /* current filter frequency position (0.FRACTION_BITS) */
+	uint32_t m_filter_step;             /* per-sample filter step (0.FRACTION_BITS) */
+	uint32_t m_modulation_depth;        /* fraction of total by which we modulate (0.FRACTION_BITS) */
+	int16_t m_last_ext;                 /* last external sample we read */
 
-	UINT32 m_pulse_width;             /* fractional pulse width (0.FRACTION_BITS) */
+	uint32_t m_pulse_width;             /* fractional pulse width (0.FRACTION_BITS) */
 
 	double m_inv_sample_rate;
 	int m_sample_rate;
 
-	std::unique_ptr<INT16[]> m_mixer_buffer;
-	std::unique_ptr<INT16[]> m_external_buffer;
+	std::unique_ptr<int16_t[]> m_mixer_buffer;
+	std::unique_ptr<int16_t[]> m_external_buffer;
 };
 
 extern const device_type CEM3394;

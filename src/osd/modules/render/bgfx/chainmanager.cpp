@@ -363,7 +363,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-INT32 chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -393,7 +393,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 
 	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, UINT8, size));
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, uint8_t, size));
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];

@@ -98,16 +98,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<sknsspr_device> m_spritegen;
 
-	required_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_priority_buffer;
-	required_shared_ptr<UINT16> m_sprregs;
+	required_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_priority_buffer;
+	required_shared_ptr<uint16_t> m_sprregs;
 
 	bitmap_ind16 m_sprite_bitmap_1;
-	UINT16 m_priority_buffer_scrollx;
-	UINT16 m_priority_buffer_scrolly;
-	UINT32 m_spriteram32[0x4000/4];
-	UINT32 m_spc_regs[0x40/4];
+	uint16_t m_priority_buffer_scrollx;
+	uint16_t m_priority_buffer_scrolly;
+	uint32_t m_spriteram32[0x4000/4];
+	uint32_t m_spc_regs[0x40/4];
 
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
@@ -117,7 +117,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
 };
@@ -161,7 +161,7 @@ void galpani3_state::video_start()
 
 int galpani3_state::gp3_is_alpha_pen(int pen)
 {
-	UINT16 dat = 0;
+	uint16_t dat = 0;
 
 	if (pen<0x4000)
 	{
@@ -197,12 +197,12 @@ int galpani3_state::gp3_is_alpha_pen(int pen)
 }
 
 
-UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT16* src1;
-	UINT32* dst;
-	UINT16 pixdata1;
+	uint16_t* src1;
+	uint32_t* dst;
+	uint16_t pixdata1;
 	const pen_t *paldata = m_palette->pens();
 
 	bitmap.fill(0x0000, cliprect);
@@ -215,11 +215,11 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 		int drawy, drawx;
 		for (drawy=0;drawy<512;drawy++)
 		{
-			UINT16* srcline1 = m_grap2_0->m_framebuffer.get() + ((drawy+m_grap2_0->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			UINT16* srcline2 = m_grap2_1->m_framebuffer.get() + ((drawy+m_grap2_1->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			UINT16* srcline3 = m_grap2_2->m_framebuffer.get() + ((drawy+m_grap2_2->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			uint16_t* srcline1 = m_grap2_0->m_framebuffer.get() + ((drawy+m_grap2_0->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			uint16_t* srcline2 = m_grap2_1->m_framebuffer.get() + ((drawy+m_grap2_1->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			uint16_t* srcline3 = m_grap2_2->m_framebuffer.get() + ((drawy+m_grap2_2->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
-			UINT16*  priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
+			uint16_t*  priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
 
 			for (drawx=0;drawx<512;drawx++)
 			{
@@ -229,13 +229,13 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 
 				int prioffs  = (drawx+m_priority_buffer_scrollx+66)&0x1ff;
 
-				UINT8 dat1 = srcline1[srcoffs1];
-				UINT8 dat2 = srcline2[srcoffs2];
-				UINT8 dat3 = srcline3[srcoffs3];
+				uint8_t dat1 = srcline1[srcoffs1];
+				uint8_t dat2 = srcline2[srcoffs2];
+				uint8_t dat3 = srcline3[srcoffs3];
 
-				UINT8 pridat = priline[prioffs];
+				uint8_t pridat = priline[prioffs];
 
-				UINT32* dst = &bitmap.pix32(drawy, drawx);
+				uint32_t* dst = &bitmap.pix32(drawy, drawx);
 
 
 
@@ -264,8 +264,8 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 					   enable -- see fading in intro */
 					if (dat1 && m_grap2_0->m_framebuffer_enable)
 					{
-						UINT16 pen = dat1+0x4000;
-						UINT32 pal = paldata[pen];
+						uint16_t pen = dat1+0x4000;
+						uint32_t pal = paldata[pen];
 
 						if (gp3_is_alpha_pen(pen))
 						{
@@ -292,8 +292,8 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 
 					if (dat2 && m_grap2_1->m_framebuffer_enable)
 					{
-						UINT16 pen = dat2+0x4100;
-						UINT32 pal = paldata[pen];
+						uint16_t pen = dat2+0x4100;
+						uint32_t pal = paldata[pen];
 
 						if (gp3_is_alpha_pen(pen))
 						{

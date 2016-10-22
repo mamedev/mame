@@ -165,7 +165,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			{
 				offs_t const address = dasmview->selected_address();
 				device_debug *const debug = dasmview->source_device()->debug();
-				INT32 bpindex = -1;
+				int32_t bpindex = -1;
 
 				// first find an existing breakpoint at this address
 				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != nullptr; bp = bp->next())
@@ -222,14 +222,14 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					if (!is_main_console())
 					{
 						debug->breakpoint_enable(bp->index(), !bp->enabled());
-						machine().debugger().console().printf("Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+						machine().debugger().console().printf("Breakpoint %X %s\n", (uint32_t)bp->index(), bp->enabled() ? "enabled" : "disabled");
 						machine().debug_view().update_all();
 						machine().debugger().refresh_display();
 					}
 					else if (dasmview->source_is_visible_cpu())
 					{
 						std::string command;
-						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
+						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (uint32_t)bp->index());
 						machine().debugger().console().execute_command(command.c_str(), true);
 					}
 				}

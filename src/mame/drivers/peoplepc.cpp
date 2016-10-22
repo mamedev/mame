@@ -42,9 +42,9 @@ public:
 	required_device<floppy_connector> m_flop1;
 	required_device<i8257_device> m_dmac;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT16> m_gvram;
-	required_shared_ptr<UINT16> m_cvram;
-	std::vector<UINT8> m_charram;
+	required_shared_ptr<uint16_t> m_gvram;
+	required_shared_ptr<uint16_t> m_cvram;
+	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -60,7 +60,7 @@ public:
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
-	UINT8 m_dma0pg;
+	uint8_t m_dma0pg;
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -88,15 +88,15 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 	{
 		if(0)
 		{
-			UINT16 offset = ((ma | (ra << 1)) << 4) + i;
-			UINT8 data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
+			uint16_t offset = ((ma | (ra << 1)) << 4) + i;
+			uint8_t data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
 
 			for(j = 8; j >= 0; j--)
 				bitmap.pix32(y, (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
 		}
 		else
 		{
-			UINT8 data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
+			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
 			for(j = 0; j < 8; j++)
 				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
 		}

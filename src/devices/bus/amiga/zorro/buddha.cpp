@@ -67,7 +67,7 @@ const tiny_rom_entry *buddha_device::device_rom_region() const
 //  buddha_device - constructor
 //-------------------------------------------------
 
-buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BUDDHA, "Buddha IDE controller", tag, owner, clock, "buddha", __FILE__),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 
 READ16_MEMBER( buddha_device::speed_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (VERBOSE)
 		logerror("%s('%s'): ide_0_interrupt_r %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w)
 
 READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	data = m_ide_0_interrupt << 15;
 
@@ -234,7 +234,7 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 
 READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	data = m_ide_1_interrupt << 15;
 
@@ -255,7 +255,7 @@ WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 
 READ16_MEMBER( buddha_device::ide_0_cs0_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_0->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
@@ -279,7 +279,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 
 READ16_MEMBER( buddha_device::ide_0_cs1_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_0->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
@@ -303,7 +303,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 
 READ16_MEMBER( buddha_device::ide_1_cs0_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_1->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
@@ -327,7 +327,7 @@ WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 
 READ16_MEMBER( buddha_device::ide_1_cs1_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_1->read_cs1(space, (offset >> 1) & 0x07, mem_mask);

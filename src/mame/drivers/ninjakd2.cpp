@@ -178,9 +178,9 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 		return;
 	}
 
-	const UINT8* const rom = m_pcm_region->base();
+	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
-	INT16* sampledata = auto_alloc_array(machine(), INT16, length);
+	int16_t* sampledata = auto_alloc_array(machine(), int16_t, length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
@@ -199,7 +199,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 		return;
 	}
 
-	const UINT8* const rom = m_pcm_region->base();
+	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	const int start = data << 8;
 
@@ -248,7 +248,7 @@ void ninjakd2_state::omegaf_io_protection_reset()
 
 READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	switch (m_omegaf_io_protection[1] & 3)
 	{
@@ -1577,8 +1577,8 @@ by one place all the intervening bits.
 void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
-	UINT8* const src = memregion(region)->base();
-	std::vector<UINT8> temp(length);
+	uint8_t* const src = memregion(region)->base();
+	std::vector<uint8_t> temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
 	for (int sa = 0; sa < length; sa++)
@@ -1626,7 +1626,7 @@ READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
 	return 0xe6;
 }
 
-void ninjakd2_state::robokid_motion_error_kludge(UINT16 offset)
+void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 {
 	// patch out rare "5268 MOTION ERROR" (MT 05024)
 	// It looks like it's due to a buggy random number generator,
@@ -1634,7 +1634,7 @@ void ninjakd2_state::robokid_motion_error_kludge(UINT16 offset)
 	// I doubt it is protection related, but you can never be sure.
 	// Update 131016: there's also a 5208 VECTOR ERROR happening at worm mid-boss on stage 10, I'm prone to think it's 
 	// a timing/sprite fault on our side therefore marking as UNEMULATED_PROTECTION until this is resolved. -AS
-	UINT8 *ROM = memregion("maincpu")->base() + offset;
+	uint8_t *ROM = memregion("maincpu")->base() + offset;
 	ROM[0] = 0xe6;
 	ROM[1] = 0x03; // and 3
 	ROM[2] = 0x18;

@@ -243,9 +243,9 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // CoCo 1/2 you should get $F627 instead.
 //-------------------------------------------------
 
-UINT8 coco_state::floating_bus_read(void)
+uint8_t coco_state::floating_bus_read(void)
 {
-	UINT8 result;
+	uint8_t result;
 
 	// this method calls program.read_byte() - therefore we run the risk of a stack overflow if we don't check for
 	// a reentrant invocation
@@ -264,11 +264,11 @@ UINT8 coco_state::floating_bus_read(void)
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 
 		// get the previous and current PC
-		UINT16 prev_pc = m_maincpu->pcbase();
-		UINT16 pc = m_maincpu->pc();
+		uint16_t prev_pc = m_maincpu->pcbase();
+		uint16_t pc = m_maincpu->pc();
 
 		// get the byte; and skip over header bytes
-		UINT8 byte = program.read_byte(prev_pc);
+		uint8_t byte = program.read_byte(prev_pc);
 		if ((byte == 0x10) || (byte == 0x11))
 			byte = program.read_byte(++prev_pc);
 
@@ -459,7 +459,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 {
 	// Port B: lines in output mode are handled automatically by the PIA object.
 	// We only need to specify the input lines here
-	UINT32 ram_size = m_ram->size();
+	uint32_t ram_size = m_ram->size();
 
 	//  For the CoCo 1, the logic has been changed to only select 64K rams
 	//  if there is more than 16K of memory, as the Color Basic 1.0 rom
@@ -663,7 +663,7 @@ void coco_state::update_sound(void)
 	 *
 	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
 	 */
-	UINT8 single_bit_sound = (m_pia_1->b_output() & 0x02) ? 0x80 : 0x00;
+	uint8_t single_bit_sound = (m_pia_1->b_output() & 0x02) ? 0x80 : 0x00;
 
 	/* determine the sound mux status */
 	soundmux_status_t status = soundmux_status();
@@ -671,12 +671,12 @@ void coco_state::update_sound(void)
 	/* the SC77526 DAC chip internally biases the AC-coupled sound inputs for Cassette and Cartridge at the midpoint of the 3.9v output range */
 	bool bCassSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL1));
 	bool bCartSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL2));
-	UINT8 cassette_sound = (bCassSoundEnable ? 0x40 : 0);
-	UINT8 cart_sound = (bCartSoundEnable ? 0x40 : 0);
+	uint8_t cassette_sound = (bCassSoundEnable ? 0x40 : 0);
+	uint8_t cart_sound = (bCartSoundEnable ? 0x40 : 0);
 
 	/* determine the value to send to the DAC (this is used by the Joystick read as well as audio out) */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
-	UINT8 dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
+	uint8_t dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
 
 	/* The CoCo uses a single DAC for both audio output and joystick axis position measurement.
 	 * To avoid introducing artifacts while reading the axis positions, some software will disable
@@ -768,7 +768,7 @@ bool coco_state::is_joystick_hires(int joystick_index)
 //  poll_joystick
 //-------------------------------------------------
 
-void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
+void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 {
 	static const analog_input_t s_empty = {};
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -781,7 +781,7 @@ void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
 	/* determine the JOYIN value */
 	const analog_input_t *analog;
 	bool joyin_value;
-	UINT8 joyval;
+	uint8_t joyval;
 	int dclg_vpos;
 	switch(joystick_type(joystick))
 	{
@@ -850,11 +850,11 @@ void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
 
 void coco_state::poll_keyboard(void)
 {
-	UINT8 pia0_pb = m_pia_0->b_output();
-	UINT8 pia0_pb_z = m_pia_0->port_b_z_mask();
+	uint8_t pia0_pb = m_pia_0->b_output();
+	uint8_t pia0_pb_z = m_pia_0->port_b_z_mask();
 
-	UINT8 pia0_pa = 0x7F;
-	UINT8 pia0_pa_z = 0x7F;
+	uint8_t pia0_pa = 0x7F;
+	uint8_t pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
@@ -875,7 +875,7 @@ void coco_state::poll_keyboard(void)
 
 	/* poll the joystick (*/
 	bool joyin;
-	UINT8 buttons;
+	uint8_t buttons;
 	poll_joystick(&joyin, &buttons);
 
 	/* PA7 comes from JOYIN */
@@ -896,7 +896,7 @@ void coco_state::poll_keyboard(void)
 //  on the CoCo 3 controls a GIME input
 //-------------------------------------------------
 
-void coco_state::update_keyboard_input(UINT8 value, UINT8 z)
+void coco_state::update_keyboard_input(uint8_t value, uint8_t z)
 {
 	m_pia_0->set_a_input(value, z);
 }
@@ -983,7 +983,7 @@ void coco_state::update_prinout(bool prinout)
 //  pia1_pa_changed - called when PIA1 PA changes
 //-------------------------------------------------
 
-void coco_state::pia1_pa_changed(UINT8 data)
+void coco_state::pia1_pa_changed(uint8_t data)
 {
 	update_sound();     // DAC is connected to PIA1 PA2-PA7
 	poll_keyboard();
@@ -997,7 +997,7 @@ void coco_state::pia1_pa_changed(UINT8 data)
 //  pia1_pb_changed - called when PIA1 PB changes
 //-------------------------------------------------
 
-void coco_state::pia1_pb_changed(UINT8 data)
+void coco_state::pia1_pb_changed(uint8_t data)
 {
 	update_sound();     // singe_bit_sound is connected to PIA1 PB1
 }
@@ -1080,7 +1080,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = m_maincpu->clocks_to_attotime((UINT64) value) * 8;
+			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 8;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)
@@ -1120,7 +1120,7 @@ coco_vhd_image_device *coco_state::current_vhd(void)
 
 READ8_MEMBER( coco_state::ff60_read )
 {
-	UINT8 result;
+	uint8_t result;
 
 	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
@@ -1354,7 +1354,7 @@ static const char *const os9syscalls[] =
 };
 
 
-offs_t coco_state::dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t coco_state::dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	unsigned call;
 	unsigned result = 0;

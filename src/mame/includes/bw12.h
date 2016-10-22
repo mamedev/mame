@@ -72,7 +72,7 @@ public:
 	required_device<timer_device> m_floppy_timer;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_modifiers;
 
 	virtual void machine_start() override;

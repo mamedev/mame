@@ -101,12 +101,12 @@ public:
 	virtual WRITE_LINE_MEMBER( cursor_w ) { };
 	virtual WRITE_LINE_MEMBER( romen_w ) { };
 
-	void set_rom_bank(UINT8 sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
-	UINT8 get_rom_bank() { return m_rom_sel; }
-	virtual void set_mapping(UINT8 type) { };
+	void set_rom_bank(uint8_t sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
+	uint8_t get_rom_bank() { return m_rom_sel; }
+	virtual void set_mapping(uint8_t type) { };
 
 private:
-	UINT8 m_rom_sel;  // currently selected ROM
+	uint8_t m_rom_sel;  // currently selected ROM
 };
 
 
@@ -117,7 +117,7 @@ class cpc_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cpc_expansion_slot_device();
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -132,8 +132,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
 	DECLARE_WRITE8_MEMBER( rom_select );
 
-	void set_rom_bank(UINT8 sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
-	void set_mapping(UINT8 type) { if(m_card) m_card->set_mapping(type); }  // tell device to enable any ROM or RAM mapping
+	void set_rom_bank(uint8_t sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
+	void set_mapping(uint8_t type) { if(m_card) m_card->set_mapping(type); }  // tell device to enable any ROM or RAM mapping
 	DECLARE_WRITE_LINE_MEMBER( cursor_w ) { if(m_card) m_card->cursor_w(state); }  // pass on CRTC Cursor signal
 	DECLARE_WRITE_LINE_MEMBER( romen_w ) { if(m_card) m_card->romen_w(state); }  // pass on /ROMEN signal
 

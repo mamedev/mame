@@ -38,9 +38,9 @@ void fgoal_state::video_start()
 }
 
 
-UINT32 fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8* VRAM = m_video_ram;
+	const uint8_t* VRAM = m_video_ram;
 
 	int x;
 	int y;
@@ -98,14 +98,14 @@ UINT32 fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* p = &bitmap.pix16(y);
+		uint16_t* p = &bitmap.pix16(y);
 
-		const UINT16* FG = &m_fgbitmap.pix16(y);
-		const UINT16* BG = &m_bgbitmap.pix16(y);
+		const uint16_t* FG = &m_fgbitmap.pix16(y);
+		const uint16_t* BG = &m_bgbitmap.pix16(y);
 
 		for (x = 0; x < 256; x += 8)
 		{
-			UINT8 v = *VRAM++;
+			uint8_t v = *VRAM++;
 
 			for (n = 0; n < 8; n++)
 			{

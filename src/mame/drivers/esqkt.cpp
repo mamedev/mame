@@ -120,7 +120,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
-	UINT8 m_duart_io;
+	uint8_t m_duart_io;
 	bool  m_bCalibSecondByte;
 
 public:

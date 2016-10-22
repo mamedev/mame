@@ -321,7 +321,7 @@ static const spc700_opcode_struct g_opcodes[256] =
 };
 
 static unsigned int g_pc;
-static const UINT8 *rombase;
+static const uint8_t *rombase;
 
 static inline unsigned int read_8_immediate(void)
 {
@@ -340,7 +340,7 @@ static inline unsigned int read_16_immediate(void)
 CPU_DISASSEMBLE( spc700 )
 {
 	const spc700_opcode_struct* opcode;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	char* ptr;
 	int var;
 	int i;

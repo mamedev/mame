@@ -8,25 +8,25 @@
 
 struct upd71071_reg
 {
-	UINT8 initialise;
-	UINT8 channel;
-	UINT16 count_current[4];
-	UINT16 count_base[4];
-	UINT32 address_current[4];
-	UINT32 address_base[4];
-	UINT16 device_control;
-	UINT8 mode_control[4];
-	UINT8 status;
-	UINT8 temp_l;
-	UINT8 temp_h;
-	UINT8 request;
-	UINT8 mask;
+	uint8_t initialise;
+	uint8_t channel;
+	uint16_t count_current[4];
+	uint16_t count_base[4];
+	uint32_t address_current[4];
+	uint32_t address_base[4];
+	uint16_t device_control;
+	uint8_t mode_control[4];
+	uint8_t status;
+	uint8_t temp_l;
+	uint8_t temp_h;
+	uint8_t request;
+	uint8_t mask;
 };
 
 class upd71071_device : public device_t
 {
 public:
-	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~upd71071_device() {}
 
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<upd71071_device &>(device).m_cpu.set_tag(tag); }

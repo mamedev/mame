@@ -33,14 +33,14 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 #include "machine/s3c24xx.hxx"
 #undef DEVICE_S3C2400
 
-UINT32 s3c2400_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3c2400_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return s3c24xx_video_update(screen, bitmap, cliprect);
 }
 
 const device_type S3C2400 = &device_creator<s3c2400_device>;
 
-s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, S3C2400, "Samsung S3C2400", tag, owner, clock, "s3c2400", __FILE__),
 		m_palette(*this, finder_base::DUMMY_TAG),
 		m_cpu(*this, ":maincpu"),
@@ -133,7 +133,7 @@ void s3c2400_device::device_reset()
 	s3c24xx_device_reset();
 }
 
-void s3c2400_device::s3c2400_uart_fifo_w(int uart, UINT8 data)
+void s3c2400_device::s3c2400_uart_fifo_w(int uart, uint8_t data)
 {
 	s3c24xx_uart_fifo_w(uart, data);
 }

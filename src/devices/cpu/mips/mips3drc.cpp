@@ -31,7 +31,7 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
-extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
+extern unsigned dasmmips3(char *buffer, unsigned pc, uint32_t op);
 
 using namespace uml;
 
@@ -79,7 +79,7 @@ using namespace uml;
 #define FDVALD_FR1  mem((double *)&m_core->cpr[1][FDREG])
 
 #define FCCSHIFT(which)         fcc_shift[(m_flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]
-#define FCCMASK(which)          ((UINT32)(1 << FCCSHIFT(which)))
+#define FCCMASK(which)          ((uint32_t)(1 << FCCSHIFT(which)))
 
 
 
@@ -97,7 +97,7 @@ static void cfunc_printf_probe(void *param);
 ***************************************************************************/
 
 /* bit indexes for various FCCs */
-static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
+static const uint8_t fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
 
 
 /***************************************************************************
@@ -109,7 +109,7 @@ static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
     descriptor
 -------------------------------------------------*/
 
-static inline UINT32 epc(const opcode_desc *desc)
+static inline uint32_t epc(const opcode_desc *desc)
 {
 	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
 }
@@ -166,7 +166,7 @@ inline void mips3_device::save_fast_iregs(drcuml_block *block)
     mips3drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void mips3_device::mips3drc_set_options(UINT32 options)
+void mips3_device::mips3drc_set_options(uint32_t options)
 {
 	if (!allow_drc()) return;
 	m_drcoptions = options;
@@ -176,7 +176,7 @@ void mips3_device::mips3drc_set_options(UINT32 options)
     mips3drc_clears_fastram - clears fastram
     region starting at index select_start
 -------------------------------------------------*/
-void mips3_device::clear_fastram(UINT32 select_start)
+void mips3_device::clear_fastram(uint32_t select_start)
 {
 	for (int i=select_start; i<MIPS3_MAX_FASTRAM; i++) {
 		m_fastram[i].start = 0;
@@ -194,7 +194,7 @@ void mips3_device::clear_fastram(UINT32 select_start)
     region
 -------------------------------------------------*/
 
-void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+void mips3_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
 	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
 	{
@@ -202,9 +202,9 @@ void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *b
 		m_fastram[m_fastram_select].end = end;
 		m_fastram[m_fastram_select].readonly = readonly;
 		m_fastram[m_fastram_select].base = base;
-		m_fastram[m_fastram_select].offset_base8 = (UINT8*)base - start;
-		m_fastram[m_fastram_select].offset_base16 = (UINT16*)((UINT8*)base - start);
-		m_fastram[m_fastram_select].offset_base32 = (UINT32*)((UINT8*)base - start);
+		m_fastram[m_fastram_select].offset_base8 = (uint8_t*)base - start;
+		m_fastram[m_fastram_select].offset_base16 = (uint16_t*)((uint8_t*)base - start);
+		m_fastram[m_fastram_select].offset_base32 = (uint32_t*)((uint8_t*)base - start);
 		m_fastram_select++;
 	}
 }
@@ -214,7 +214,7 @@ void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *b
     mips3drc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void mips3_device::mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles)
+void mips3_device::mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles)
 {
 	if (!allow_drc()) return;
 	if (m_hotspot_select < ARRAY_LENGTH(m_hotspot))
@@ -298,7 +298,7 @@ void mips3_device::code_flush_cache()
     given mode at the specified pc
 -------------------------------------------------*/
 
-void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
+void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
@@ -327,7 +327,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -463,7 +463,7 @@ static void cfunc_get_cycles(void *param)
 
 void mips3_device::func_printf_exception()
 {
-	printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", (UINT32)m_core->cpr[0][COP0_EPC], (UINT32)m_core->cpr[0][COP0_Cause], (UINT32)m_core->cpr[0][COP0_BadVAddr], m_core->pc);
+	printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", (uint32_t)m_core->cpr[0][COP0_EPC], (uint32_t)m_core->cpr[0][COP0_Cause], (uint32_t)m_core->cpr[0][COP0_BadVAddr], m_core->pc);
 	func_printf_probe();
 }
 
@@ -497,47 +497,47 @@ void mips3_device::func_printf_probe()
 {
 	printf(" PC=%08X          r1=%08X%08X  r2=%08X%08X  r3=%08X%08X\n",
 		m_core->pc,
-		(UINT32)(m_core->r[1] >> 32), (UINT32)m_core->r[1],
-		(UINT32)(m_core->r[2] >> 32), (UINT32)m_core->r[2],
-		(UINT32)(m_core->r[3] >> 32), (UINT32)m_core->r[3]);
+		(uint32_t)(m_core->r[1] >> 32), (uint32_t)m_core->r[1],
+		(uint32_t)(m_core->r[2] >> 32), (uint32_t)m_core->r[2],
+		(uint32_t)(m_core->r[3] >> 32), (uint32_t)m_core->r[3]);
 	printf(" r4=%08X%08X  r5=%08X%08X  r6=%08X%08X  r7=%08X%08X\n",
-		(UINT32)(m_core->r[4] >> 32), (UINT32)m_core->r[4],
-		(UINT32)(m_core->r[5] >> 32), (UINT32)m_core->r[5],
-		(UINT32)(m_core->r[6] >> 32), (UINT32)m_core->r[6],
-		(UINT32)(m_core->r[7] >> 32), (UINT32)m_core->r[7]);
+		(uint32_t)(m_core->r[4] >> 32), (uint32_t)m_core->r[4],
+		(uint32_t)(m_core->r[5] >> 32), (uint32_t)m_core->r[5],
+		(uint32_t)(m_core->r[6] >> 32), (uint32_t)m_core->r[6],
+		(uint32_t)(m_core->r[7] >> 32), (uint32_t)m_core->r[7]);
 	printf(" r8=%08X%08X  r9=%08X%08X r10=%08X%08X r11=%08X%08X\n",
-		(UINT32)(m_core->r[8] >> 32), (UINT32)m_core->r[8],
-		(UINT32)(m_core->r[9] >> 32), (UINT32)m_core->r[9],
-		(UINT32)(m_core->r[10] >> 32), (UINT32)m_core->r[10],
-		(UINT32)(m_core->r[11] >> 32), (UINT32)m_core->r[11]);
+		(uint32_t)(m_core->r[8] >> 32), (uint32_t)m_core->r[8],
+		(uint32_t)(m_core->r[9] >> 32), (uint32_t)m_core->r[9],
+		(uint32_t)(m_core->r[10] >> 32), (uint32_t)m_core->r[10],
+		(uint32_t)(m_core->r[11] >> 32), (uint32_t)m_core->r[11]);
 	printf("r12=%08X%08X r13=%08X%08X r14=%08X%08X r15=%08X%08X\n",
-		(UINT32)(m_core->r[12] >> 32), (UINT32)m_core->r[12],
-		(UINT32)(m_core->r[13] >> 32), (UINT32)m_core->r[13],
-		(UINT32)(m_core->r[14] >> 32), (UINT32)m_core->r[14],
-		(UINT32)(m_core->r[15] >> 32), (UINT32)m_core->r[15]);
+		(uint32_t)(m_core->r[12] >> 32), (uint32_t)m_core->r[12],
+		(uint32_t)(m_core->r[13] >> 32), (uint32_t)m_core->r[13],
+		(uint32_t)(m_core->r[14] >> 32), (uint32_t)m_core->r[14],
+		(uint32_t)(m_core->r[15] >> 32), (uint32_t)m_core->r[15]);
 	printf("r16=%08X%08X r17=%08X%08X r18=%08X%08X r19=%08X%08X\n",
-		(UINT32)(m_core->r[16] >> 32), (UINT32)m_core->r[16],
-		(UINT32)(m_core->r[17] >> 32), (UINT32)m_core->r[17],
-		(UINT32)(m_core->r[18] >> 32), (UINT32)m_core->r[18],
-		(UINT32)(m_core->r[19] >> 32), (UINT32)m_core->r[19]);
+		(uint32_t)(m_core->r[16] >> 32), (uint32_t)m_core->r[16],
+		(uint32_t)(m_core->r[17] >> 32), (uint32_t)m_core->r[17],
+		(uint32_t)(m_core->r[18] >> 32), (uint32_t)m_core->r[18],
+		(uint32_t)(m_core->r[19] >> 32), (uint32_t)m_core->r[19]);
 	printf("r20=%08X%08X r21=%08X%08X r22=%08X%08X r23=%08X%08X\n",
-		(UINT32)(m_core->r[20] >> 32), (UINT32)m_core->r[20],
-		(UINT32)(m_core->r[21] >> 32), (UINT32)m_core->r[21],
-		(UINT32)(m_core->r[22] >> 32), (UINT32)m_core->r[22],
-		(UINT32)(m_core->r[23] >> 32), (UINT32)m_core->r[23]);
+		(uint32_t)(m_core->r[20] >> 32), (uint32_t)m_core->r[20],
+		(uint32_t)(m_core->r[21] >> 32), (uint32_t)m_core->r[21],
+		(uint32_t)(m_core->r[22] >> 32), (uint32_t)m_core->r[22],
+		(uint32_t)(m_core->r[23] >> 32), (uint32_t)m_core->r[23]);
 	printf("r24=%08X%08X r25=%08X%08X r26=%08X%08X r27=%08X%08X\n",
-		(UINT32)(m_core->r[24] >> 32), (UINT32)m_core->r[24],
-		(UINT32)(m_core->r[25] >> 32), (UINT32)m_core->r[25],
-		(UINT32)(m_core->r[26] >> 32), (UINT32)m_core->r[26],
-		(UINT32)(m_core->r[27] >> 32), (UINT32)m_core->r[27]);
+		(uint32_t)(m_core->r[24] >> 32), (uint32_t)m_core->r[24],
+		(uint32_t)(m_core->r[25] >> 32), (uint32_t)m_core->r[25],
+		(uint32_t)(m_core->r[26] >> 32), (uint32_t)m_core->r[26],
+		(uint32_t)(m_core->r[27] >> 32), (uint32_t)m_core->r[27]);
 	printf("r28=%08X%08X r29=%08X%08X r30=%08X%08X r31=%08X%08X\n",
-		(UINT32)(m_core->r[28] >> 32), (UINT32)m_core->r[28],
-		(UINT32)(m_core->r[29] >> 32), (UINT32)m_core->r[29],
-		(UINT32)(m_core->r[30] >> 32), (UINT32)m_core->r[30],
-		(UINT32)(m_core->r[31] >> 32), (UINT32)m_core->r[31]);
+		(uint32_t)(m_core->r[28] >> 32), (uint32_t)m_core->r[28],
+		(uint32_t)(m_core->r[29] >> 32), (uint32_t)m_core->r[29],
+		(uint32_t)(m_core->r[30] >> 32), (uint32_t)m_core->r[30],
+		(uint32_t)(m_core->r[31] >> 32), (uint32_t)m_core->r[31]);
 	printf(" hi=%08X%08X  lo=%08X%08X\n",
-		(UINT32)(m_core->r[REG_HI] >> 32), (UINT32)m_core->r[REG_HI],
-		(UINT32)(m_core->r[REG_LO] >> 32), (UINT32)m_core->r[REG_LO]);
+		(uint32_t)(m_core->r[REG_HI] >> 32), (uint32_t)m_core->r[REG_HI],
+		(uint32_t)(m_core->r[REG_LO] >> 32), (uint32_t)m_core->r[REG_LO]);
 }
 
 static void cfunc_printf_probe(void *param)
@@ -552,7 +552,7 @@ static void cfunc_printf_probe(void *param)
 
 void mips3_device::func_unimplemented()
 {
-	UINT32 opcode = m_core->arg0;
+	uint32_t opcode = m_core->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)\n", m_core->pc, opcode, opcode >> 26, opcode & 0x3f);
 }
 
@@ -719,11 +719,11 @@ void mips3_device::static_generate_tlb_mismatch()
     exception handler
 -------------------------------------------------*/
 
-void mips3_device::static_generate_exception(UINT8 exception, int recover, const char *name)
+void mips3_device::static_generate_exception(uint8_t exception, int recover, const char *name)
 {
 	code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
 	drcuml_state *drcuml = m_drcuml.get();
-	UINT32 offset = 0x180;
+	uint32_t offset = 0x180;
 	code_label next = 1;
 	code_label skip = 2;
 	drcuml_block *block;
@@ -868,8 +868,8 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 			if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
 			{
-				void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
-				UINT32 skip = label++;
+				void *fastbase = (uint8_t *)m_fastram[ramnum].base - m_fastram[ramnum].start;
+				uint32_t skip = label++;
 				if (m_fastram[ramnum].end != 0xffffffff)
 				{
 					UML_CMP(block, I0, m_fastram[ramnum].end);   // cmp     i0,end
@@ -1114,7 +1114,7 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UINT32 sum = seqhead->opptr.l[0];
+			uint32_t sum = seqhead->opptr.l[0];
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);         // load    i0,base,0,dword
 
@@ -1146,7 +1146,7 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 				UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));   // exne    nocode,seqhead->pc
 			}
 #else
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
@@ -1299,10 +1299,10 @@ void mips3_device::generate_sequence_instruction(drcuml_block *block, compiler_s
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
-void mips3_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
+void mips3_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg)
 {
 	compiler_state compiler_temp = *compiler;
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
@@ -1314,7 +1314,7 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_DMOV(block, R64(linkreg), (INT32)(desc->pc + 8));                   // dmov    <linkreg>,desc->pc + 8
+		UML_DMOV(block, R64(linkreg), (int32_t)(desc->pc + 8));                   // dmov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -1356,8 +1356,8 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_
 int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op >> 26;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op >> 26;
 	code_label skip;
 
 	switch (opswitch)
@@ -1624,12 +1624,12 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			UML_AND(block, I0, I0, ~7);                             // and     i0,i0,~7
 			if (!m_bigendian)
 				UML_XOR(block, I1, I1, 0x38);                       // xor     i1,i1,0x38
-			UML_DSHR(block, I2, (UINT64)~0, I1);                        // dshr    i2,~0,i1
+			UML_DSHR(block, I2, (uint64_t)~0, I1);                        // dshr    i2,~0,i1
 			UML_CALLH(block, *m_read64mask[m_core->mode >> 1]);
 																					// callh   read64mask
 			if (RTREG != 0)
 			{
-				UML_DSHL(block, I2, (UINT64)~0, I1);                    // dshl    i2,~0,i1
+				UML_DSHL(block, I2, (uint64_t)~0, I1);                    // dshl    i2,~0,i1
 				UML_DROLINS(block, R64(RTREG), I0, I1, I2);         // drolins <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
@@ -1642,11 +1642,11 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			UML_AND(block, I0, I0, ~7);                         // and     i0,i0,~7
 			if (m_bigendian)
 				UML_XOR(block, I1, I1, 0x38);                   // xor     i1,i1,0x38
-			UML_DSHL(block, I2, (UINT64)~0, I1);                // dshl    i2,~0,i1
+			UML_DSHL(block, I2, (uint64_t)~0, I1);                // dshl    i2,~0,i1
 			UML_CALLH(block, *m_read64mask[m_core->mode >> 1]); // callh   read64mask
 			if (RTREG != 0)
 			{
-				UML_DSHR(block, I2, (UINT64)~0, I1);            // dshr    i2,~0,i1
+				UML_DSHR(block, I2, (uint64_t)~0, I1);            // dshr    i2,~0,i1
 				UML_SUB(block, I1, 64, I1);                     // sub     i1,64,i1
 				UML_DROLINS(block, R64(RTREG), I0, I1, I2);     // drolins <rtreg>,i0,i1,i2
 			}
@@ -1784,7 +1784,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			UML_DMOV(block, I1, R64(RTREG));                    // dmov    i1,<rtreg>
 			if (!m_bigendian)
 				UML_XOR(block, I3, I3, 0x38);                   // xor     i3,i3,0x38
-			UML_DSHR(block, I2, (UINT64)~0, I3);                // dshr    i2,~0,i3
+			UML_DSHR(block, I2, (uint64_t)~0, I3);                // dshr    i2,~0,i3
 			UML_DSHR(block, I1, I1, I3);                        // dshr    i1,i1,i3
 			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);// callh   write64mask
 
@@ -1799,7 +1799,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			UML_DMOV(block, I1, R64(RTREG));                    // dmov    i1,<rtreg>
 			if (m_bigendian)
 				UML_XOR(block, I3, I3, 0x38);                   // xor     i3,i3,0x38
-			UML_DSHL(block, I2, (UINT64)~0, I3);                // dshl    i2,~0,i3
+			UML_DSHL(block, I2, (uint64_t)~0, I3);                // dshl    i2,~0,i3
 			UML_DSHL(block, I1, I1, I3);                        // dshl    i1,i1,i3
 			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);// callh   write64mask
 
@@ -1889,8 +1889,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 
 int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op & 63;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op & 63;
 
 	switch (opswitch)
 	{
@@ -2138,7 +2138,7 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 			if (RDREG != 0)
 			{
 				UML_DOR(block, I0, R64(RSREG), R64(RTREG));                 // dor      i0,<rsreg>,<rtreg>
-				UML_DXOR(block, R64(RDREG), I0, (UINT64)~0);                // dxor     <rdreg>,i0,~0
+				UML_DXOR(block, R64(RDREG), I0, (uint64_t)~0);                // dxor     <rdreg>,i0,~0
 			}
 			return TRUE;
 
@@ -2282,8 +2282,8 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 
 int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RTREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RTREG;
 	code_label skip;
 
 	switch (opswitch)
@@ -2294,7 +2294,7 @@ int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler,
 		case 0x12:  /* BLTZALL */
 			if (opswitch & 0x10)
 			{
-				UML_DMOV(block, R64(31), (INT32)(desc->pc + 8));
+				UML_DMOV(block, R64(31), (int32_t)(desc->pc + 8));
 			}
 			if (RSREG != 0)
 			{
@@ -2312,7 +2312,7 @@ int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler,
 		case 0x13:  /* BGEZALL */
 			if (opswitch & 0x10)
 			{
-				UML_DMOV(block, R64(31), (INT32)(desc->pc + 8));
+				UML_DMOV(block, R64(31), (int32_t)(desc->pc + 8));
 			}
 
 			if (RSREG != 0)
@@ -2369,8 +2369,8 @@ int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler,
 
 int mips3_device::generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op & 0x1f;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op & 0x1f;
 
 	/* only enabled on IDT processors */
 	if (m_flavor != MIPS3_TYPE_R4650)
@@ -2417,7 +2417,7 @@ int mips3_device::generate_idt(drcuml_block *block, compiler_state *compiler, co
     handle special COP0 registers
 -------------------------------------------------*/
 
-int mips3_device::generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 reg)
+int mips3_device::generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 	code_label link;
@@ -2491,7 +2491,7 @@ int mips3_device::generate_set_cop0_reg(drcuml_block *block, compiler_state *com
     read special COP0 registers
 -------------------------------------------------*/
 
-int mips3_device::generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 reg)
+int mips3_device::generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg)
 {
 	code_label link1, link2;
 
@@ -2559,8 +2559,8 @@ void mips3_device::check_cop0_access(drcuml_block *block)
 
 int mips3_device::generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = RSREG;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = RSREG;
 	int skip;
 
 	/* generate an exception if COP0 is disabled unless we are in kernel mode */
@@ -2691,7 +2691,7 @@ void mips3_device::check_cop1_access(drcuml_block *block)
 	}
 }
 
-void mips3_device::generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+void mips3_device::generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param)
 {
 	if ((m_core->mode & 1) == 0)
 	{
@@ -2707,7 +2707,7 @@ void mips3_device::generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_sta
 	}
 }
 
-void mips3_device::generate_get_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+void mips3_device::generate_get_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param)
 {
 	if ((m_core->mode & 1) == 0)
 	{
@@ -2723,7 +2723,7 @@ void mips3_device::generate_get_cop1_reg64(drcuml_block *block, compiler_state *
 	}
 }
 
-void mips3_device::generate_set_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+void mips3_device::generate_set_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param)
 {
 	if ((m_core->mode & 1) == 0)
 	{
@@ -2740,7 +2740,7 @@ void mips3_device::generate_set_cop1_reg64(drcuml_block *block, compiler_state *
 	}
 }
 
-void mips3_device::generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+void mips3_device::generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param)
 {
 	if ((m_core->mode & 1) == 0)
 	{
@@ -2763,7 +2763,7 @@ void mips3_device::generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_sta
 
 int mips3_device::generate_cop1_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 	code_label skip;
 	condition_t condition;
 
@@ -3349,7 +3349,7 @@ int mips3_device::generate_cop1_fr0(drcuml_block *block, compiler_state *compile
 
 int mips3_device::generate_cop1_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 	code_label skip;
 	condition_t condition;
 
@@ -3732,7 +3732,7 @@ int mips3_device::generate_cop1_fr1(drcuml_block *block, compiler_state *compile
 int mips3_device::generate_cop1x_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 
 	check_cop1_access(block);
 
@@ -3845,7 +3845,7 @@ int mips3_device::generate_cop1x_fr0(drcuml_block *block, compiler_state *compil
 int mips3_device::generate_cop1x_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
+	uint32_t op = desc->opptr.l[0];
 
 	check_cop1_access(block);
 
@@ -3945,7 +3945,7 @@ int mips3_device::generate_cop1x_fr1(drcuml_block *block, compiler_state *compil
     including disassembly of a MIPS instruction
 -------------------------------------------------*/
 
-void mips3_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void mips3_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{
@@ -3962,7 +3962,7 @@ void mips3_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32
     flags
 -------------------------------------------------*/
 
-const char *mips3_device::log_desc_flags_to_string(UINT32 flags)
+const char *mips3_device::log_desc_flags_to_string(uint32_t flags)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
@@ -4016,7 +4016,7 @@ const char *mips3_device::log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-void mips3_device::log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
+void mips3_device::log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
 {
 	int count = 0;
 	int regnum;

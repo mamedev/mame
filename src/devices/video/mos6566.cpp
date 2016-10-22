@@ -277,7 +277,7 @@ inline void mos6566_device::clear_interrupt( int mask )
 	}
 }
 
-inline UINT8 mos6566_device::read_videoram(offs_t offset)
+inline uint8_t mos6566_device::read_videoram(offs_t offset)
 {
 	//logerror("cycle %u VRAM %04x BA %u AEC %u\n", m_cycle, offset & 0x3fff, m_ba, m_aec);
 	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
@@ -285,7 +285,7 @@ inline UINT8 mos6566_device::read_videoram(offs_t offset)
 	return m_last_data;
 }
 
-inline UINT8 mos6566_device::read_colorram(offs_t offset)
+inline uint8_t mos6566_device::read_colorram(offs_t offset)
 {
 	return space(AS_1).read_byte(offset & 0x3ff);
 }
@@ -412,7 +412,7 @@ inline void mos6566_device::sample_border()
 inline void mos6566_device::check_sprite_dma()
 {
 	int i;
-	UINT8 mask = 1;
+	uint8_t mask = 1;
 
 	for (i = 0; i < 8; i++, mask <<= 1)
 		if (SPRITEON(i) && ((m_rasterline & 0xff) == SPRITE_Y_POS(i)))
@@ -429,7 +429,7 @@ inline void mos6566_device::matrix_access()
 {
 	if (!m_is_bad_line) return;
 
-	UINT16 adr = (m_vc & 0x03ff) | VIDEOADDR;
+	uint16_t adr = (m_vc & 0x03ff) | VIDEOADDR;
 
 	// we're in the second clock phase
 	m_phi0 = 1;
@@ -452,7 +452,7 @@ inline void mos6566_device::graphics_access()
 {
 	if (m_display_state == 1)
 	{
-		UINT16 adr;
+		uint16_t adr;
 		if (HIRESON)
 			adr = ((m_vc & 0x03ff) << 3) | m_bitmapaddr | m_rc;
 		else
@@ -476,7 +476,7 @@ inline void mos6566_device::draw_background()
 {
 	if (m_draw_this_line)
 	{
-		UINT8 c;
+		uint8_t c;
 
 		switch (GFXMODE)
 		{
@@ -508,10 +508,10 @@ inline void mos6566_device::draw_background()
 	}
 }
 
-inline void mos6566_device::draw_mono( UINT16 p, UINT8 c0, UINT8 c1 )
+inline void mos6566_device::draw_mono( uint16_t p, uint8_t c0, uint8_t c1 )
 {
-	UINT8 c[2];
-	UINT8 data = m_gfx_data;
+	uint8_t c[2];
+	uint8_t data = m_gfx_data;
 
 	c[0] = c0;
 	c[1] = c1;
@@ -534,10 +534,10 @@ inline void mos6566_device::draw_mono( UINT16 p, UINT8 c0, UINT8 c1 )
 	m_fore_coll_buf[p + 0] = data & 1;
 }
 
-inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 )
+inline void mos6566_device::draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 )
 {
-	UINT8 c[4];
-	UINT8 data = m_gfx_data;
+	uint8_t c[4];
+	uint8_t data = m_gfx_data;
 
 	c[0] = c0;
 	c[1] = c1;
@@ -572,12 +572,12 @@ inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, 
 //  mos6566_device - constructor
 //-------------------------------------------------
 
-mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6566_device(mconfig, MOS6566, "MOS6566", tag, owner, clock, TYPE_6566, "mos6566", __FILE__)
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -597,28 +597,28 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock, TYPE_6567, "mos6567", __FILE__) { }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
-mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock, TYPE_8562, "mos8562", __FILE__) { }
 
-mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock, TYPE_8564, "mos8564", __FILE__) { }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
-mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock, TYPE_8565, "mos8565", __FILE__) { }
 
-mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:mos6569_device(mconfig, MOS8566, "MOS8566", tag, owner, clock, TYPE_8566, "mos8566", __FILE__) { }
 
 
@@ -846,8 +846,8 @@ void mos6566_device::execute_run()
 {
 	do
 	{
-		UINT8 cpu_cycles = m_cpu->total_cycles() & 0xff;
-		UINT8 vic_cycles = total_cycles() & 0xff;
+		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
+		uint8_t vic_cycles = total_cycles() & 0xff;
 
 		m_phi0 = 0;
 
@@ -857,7 +857,7 @@ void mos6566_device::execute_run()
 		set_aec(CLEAR_LINE);
 
 		int i;
-		UINT8 mask;
+		uint8_t mask;
 
 		if (m_rasterline == VIC2_FIRST_DMA_LINE)
 			m_bad_lines_enabled = SCREENON;
@@ -1434,8 +1434,8 @@ void mos6569_device::execute_run()
 {
 	do
 	{
-		UINT8 cpu_cycles = m_cpu->total_cycles() & 0xff;
-		UINT8 vic_cycles = total_cycles() & 0xff;
+		uint8_t cpu_cycles = m_cpu->total_cycles() & 0xff;
+		uint8_t vic_cycles = total_cycles() & 0xff;
 
 		m_phi0 = 0;
 
@@ -1445,7 +1445,7 @@ void mos6569_device::execute_run()
 		set_aec(CLEAR_LINE);
 
 		int i;
-		UINT8 mask;
+		uint8_t mask;
 
 		if ((m_rasterline == VIC2_FIRST_DMA_LINE) && !m_bad_lines_enabled)
 			m_bad_lines_enabled = SCREENON;
@@ -1999,7 +1999,7 @@ void mos6566_device::draw_graphics()
 {
 	if (m_draw_this_line == 0)
 	{
-		UINT16 p = m_graphic_x + XSCROLL;
+		uint16_t p = m_graphic_x + XSCROLL;
 		m_fore_coll_buf[p + 7] = 0;
 		m_fore_coll_buf[p + 6] = 0;
 		m_fore_coll_buf[p + 5] = 0;
@@ -2011,7 +2011,7 @@ void mos6566_device::draw_graphics()
 	}
 	else if (m_ud_border_on)
 	{
-		UINT16 p = m_graphic_x + XSCROLL;
+		uint16_t p = m_graphic_x + XSCROLL;
 		m_fore_coll_buf[p + 7] = 0;
 		m_fore_coll_buf[p + 6] = 0;
 		m_fore_coll_buf[p + 5] = 0;
@@ -2024,8 +2024,8 @@ void mos6566_device::draw_graphics()
 	}
 	else
 	{
-		UINT8 tmp_col;
-		UINT16 p = m_graphic_x + XSCROLL;
+		uint8_t tmp_col;
+		uint16_t p = m_graphic_x + XSCROLL;
 		switch (GFXMODE)
 		{
 			case 0:
@@ -2117,10 +2117,10 @@ void mos6566_device::draw_graphics()
 void mos6566_device::draw_sprites()
 {
 	int i;
-	UINT8 snum, sbit;
-	UINT8 spr_coll = 0, gfx_coll = 0;
-	UINT32 plane0_l, plane0_r, plane1_l, plane1_r;
-	UINT32 sdata_l, sdata_r;
+	uint8_t snum, sbit;
+	uint8_t spr_coll = 0, gfx_coll = 0;
+	uint32_t plane0_l, plane0_r, plane1_l, plane1_r;
+	uint32_t sdata_l, sdata_r;
 
 	for (i = 0; i < 0x400; i++)
 		m_spr_coll_buf[i] = 0;
@@ -2129,9 +2129,9 @@ void mos6566_device::draw_sprites()
 	{
 		if ((m_spr_draw & sbit) && (SPRITE_X_POS(snum) <= (403 - (VIC2_FIRSTCOLUMN + 1))))
 		{
-			UINT16 p = SPRITE_X_POS(snum) + VIC2_X_2_EMU(0) + 8;
-			UINT8 color = SPRITE_COLOR(snum);
-			UINT32 sdata = (m_spr_draw_data[snum][0] << 24) | (m_spr_draw_data[snum][1] << 16) | (m_spr_draw_data[snum][2] << 8);
+			uint16_t p = SPRITE_X_POS(snum) + VIC2_X_2_EMU(0) + 8;
+			uint8_t color = SPRITE_COLOR(snum);
+			uint32_t sdata = (m_spr_draw_data[snum][0] << 24) | (m_spr_draw_data[snum][1] << 16) | (m_spr_draw_data[snum][2] << 8);
 
 			if (SPRITE_X_EXPAND(snum))
 			{
@@ -2148,7 +2148,7 @@ void mos6566_device::draw_sprites()
 					plane1_r = (sdata_r & 0xaaaaaaaa) | (sdata_r & 0xaaaaaaaa) >> 1;
 					for (i = 0; i < 32; i++, plane0_l <<= 1, plane1_l <<= 1)
 					{
-						UINT8 col;
+						uint8_t col;
 
 						if (plane1_l & 0x80000000)
 						{
@@ -2195,7 +2195,7 @@ void mos6566_device::draw_sprites()
 
 					for (; i < 48; i++, plane0_r <<= 1, plane1_r <<= 1)
 					{
-						UINT8 col;
+						uint8_t col;
 
 						if(plane1_r & 0x80000000)
 						{
@@ -2303,12 +2303,12 @@ void mos6566_device::draw_sprites()
 			{
 				if (SPRITE_MULTICOLOR(snum))
 				{
-					UINT32 plane0 = (sdata & 0x55555555) | (sdata & 0x55555555) << 1;
-					UINT32 plane1 = (sdata & 0xaaaaaaaa) | (sdata & 0xaaaaaaaa) >> 1;
+					uint32_t plane0 = (sdata & 0x55555555) | (sdata & 0x55555555) << 1;
+					uint32_t plane1 = (sdata & 0xaaaaaaaa) | (sdata & 0xaaaaaaaa) >> 1;
 
 					for (i = 0; i < 24; i++, plane0 <<= 1, plane1 <<= 1)
 					{
-						UINT8 col;
+						uint8_t col;
 
 						if (plane1 & 0x80000000)
 						{
@@ -2412,7 +2412,7 @@ void mos6566_device::draw_sprites()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(PALETTE_MOS[0], cliprect);
 
@@ -2429,7 +2429,7 @@ UINT32 mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 READ8_MEMBER( mos6566_device::read )
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	offset &= 0x3f;
 

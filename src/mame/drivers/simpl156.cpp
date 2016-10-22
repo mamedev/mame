@@ -1017,16 +1017,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = memregion("okimusic")->base();
+	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	std::vector<UINT8> buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	/* hmm low address line goes to banking chip instead? */
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,

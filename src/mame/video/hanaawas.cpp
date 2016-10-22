@@ -19,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -57,7 +57,7 @@ PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
 	for (i = 0; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
-		UINT8 ctabentry = color_prom[swapped_i] & 0x0f;
+		uint8_t ctabentry = color_prom[swapped_i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -104,7 +104,7 @@ void hanaawas_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 hanaawas_state::screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hanaawas_state::screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

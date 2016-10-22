@@ -44,15 +44,15 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_port_80;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_port_80;
 
 	/* video-related */
 	tilemap_t        *m_cm_tilemap;
 	std::unique_ptr<bitmap_ind16>       m_bitmap_buffer;
 
-	UINT8          m_irq_mask;
+	uint8_t          m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(port_40_w);
 	DECLARE_WRITE8_MEMBER(port_80_w);
@@ -66,6 +66,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cheekyms);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip );
 };

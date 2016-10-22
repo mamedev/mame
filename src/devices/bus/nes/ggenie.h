@@ -12,7 +12,7 @@ class nes_ggenie_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,7 +35,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual void pcb_reset() override;
-	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted) override;
+	virtual void pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted) override;
 
 private:
 	// emulate the Game Genie!
@@ -43,9 +43,9 @@ private:
 
 	int m_gg_bypass;
 	// GG codes
-	UINT16 m_gg_addr[3];
-	UINT8  m_gg_repl[3];
-	UINT8  m_gg_comp[3];
+	uint16_t m_gg_addr[3];
+	uint8_t  m_gg_repl[3];
+	uint8_t  m_gg_comp[3];
 	int    m_gg_disable[3];
 	int    m_gg_is_comp[3];
 };

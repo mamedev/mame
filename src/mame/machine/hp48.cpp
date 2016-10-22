@@ -54,8 +54,8 @@ static const char *const hp48_module_names[6] =
 { "HDW (I/O)", "NCE2 (RAM)", "CE1", "CE2", "NCE3", "NCE1 (ROM)" };
 
 /* values returned by C=ID */
-static const UINT8 hp48_module_mask_id[6] = { 0x00, 0x03, 0x05, 0x07, 0x01, 0x00 };
-static const UINT8 hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00 };
+static const uint8_t hp48_module_mask_id[6] = { 0x00, 0x03, 0x05, 0x07, 0x01, 0x00 };
+static const uint8_t hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00 };
 
 
 
@@ -95,7 +95,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_recv_cb)
 }
 
 /* outside world initiates a receive event */
-void hp48_state::hp48_rs232_start_recv_byte( UINT8 data )
+void hp48_state::hp48_rs232_start_recv_byte( uint8_t data )
 {
 	LOG_SERIAL(( "%f hp48_rs232_start_recv_byte: start receiving, data=%02x\n",
 				machine().time().as_double(), data ));
@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_sent_cb)
 /* CPU initiates a send event */
 void hp48_state::hp48_rs232_send_byte(  )
 {
-	UINT8 data = HP48_IO_8(0x16); /* byte to send */
+	uint8_t data = HP48_IO_8(0x16); /* byte to send */
 
 	LOG_SERIAL(( "%s %f hp48_rs232_send_byte: start sending, data=%02x\n",
 				machine().describe_context(), machine().time().as_double(), data ));
@@ -394,7 +394,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 
 READ8_MEMBER(hp48_state::hp48_io_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch( offset )
 	{
@@ -697,12 +697,12 @@ void hp48_state::hp48_apply_modules()
 	/* from lowest to highest priority */
 	for ( i = 4; i >= 0; i-- )
 	{
-		UINT32 select_mask = m_modules[i].mask;
-		UINT32 nselect_mask = ~select_mask & 0xfffff;
-		UINT32 base = m_modules[i].base;
-		UINT32 off_mask = m_modules[i].off_mask;
-		UINT32 mirror = nselect_mask & ~off_mask;
-		UINT32 end = base + (off_mask & nselect_mask);
+		uint32_t select_mask = m_modules[i].mask;
+		uint32_t nselect_mask = ~select_mask & 0xfffff;
+		uint32_t base = m_modules[i].base;
+		uint32_t off_mask = m_modules[i].off_mask;
+		uint32_t mirror = nselect_mask & ~off_mask;
+		uint32_t end = base + (off_mask & nselect_mask);
 		char bank[10];
 		sprintf(bank,"bank%d",i);
 
@@ -890,7 +890,7 @@ WRITE32_MEMBER( hp48_state::hp48_mem_crc )
 
 
 /* decodes size bytes into 2*size nibbles (least significant first) */
-void hp48_state::hp48_decode_nibble( UINT8* dst, UINT8* src, int size )
+void hp48_state::hp48_decode_nibble( uint8_t* dst, uint8_t* src, int size )
 {
 	int i;
 	for ( i=size-1; i >= 0; i-- )
@@ -901,7 +901,7 @@ void hp48_state::hp48_decode_nibble( UINT8* dst, UINT8* src, int size )
 }
 
 /* inverse of hp48_decode_nibble  */
-void hp48_state::hp48_encode_nibble( UINT8* dst, UINT8* src, int size )
+void hp48_state::hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size )
 {
 	int i;
 	for ( i=0; i < size; i++ )
@@ -921,7 +921,7 @@ void hp48_port_image_device::hp48_fill_port()
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = state->m_port_size[m_port];
 	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, state->m_port_write[m_port] ));
-	state->m_port_data[m_port] = make_unique_clear<UINT8[]>(2 * size);
+	state->m_port_data[m_port] = make_unique_clear<uint8_t[]>(2 * size);
 	state->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
 	state->m_modules[m_module].read     = read8_delegate();
 	state->m_modules[m_module].write    = write8_delegate();
@@ -1009,7 +1009,7 @@ void hp48_port_image_device::device_start()
 	hp48_unfill_port();
 }
 
-hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -1051,7 +1051,7 @@ void hp48_state::machine_reset()
 
 void hp48_state::hp48_machine_start( hp48_models model )
 {
-	UINT8 *ram;
+	uint8_t *ram;
 	int ram_size, rom_size, i;
 
 	LOG(( "hp48_machine_start: model %i\n", model ));
@@ -1063,7 +1063,7 @@ void hp48_state::hp48_machine_start( hp48_models model )
 		HP49_G_MODEL  ? (512 * 1024) :
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
-	ram = auto_alloc_array(machine(), UINT8, 2 * ram_size);
+	ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
 	machine().device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
 
 
@@ -1071,7 +1071,7 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	rom_size =
 		HP49_G_MODEL  ? (2048 * 1024) :
 		HP48_S_SERIES ?  (256 * 1024) : (512 * 1024);
-	m_rom = auto_alloc_array(machine(), UINT8, 2 * rom_size);
+	m_rom = auto_alloc_array(machine(), uint8_t, 2 * rom_size);
 	hp48_decode_nibble( m_rom, memregion( "maincpu" )->base(), rom_size );
 
 	/* init state */

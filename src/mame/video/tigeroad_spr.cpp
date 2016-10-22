@@ -21,7 +21,7 @@
 
 const device_type TIGEROAD_SPRITE = &device_creator<tigeroad_spr_device>;
 
-tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TIGEROAD_SPRITE, "Simple Capcom (Tiger Road) Sprite", tag, owner, clock, "tigeroad_spr", __FILE__)
 {
 }
@@ -53,10 +53,10 @@ void tigeroad_spr_device::device_reset()
 */
 
 
-void tigeroad_spr_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int region, UINT16* ram, UINT32 size, int flip_screen, int rev_y )
+void tigeroad_spr_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int region, uint16_t* ram, uint32_t size, int flip_screen, int rev_y )
 {
-	UINT16 *source = &ram[size/2] - 4;
-	UINT16 *finish = ram;
+	uint16_t *source = &ram[size/2] - 4;
+	uint16_t *finish = ram;
 
 	while (source >= finish)
 	{

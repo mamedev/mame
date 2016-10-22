@@ -83,7 +83,7 @@ static char *format_address_mode(int mode, int areg, int s, int limx)
 	return buffer;
 }
 
-static void format_transfer(UINT64 op)
+static void format_transfer(uint64_t op)
 {
 	char buffer[128];
 	char *b = buffer;
@@ -258,7 +258,7 @@ static void format_transfer(UINT64 op)
 
 					int reg = (bank << 3) | d;
 
-					UINT16 offset;
+					uint16_t offset;
 					if (s)
 					{
 						offset = op & 0x7fff;
@@ -418,13 +418,13 @@ static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_
 	}
 }
 
-static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
+static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const uint8_t *oprom)
 {
 	output = buffer;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
-	UINT64 op = ((UINT64)(oprom[0]) << 56) | ((UINT64)(oprom[1]) << 48) | ((UINT64)(oprom[2]) << 40) | ((UINT64)(oprom[3]) << 32) |
-				((UINT64)(oprom[4]) << 24) | ((UINT64)(oprom[5]) << 16) | ((UINT64)(oprom[6]) << 8) | ((UINT64)(oprom[7]));
+	uint64_t op = ((uint64_t)(oprom[0]) << 56) | ((uint64_t)(oprom[1]) << 48) | ((uint64_t)(oprom[2]) << 40) | ((uint64_t)(oprom[3]) << 32) |
+				((uint64_t)(oprom[4]) << 24) | ((uint64_t)(oprom[5]) << 16) | ((uint64_t)(oprom[6]) << 8) | ((uint64_t)(oprom[7]));
 
 	switch (op >> 60)
 	{
@@ -447,7 +447,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 			if ((op & U64(0xfaa8100000000000)) == U64(0x8800000000000000))
 			{
 				int operation = (op >> 39) & 0x1f;
-				UINT64 parallel_xfer = (op & U64(0x0000007fffffffff));
+				uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
 
 				switch (operation)
 				{
@@ -471,7 +471,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 					case 0:
 					case 1:     // Base set ALU (5-bit immediate)
 					{
-						UINT64 parallel_xfer = (op & U64(0x0000007fffffffff));
+						uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
 
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;
@@ -550,7 +550,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 
 					case 2:     // Base set ALU (reg src2)
 					{
-						UINT64 parallel_xfer = (op & U64(0x0000007fffffffff));
+						uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
 
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;
@@ -638,7 +638,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 						int cl = (op >> 60) & 7;
 						int aluop = (op >> 51) & 0xff;
 						int a = (op >> 59) & 1;
-						UINT32 imm32 = (UINT32)(op);
+						uint32_t imm32 = (uint32_t)(op);
 
 						int dreg = dst | (dstbank << 3);
 						int s1reg = src1 | (s1bank << 3);
@@ -700,7 +700,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 		}
 
 		default:
-			print("??? (%02X)", (UINT32)(op >> 60));
+			print("??? (%02X)", (uint32_t)(op >> 60));
 			break;
 	}
 

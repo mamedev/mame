@@ -43,8 +43,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -67,14 +67,14 @@ public:
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_sprite_bitmap;
 
-	UINT8 m_scroll;
+	uint8_t m_scroll;
 	int m_mux;
 
-	UINT8 m_main_irq_mask;
-	UINT8 m_sub_irq_mask;
-	UINT8 m_sub2_irq_mask;
+	uint8_t m_main_irq_mask;
+	uint8_t m_sub_irq_mask;
+	uint8_t m_sub2_irq_mask;
 
-	void common_latch_w(UINT32 offset);
+	void common_latch_w(uint32_t offset);
 	DECLARE_WRITE8_MEMBER(superpac_latch_w);
 	DECLARE_WRITE8_MEMBER(phozon_latch_w);
 	DECLARE_WRITE8_MEMBER(mappy_latch_w);
@@ -104,9 +104,9 @@ public:
 	DECLARE_MACHINE_RESET(mappy);
 	DECLARE_VIDEO_START(mappy);
 	DECLARE_PALETTE_INIT(mappy);
-	UINT32 screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superpac_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(pacnpal_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(grobda_main_vblank_irq);
@@ -131,8 +131,8 @@ public:
 	DECLARE_DRIVER_INIT(druaga);
 	DECLARE_DRIVER_INIT(digdug2);
 	DECLARE_DRIVER_INIT(motos);
-	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
-	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
+	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
+	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

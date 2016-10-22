@@ -153,8 +153,8 @@ public:
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
 	DECLARE_DRIVER_INIT(simpbowl);
-	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
 protected:
 	virtual void driver_start() override;
@@ -162,16 +162,16 @@ protected:
 private:
 	required_device<am53cf96_device> m_am53cf96;
 
-	UINT32 m_flash_address;
+	uint32_t m_flash_address;
 
-	UINT16 m_trackball_prev[ 2 ];
-	UINT16 m_trackball_data[ 2 ];
-	UINT16 m_btc_trackball_prev[ 4 ];
-	UINT16 m_btc_trackball_data[ 4 ];
+	uint16_t m_trackball_prev[ 2 ];
+	uint16_t m_trackball_data[ 2 ];
+	uint16_t m_btc_trackball_prev[ 4 ];
+	uint16_t m_btc_trackball_data[ 4 ];
 
 	fujitsu_29f016a_device *m_flash8[4];
 
-	UINT8 m_sector_buffer[ 4096 ];
+	uint8_t m_sector_buffer[ 4096 ];
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -223,9 +223,9 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-void konamigv_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *sector_buffer = m_sector_buffer;
+	uint8_t *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
@@ -267,9 +267,9 @@ void konamigv_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 
 	}
 }
 
-void konamigv_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *sector_buffer = m_sector_buffer;
+	uint8_t *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
@@ -476,7 +476,7 @@ READ16_MEMBER(konamigv_state::trackball_r)
 
 		for( int axis = 0; axis < 2; axis++ )
 		{
-			UINT16 value = ioport(axisnames[axis])->read();
+			uint16_t value = ioport(axisnames[axis])->read();
 			m_trackball_data[ axis ] = value - m_trackball_prev[ axis ];
 			m_trackball_prev[ axis ] = value;
 		}
@@ -536,7 +536,7 @@ READ16_MEMBER(konamigv_state::btc_trackball_r)
 
 		for( int axis = 0; axis < 4; axis++ )
 		{
-			UINT16 value = ioport(axisnames[axis])->read();
+			uint16_t value = ioport(axisnames[axis])->read();
 			m_btc_trackball_data[ axis ] = value - m_btc_trackball_prev[ axis ];
 			m_btc_trackball_prev[ axis ] = value;
 		}

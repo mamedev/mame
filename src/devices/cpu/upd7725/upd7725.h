@@ -73,7 +73,7 @@ class necdsp_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source);
 
 public:
 
@@ -89,8 +89,8 @@ public:
 	//template<class _Object> static devcb_base &set_out_sorq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(object); }
 	//template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(object); }
 
-	UINT8 snesdsp_read(bool mode);
-	void snesdsp_write(bool mode, UINT8 data);
+	uint8_t snesdsp_read(bool mode);
+	void snesdsp_write(bool mode, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -98,9 +98,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -113,14 +113,14 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// inline data
 	const address_space_config m_program_config, m_data_config;
 
-	UINT16 dataRAM[2048];
+	uint16_t dataRAM[2048];
 
 private:
 	struct Flag
@@ -161,32 +161,32 @@ private:
 
 	struct Regs
 	{
-		UINT16 pc;          //program counter
-		UINT16 stack[16];   //LIFO
-		UINT16 rp;          //ROM pointer
-		UINT16 dp;          //data pointer
-		UINT8  sp;          //stack pointer
-		INT16  k;
-		INT16  l;
-		INT16  m;
-		INT16  n;
-		INT16  a;         //accumulator
-		INT16  b;         //accumulator
+		uint16_t pc;          //program counter
+		uint16_t stack[16];   //LIFO
+		uint16_t rp;          //ROM pointer
+		uint16_t dp;          //data pointer
+		uint8_t  sp;          //stack pointer
+		int16_t  k;
+		int16_t  l;
+		int16_t  m;
+		int16_t  n;
+		int16_t  a;         //accumulator
+		int16_t  b;         //accumulator
 		Flag  flaga;
 		Flag  flagb;
-		UINT16 tr;        //temporary register
-		UINT16 trb;       //temporary register
+		uint16_t tr;        //temporary register
+		uint16_t trb;       //temporary register
 		Status sr;        //status register
-		UINT16 dr;        //data register
-		UINT16 si;
-		UINT16 so;
-		UINT16 idb;
+		uint16_t dr;        //data register
+		uint16_t si;
+		uint16_t so;
+		uint16_t idb;
 	} regs;
 
-	void exec_op(UINT32 opcode);
-	void exec_rt(UINT32 opcode);
-	void exec_jp(UINT32 opcode);
-	void exec_ld(UINT32 opcode);
+	void exec_op(uint32_t opcode);
+	void exec_rt(uint32_t opcode);
+	void exec_jp(uint32_t opcode);
+	void exec_ld(uint32_t opcode);
 
 	int m_icount;
 	int m_irq; // old irq line state, for detecting rising edges.
@@ -213,17 +213,17 @@ class upd7725_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class upd96050_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
-	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }
+	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr]; }
+	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr] = data; }
 };
 
 // device type definition

@@ -2175,11 +2175,11 @@ void mitchell_state::bootleg_decode()
 }
 
 
-void mitchell_state::configure_banks(void (*decode)(UINT8 *src, UINT8 *dst, int size))
+void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size))
 {
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, size);
+	uint8_t *dst = auto_alloc_array(machine(), uint8_t, size);
 	decode(src, dst, size);
 	m_bank1->configure_entries(0, 16, src + 0x10000, 0x4000);
 	m_bank0d->set_base(dst);
@@ -2295,8 +2295,8 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
-	std::vector<UINT8> source(len);
-	UINT8* dst = memregion("maincpu")->base() ;
+	std::vector<uint8_t> source(len);
+	uint8_t* dst = memregion("maincpu")->base() ;
 	int x;
 
 	static const int tablebank[]=

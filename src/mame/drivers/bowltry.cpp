@@ -41,14 +41,14 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32 screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
 #if HACK_ENABLED
 	DECLARE_READ16_MEMBER(hack_r);
 	DECLARE_WRITE16_MEMBER(hack_w);
-	UINT16 m_hack[2];
+	uint16_t m_hack[2];
 #endif
 
 protected:
@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bowltry )
 INPUT_PORTS_END
 
-UINT32 bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

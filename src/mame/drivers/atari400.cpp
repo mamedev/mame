@@ -311,9 +311,9 @@ protected:
 
 	int m_cart_disabled, m_cart_helper;
 	int m_last_offs;
-	UINT8 m_mmu, m_ext_bank;
+	uint8_t m_mmu, m_ext_bank;
 
-	void setup_ram(int bank,UINT32 size);
+	void setup_ram(int bank,uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
 
@@ -1002,7 +1002,7 @@ dependent upon display type.
  *
  **************************************************************/
 
-static const UINT8 atari_palette[256*3] =
+static const uint8_t atari_palette[256*3] =
 {
 	/* Grey */
 	0x00,0x00,0x00, 0x11,0x11,0x11, 0x22,0x22,0x22, 0x33,0x33,0x33,
@@ -1701,21 +1701,21 @@ LIGHT-ORANGE
  *
  **************************************************************/
 
-void a400_state::setup_ram(int bank, UINT32 size)
+void a400_state::setup_ram(int bank, uint32_t size)
 {
 	offs_t ram_top;
 
 	switch (bank)
 	{
 		case 0: // 0x0000-0x7fff
-			ram_top = std::min(size, UINT32(0x8000)) - 1;
+			ram_top = std::min(size, uint32_t(0x8000)) - 1;
 			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
 			if (m_0000 == nullptr)
 				m_0000.findit(false);
 			m_0000->set_base(m_ram->pointer());
 			break;
 		case 1: // 0x8000-0x9fff
-			ram_top = std::min(size, UINT32(0xa000)) - 1;
+			ram_top = std::min(size, uint32_t(0xa000)) - 1;
 			if (ram_top > 0x8000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
@@ -1725,7 +1725,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 			}
 			break;
 		case 2: // 0xa000-0xbfff
-			ram_top = std::min(size, UINT32(0xc000)) - 1;
+			ram_top = std::min(size, uint32_t(0xc000)) - 1;
 			if (ram_top > 0xa000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");

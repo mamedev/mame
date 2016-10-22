@@ -27,10 +27,10 @@ public:
 	required_device<decobsmt_device> m_decobsmt;
 	required_device<decodmd_type2_device> m_decodmd;
 
-	UINT8 m_dmd_latch;
-	UINT8 m_dmd_ctrl;
-	UINT8 m_dmd_status;
-	UINT8 m_dmd_busy;
+	uint8_t m_dmd_latch;
+	uint8_t m_dmd_ctrl;
+	uint8_t m_dmd_status;
+	uint8_t m_dmd_busy;
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dmddata_w);

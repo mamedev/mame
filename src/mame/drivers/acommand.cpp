@@ -77,17 +77,17 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT16> m_ac_bgvram;
-	required_shared_ptr<UINT16> m_ac_txvram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_ac_devram;
+	required_shared_ptr<uint16_t> m_ac_bgvram;
+	required_shared_ptr<uint16_t> m_ac_txvram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_ac_devram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
-	std::unique_ptr<UINT16[]> m_ac_vregs;
-	UINT16 m_led0;
-	UINT16 m_led1;
-	UINT16 m_ufo_sw1;
-	UINT16 m_ufo_sw2;
+	std::unique_ptr<uint16_t[]> m_ac_vregs;
+	uint16_t m_led0;
+	uint16_t m_led1;
+	uint16_t m_ufo_sw1;
+	uint16_t m_ufo_sw2;
 	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
 	DECLARE_WRITE16_MEMBER(ac_txvram_w);
 	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
@@ -99,10 +99,10 @@ public:
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
-	void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value);
+	void draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
 
 void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs;
 
 	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 8)
@@ -199,7 +199,7 @@ void acommand_state::video_start()
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,512,32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),this),16,16,256,16);
 
-	m_ac_vregs = std::make_unique<UINT16[]>(0x80/2);
+	m_ac_vregs = std::make_unique<uint16_t[]>(0x80/2);
 
 	m_tx_tilemap->set_transparent_pen(15);
 }
@@ -225,9 +225,9 @@ g & 40
 7f
 */
 /*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
-static const UINT8 led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
+static const uint8_t led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
-void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
+void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value)
 {
 	bitmap.plot_box(x, y, 6, 10, 0x00000000);
 
@@ -262,7 +262,7 @@ void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 }
 
 
-UINT32 acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0,0);

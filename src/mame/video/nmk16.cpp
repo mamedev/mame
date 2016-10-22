@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(nmk16_state::get_tile_info_0_8bit)
 {
-	UINT16 code = m_nmk_bgvideoram0[tile_index];
+	uint16_t code = m_nmk_bgvideoram0[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			0,
@@ -109,8 +109,8 @@ TILE_GET_INFO_MEMBER(nmk16_state::get_tile_info_0_8bit)
 
 void nmk16_state::nmk16_video_init()
 {
-	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
 
 	m_videoshift = 0;        /* 256x224 screen, no shift */
 	m_background_bitmap = nullptr;
@@ -392,7 +392,7 @@ WRITE16_MEMBER(nmk16_state::bioship_bank_w)
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr)
+inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *spr)
 {
 	if(!(spr[0] & 0x0001))
 		return;
@@ -433,7 +433,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 	} while (--yy >= 0);
 }
 
-inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr)
+inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *spr)
 {
 	if(!(spr[0] & 0x0001))
 		return;
@@ -579,7 +579,7 @@ int nmk16_state::nmk16_bg_sprflip_tx_update(screen_device &screen, bitmap_ind16 
 
 int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *tilerom = (UINT16 *)memregion("gfx5")->base();
+	uint16_t *tilerom = (uint16_t *)memregion("gfx5")->base();
 	int scrollx=-(m_bioship_scroll[1] + m_bioship_scroll[0]*256);
 	int scrolly=-(m_bioship_scroll[3] + m_bioship_scroll[2]*256);
 
@@ -593,7 +593,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 
 		/* Draw background from tile rom */
 		for (offs = 0;offs <0x1000;offs++) {
-				UINT16 data = tilerom[offs+bank];
+				uint16_t data = tilerom[offs+bank];
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
@@ -694,8 +694,8 @@ int nmk16_state::nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap
 	}
 	else
 	{
-		UINT16 yscroll = ((m_gunnail_scrollram[2]&0xff)<<8) | ((m_gunnail_scrollram[3]&0xff)<<0);
-		UINT16 xscroll = ((m_gunnail_scrollram[0]&0xff)<<8) | ((m_gunnail_scrollram[1]&0xff)<<0);
+		uint16_t yscroll = ((m_gunnail_scrollram[2]&0xff)<<8) | ((m_gunnail_scrollram[3]&0xff)<<0);
+		uint16_t xscroll = ((m_gunnail_scrollram[0]&0xff)<<8) | ((m_gunnail_scrollram[1]&0xff)<<0);
 		int tilemap_bank_select;
 		tilemap_t* bg_tilemap = m_bg_tilemap0;
 
@@ -732,27 +732,27 @@ int nmk16_state::nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap
 
 ***************************************************************************/
 
-UINT32 nmk16_state::screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return nmk16_bg_spr_tx_update(screen, bitmap, cliprect);
 }
 
-UINT32 nmk16_state::screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return nmk16_bg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-UINT32 nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* I think the protection device probably copies this to the regs... */
-	UINT16 tharrier_scroll = m_mainram[0x9f00/2];
+	uint16_t tharrier_scroll = m_mainram[0x9f00/2];
 
 	m_bg_tilemap0->set_scrollx(0,tharrier_scroll);
 
 	return nmk16_bg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-UINT32 nmk16_state::screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int bittbl[8] = {
 	4, 6, 5, 7, 3, 2, 1, 0
@@ -761,7 +761,7 @@ UINT32 nmk16_state::screen_update_tdragon2(screen_device &screen, bitmap_ind16 &
 	return nmk16_complexbg_sprswap_tx_update(screen, bitmap, cliprect, bittbl);
 }
 
-UINT32 nmk16_state::screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int bittbl[8] = {
 	7, 6, 5, 4, 3, 2, 1, 0
@@ -770,17 +770,17 @@ UINT32 nmk16_state::screen_update_gunnail(screen_device &screen, bitmap_ind16 &b
 	return nmk16_complexbg_sprswap_tx_update(screen, bitmap, cliprect, bittbl);
 }
 
-UINT32 nmk16_state::screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return nmk16_bioshipbg_sprflip_tx_update(screen, bitmap, cliprect);
 }
 
-UINT32 nmk16_state::screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return nmk16_bg_fg_spr_tx_update(screen, bitmap, cliprect);
 }
 
-UINT32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return nmk16_bg_spr_update(screen, bitmap, cliprect);
 }
@@ -796,8 +796,8 @@ UINT32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bi
 
 VIDEO_START_MEMBER(nmk16_state,afega)
 {
-	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
 
 	m_bg_tilemap0 = &machine().tilemap().create(
 			*m_gfxdecode,
@@ -817,8 +817,8 @@ VIDEO_START_MEMBER(nmk16_state,afega)
 
 VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 {
-	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
 
 
 	m_bg_tilemap0 = &machine().tilemap().create(
@@ -839,8 +839,8 @@ VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 
 VIDEO_START_MEMBER(nmk16_state,firehawk)
 {
-	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
 
 
 	m_bg_tilemap0 = &machine().tilemap().create(
@@ -904,12 +904,12 @@ void nmk16_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bit
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 }
 
-UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);  return 0; }
-UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);  return 0; } // no flipscreen support, I really would confirmation from the schematics
-UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);  return 0; }
-UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ redhawki_video_update(screen,bitmap,cliprect); return 0;} // strange scroll regs
+uint32_t nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);  return 0; }
+uint32_t nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);  return 0; } // no flipscreen support, I really would confirmation from the schematics
+uint32_t nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);  return 0; }
+uint32_t nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ redhawki_video_update(screen,bitmap,cliprect); return 0;} // strange scroll regs
 
-UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1] + 0x100);
 	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_0[1] - 0x100);

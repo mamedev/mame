@@ -143,7 +143,7 @@ const tiny_rom_entry *bbc_opus1770_device::device_rom_region() const
 //  bbc_opusfdc_device - constructor
 //-------------------------------------------------
 
-bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
@@ -153,17 +153,17 @@ bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_typ
 {
 }
 
-bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, "Opus 2791 FDC", tag, owner, clock, "bbc_opus2791", __FILE__)
 {
 }
 
-bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, "Opus 2793 FDC", tag, owner, clock, "bbc_opus2793", __FILE__)
 {
 }
 
-bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, "Opus D-DOS(B) 1770 FDC", tag, owner, clock, "bbc_opus1770", __FILE__)
 {
 }

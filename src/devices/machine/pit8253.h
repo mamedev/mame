@@ -54,8 +54,8 @@
 class pit8253_device : public device_t
 {
 public:
-	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~pit8253_device() {}
 
 	// static configuration helpers
@@ -106,12 +106,12 @@ protected:
 
 		emu_timer *updatetimer; /* MAME timer to process updates */
 
-		UINT16 value;           /* current counter value ("CE" in Intel docs) */
-		UINT16 latch;           /* latched counter value ("OL" in Intel docs) */
-		UINT16 count;           /* new counter value ("CR" in Intel docs) */
-		UINT8 control;          /* 6-bit control byte */
-		UINT8 status;           /* status byte - 8254 only */
-		UINT8 lowcount;         /* LSB of new counter value for 16-bit writes */
+		uint16_t value;           /* current counter value ("CE" in Intel docs) */
+		uint16_t latch;           /* latched counter value ("OL" in Intel docs) */
+		uint16_t count;           /* new counter value ("CR" in Intel docs) */
+		uint8_t control;          /* 6-bit control byte */
+		uint8_t status;           /* status byte - 8254 only */
+		uint8_t lowcount;         /* LSB of new counter value for 16-bit writes */
 		int rmsb;               /* 1 = Next read is MSB of 16-bit value */
 		int wmsb;               /* 1 = Next write is MSB of 16-bit value */
 		int output;             /* 0 = low, 1 = high */
@@ -124,7 +124,7 @@ protected:
 	};
 
 	void readback(pit8253_timer *timer, int command);
-	virtual void readback_command(UINT8 data);
+	virtual void readback_command(uint8_t data);
 	pit8253_timer *get_timer(int which);
 
 private:
@@ -142,15 +142,15 @@ private:
 
 	pit8253_timer m_timers[PIT8253_MAX_TIMER];
 
-	inline UINT32 adjusted_count(int bcd, UINT16 val);
-	void decrease_counter_value(pit8253_timer *timer, INT64 cycles);
+	inline uint32_t adjusted_count(int bcd, uint16_t val);
+	void decrease_counter_value(pit8253_timer *timer, int64_t cycles);
 	void load_counter_value(pit8253_timer *timer);
 	void set_output(pit8253_timer *timer, int output);
-	void simulate2(pit8253_timer *timer, INT64 elapsed_cycles);
-	void simulate(pit8253_timer *timer, INT64 elapsed_cycles);
+	void simulate2(pit8253_timer *timer, int64_t elapsed_cycles);
+	void simulate(pit8253_timer *timer, int64_t elapsed_cycles);
 	void update(pit8253_timer *timer);
-	UINT16 masked_value(pit8253_timer *timer);
-	void load_count(pit8253_timer *timer, UINT16 newcount);
+	uint16_t masked_value(pit8253_timer *timer);
+	void load_count(pit8253_timer *timer, uint16_t newcount);
 	void gate_w(int gate, int state);
 	void set_clock_signal(int timerno, int state);
 };
@@ -161,10 +161,10 @@ extern const device_type PIT8253;
 class pit8254_device : public pit8253_device
 {
 public:
-	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void readback_command(UINT8 data) override;
+	virtual void readback_command(uint8_t data) override;
 };
 
 extern const device_type PIT8254;

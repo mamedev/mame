@@ -35,7 +35,7 @@ class grip_device : public device_t,
 {
 public:
 	// construction/destruction
-	grip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	grip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -71,8 +71,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_ecbbus_card_interface overrides
-	virtual UINT8 ecbbus_io_r(offs_t offset) override;
-	virtual void ecbbus_io_w(offs_t offset, UINT8 data) override;
+	virtual uint8_t ecbbus_io_r(offs_t offset) override;
+	virtual void ecbbus_io_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<i8255_device> m_ppi;
@@ -81,7 +81,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<palette_device> m_palette;
 	required_device<speaker_sound_device> m_speaker;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_j3a;
 	required_ioport m_j3b;
 	required_ioport m_j7;
@@ -96,7 +96,7 @@ private:
 	// keyboard state
 	int m_ia;               // PPI port A interrupt
 	int m_ib;               // PPI port B interrupt
-	UINT8 m_keydata;        // keyboard data
+	uint8_t m_keydata;        // keyboard data
 	int m_kbf;              // keyboard buffer full
 
 	// video state
@@ -105,9 +105,9 @@ private:
 	int m_flash;            // flash
 
 	// ECB bus state
-	UINT8 m_base;           // ECB base address
-	UINT8 m_ppi_pa;         // PPI port A data
-	UINT8 m_ppi_pc;         // PPI port C data
+	uint8_t m_base;           // ECB base address
+	uint8_t m_ppi_pa;         // PPI port A data
+	uint8_t m_ppi_pc;         // PPI port C data
 
 	// timers
 	emu_timer *m_kb_timer;

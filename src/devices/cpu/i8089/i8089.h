@@ -44,14 +44,14 @@ class i8089_device : public cpu_device
 
 public:
 	// construction/destruction
-	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	template<class _sintr1> void set_sintr1_callback(_sintr1 sintr1) { m_write_sintr1.set_callback(sintr1); }
 	template<class _sintr2> void set_sintr2_callback(_sintr2 sintr2) { m_write_sintr2.set_callback(sintr2); }
 
 	// static configuration helpers
-	static void set_databus_width(device_t &device, UINT8 databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
+	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
@@ -83,9 +83,9 @@ protected:
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 7; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 7; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -98,10 +98,10 @@ private:
 	bool remotebus_width() const { return BIT(m_soc, 0); }
 	bool request_grant() const { return BIT(m_soc, 1); }
 
-	UINT8 read_byte(bool space, offs_t address);
-	UINT16 read_word(bool space, offs_t address);
-	void write_byte(bool space, offs_t address, UINT8 data);
-	void write_word(bool space, offs_t address, UINT16 data);
+	uint8_t read_byte(bool space, offs_t address);
+	uint16_t read_word(bool space, offs_t address);
+	void write_byte(bool space, offs_t address, uint8_t data);
+	void write_word(bool space, offs_t address, uint16_t data);
 
 	required_device<i8089_channel> m_ch1;
 	required_device<i8089_channel> m_ch2;
@@ -111,7 +111,7 @@ private:
 
 	void initialize();
 
-	UINT8 m_databus_width;
+	uint8_t m_databus_width;
 	address_space *m_mem;
 	address_space *m_io;
 
@@ -134,9 +134,9 @@ private:
 	};
 
 	// system configuration
-	UINT8 m_sysbus;
+	uint8_t m_sysbus;
 	offs_t m_scb;
-	UINT8 m_soc;
+	uint8_t m_soc;
 
 	bool m_initialized;
 	bool m_master;

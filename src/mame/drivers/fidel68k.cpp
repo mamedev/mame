@@ -184,7 +184,7 @@ public:
 void fidel68k_state::eag_prepare_display()
 {
 	// 8*7seg leds, (8+1)*8 chessboard leds
-	UINT8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	uint8_t seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ef, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
@@ -223,7 +223,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	UINT16 sel = 1 << (data & 0xf);
+	uint16_t sel = 1 << (data & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();

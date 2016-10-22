@@ -71,8 +71,8 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK = 50000000;
-const UINT32 SOUND_CLOCK = 32215900;
+const uint32_t MASTER_CLOCK = 50000000;
+const uint32_t SOUND_CLOCK = 32215900;
 
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
@@ -166,7 +166,7 @@ READ16_MEMBER( segaybd_state::io_chip_r )
 
 WRITE16_MEMBER( segaybd_state::io_chip_w )
 {
-	UINT8 old;
+	uint8_t old;
 
 	// generic implementation
 	offset &= 0x1f/2;
@@ -394,7 +394,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb1(UINT16 data)
+void segaybd_state::gforce2_output_cb1(uint16_t data)
 {
 	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
 	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
@@ -408,7 +408,7 @@ void segaybd_state::gforce2_output_cb1(UINT16 data)
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb2(UINT16 data)
+void segaybd_state::gforce2_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 }
@@ -419,7 +419,7 @@ void segaybd_state::gforce2_output_cb2(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb1(UINT16 data)
+void segaybd_state::gloc_output_cb1(uint16_t data)
 {
 	if (data < 32)
 	{
@@ -453,7 +453,7 @@ void segaybd_state::gloc_output_cb1(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb2(UINT16 data)
+void segaybd_state::gloc_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("danger_lamp", BIT(data, 5));
@@ -466,7 +466,7 @@ void segaybd_state::gloc_output_cb2(UINT16 data)
 //  G-Loc R360
 //-------------------------------------------------
 
-void segaybd_state::r360_output_cb2(UINT16 data)
+void segaybd_state::r360_output_cb2(uint16_t data)
 {
 	// r360 cabinet
 	output().set_value("start_lamp", BIT(data, 2));
@@ -480,7 +480,7 @@ void segaybd_state::r360_output_cb2(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb1(UINT16 data)
+void segaybd_state::pdrift_output_cb1(uint16_t data)
 {
 	// Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100%
 
@@ -639,7 +639,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb2(UINT16 data)
+void segaybd_state::pdrift_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("upright_wheel_motor", BIT(data, 1));
@@ -651,7 +651,7 @@ void segaybd_state::pdrift_output_cb2(UINT16 data)
 //  Rail Chase
 //-------------------------------------------------
 
-void segaybd_state::rchase_output_cb2(UINT16 data)
+void segaybd_state::rchase_output_cb2(uint16_t data)
 {
 	output().set_value("left_start_lamp", BIT(data, 2));
 	output().set_value("right_start_lamp", BIT(data, 1));

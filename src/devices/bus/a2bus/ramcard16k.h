@@ -24,20 +24,20 @@ class a2bus_ramcard_device:
 {
 public:
 	// construction/destruction
-	a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a2bus_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	a2bus_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) override;
-	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data) override;
-	virtual UINT16 inh_start() override { return 0xd000; }
-	virtual UINT16 inh_end() override { return 0xffff; }
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) override;
+	virtual void write_inh_rom(address_space &space, uint16_t offset, uint8_t data) override;
+	virtual uint16_t inh_start() override { return 0xd000; }
+	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
 
 private:
@@ -46,7 +46,7 @@ private:
 	int m_inh_state;
 	int m_last_offset;
 	int m_dxxx_bank;
-	UINT8 m_ram[16*1024];
+	uint8_t m_ram[16*1024];
 };
 
 // device type definition

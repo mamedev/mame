@@ -51,7 +51,7 @@ DRIVER_INIT_MEMBER(sprint2_state,dominos4)
 
 int sprint2_state::service_mode()
 {
-	UINT8 v = ioport("INB")->read();
+	uint8_t v = ioport("INB")->read();
 
 	if (MACHINE_IS_SPRINT1)
 	{
@@ -133,7 +133,7 @@ READ8_MEMBER(sprint2_state::sprint2_dip_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	UINT8 val = ioport("INA")->read();
+	uint8_t val = ioport("INA")->read();
 
 	if (m_game == 2)// (MACHINE_IS_SPRINT2)
 	{
@@ -151,7 +151,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	UINT8 val = ioport("INB")->read();
+	uint8_t val = ioport("INB")->read();
 
 	if (m_game == 1) // (MACHINE_IS_SPRINT1)
 	{
@@ -166,7 +166,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 
 READ8_MEMBER(sprint2_state::sprint2_sync_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if (m_attract != 0)
 		val |= 0x10;

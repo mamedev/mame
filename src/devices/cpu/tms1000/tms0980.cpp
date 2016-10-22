@@ -40,15 +40,15 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0970_cpu_device(mconfig, TMS0980, "TMS0980", tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4), "tms0980", __FILE__)
 { }
 
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t o_pins, uint8_t r_pins, uint8_t pc_bits, uint8_t byte_bits, uint8_t x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 	: tms0970_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
 { }
 
-tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4), "tms1980", __FILE__)
 { }
 
@@ -90,7 +90,7 @@ machine_config_constructor tms1980_cpu_device::device_mconfig_additions() const
 
 
 // disasm
-offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(tms0980);
 	return CPU_DISASSEMBLE_NAME(tms0980)(this, buffer, pc, oprom, opram, options);
@@ -98,13 +98,13 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 
 // device_reset
-UINT32 tms0980_cpu_device::decode_fixed(UINT16 op)
+uint32_t tms0980_cpu_device::decode_fixed(uint16_t op)
 {
-	UINT32 decode = 0;
-	UINT32 mask = m_ipla->read(op);
+	uint32_t decode = 0;
+	uint32_t mask = m_ipla->read(op);
 
 	// 1 line per PLA row, no OR-mask
-	const UINT32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
+	const uint32_t id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
 
 	for (int bit = 0; bit < 15; bit++)
 		if (mask & (0x80 << bit))
@@ -113,17 +113,17 @@ UINT32 tms0980_cpu_device::decode_fixed(UINT16 op)
 	return decode;
 }
 
-UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
+uint32_t tms0980_cpu_device::decode_micro(uint8_t sel)
 {
-	UINT32 decode = 0;
+	uint32_t decode = 0;
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	UINT32 mask = m_mpla->read(sel);
+	uint32_t mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
 
 	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
 	// M_UNK1 is specific to TMS0270, unknown/unused yet and apparently not connected on every TMS0270
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
-	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
+	const uint32_t md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))
@@ -139,11 +139,11 @@ void tms0980_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x200);
-	memset(&m_fixed_decode[0], 0, 0x200*sizeof(UINT32));
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(uint32_t));
 	m_micro_decode.resize(0x200);
-	memset(&m_micro_decode[0], 0, 0x200*sizeof(UINT32));
+	memset(&m_micro_decode[0], 0, 0x200*sizeof(uint32_t));
 
-	for (UINT16 op = 0; op < 0x200; op++)
+	for (uint16_t op = 0; op < 0x200; op++)
 	{
 		// upper half of the opcodes is always branch/call
 		if (op & 0x100)
@@ -159,7 +159,7 @@ void tms0980_cpu_device::device_reset()
 	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
 	// but it can't be pre-determined when it's active
 	m_micro_direct.resize(0x40);
-	memset(&m_micro_decode[0], 0, 0x40*sizeof(UINT32));
+	memset(&m_micro_decode[0], 0, 0x40*sizeof(uint32_t));
 
 	for (int op = 0; op < 0x40; op++)
 		m_micro_direct[op] = decode_micro(op);
@@ -167,7 +167,7 @@ void tms0980_cpu_device::device_reset()
 
 
 // program counter/opcode decode
-UINT32 tms0980_cpu_device::read_micro()
+uint32_t tms0980_cpu_device::read_micro()
 {
 	// if ipla term 0 is active, R4-R8 directly select a microinstruction index when R0 or R0^BL is 0
 	int r0 = m_opcode >> 8 & 1;
@@ -195,10 +195,10 @@ void tms0980_cpu_device::read_opcode()
 
 
 // i/o handling
-UINT8 tms0980_cpu_device::read_k_input()
+uint8_t tms0980_cpu_device::read_k_input()
 {
-	UINT8 k = m_read_k(0, 0xff) & 0x1f;
-	UINT8 k3 = (k & 0x10) ? 3: 0; // the TMS0980 K3 line is simply K1|K2
+	uint8_t k = m_read_k(0, 0xff) & 0x1f;
+	uint8_t k3 = (k & 0x10) ? 3: 0; // the TMS0980 K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }
 

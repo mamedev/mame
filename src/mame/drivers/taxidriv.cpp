@@ -304,7 +304,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, r, g, b;
 	int i;
 

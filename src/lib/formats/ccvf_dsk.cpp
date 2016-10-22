@@ -44,7 +44,7 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 	{}
 };
 
-int ccvf_format::identify(io_generic *io, UINT32 form_factor)
+int ccvf_format::identify(io_generic *io, uint32_t form_factor)
 {
 	char h[36];
 
@@ -85,20 +85,20 @@ floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &c
 	return desc;
 }
 
-bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool ccvf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	const format &f = formats[0];
 
-	UINT64 size = io_generic_size(io);
-	std::vector<UINT8> img(size);
+	uint64_t size = io_generic_size(io);
+	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
 	std::string ccvf = std::string((const char *)&img[0], size);
-	std::vector<UINT8> bytes(78720);
+	std::vector<uint8_t> bytes(78720);
 
 	int start = 0, end = 0;
 	std::string line;
-	UINT32 byteoffs = 0;
+	uint32_t byteoffs = 0;
 	char hex[3] = {0};
 
 	do {
@@ -115,11 +115,11 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		start = end + 1;
 	} while (start > 0 && end != -1);
 
-	UINT64 pos = 0;
+	uint64_t pos = 0;
 	int total_size = 200000000/f.cell_size;
 
 	for(int track=0; track < f.track_count; track++) {
-		std::vector<UINT32> buffer;
+		std::vector<uint32_t> buffer;
 		int offset = 0;
 
 		for (int i=0; i<1920 && pos<size; i++, pos++) {

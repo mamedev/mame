@@ -11,9 +11,9 @@
 #ifndef __ARCOMPACT_H__
 #define __ARCOMPACT_H__
 
-#define ARCOMPACT_RETTYPE UINT32
-#define OPS_32 UINT32 op
-#define OPS_16 UINT16 op
+#define ARCOMPACT_RETTYPE uint32_t
+#define OPS_32 uint32_t op
+#define OPS_16 uint16_t op
 #define PARAMS op
 #define LIMM_REG 62
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
@@ -61,7 +61,7 @@ class arcompact_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER( arcompact_auxreg002_LPSTART_r);
 	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);
@@ -79,9 +79,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 5; }
-	virtual UINT32 execute_max_cycles() const override { return 5; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 5; }
+	virtual uint32_t execute_max_cycles() const override { return 5; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -93,9 +93,9 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 
 
@@ -774,8 +774,8 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle1e_03_0x_helper(OPS_16, const char* optext);
 
 
-	UINT32 handle_jump_to_addr(int delay, int link, UINT32 address, UINT32 next_addr);
-	UINT32 handle_jump_to_register(int delay, int link, UINT32 reg, UINT32 next_addr, int flag);
+	uint32_t handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr);
+	uint32_t handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag);
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
@@ -813,43 +813,43 @@ private:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 
-	UINT32 m_pc;
+	uint32_t m_pc;
 
 	address_space *m_program;
 	address_space  *m_io;
 
 	int m_icount;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
-	void unimplemented_opcode(UINT16 op);
+	void unimplemented_opcode(uint16_t op);
 
-	inline  UINT32 READ32(UINT32 address) { return m_program->read_dword(address << 2); }
-	inline void WRITE32(UINT32 address, UINT32 data) { m_program->write_dword(address << 2, data); }
-	inline UINT16 READ16(UINT32 address) { return m_program->read_word(address << 1); }
-	inline void WRITE16(UINT32 address, UINT16 data){   m_program->write_word(address << 1, data); }
-	inline UINT8 READ8(UINT32 address) { return m_program->read_byte(address << 0); }
-	inline void WRITE8(UINT32 address, UINT8 data){     m_program->write_byte(address << 0, data); }
+	inline  uint32_t READ32(uint32_t address) { return m_program->read_dword(address << 2); }
+	inline void WRITE32(uint32_t address, uint32_t data) { m_program->write_dword(address << 2, data); }
+	inline uint16_t READ16(uint32_t address) { return m_program->read_word(address << 1); }
+	inline void WRITE16(uint32_t address, uint16_t data){   m_program->write_word(address << 1, data); }
+	inline uint8_t READ8(uint32_t address) { return m_program->read_byte(address << 0); }
+	inline void WRITE8(uint32_t address, uint8_t data){     m_program->write_byte(address << 0, data); }
 
-	inline  UINT64 READAUX(UINT64 address) { return m_io->read_dword(address *4); }
-	inline void WRITEAUX(UINT64 address, UINT32 data) { m_io->write_dword(address *4, data); }
+	inline  uint64_t READAUX(uint64_t address) { return m_io->read_dword(address *4); }
+	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address *4, data); }
 
 
-	int check_condition(UINT8 condition);
+	int check_condition(uint8_t condition);
 
-	UINT32 m_regs[0x40];
+	uint32_t m_regs[0x40];
 
 	int m_delayactive;
 	int m_delaylinks;
-	UINT32 m_delayjump;
+	uint32_t m_delayjump;
 
 //  f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
-	UINT32 m_status32;
+	uint32_t m_status32;
 
-	UINT32 m_LP_START;
-	UINT32 m_LP_END;
-	UINT32 m_INTVECTORBASE;
+	uint32_t m_LP_START;
+	uint32_t m_LP_END;
+	uint32_t m_INTVECTORBASE;
 
 };
 

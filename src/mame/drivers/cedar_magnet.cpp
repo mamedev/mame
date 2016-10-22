@@ -242,7 +242,7 @@ WRITE8_MEMBER(cedar_magnet_state::port18_w)
 
 READ8_MEMBER(cedar_magnet_state::port19_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 //	printf("%s: port19_r\n", device().machine().describe_context());
 
 // 9496 in a,($19)
@@ -299,7 +299,7 @@ WRITE8_MEMBER(cedar_magnet_state::palette_b_w)
 	set_palette(offset);
 }
 
-UINT32 cedar_magnet_state::screen_update_cedar_magnet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cedar_magnet_state::screen_update_cedar_magnet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -341,7 +341,7 @@ READ8_MEMBER(cedar_magnet_state::other_cpu_r)
 	int unk2 = (m_ic49_pio_pb_val & 0x03) >> 0;
 
 	int cpus_accessed = 0;
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	int offset2 = offset + windowbank * 0x4000;
 
@@ -451,7 +451,7 @@ void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_device* d
 
 READ8_MEMBER( cedar_magnet_state::ic48_pio_pa_r ) // 0x20
 {
-	UINT8 ret = m_ic48_pio_pa_val & ~0x08;
+	uint8_t ret = m_ic48_pio_pa_val & ~0x08;
 
 	ret |= ioport("COIN1")->read()<<3;
 	if (!m_cedplane0->is_running()) ret &= ~0x01;
@@ -493,7 +493,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 
 READ8_MEMBER( cedar_magnet_state::ic48_pio_pb_r ) // 0x22
 {
-	UINT8 ret = m_ic48_pio_pb_val & ~0x80;
+	uint8_t ret = m_ic48_pio_pb_val & ~0x80;
 
 	ret |= ioport("COIN2")->read()<<7;
 
@@ -539,7 +539,7 @@ WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 
 READ8_MEMBER( cedar_magnet_state::ic49_pio_pb_r ) // 0x42
 {
-	UINT8 ret = m_ic49_pio_pb_val;
+	uint8_t ret = m_ic49_pio_pb_val;
 
 	if (!m_cedsound->is_running()) ret &= ~0x10;
 
@@ -751,7 +751,7 @@ ROM_END
 */
 
 
-void protection_hack(UINT8* ram, int address1, int address2)
+void protection_hack(uint8_t* ram, int address1, int address2)
 {
 	if ((ram[address1] == 0x3e) && (ram[address1+1] == 0xff)) ram[address1] = 0xc9;
 	if ((ram[address2] == 0x3e) && (ram[address2+1] == 0xff)) ram[address2] = 0xc9;

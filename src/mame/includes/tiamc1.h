@@ -15,18 +15,18 @@ public:
 		m_speaker(*this, "speaker")
 		{ }
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 *m_tileram;
-	UINT8 *m_charram;
-	UINT8 *m_spriteram_x;
-	UINT8 *m_spriteram_y;
-	UINT8 *m_spriteram_a;
-	UINT8 *m_spriteram_n;
-	UINT8 *m_paletteram;
-	UINT8 m_layers_ctrl;
-	UINT8 m_bg_vshift;
-	UINT8 m_bg_hshift;
-	UINT8 m_bg_bplctrl;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t *m_tileram;
+	uint8_t *m_charram;
+	uint8_t *m_spriteram_x;
+	uint8_t *m_spriteram_y;
+	uint8_t *m_spriteram_a;
+	uint8_t *m_spriteram_n;
+	uint8_t *m_paletteram;
+	uint8_t m_layers_ctrl;
+	uint8_t m_bg_vshift;
+	uint8_t m_bg_hshift;
+	uint8_t m_bg_bplctrl;
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
@@ -51,8 +51,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(kot);
 	DECLARE_PALETTE_INIT(tiamc1);
-	UINT32 screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -83,15 +83,15 @@ struct timer8253chan
 		enable(0)
 	{}
 
-	UINT16 count;
-	UINT16 cnval;
-	UINT8 bcdMode;
-	UINT8 cntMode;
-	UINT8 valMode;
-	UINT8 gate;
-	UINT8 output;
-	UINT8 loadCnt;
-	UINT8 enable;
+	uint16_t count;
+	uint16_t cnval;
+	uint8_t bcdMode;
+	uint8_t cntMode;
+	uint8_t valMode;
+	uint8_t gate;
+	uint8_t output;
+	uint8_t loadCnt;
+	uint8_t enable;
 };
 
 struct timer8253struct
@@ -106,7 +106,7 @@ class tiamc1_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tiamc1_sound_device() { }
 
 protected:
@@ -124,9 +124,9 @@ public:
 private:
 	void timer8253_reset(struct timer8253struct *t);
 	void timer8253_tick(struct timer8253struct *t,int chn);
-	void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val);
+	void timer8253_wr(struct timer8253struct *t, int reg, uint8_t val);
 	char timer8253_get_output(struct timer8253struct *t, int chn);
-	void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate);
+	void timer8253_set_gate(struct timer8253struct *t, int chn, uint8_t gate);
 
 private:
 	sound_stream *m_channel;

@@ -36,21 +36,21 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_pf_data;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_pf_data;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
 	int         m_flipscreen;
-	UINT16      m_scroll[2];
+	uint16_t      m_scroll[2];
 
 	/* misc */
-	UINT16      m_i8751_return;
-	UINT16      m_i8751_needs_ack;
-	UINT16      m_i8751_coin_pending;
-	UINT16      m_i8751_command_queue;
+	uint16_t      m_i8751_return;
+	uint16_t      m_i8751_needs_ack;
+	uint16_t      m_i8751_coin_pending;
+	uint16_t      m_i8751_command_queue;
 	int         m_i8751_level;  // needed by chelnov
 	int         m_microcontroller_id;
 	int         m_coin_mask;
@@ -72,7 +72,7 @@ public:
 	DECLARE_PALETTE_INIT(karnov);
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
-	UINT32 screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(karnov_interrupt);
 	void karnov_flipscreen_w( int data );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );

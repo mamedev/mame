@@ -2,10 +2,10 @@
 // copyright-holders:Wilbert Pol
 #define INC_8BIT(x) \
 { \
-	UINT8 r,f; \
+	uint8_t r,f; \
 	x++; \
 	r=(x);  \
-	f=(UINT8)(m_F&FLAG_C); \
+	f=(uint8_t)(m_F&FLAG_C); \
 	if( r==0 )       f|=FLAG_Z; \
 	if( (r&0xF)==0 ) f|=FLAG_H; \
 	m_F=f; \
@@ -13,10 +13,10 @@
 
 #define DEC_8BIT(x) \
 { \
-	UINT8 r,f; \
+	uint8_t r,f; \
 	x--; \
 	r=(x);  \
-	f=(UINT8)((m_F&FLAG_C)|FLAG_N); \
+	f=(uint8_t)((m_F&FLAG_C)|FLAG_N); \
 	if( r==0 )       f|=FLAG_Z; \
 	if( (r&0xF)==0xF ) f|=FLAG_H; \
 	m_F=f; \
@@ -24,25 +24,25 @@
 
 #define INC_16BIT(x,y) \
 { \
-	UINT16 r = x << 8 | y; \
+	uint16_t r = x << 8 | y; \
 	if (++y == 0) x++; \
 	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define DEC_16BIT(x,y) \
 { \
-	UINT16 r = x << 8 | y; \
+	uint16_t r = x << 8 | y; \
 	if (--y == 0xff) x--; \
 	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define ADD_HL_RR(x) \
 { \
-	UINT32 r1,r2; \
-	UINT8 f; \
+	uint32_t r1,r2; \
+	uint8_t f; \
 	r1=((m_H<<8)|m_L)+(x); \
 	r2=(((m_H<<8)|m_L)&0xFFF)+((x)&0xFFF); \
-	f=(UINT8)(m_F&FLAG_Z); \
+	f=(uint8_t)(m_F&FLAG_Z); \
 	if( r1>0xFFFF ) f|=FLAG_C; \
 	if( r2>0x0FFF ) f|=FLAG_H; \
 	m_L = r1; \
@@ -52,12 +52,12 @@
 
 #define ADD_A_X(x) \
 { \
-	UINT16 r1,r2; \
-	UINT8 f; \
-	r1=(UINT16)((m_A&0xF)+((x)&0xF)); \
-	r2=(UINT16)(m_A+(x)); \
-	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_Z; \
+	uint16_t r1,r2; \
+	uint8_t f; \
+	r1=(uint16_t)((m_A&0xF)+((x)&0xF)); \
+	r2=(uint16_t)(m_A+(x)); \
+	m_A=(uint8_t)r2; \
+	if( ((uint8_t)r2)==0 ) f=FLAG_Z; \
 	else f=0; \
 	if( r2>0xFF ) f|=FLAG_C; \
 	if( r1>0xF )  f|=FLAG_H; \
@@ -66,12 +66,12 @@
 
 #define SUB_A_X(x) \
 { \
-	UINT16 r1,r2; \
-	UINT8 f; \
-	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
-	r2=(UINT16)(m_A-(x)); \
-	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
+	uint16_t r1,r2; \
+	uint8_t f; \
+	r1=(uint16_t)((m_A&0xF)-((x)&0xF)); \
+	r2=(uint16_t)(m_A-(x)); \
+	m_A=(uint8_t)r2; \
+	if( ((uint8_t)r2)==0 ) f=FLAG_N|FLAG_Z; \
 	else f=FLAG_N; \
 	if( r2>0xFF ) f|=FLAG_C; \
 	if( r1>0xF )  f|=FLAG_H; \
@@ -80,11 +80,11 @@
 
 #define CP_A_X(x) \
 { \
-	UINT16 r1,r2; \
-	UINT8 f; \
-	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
-	r2=(UINT16)(m_A-(x)); \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
+	uint16_t r1,r2; \
+	uint8_t f; \
+	r1=(uint16_t)((m_A&0xF)-((x)&0xF)); \
+	r2=(uint16_t)(m_A-(x)); \
+	if( ((uint8_t)r2)==0 ) f=FLAG_N|FLAG_Z; \
 	else f=FLAG_N; \
 	if( r2>0xFF ) f|=FLAG_C; \
 	if( r1>0xF )  f|=FLAG_H; \
@@ -93,12 +93,12 @@
 
 #define SBC_A_X(x) \
 { \
-	UINT16 r1,r2; \
-	UINT8 f; \
-	r1=(UINT16)((m_A&0xF)-((x)&0xF)-((m_F&FLAG_C)?1:0)); \
-	r2=(UINT16)(m_A-(x)-((m_F&FLAG_C)?1:0)); \
-	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
+	uint16_t r1,r2; \
+	uint8_t f; \
+	r1=(uint16_t)((m_A&0xF)-((x)&0xF)-((m_F&FLAG_C)?1:0)); \
+	r2=(uint16_t)(m_A-(x)-((m_F&FLAG_C)?1:0)); \
+	m_A=(uint8_t)r2; \
+	if( ((uint8_t)r2)==0 ) f=FLAG_N|FLAG_Z; \
 	else f=FLAG_N; \
 	if( r2>0xFF ) f|=FLAG_C; \
 	if( r1>0xF )  f|=FLAG_H; \
@@ -107,11 +107,11 @@
 
 #define ADC_A_X(x) \
 { \
-	UINT16 r1,r2;  \
-	UINT8 f; \
-	r1=(UINT16)((m_A&0xF)+((x)&0xF)+((m_F&FLAG_C)?1:0));  \
-	r2=(UINT16)(m_A+(x)+((m_F&FLAG_C)?1:0)); \
-	if( (m_A=(UINT8)r2)==0 ) f=FLAG_Z; \
+	uint16_t r1,r2;  \
+	uint8_t f; \
+	r1=(uint16_t)((m_A&0xF)+((x)&0xF)+((m_F&FLAG_C)?1:0));  \
+	r2=(uint16_t)(m_A+(x)+((m_F&FLAG_C)?1:0)); \
+	if( (m_A=(uint8_t)r2)==0 ) f=FLAG_Z; \
 	else f=0; \
 	if( r2>0xFF )   f|=FLAG_C; \
 	if( r1>0xF )    f|=FLAG_H; \
@@ -179,7 +179,7 @@ case 0x06: /*      LD B,n8 */
 
 case 0x07: /*      RLCA */
 
-	m_A = (UINT8) ((m_A << 1) | (m_A >> 7));
+	m_A = (uint8_t) ((m_A << 1) | (m_A >> 7));
 	if (m_A & 1)
 	{
 	m_F = FLAG_C;
@@ -221,7 +221,7 @@ case 0x0E: /*      LD C,n8 */
 	break;
 case 0x0F: /*      RRCA */
 
-	m_A = (UINT8) ((m_A >> 1) | (m_A << 7));
+	m_A = (uint8_t) ((m_A >> 1) | (m_A << 7));
 	m_F = 0;
 	if (m_A & 0x80)
 	{
@@ -235,7 +235,7 @@ case 0x10: /*      STOP */
 		{
 			// Quite a lot of time for a simple input clock change...
 			// And still not all speedchange related tests are passing.
-			UINT32 cycles = ( 2 * 45 + 1 ) * 65536 + 8;
+			uint32_t cycles = ( 2 * 45 + 1 ) * 65536 + 8;
 
 			do {
 				cycles_passed(128);
@@ -274,12 +274,12 @@ case 0x17: /*      RLA */
 
 	x = (m_A & 0x80) ? FLAG_C : 0;
 
-	m_A = (UINT8) ((m_A << 1) | ((m_F & FLAG_C) ? 1 : 0));
+	m_A = (uint8_t) ((m_A << 1) | ((m_F & FLAG_C) ? 1 : 0));
 	m_F = x;
 	break;
 case 0x18: /*      JR      n8 */
 	{
-	INT8 offset;
+	int8_t offset;
 
 	offset = mem_read_byte( m_PC++ );
 	m_PC += offset;
@@ -314,12 +314,12 @@ case 0x1F: /*      RRA */
 
 	x = (m_A & 1) ? FLAG_C : 0;
 
-	m_A = (UINT8) ((m_A >> 1) | ((m_F & FLAG_C) ? 0x80 : 0));
+	m_A = (uint8_t) ((m_A >> 1) | ((m_F & FLAG_C) ? 0x80 : 0));
 	m_F = x;
 	break;
 case 0x20: /*      JR NZ,n8 */
 	{
-		INT8 offset = mem_read_byte( m_PC++ );
+		int8_t offset = mem_read_byte( m_PC++ );
 		if (! (m_F & FLAG_Z) )
 		{
 			m_PC += offset;
@@ -379,7 +379,7 @@ case 0x27: /*      DAA */
 	break;
 case 0x28: /*      JR Z,n8 */
 	{
-		INT8 offset = mem_read_byte( m_PC++ );
+		int8_t offset = mem_read_byte( m_PC++ );
 
 		if (m_F & FLAG_Z)
 		{
@@ -419,7 +419,7 @@ case 0x2F: /*      CPL */
 	break;
 case 0x30: /*      JR NC,n8 */
 	{
-		INT8 offset = mem_read_byte( m_PC++ );
+		int8_t offset = mem_read_byte( m_PC++ );
 
 		if ( ! (m_F & FLAG_C) )
 		{
@@ -443,10 +443,10 @@ case 0x33: /*      INC SP */
 	break;
 case 0x34: /*      INC (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
-		UINT8 r, f;
+		uint16_t addr = ( m_H << 8 ) | m_L;
+		uint8_t r, f;
 
-		f = (UINT8) (m_F & FLAG_C);
+		f = (uint8_t) (m_F & FLAG_C);
 		r = mem_read_byte( addr );
 		r += 1;
 		mem_write_byte( addr, r );
@@ -462,10 +462,10 @@ case 0x34: /*      INC (HL) */
 	break;
 case 0x35: /*      DEC (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
-		UINT8 r, f;
+		uint16_t addr = ( m_H << 8 ) | m_L;
+		uint8_t r, f;
 
-		f = (UINT8) ((m_F & FLAG_C) | FLAG_N);
+		f = (uint8_t) ((m_F & FLAG_C) | FLAG_N);
 		r = mem_read_byte( addr );
 		r -= 1;
 		mem_write_byte( addr, r );
@@ -481,17 +481,17 @@ case 0x35: /*      DEC (HL) */
 	break;
 case 0x36: /*      LD (HL),n8 */
 	{
-		UINT8 v = mem_read_byte( m_PC++ );
+		uint8_t v = mem_read_byte( m_PC++ );
 		mem_write_byte( ( m_H << 8 ) | m_L, v );
 	}
 	break;
 case 0x37: /*      SCF */
 
-	m_F = (UINT8) ((m_F & FLAG_Z) | FLAG_C);
+	m_F = (uint8_t) ((m_F & FLAG_Z) | FLAG_C);
 	break;
 case 0x38: /*      JR C,n8 */
 	{
-		INT8 offset = mem_read_byte( m_PC++ );
+		int8_t offset = mem_read_byte( m_PC++ );
 
 		if (m_F & FLAG_C)
 		{
@@ -526,7 +526,7 @@ case 0x3E: /*      LD A,n8 */
 	break;
 case 0x3F: /*      CCF */
 
-	m_F = (UINT8) ((m_F & FLAG_Z) | ((m_F & FLAG_C) ? 0 : FLAG_C));
+	m_F = (uint8_t) ((m_F & FLAG_Z) | ((m_F & FLAG_C) ? 0 : FLAG_C));
 	break;
 case 0x40: /*      LD B,B */
 	break;
@@ -1055,7 +1055,7 @@ case 0xC1: /*      POP BC */
 	break;
 case 0xC2: /*      JP NZ,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if ( ! (m_F & FLAG_Z) )
@@ -1071,7 +1071,7 @@ case 0xC3: /*      JP n16 */
 	break;
 case 0xC4: /*      CALL NZ,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if ( ! (m_F & FLAG_Z) )
@@ -1115,7 +1115,7 @@ case 0xC9: /*      RET */
 	break;
 case 0xCA: /*      JP Z,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if (m_F & FLAG_Z)
@@ -1134,7 +1134,7 @@ case 0xCB: /*      PREFIX! */
 	break;
 case 0xCC: /*      CALL Z,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if (m_F & FLAG_Z)
@@ -1148,7 +1148,7 @@ case 0xCC: /*      CALL Z,n16 */
 	break;
 case 0xCD: /*      CALL n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		// Internal delay
@@ -1183,7 +1183,7 @@ case 0xD1: /*      POP DE */
 	break;
 case 0xD2: /*      JP NC,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if ( ! (m_F & FLAG_C) )
@@ -1195,7 +1195,7 @@ case 0xD2: /*      JP NC,n16 */
 	break;
 case 0xD4: /*      CALL NC,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if ( ! (m_F & FLAG_C) )
@@ -1240,7 +1240,7 @@ case 0xD9: /*      RETI */
 	break;
 case 0xDA: /*      JP C,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if (m_F & FLAG_C)
@@ -1252,7 +1252,7 @@ case 0xDA: /*      JP C,n16 */
 	break;
 case 0xDC: /*      CALL C,n16 */
 	{
-		UINT16 addr = mem_read_word( m_PC );
+		uint16_t addr = mem_read_word( m_PC );
 		m_PC += 2;
 
 		if (m_F & FLAG_C)
@@ -1277,7 +1277,7 @@ case 0xDF: /*      RST     $18 */
 	break;
 case 0xE0: /*      LD      ($FF00+n8),A */
 	{
-	UINT8 v = mem_read_byte( m_PC++ );
+	uint8_t v = mem_read_byte( m_PC++ );
 	mem_write_byte( 0xFF00 + v, m_A );
 	}
 	break;
@@ -1313,11 +1313,11 @@ case 0xE8: /*      ADD SP,n8 */
  */
 
 	{
-	INT32 n;
+	int32_t n;
 
-	n = (INT8) mem_read_byte( m_PC++ );
+	n = (int8_t) mem_read_byte( m_PC++ );
 
-	if ( ( m_SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
+	if ( ( m_SP & 0xFF ) + (uint8_t)(n & 0xFF) > 0xFF )
 	{
 		m_F = FLAG_C;
 	}
@@ -1331,7 +1331,7 @@ case 0xE8: /*      ADD SP,n8 */
 		m_F |= FLAG_H;
 	}
 
-	m_SP = (UINT16) ( m_SP + n );
+	m_SP = (uint16_t) ( m_SP + n );
 	}
 	cycles_passed( 8 );
 	break;
@@ -1356,7 +1356,7 @@ case 0xEF: /*      RST $28 */
 	break;
 case 0xF0: /*      LD A,($FF00+n8) */
 	{
-	UINT8 v = mem_read_byte( m_PC++ );
+	uint8_t v = mem_read_byte( m_PC++ );
 	m_A = mem_read_byte( 0xFF00 + v );
 	}
 	break;
@@ -1391,7 +1391,7 @@ case 0xF7: /*      RST $30 */
 	break;
 case 0xF8: /*      LD HL,SP+n8 */
 /*
- *   n = one UINT8 signed immediate value.
+ *   n = one uint8_t signed immediate value.
  * Flags affected:
  *   Z - Reset.
  *   N - Reset.
@@ -1401,11 +1401,11 @@ case 0xF8: /*      LD HL,SP+n8 */
  */
 
 	{
-	INT32 n;
+	int32_t n;
 
-	n = (INT8) mem_read_byte( m_PC++ );
+	n = (int8_t) mem_read_byte( m_PC++ );
 
-	if ( ( m_SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
+	if ( ( m_SP & 0xFF ) + (uint8_t)(n & 0xFF) > 0xFF )
 	{
 		m_F = FLAG_C;
 	}
@@ -1419,7 +1419,7 @@ case 0xF8: /*      LD HL,SP+n8 */
 		m_F |= FLAG_H;
 	}
 
-	UINT16 res = m_SP + n;
+	uint16_t res = m_SP + n;
 
 	m_L = res & 0xFF;
 	m_H = res >> 8;

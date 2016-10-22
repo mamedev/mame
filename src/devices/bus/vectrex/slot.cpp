@@ -45,7 +45,7 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -62,7 +62,7 @@ void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //-------------------------------------------------
 //  vectrex_cart_slot_device - constructor
 //-------------------------------------------------
-vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, VECTREX_CART_SLOT, "GCE Vectrex Cartridge Slot", tag, owner, clock, "vectrex_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -152,8 +152,8 @@ image_init_result vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
+		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
 
 		if (size > 0x10000)
 		{
@@ -211,8 +211,8 @@ std::string vectrex_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = m_file->size();
-		std::vector<UINT8> rom(size);
+		uint32_t size = m_file->size();
+		std::vector<uint8_t> rom(size);
 		int type = VECTREX_STD;
 
 		m_file->read(&rom[0], size);

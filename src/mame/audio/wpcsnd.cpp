@@ -15,7 +15,7 @@
 
 const device_type WPCSND = &device_creator<wpcsnd_device>;
 
-wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,WPCSND,"Williams WPC Sound",tag,owner,clock, "wpcsnd", __FILE__),
 	device_mixer_interface(mconfig, *this),
 	m_cpu(*this, "bgcpu"),
@@ -42,23 +42,23 @@ static ADDRESS_MAP_START( wpcsnd_map, AS_PROGRAM, 8, wpcsnd_device )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("fixed")
 ADDRESS_MAP_END
 
-void wpcsnd_device::ctrl_w(UINT8 data)
+void wpcsnd_device::ctrl_w(uint8_t data)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-void wpcsnd_device::data_w(UINT8 data)
+void wpcsnd_device::data_w(uint8_t data)
 {
 	m_latch = data;
 	m_cpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 }
 
-UINT8 wpcsnd_device::ctrl_r()
+uint8_t wpcsnd_device::ctrl_r()
 {
 	return (m_reply_available) ? 0x01 : 0x00;
 }
 
-UINT8 wpcsnd_device::data_r()
+uint8_t wpcsnd_device::data_r()
 {
 	m_reply_available = false;
 	m_reply_cb(m_cpu->space(AS_PROGRAM),0);
@@ -95,7 +95,7 @@ void wpcsnd_device::device_start()
 
 void wpcsnd_device::device_reset()
 {
-	UINT8* ROM = m_rom->base();
+	uint8_t* ROM = m_rom->base();
 	m_cpubank->configure_entries(0, 0x80, &ROM[0], 0x8000);
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &ROM[0x17c000], 0x4000);
@@ -132,7 +132,7 @@ WRITE8_MEMBER( wpcsnd_device::bg_speech_digit_w )
 
 WRITE8_MEMBER( wpcsnd_device::rombank_w )
 {
-	UINT8 bank = data & 0x0f;
+	uint8_t bank = data & 0x0f;
 
 	switch((~data) & 0xe0)
 	{

@@ -187,7 +187,7 @@ INPUT_PORTS_END
 // solenoids (not knocker)
 WRITE8_MEMBER( zac_proto_state::out0_w )
 {
-	UINT16 t = data | (offset << 8);
+	uint16_t t = data | (offset << 8);
 
 	switch (t)
 	{
@@ -214,8 +214,8 @@ WRITE8_MEMBER( zac_proto_state::out1_w )
 // need to implement blanking of leading zeroes
 WRITE8_MEMBER( zac_proto_state::digit_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
-	static const UINT8 decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
+	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
 	output().set_digit_value(offset, patterns[data&15] | decimals[offset]);
 	offset++;

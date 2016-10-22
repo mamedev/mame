@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ( size == 4 ) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -179,25 +179,25 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 }
 
 
-z8601_device::z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+z8601_device::z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
 	: z8_device(mconfig, Z8601, "Z8601", _tag, _owner, _clock, "z8601", __FILE__, 2)
 {
 }
 
 
-ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
 	: z8_device(mconfig, UB8830D, "UB8830D", _tag, _owner, _clock, "ub8830d", __FILE__, 2)
 {
 }
 
 
-z8611_device::z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+z8611_device::z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
 	: z8_device(mconfig, Z8611, "Z8611", _tag, _owner, _clock, "z8611", __FILE__, 4)
 {
 }
 
 
-offs_t z8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t z8_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( z8 );
 	return CPU_DISASSEMBLE_NAME(z8)(this, buffer, pc, oprom, opram, options);
@@ -208,9 +208,9 @@ offs_t z8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom
     INLINE FUNCTIONS
 ***************************************************************************/
 
-UINT8 z8_device::fetch()
+uint8_t z8_device::fetch()
 {
-	UINT8 data = m_direct->read_byte(m_pc);
+	uint8_t data = m_direct->read_byte(m_pc);
 
 	m_pc++;
 
@@ -218,10 +218,10 @@ UINT8 z8_device::fetch()
 }
 
 
-UINT8 z8_device::register_read(UINT8 offset)
+uint8_t z8_device::register_read(uint8_t offset)
 {
-	UINT8 data = 0xff;
-	UINT8 mask = 0;
+	uint8_t data = 0xff;
+	uint8_t mask = 0;
 
 	switch (offset)
 	{
@@ -312,14 +312,14 @@ UINT8 z8_device::register_read(UINT8 offset)
 	return data;
 }
 
-UINT16 z8_device::register_pair_read(UINT8 offset)
+uint16_t z8_device::register_pair_read(uint8_t offset)
 {
 	return (register_read(offset) << 8) | register_read(offset + 1);
 }
 
-void z8_device::register_write(UINT8 offset, UINT8 data)
+void z8_device::register_write(uint8_t offset, uint8_t data)
 {
-	UINT8 mask = 0;
+	uint8_t mask = 0;
 
 	switch (offset)
 	{
@@ -403,18 +403,18 @@ void z8_device::register_write(UINT8 offset, UINT8 data)
 	m_r[offset] = data;
 }
 
-void z8_device::register_pair_write(UINT8 offset, UINT16 data)
+void z8_device::register_pair_write(uint8_t offset, uint16_t data)
 {
 	register_write(offset, data >> 8);
 	register_write(offset + 1, data & 0xff);
 }
 
-UINT8 z8_device::get_working_register(int offset)
+uint8_t z8_device::get_working_register(int offset)
 {
 	return (m_r[Z8_REGISTER_RP] & 0xf0) | (offset & 0x0f);
 }
 
-UINT8 z8_device::get_register(UINT8 offset)
+uint8_t z8_device::get_register(uint8_t offset)
 {
 	if ((offset & 0xf0) == 0xe0)
 		return get_working_register(offset & 0x0f);
@@ -422,17 +422,17 @@ UINT8 z8_device::get_register(UINT8 offset)
 		return offset;
 }
 
-UINT8 z8_device::get_intermediate_register(int offset)
+uint8_t z8_device::get_intermediate_register(int offset)
 {
 	return register_read(get_register(offset));
 }
 
-void z8_device::stack_push_byte(UINT8 src)
+void z8_device::stack_push_byte(uint8_t src)
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP - 1 */
-		UINT8 sp = register_read(Z8_REGISTER_SPL) - 1;
+		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
 		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
@@ -441,7 +441,7 @@ void z8_device::stack_push_byte(UINT8 src)
 	else
 	{
 		/* SP <- SP - 1 */
-		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) - 1;
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 1;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
@@ -449,12 +449,12 @@ void z8_device::stack_push_byte(UINT8 src)
 	}
 }
 
-void z8_device::stack_push_word(UINT16 src)
+void z8_device::stack_push_word(uint16_t src)
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP - 2 */
-		UINT8 sp = register_read(Z8_REGISTER_SPL) - 2;
+		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
 		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
@@ -463,7 +463,7 @@ void z8_device::stack_push_word(UINT16 src)
 	else
 	{
 		/* SP <- SP - 2 */
-		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) - 2;
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 2;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
@@ -471,12 +471,12 @@ void z8_device::stack_push_word(UINT16 src)
 	}
 }
 
-UINT8 z8_device::stack_pop_byte()
+uint8_t z8_device::stack_pop_byte()
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP + 1 */
-		UINT8 sp = register_read(Z8_REGISTER_SPL) + 1;
+		uint8_t sp = register_read(Z8_REGISTER_SPL) + 1;
 		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
@@ -485,7 +485,7 @@ UINT8 z8_device::stack_pop_byte()
 	else
 	{
 		/* SP <- SP + 1 */
-		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) + 1;
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) + 1;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
@@ -493,12 +493,12 @@ UINT8 z8_device::stack_pop_byte()
 	}
 }
 
-UINT16 z8_device::stack_pop_word()
+uint16_t z8_device::stack_pop_word()
 {
 	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP + 2 */
-		UINT8 sp = register_read(Z8_REGISTER_SPL) + 2;
+		uint8_t sp = register_read(Z8_REGISTER_SPL) + 2;
 		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
@@ -507,7 +507,7 @@ UINT16 z8_device::stack_pop_word()
 	else
 	{
 		/* SP <- SP + 2 */
-		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) + 2;
+		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) + 2;
 		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
@@ -515,7 +515,7 @@ UINT16 z8_device::stack_pop_word()
 	}
 }
 
-void z8_device::set_flag(UINT8 flag, int state)
+void z8_device::set_flag(uint8_t flag, int state)
 {
 	if (state)
 		m_r[Z8_REGISTER_FLAGS] |= flag;
@@ -534,7 +534,7 @@ void z8_device::set_flag(UINT8 flag, int state)
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) void z8_device::mnemonic(UINT8 opcode, int *cycles)
+#define INSTRUCTION(mnemonic) void z8_device::mnemonic(uint8_t opcode, int *cycles)
 
 INSTRUCTION( illegal )
 {
@@ -726,7 +726,7 @@ void z8_device::execute_run()
 {
 	do
 	{
-		UINT8 opcode;
+		uint8_t opcode;
 		int cycles;
 
 		debugger_instruction_hook(this, m_pc);

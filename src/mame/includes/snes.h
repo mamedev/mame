@@ -284,14 +284,14 @@
 
 struct snes_cart_info
 {
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	std::unique_ptr<UINT8[]> m_nvram;
-	UINT32 m_nvram_size;
-	UINT8  mode;        /* ROM memory mode */
-	UINT32 sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::unique_ptr<uint8_t[]> m_nvram;
+	uint32_t m_nvram_size;
+	uint8_t  mode;        /* ROM memory mode */
+	uint32_t sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
 	int    slot_in_use; /* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
-	UINT8 rom_bank_map[0x100];
+	uint8_t rom_bank_map[0x100];
 };
 
 class snes_state : public driver_device
@@ -318,18 +318,18 @@ public:
 		m_screen(*this, "screen") { }
 
 	/* misc */
-	UINT16                m_hblank_offset;
-	UINT32                m_wram_address;
-	UINT16                m_htime;
-	UINT16                m_vtime;
+	uint16_t                m_hblank_offset;
+	uint32_t                m_wram_address;
+	uint16_t                m_htime;
+	uint16_t                m_vtime;
 	bool                  m_is_pal;
 
 	/* non-SNES HW-specific flags / variables */
-	UINT8                 m_is_nss;
-	UINT8                 m_input_disabled;
-	UINT8                 m_game_over_flag;
-	UINT8                 m_joy_flag;
-	UINT8                 m_is_sfcbox;
+	uint8_t                 m_is_nss;
+	uint8_t                 m_input_disabled;
+	uint8_t                 m_game_over_flag;
+	uint8_t                 m_joy_flag;
+	uint8_t                 m_is_sfcbox;
 
 	/* timers */
 	emu_timer             *m_scanline_timer;
@@ -343,36 +343,36 @@ public:
 	/* DMA/HDMA-related */
 	struct
 	{
-		UINT8  dmap;
-		UINT8  dest_addr;
-		UINT16 src_addr;
-		UINT16 trans_size;
-		UINT8  bank;
-		UINT8  ibank;
-		UINT16 hdma_addr;
-		UINT16 hdma_iaddr;
-		UINT8  hdma_line_counter;
-		UINT8  unk;
+		uint8_t  dmap;
+		uint8_t  dest_addr;
+		uint16_t src_addr;
+		uint16_t trans_size;
+		uint8_t  bank;
+		uint8_t  ibank;
+		uint16_t hdma_addr;
+		uint16_t hdma_iaddr;
+		uint8_t  hdma_line_counter;
+		uint8_t  unk;
 
 		int    do_transfer;
 
 		int    dma_disabled;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
 	} m_dma_channel[8];
-	UINT8                 m_hdmaen; /* channels enabled for HDMA */
-	UINT8                 m_dma_regs[0x80];
-	UINT8                 m_cpu_regs[0x20];
-	UINT8                 m_oldjoy1_latch;
+	uint8_t                 m_hdmaen; /* channels enabled for HDMA */
+	uint8_t                 m_dma_regs[0x80];
+	uint8_t                 m_cpu_regs[0x20];
+	uint8_t                 m_oldjoy1_latch;
 
 	/* input-related */
-	UINT16                m_data1[4];   // JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
-	UINT16                m_data2[4];   // JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
-	UINT8                 m_read_idx[4];    // 3rd & 4th only used by multitap (hacky support)
+	uint16_t                m_data1[4];   // JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
+	uint16_t                m_data2[4];   // JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
+	uint8_t                 m_read_idx[4];    // 3rd & 4th only used by multitap (hacky support)
 
 	/* cart related */
 	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!
-	void rom_map_setup(UINT32 size);
+	void rom_map_setup(uint32_t size);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* devices */
 	required_device<_5a22_device> m_maincpu;
@@ -387,27 +387,27 @@ public:
 	DECLARE_DRIVER_INIT(snes_mess);
 	DECLARE_DRIVER_INIT(snesst);
 
-	inline int dma_abus_valid(UINT32 address);
-	inline UINT8 abus_read(address_space &space, UINT32 abus);
-	inline void dma_transfer(address_space &space, UINT8 dma, UINT32 abus, UINT16 bbus);
+	inline int dma_abus_valid(uint32_t address);
+	inline uint8_t abus_read(address_space &space, uint32_t abus);
+	inline void dma_transfer(address_space &space, uint8_t dma, uint32_t abus, uint16_t bbus);
 	inline int is_last_active_channel(int dma);
-	inline UINT32 get_hdma_addr(int dma);
-	inline UINT32 get_hdma_iaddr(int dma);
-	void dma(address_space &space, UINT8 channels);
+	inline uint32_t get_hdma_addr(int dma);
+	inline uint32_t get_hdma_iaddr(int dma);
+	void dma(address_space &space, uint8_t channels);
 	void hdma(address_space &space);
 	void hdma_init(address_space &space);
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
-	virtual void write_joy_latch(UINT8 data);
-	virtual void wrio_write(UINT8 data);
-	inline UINT8 snes_rom_access(UINT32 offset);
+	virtual void write_joy_latch(uint8_t data);
+	virtual void wrio_write(uint8_t data);
+	inline uint8_t snes_rom_access(uint32_t offset);
 
 	void snes_init_ram();
 
 	// input related
 	virtual DECLARE_WRITE8_MEMBER(io_read);
-	virtual UINT8 oldjoy1_read(int latched);
-	virtual UINT8 oldjoy2_read(int latched);
+	virtual uint8_t oldjoy1_read(int latched);
+	virtual uint8_t oldjoy2_read(int latched);
 
 	DECLARE_READ8_MEMBER(snes_r_io);
 	DECLARE_WRITE8_MEMBER(snes_w_io);

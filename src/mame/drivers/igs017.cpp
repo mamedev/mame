@@ -81,7 +81,7 @@ public:
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 
@@ -89,23 +89,23 @@ public:
 
 
 
-	UINT8 m_input_select;
-	UINT8 m_hopper;
-	UINT16 m_igs_magic[2];
-	UINT8 m_scramble_data;
+	uint8_t m_input_select;
+	uint8_t m_hopper;
+	uint16_t m_igs_magic[2];
+	uint8_t m_scramble_data;
 
-	UINT8 m_dsw_select;
+	uint8_t m_dsw_select;
 
 	// lhzb2a protection:
-	UINT16 m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
-	UINT8 m_prot2;
+	uint16_t m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
+	uint8_t m_prot2;
 
 	// IGS029 protection (communication)
-	UINT8 m_igs029_send_data, m_igs029_recv_data;
-	UINT8 m_igs029_send_buf[256], m_igs029_recv_buf[256];
+	uint8_t m_igs029_send_data, m_igs029_recv_data;
+	uint8_t m_igs029_send_buf[256], m_igs029_recv_buf[256];
 	int m_igs029_send_len, m_igs029_recv_len;
 	// IGS029 protection (mgcs)
-	UINT32 m_igs029_mgcs_long;
+	uint32_t m_igs029_mgcs_long;
 
 
 	DECLARE_WRITE8_MEMBER(input_select_w);
@@ -113,10 +113,10 @@ public:
 	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
 	DECLARE_READ16_MEMBER(mgcs_magic_r);
 
-	UINT16 mgcs_palette_bitswap(UINT16 bgr);
-	UINT16 lhzb2a_palette_bitswap(UINT16 bgr);
-	UINT16 tjsb_palette_bitswap(UINT16 bgr);
-	UINT16 slqz2_palette_bitswap(UINT16 bgr);
+	uint16_t mgcs_palette_bitswap(uint16_t bgr);
+	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
+	uint16_t tjsb_palette_bitswap(uint16_t bgr);
+	uint16_t slqz2_palette_bitswap(uint16_t bgr);
 
 	DECLARE_READ8_MEMBER(sdmg2_keys_r);
 	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
@@ -167,7 +167,7 @@ public:
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
-	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
@@ -184,7 +184,7 @@ public:
 	void tarzan_decrypt_tiles();
 	void tarzan_decrypt_program_rom();
 	void tarzana_decrypt_program_rom();
-	void starzan_decrypt(UINT8 *ROM, int size, bool isOpcode);
+	void starzan_decrypt(uint8_t *ROM, int size, bool isOpcode);
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
 	void lhzb2_decrypt_sprites();
@@ -208,33 +208,33 @@ void igs017_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
-UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
 	return 0;
 }
 
 // palette bitswap callbacks
-UINT16 igs017_state::mgcs_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return BITSWAP16(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-UINT16 igs017_state::lhzb2a_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-UINT16 igs017_state::tjsb_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
 {
 	// bitswap
 	return BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-UINT16 igs017_state::slqz2_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
 {
 	return BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -249,8 +249,8 @@ UINT16 igs017_state::slqz2_palette_bitswap(UINT16 bgr)
 void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
 	int length = memregion("maincpu")->bytes();
-	UINT8 *rom = memregion("maincpu")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i;
 
 	// decrypt the program ROM
@@ -307,7 +307,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 
 void igs017_state::iqblocka_patch_rom()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -349,8 +349,8 @@ DRIVER_INIT_MEMBER(igs017_state,iqblockf)
 void igs017_state::tjsb_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -364,7 +364,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	// data lines swap
 	for (i = 0; i < length; i += 2)
 	{
-		UINT16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
+		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = BITSWAP16(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
@@ -384,13 +384,13 @@ DRIVER_INIT_MEMBER(igs017_state,tjsb)
 void igs017_state::mgcs_decrypt_program_rom()
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -434,8 +434,8 @@ void igs017_state::mgcs_decrypt_program_rom()
 void igs017_state::mgcs_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	std::vector<UINT8> tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -449,12 +449,12 @@ void igs017_state::mgcs_decrypt_tiles()
 void igs017_state::mgcs_flip_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
+	uint8_t *rom = memregion("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
 	{
-		UINT16 pixels = (rom[i+1] << 8) | rom[i+0];
+		uint16_t pixels = (rom[i+1] << 8) | rom[i+0];
 
 		// flip bits
 		pixels = BITSWAP16(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -469,7 +469,7 @@ void igs017_state::mgcs_flip_sprites()
 
 void igs017_state::mgcs_patch_rom()
 {
-//  UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 //  rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
 
@@ -494,8 +494,8 @@ DRIVER_INIT_MEMBER(igs017_state,mgcs)
 void igs017_state::tarzan_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	std::vector<UINT8> tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -509,13 +509,13 @@ void igs017_state::tarzan_decrypt_tiles()
 // decryption is incomplete, the first part of code doesn't seem right.
 void igs017_state::tarzan_decrypt_program_rom()
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
 	for(i=0; i<size/2; i++)
 	{
-		UINT16 x = ROM[i];
+		uint16_t x = ROM[i];
 
 		if((i & 0x10c0) == 0x0000)
 			x ^= 0x0001;
@@ -535,13 +535,13 @@ void igs017_state::tarzan_decrypt_program_rom()
 // by iq_132
 void igs017_state::tarzana_decrypt_program_rom()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
 	for (i = 0; i < size; i++)
 	{
-		UINT8 x = 0;
+		uint8_t x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
 		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
@@ -567,12 +567,12 @@ DRIVER_INIT_MEMBER(igs017_state,tarzana)
 
 // decryption is incomplete: data decryption is correct but opcodes are encrypted differently.
 
-void igs017_state::starzan_decrypt(UINT8 *ROM, int size, bool isOpcode)
+void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 {
 	for(int i=0; i<size; i++)
 	{
 #if 1
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		// this seems ok for opcodes too
 		if ( (i & 0x10) && (i & 0x01) )
@@ -619,8 +619,8 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 {
 	int size = 0x040000;
 
-	UINT8 *data = memregion("maincpu")->base();
-	UINT8 *code = m_decrypted_opcodes;
+	uint8_t *data = memregion("maincpu")->base();
+	uint8_t *code = m_decrypted_opcodes;
 	memcpy(code, data, size);
 
 	starzan_decrypt(data, size, false); // data
@@ -635,13 +635,13 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -692,13 +692,13 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 DRIVER_INIT_MEMBER(igs017_state,mgdha)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if( (i & 0x20/2) && (i & 0x02/2) )
 		{
@@ -727,7 +727,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 {
 	DRIVER_INIT_CALL(mgdha);
 
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// additional protection
 	rom[0x4ad50/2] = 0x4e71;
@@ -739,7 +739,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 
 void igs017_state::lhzb2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x14786/2] = 0x6044;    // 014786: 6744    beq $147cc
@@ -751,8 +751,8 @@ void igs017_state::lhzb2_patch_rom()
 void igs017_state::lhzb2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	std::vector<UINT8> tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	int addr;
@@ -767,8 +767,8 @@ void igs017_state::lhzb2_decrypt_tiles()
 void igs017_state::lhzb2_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -782,7 +782,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	// data lines swap
 	for (i = 0;i < length;i+=2)
 	{
-		UINT16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
+		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = BITSWAP16(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
@@ -799,13 +799,13 @@ void igs017_state::igs025_to_igs022_callback( void )
 DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -900,13 +900,13 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -964,7 +964,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 
 void igs017_state::slqz2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x1489c/2] = 0x6044;    // 01489C: 6744    beq $148e2
@@ -976,8 +976,8 @@ void igs017_state::slqz2_patch_rom()
 void igs017_state::slqz2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	std::vector<UINT8> tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -991,13 +991,13 @@ void igs017_state::slqz2_decrypt_tiles()
 DRIVER_INIT_MEMBER(igs017_state,slqz2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -1081,8 +1081,8 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 void igs017_state::spkrform_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -1197,8 +1197,8 @@ void igs017_state::mgcs_igs029_run()
 
 	if (m_igs029_send_buf[0] == 0x05 && m_igs029_send_buf[1] == 0x5a)
 	{
-		UINT8 data = m_igs029_send_buf[2];
-		UINT8 port = m_igs029_send_buf[3];
+		uint8_t data = m_igs029_send_buf[2];
+		uint8_t port = m_igs029_send_buf[3];
 
 		logerror("PORT %02x = %02x\n", port, data);
 
@@ -1239,7 +1239,7 @@ void igs017_state::mgcs_igs029_run()
 
 		// No inputs. Returns 1 long
 
-		UINT8 min_bets[4] = {1, 2, 3, 5};
+		uint8_t min_bets[4] = {1, 2, 3, 5};
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
@@ -1252,7 +1252,7 @@ void igs017_state::mgcs_igs029_run()
 	{
 		logerror("READ DSW\n");
 
-		UINT8 ret;
+		uint8_t ret;
 		if      (~m_dsw_select & 0x01)  ret = ioport("DSW1")->read();
 		else if (~m_dsw_select & 0x02)  ret = ioport("DSW2")->read();
 		else
@@ -1406,14 +1406,14 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 
 		case 0x01:
 		{
-			UINT16 ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			uint16_t ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
 
 		case 0x02:
 		{
-			UINT8 ret = m_igs029_recv_data;
+			uint8_t ret = m_igs029_recv_data;
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
@@ -1509,7 +1509,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
@@ -1625,7 +1625,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
@@ -1692,7 +1692,7 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 		case 0x02:  return ioport("COINS")->read();
 		case 0x03:
 		{
-			UINT8 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
+			uint8_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
 			return ioport("HOPPER")->read() | hopper_bit;
 		}
 
@@ -1965,10 +1965,10 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 		case 0x86:
 		case 0x87:
 		{
-			UINT16 x  = m_prot_val;
-			UINT16 mf = m_prot_mf;
+			uint16_t x  = m_prot_val;
+			uint16_t mf = m_prot_mf;
 
-			UINT16 bit0 = 0;
+			uint16_t bit0 = 0;
 			switch (m_prot_m3)
 			{
 				case 0: bit0 = BIT(~x,12) ^ BIT(~x,15) ^ BIT( x, 8) ^ BIT(~x, 3);   break;
@@ -1977,7 +1977,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 				case 3: bit0 = BIT(~x,15) ^ BIT(~x, 9) ^ BIT( x,12) ^ BIT(~x,11);   break;
 			}
 
-			UINT16 xor0 = BIT(m_prot_regs[1], m_prot_regs[0] - 0x80);
+			uint16_t xor0 = BIT(m_prot_regs[1], m_prot_regs[0] - 0x80);
 			bit0 ^= xor0;
 
 			m_prot_val  =   (    BIT( x,14)                 << 15   ) |
@@ -2019,8 +2019,8 @@ READ16_MEMBER(igs017_state::lhzb2a_prot_r)
 	{
 		case 0x03:  // result
 		{
-			UINT16 x = m_prot_val;
-			UINT16 res  =   (BIT(x, 5) << 7) |
+			uint16_t x = m_prot_val;
+			uint16_t res  =   (BIT(x, 5) << 7) |
 							(BIT(x, 2) << 6) |
 							(BIT(x, 9) << 5) |
 							(BIT(x, 7) << 4) |
@@ -2063,8 +2063,8 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot2_dec_w)
 
 READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
 {
-	UINT8 x     =   m_prot2;
-	UINT8 res   =   (BIT(x, 0) << 7) |
+	uint8_t x     =   m_prot2;
+	uint8_t res   =   (BIT(x, 0) << 7) |
 					(BIT(x, 3) << 5) |
 					(BIT(x, 2) << 4) |
 					(BIT(x, 1) << 2) ;
@@ -2093,7 +2093,7 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 
 		case 0x02:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
 			return (ioport("DSW1")->read() << 8) | ioport("COINS")->read() | hopper_bit;
 		}
 

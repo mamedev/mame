@@ -49,17 +49,17 @@ public:
 			}),
 			m_generic_paletteram_16(*this, "paletteram") { }
 
-	std::unique_ptr<UINT8[]> m_depth_buffer;
+	std::unique_ptr<uint8_t[]> m_depth_buffer;
 	int m_video_field;
-	UINT8 m_io_latch;
-	UINT8 m_reset_latch;
+	uint8_t m_io_latch;
+	uint8_t m_reset_latch;
 	required_device<simutrek_special_device> m_laserdisc;
 	required_device<cquestrot_cpu_device> m_rotatecpu;
 	required_device<cquestlin_cpu_device> m_linecpu;
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device_array<dac_word_interface, 16> m_dacs;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	std::unique_ptr<rgb_t[]> m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
@@ -79,7 +79,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
@@ -107,7 +107,7 @@ public:
 void cubeqst_state::video_start()
 {
 	m_video_field = 0;
-	m_depth_buffer = std::make_unique<UINT8[]>(512);
+	m_depth_buffer = std::make_unique<uint8_t[]>(512);
 }
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
@@ -119,7 +119,7 @@ WRITE16_MEMBER(cubeqst_state::palette_w)
 }
 
 /* TODO: This is a simplified version of what actually happens */
-UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -136,9 +136,9 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	{
 		int i;
 		int num_entries = m_linecpu->cubeqcpu_get_ptr_ram_val(y);
-		UINT32 *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
-		UINT32 *dest = &bitmap.pix32(y);
-		UINT32 pen;
+		uint32_t *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
+		uint32_t *dest = &bitmap.pix32(y);
+		uint32_t pen;
 
 		/* Zap the depth buffer */
 		memset(m_depth_buffer.get(), 0xff, 512);
@@ -338,7 +338,7 @@ WRITE16_MEMBER(cubeqst_state::io_w)
 
 READ16_MEMBER(cubeqst_state::io_r)
 {
-	UINT16 port_data = ioport("IO")->read();
+	uint16_t port_data = ioport("IO")->read();
 
 	/*
 	     Certain bits depend on Q7 of the IO latch:
@@ -458,7 +458,7 @@ void cubeqst_state::machine_start()
 	m_colormap = std::make_unique<rgb_t[]>(65536);
 	for (i = 0; i < 65536; ++i)
 	{
-		UINT8 a, r, g, b, y;
+		uint8_t a, r, g, b, y;
 
 		a = (i >> 3) & 1;
 		b = (i >> 0) & 7;

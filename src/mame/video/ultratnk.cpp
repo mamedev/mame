@@ -13,7 +13,7 @@ Atari Ultra Tank video emulation
 
 PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0xa4, 0xa4, 0xa4));
@@ -36,8 +36,8 @@ PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
 
 TILE_GET_INFO_MEMBER(ultratnk_state::ultratnk_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 code = videoram[tile_index];
+	uint8_t *videoram = m_videoram;
+	uint8_t code = videoram[tile_index];
 
 	if (code & 0x20)
 		SET_TILE_INFO_MEMBER(0, code, code >> 6, 0);
@@ -54,9 +54,9 @@ void ultratnk_state::video_start()
 }
 
 
-UINT32 ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int i;
 
 	m_playfield->draw(screen, bitmap, cliprect, 0, 0);
@@ -65,10 +65,10 @@ UINT32 ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind1
 	{
 		int bank = 0;
 
-		UINT8 horz = videoram[0x390 + 2 * i + 0];
-		UINT8 attr = videoram[0x390 + 2 * i + 1];
-		UINT8 vert = videoram[0x398 + 2 * i + 0];
-		UINT8 code = videoram[0x398 + 2 * i + 1];
+		uint8_t horz = videoram[0x390 + 2 * i + 0];
+		uint8_t attr = videoram[0x390 + 2 * i + 1];
+		uint8_t vert = videoram[0x398 + 2 * i + 0];
+		uint8_t code = videoram[0x398 + 2 * i + 1];
 
 		if (code & 4)
 			bank = 32;
@@ -94,8 +94,8 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 	if (state)
 	{
 		int i;
-		UINT16 BG = m_palette->pen_indirect(0);
-		UINT8 *videoram = m_videoram;
+		uint16_t BG = m_palette->pen_indirect(0);
+		uint8_t *videoram = m_videoram;
 
 		/* check for sprite-playfield collisions */
 
@@ -108,9 +108,9 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 			int bank = 0;
 
-			UINT8 horz = videoram[0x390 + 2 * i + 0];
-			UINT8 vert = videoram[0x398 + 2 * i + 0];
-			UINT8 code = videoram[0x398 + 2 * i + 1];
+			uint8_t horz = videoram[0x390 + 2 * i + 0];
+			uint8_t vert = videoram[0x398 + 2 * i + 0];
+			uint8_t code = videoram[0x398 + 2 * i + 1];
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
@@ -148,7 +148,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_video_ram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_playfield->mark_tile_dirty(offset);
 }

@@ -30,59 +30,59 @@
 
 struct Memconf
 {
-	UINT16 cmd_q, rcv_q, mcast, frame, rcv_b, progs;
+	uint16_t cmd_q, rcv_q, mcast, frame, rcv_b, progs;
 };
 
 struct Rcv_pkt
 {
-	UINT16 buf_ofs, buf_seg, buf_len, timeout;
+	uint16_t buf_ofs, buf_seg, buf_len, timeout;
 };
 
 struct Xmit_pkt
 {
-	UINT16 buf_ofs, buf_seg, pkt_len;
+	uint16_t buf_ofs, buf_seg, pkt_len;
 };
 
 struct Rcv_resp
 {
-	UINT16 buf_ofs, buf_seg, buf_len, pkt_len, timeout, status;
-	UINT32 timetag;
+	uint16_t buf_ofs, buf_seg, buf_len, pkt_len, timeout, status;
+	uint32_t timetag;
 };
 
 struct Xmit_resp
 {
-	UINT16 buf_ofs, buf_seg, c_stat, status;
+	uint16_t buf_ofs, buf_seg, c_stat, status;
 };
 
 struct Netstat
 {
-	UINT32 tot_recv, tot_xmit;
-	UINT16 err_CRC, err_align, err_res, err_ovrrun;
+	uint32_t tot_recv, tot_xmit;
+	uint16_t err_CRC, err_align, err_res, err_ovrrun;
 };
 
 struct Selftest
 {
-	UINT16 error;
+	uint16_t error;
 	union
 	{
-		UINT16 ROM_cksum;
+		uint16_t ROM_cksum;
 		struct
 		{
-			UINT16 ofs, seg;
+			uint16_t ofs, seg;
 		} RAM;
-		UINT16 i82586;
+		uint16_t i82586;
 	} failure;
 };
 
 struct Info
 {
-	UINT8 minor_vers, major_vers;
-	UINT16 ROM_cksum, RAM_sz, free_ofs, free_seg;
+	uint8_t minor_vers, major_vers;
+	uint16_t ROM_cksum, RAM_sz, free_ofs, free_seg;
 };
 
 struct Memdump
 {
-	UINT16 size, off, seg;
+	uint16_t size, off, seg;
 };
 
 /*
@@ -92,24 +92,24 @@ struct Memdump
  */
 struct pcb_struct
 {
-	UINT8 command;
-	UINT8 length;
+	uint8_t command;
+	uint8_t length;
 	union
 	{
 		struct Memconf memconf;
-		UINT16 configure;
+		uint16_t configure;
 		struct Rcv_pkt rcv_pkt;
 		struct Xmit_pkt xmit_pkt;
-		UINT8 multicast[10][6];
-		UINT8 eth_addr[6];
-		INT16 failed;
+		uint8_t multicast[10][6];
+		uint8_t eth_addr[6];
+		int16_t failed;
 		struct Rcv_resp rcv_resp;
 		struct Xmit_resp xmit_resp;
 		struct Netstat netstat;
 		struct Selftest selftest;
 		struct Info info;
 		struct Memdump memdump;
-		UINT8 raw[62];
+		uint8_t raw[62];
 	} data;
 };
 
@@ -123,8 +123,8 @@ class threecom3c505_device:  public device_t,
 {
 public:
 	// construction/destruction
-	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device register I/O
 	virtual DECLARE_READ16_MEMBER(read);
@@ -136,10 +136,10 @@ public:
 	required_ioport m_irqdrq;
 	required_ioport m_romopts;
 
-	virtual void recv_cb(UINT8 *data, int length) override;
+	virtual void recv_cb(uint8_t *data, int length) override;
 
 protected:
-	virtual int tx_data(device_t *, const UINT8 *, int);
+	virtual int tx_data(device_t *, const uint8_t *, int);
 	virtual int setfilter(device_t *, int);
 
 	const char *cpu_context();
@@ -164,16 +164,16 @@ private:
 
 	public:
 		data_buffer();
-		void start(threecom3c505_device *device, INT32 size);
+		void start(threecom3c505_device *device, int32_t size);
 		void reset();
-		int append(UINT8 data);
-		UINT8 get(int i) { return m_data[i]; };
-		UINT16 get_word(int i) { return (m_data[i*2+1] << 8) + m_data[i*2]; };
+		int append(uint8_t data);
+		uint8_t get(int i) { return m_data[i]; };
+		uint16_t get_word(int i) { return (m_data[i*2+1] << 8) + m_data[i*2]; };
 		int is_empty() {return  m_length == 0; };
 		int is_full() {return  m_length >= m_data.size(); };
-		UINT16 get_length() { return m_length; };
-		UINT16 get_size() { return m_data.size(); };
-		UINT8 *get_data() { return &m_data[0]; };
+		uint16_t get_length() { return m_length; };
+		uint16_t get_size() { return m_data.size(); };
+		uint8_t *get_data() { return &m_data[0]; };
 		void copy(data_buffer *db) const;
 		void log(const char *title) const;
 
@@ -181,8 +181,8 @@ private:
 		const char *cpu_context() { return m_device->cpu_context(); }
 
 		threecom3c505_device *m_device; // pointer back to our device
-		UINT16 m_length;
-		std::vector<UINT8> m_data;
+		uint16_t m_length;
+		std::vector<uint8_t> m_data;
 	};
 
 	/* data_buffer fifo (used to buffer the received data) */
@@ -191,9 +191,9 @@ private:
 	public:
 		data_buffer_fifo();
 		~data_buffer_fifo();
-		void start(threecom3c505_device *device, INT32 size, INT32 db_size);
+		void start(threecom3c505_device *device, int32_t size, int32_t db_size);
 		void reset();
-		int put(const UINT8 data[], const int length);
+		int put(const uint8_t data[], const int length);
 		int get(data_buffer *db);
 		int is_empty () { return m_get_index == m_put_index; }
 		int is_full () { return ((m_put_index + 1) % m_size) == m_get_index; }
@@ -201,10 +201,10 @@ private:
 		const char *cpu_context() { return m_device->cpu_context(); }
 
 		threecom3c505_device *m_device; // pointer back to our device
-		UINT16 m_size;
-		UINT16 m_count;
-		UINT16 m_get_index;
-		UINT16 m_put_index;
+		uint16_t m_size;
+		uint16_t m_count;
+		uint16_t m_get_index;
+		uint16_t m_put_index;
 		data_buffer *m_db[RX_FIFO_SIZE];
 	};
 
@@ -217,23 +217,23 @@ private:
 	void do_receive_command();
 	void set_command_pending(int onoff);
 
-	int ethernet_packet_is_for_me(const UINT8 mac_address[]);
+	int ethernet_packet_is_for_me(const uint8_t mac_address[]);
 
-	void write_command_port( UINT8 data);
-	UINT8 read_command_port();
-	void write_data_port( UINT8 data);
-	UINT8 read_data_port();
-	void write_control_port( UINT8 data);
-	UINT8 read_status_port();
+	void write_command_port( uint8_t data);
+	uint8_t read_command_port();
+	void write_data_port( uint8_t data);
+	uint8_t read_data_port();
+	void write_control_port( uint8_t data);
+	uint8_t read_status_port();
 
 	void do_command();
 
-	UINT8 m_reg[16];
+	uint8_t m_reg[16];
 
-	UINT8 m_status;
-	UINT8 m_control;
+	uint8_t m_status;
+	uint8_t m_control;
 
-	UINT8 m_command_buffer[CMD_BUFFER_SIZE];
+	uint8_t m_command_buffer[CMD_BUFFER_SIZE];
 	int m_command_index;
 	int m_command_pending;
 	int m_wait_for_ack;
@@ -257,16 +257,16 @@ private:
 
 	pcb_struct m_rcv_response;
 
-	UINT16 m_microcode_version;
-	UINT16 m_microcode_running;
+	uint16_t m_microcode_version;
+	uint16_t m_microcode_running;
 
-	UINT16 m_i82586_config;
+	uint16_t m_i82586_config;
 
 	struct Netstat m_netstat;
 
-	UINT8 m_station_address[ETHERNET_ADDR_SIZE];
-	UINT8 m_multicast_list[ETHERNET_ADDR_SIZE*2];
-	UINT8 m_filter_list[ETHERNET_ADDR_SIZE*4];
+	uint8_t m_station_address[ETHERNET_ADDR_SIZE];
+	uint8_t m_multicast_list[ETHERNET_ADDR_SIZE*2];
+	uint8_t m_filter_list[ETHERNET_ADDR_SIZE*4];
 
 	enum line_state irq_state;
 

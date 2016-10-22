@@ -66,11 +66,11 @@ class colecovision_cartridge_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~colecovision_cartridge_slot_device() { }
 
 	// computer interface
-	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000);
+	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000);
 
 protected:
 	// device-level overrides
@@ -109,12 +109,12 @@ public:
 	device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_colecovision_cartridge_interface() { }
 
-	virtual UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
+	virtual uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
 
 	void rom_alloc(size_t size);
 
 protected:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	size_t m_rom_size;
 
 	colecovision_cartridge_slot_device *m_slot;

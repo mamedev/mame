@@ -46,7 +46,7 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 
     Create a MAME HD image
 */
-imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
+imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t cylinders, uint32_t heads, uint32_t sectors, uint32_t seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	chd_file chd;
@@ -70,7 +70,7 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 hunksize, UINT32 cylin
 	}
 
 	/* calculations */
-	const UINT64 logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
+	const uint64_t logicalbytes = (uint64_t)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
 	rc = chd.create(*stream.core_file(), logicalbytes, hunksize, seclen, compression);
@@ -99,7 +99,7 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 hunksize, UINT32 cylin
 	}
 
 	/* alloc and zero buffer */
-	std::vector<UINT8> cache;
+	std::vector<uint8_t> cache;
 	cache.resize(hunksize);
 	memset(&cache[0], 0, hunksize);
 
@@ -182,9 +182,9 @@ void imghd_close(struct mess_hard_disk_file *disk)
 
     Read sector(s) from MAME HD image
 */
-imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void *buffer)
+imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, void *buffer)
 {
-	UINT32 reply;
+	uint32_t reply;
 	reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
 	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
@@ -196,9 +196,9 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void
 
     Write sector(s) from MAME HD image
 */
-imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, const void *buffer)
+imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer)
 {
-	UINT32 reply;
+	uint32_t reply;
 	reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
 	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
@@ -240,7 +240,7 @@ OPTION_GUIDE_END
 #define mess_hd_create_optionspecs "B[1]-2048;C1-[32]-65536;D1-[8]-64;E1-[128]-4096;F128/256/[512]/1024/2048/4096/8192/16384/32768/65536"
 
 
-void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void hd_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -259,7 +259,7 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 static imgtoolerr_t mess_hd_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
-	UINT32  blocksize, cylinders, heads, sectors, seclen;
+	uint32_t  blocksize, cylinders, heads, sectors, seclen;
 
 	/* read options */
 	blocksize = createoptions->lookup_int(mess_hd_createopts_blocksize);

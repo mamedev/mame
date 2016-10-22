@@ -414,7 +414,7 @@ GFXDECODE_END
    I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
 READ8_MEMBER(bagman_state::dial_input_p1_r)
 {
-	UINT8 dial_val;
+	uint8_t dial_val;
 
 	dial_val = ioport("DIAL_P1")->read();
 
@@ -434,7 +434,7 @@ READ8_MEMBER(bagman_state::dial_input_p1_r)
 
 READ8_MEMBER(bagman_state::dial_input_p2_r)
 {
-	UINT8 dial_val;
+	uint8_t dial_val;
 
 	dial_val = ioport("DIAL_P2")->read();
 

@@ -1194,7 +1194,7 @@ DRIVER_INIT_MEMBER(freekick_state,gigasb)
 
 DRIVER_INIT_MEMBER(freekick_state,pbillrds)
 {
-	UINT8 *decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0x10000);
+	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0x10000);
 	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0x10000);
 	membank("bank0d")->set_base(decrypted_opcodes);
 	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
@@ -1202,7 +1202,7 @@ DRIVER_INIT_MEMBER(freekick_state,pbillrds)
 
 DRIVER_INIT_MEMBER(freekick_state,gigas)
 {
-	UINT8 *decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0xc000);
+	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0xc000);
 	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0xc000);
 	membank("bank0d")->set_base(decrypted_opcodes);
 	m_bank1d->set_base(decrypted_opcodes + 0x8000);

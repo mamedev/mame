@@ -46,15 +46,15 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 m_last_cycles;
-	UINT64 m_frame_start_cycle;
+	uint32_t m_last_cycles;
+	uint64_t m_frame_start_cycle;
 
-	UINT8 m_port_b;
-	UINT8 m_port_c;
-	UINT8 m_port_d;
+	uint8_t m_port_b;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
 
-	UINT8 m_latched_color;
-	UINT8 m_pixels[PIXELS_PER_FRAME];
+	uint8_t m_latched_color;
+	uint8_t m_pixels[PIXELS_PER_FRAME];
 
 	required_device<avr8_device> m_maincpu;
 
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_DRIVER_INIT(craft);
 	virtual void machine_reset() override;
-	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_byte_interface> m_dac;
 };
@@ -111,9 +111,9 @@ WRITE8_MEMBER(craft_state::port_w)
 
 		case AVR8_IO_PORTB: // Port B
 		{
-			UINT8 old_port_b = m_port_b;
-			UINT8 pins = data;
-			UINT8 changed = pins ^ old_port_b;
+			uint8_t old_port_b = m_port_b;
+			uint8_t pins = data;
+			uint8_t changed = pins ^ old_port_b;
 			if(pins & changed & 0x02)
 			{
 				m_frame_start_cycle = m_maincpu->get_elapsed_cycles();
@@ -137,7 +137,7 @@ WRITE8_MEMBER(craft_state::port_w)
 		case AVR8_IO_PORTD: // Port D
 		{
 			m_port_d = data;
-			UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
+			uint8_t audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
 			m_dac->write(audio_sample);
 			break;
 		}
@@ -146,20 +146,20 @@ WRITE8_MEMBER(craft_state::port_w)
 
 void craft_state::video_update()
 {
-	UINT64 cycles = m_maincpu->get_elapsed_cycles();
-	UINT32 frame_cycles = (UINT32)(cycles - m_frame_start_cycle);
+	uint64_t cycles = m_maincpu->get_elapsed_cycles();
+	uint32_t frame_cycles = (uint32_t)(cycles - m_frame_start_cycle);
 
 	if (m_last_cycles < frame_cycles)
 	{
-		for (UINT32 pixidx = m_last_cycles; pixidx < frame_cycles && pixidx < PIXELS_PER_FRAME; pixidx++)
+		for (uint32_t pixidx = m_last_cycles; pixidx < frame_cycles && pixidx < PIXELS_PER_FRAME; pixidx++)
 		{
 			m_pixels[pixidx] = m_latched_color;
 		}
 	}
 	else
 	{
-		UINT32 end_clear = sizeof(m_pixels) - m_last_cycles;
-		UINT32 start_clear = frame_cycles;
+		uint32_t end_clear = sizeof(m_pixels) - m_last_cycles;
+		uint32_t start_clear = frame_cycles;
 		end_clear = (end_clear > PIXELS_PER_FRAME) ? (PIXELS_PER_FRAME - m_last_cycles) : end_clear;
 		start_clear = (start_clear > PIXELS_PER_FRAME) ? PIXELS_PER_FRAME : start_clear;
 		if (m_last_cycles < PIXELS_PER_FRAME)
@@ -204,17 +204,17 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-UINT32 craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for(int y = 0; y < LINES_PER_FRAME; y++)
 	{
-		UINT32 *line = &bitmap.pix32(y);
+		uint32_t *line = &bitmap.pix32(y);
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{
-			UINT8 pixel = m_pixels[y * LINE_CYCLES + x];
-			UINT8 r = 0x55 * ((pixel & 0x30) >> 4);
-			UINT8 g = 0x55 * ((pixel & 0x0c) >> 2);
-			UINT8 b = 0x55 * (pixel & 0x03);
+			uint8_t pixel = m_pixels[y * LINE_CYCLES + x];
+			uint8_t r = 0x55 * ((pixel & 0x30) >> 4);
+			uint8_t g = 0x55 * ((pixel & 0x0c) >> 2);
+			uint8_t b = 0x55 * (pixel & 0x03);
 			line[x] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
 	}

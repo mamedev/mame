@@ -100,7 +100,7 @@ READ8_MEMBER(starfire_state::starfire_scratch_r)
 WRITE8_MEMBER(starfire_state::starfire_sound_w)
 {
 	// starfire sound samples (preliminary)
-	UINT8 rise = data & ~m_prev_sound;
+	uint8_t rise = data & ~m_prev_sound;
 	m_prev_sound = data;
 
 	// d0: rumble
@@ -141,9 +141,9 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 		{
 			// d3 and d4 come from the audio circuit, how does it work exactly?
 			// tie_on sounds ok, but laser_on sounds buggy
-			UINT8 tie_on = m_samples->playing(2) ? 0x00 : 0x08;
-			UINT8 laser_on = m_samples->playing(3) ? 0x00 : 0x10;
-			UINT8 input = ioport("SYSTEM")->read() & 0xe7;
+			uint8_t tie_on = m_samples->playing(2) ? 0x00 : 0x08;
+			uint8_t laser_on = m_samples->playing(3) ? 0x00 : 0x10;
+			uint8_t input = ioport("SYSTEM")->read() & 0xe7;
 			return input | tie_on | laser_on | 0x10; // disable laser_on for now
 		}
 		case 5: return ioport("STICKZ")->read();
@@ -155,7 +155,7 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 
 READ8_MEMBER(starfire_state::fireone_input_r)
 {
-	static const UINT8 fireone_paddle_map[64] =
+	static const uint8_t fireone_paddle_map[64] =
 	{
 		0x00,0x01,0x03,0x02,0x06,0x07,0x05,0x04,
 		0x0c,0x0d,0x0f,0x0e,0x0a,0x0b,0x09,0x08,
@@ -173,7 +173,7 @@ READ8_MEMBER(starfire_state::fireone_input_r)
 		case 1: return ioport("SYSTEM")->read();
 		case 2:
 		{
-			UINT8 input = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
+			uint8_t input = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
 			return (input & 0xc0) | fireone_paddle_map[input & 0x3f];
 		}
 		default: return 0xff;

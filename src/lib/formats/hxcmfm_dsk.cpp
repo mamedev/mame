@@ -11,24 +11,24 @@
 
 struct MFMIMG
 {
-	UINT8 headername[7];
+	uint8_t headername[7];
 
-	UINT16 number_of_track;
-	UINT8 number_of_side;
+	uint16_t number_of_track;
+	uint8_t number_of_side;
 
-	UINT16 floppyRPM;
-	UINT16 floppyBitRate;
-	UINT8 floppyiftype;
+	uint16_t floppyRPM;
+	uint16_t floppyBitRate;
+	uint8_t floppyiftype;
 
-	UINT32 mfmtracklistoffset;
+	uint32_t mfmtracklistoffset;
 };
 
 struct MFMTRACKIMG
 {
-	UINT16 track_number;
-	UINT8 side_number;
-	UINT32 mfmtracksize;
-	UINT32 mfmtrackoffset;
+	uint16_t track_number;
+	uint8_t side_number;
+	uint32_t mfmtracksize;
+	uint32_t mfmtrackoffset;
 };
 
 #pragma pack()
@@ -57,9 +57,9 @@ bool mfm_format::supports_save() const
 	return true;
 }
 
-int mfm_format::identify(io_generic *io, UINT32 form_factor)
+int mfm_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 header[7];
+	uint8_t header[7];
 
 	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, MFM_FORMAT_HEADER, 6 ) ==0) {
@@ -68,7 +68,7 @@ int mfm_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool mfm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
@@ -76,7 +76,7 @@ bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	// read header
 	io_generic_read(io, &header, 0, sizeof(header));
 	int counter = 0;
-	std::vector<UINT8> trackbuf;
+	std::vector<uint8_t> trackbuf;
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
 			// read location of
@@ -117,7 +117,7 @@ bool mfm_format::save(io_generic *io, floppy_image *image)
 	int tpos = sizeof(MFMIMG);
 	int dpos = tpos + track_count*head_count*sizeof(MFMTRACKIMG);
 
-	UINT8 trackbuf[150000/8];
+	uint8_t trackbuf[150000/8];
 
 	for(int track=0; track < track_count; track++) {
 		for(int side=0; side < head_count; side++) {

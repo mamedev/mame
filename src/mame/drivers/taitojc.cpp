@@ -843,7 +843,7 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
 	assert (m_dsp_rom_pos < 0x800000); // never happens
-	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
+	return ((uint16_t*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_rom_w)

@@ -84,13 +84,13 @@ public:
 	void interrupt_check();
 
 	// F3853 SMI state
-	UINT16 m_vector;
+	uint16_t m_vector;
 	int m_int_enable;
 	int m_ext_int_latch;
 	int m_timer_int_latch;
 
 	// keyboard state
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 	int m_joy_enable;
 
 	// sound state

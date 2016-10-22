@@ -55,7 +55,7 @@ CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
 
 READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	/* BIT0 => SPEECH BUSY */
 	/* BIT1 => COMP SIREN  */
@@ -216,7 +216,7 @@ static const gfx_layout tile_layout =
 	0x80
 };
 
-static const UINT32 ship_layout_xoffset[64] =
+static const uint32_t ship_layout_xoffset[64] =
 {
 		0x04, 0x05, 0x06, 0x07, 0x0c, 0x0d, 0x0e, 0x0f,
 		0x14, 0x15, 0x16, 0x17, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -244,7 +244,7 @@ static const gfx_layout ship_layout =
 	nullptr
 };
 
-static const UINT32 pt_layout_xoffset[64] =
+static const uint32_t pt_layout_xoffset[64] =
 	{
 		0x3f, 0x3f, 0x3e, 0x3e, 0x3d, 0x3d, 0x3c, 0x3c,
 		0x37, 0x37, 0x36, 0x36, 0x35, 0x35, 0x34, 0x34,

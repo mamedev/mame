@@ -196,7 +196,7 @@ const device_type KBDC8042 = &device_creator<kbdc8042_device>;
 //  kbdc8042_device - constructor
 //-------------------------------------------------
 
-kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KBDC8042, "8042 Keyboard Controller", tag, owner, clock, "kbdc8042", __FILE__)
 	, m_keyboard_dev(*this, "at_keyboard")
 	, m_system_reset_cb(*this)
@@ -249,9 +249,9 @@ void kbdc8042_device::device_reset()
 	at_8042_set_outport(0xfe, 1);
 }
 
-void kbdc8042_device::at_8042_set_outport(UINT8 data, int initial)
+void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 {
-	UINT8 change;
+	uint8_t change;
 	change = initial ? 0xFF : (m_outport ^ data);
 	m_outport = data;
 	if (change & 0x02)
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 		at_8042_check_keyboard();
 }
 
-void kbdc8042_device::at_8042_receive(UINT8 data)
+void kbdc8042_device::at_8042_receive(uint8_t data)
 {
 	if (LOG_KEYBOARD)
 		logerror("at_8042_receive Received 0x%02x\n", data);
@@ -334,7 +334,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 
 READ8_MEMBER(kbdc8042_device::data_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset) {
 	case 0:

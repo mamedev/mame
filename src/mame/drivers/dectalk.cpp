@@ -287,26 +287,26 @@ public:
 	}
 
 	// input fifo, between m68k and tms32010
-	UINT16 m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
-	UINT8 m_infifo_count;
-	UINT8 m_infifo_tail_ptr;
-	UINT8 m_infifo_head_ptr;
+	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
+	uint8_t m_infifo_count;
+	uint8_t m_infifo_tail_ptr;
+	uint8_t m_infifo_head_ptr;
 	// output fifo, between tms32010 and 10khz sample latch for dac
-	UINT16 m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
-	UINT8 m_outfifo_count;
-	UINT8 m_outfifo_tail_ptr;
-	UINT8 m_outfifo_head_ptr;
-	UINT8 m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
-	UINT8 m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
-	UINT8 m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed!
-	UINT8 m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves'
-	UINT8 m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
-	UINT8 m_tlc_tonedetect;
-	UINT8 m_tlc_ringdetect;
-	UINT8 m_tlc_dtmf; // dtmf holding reg
-	UINT8 m_duart_inport; // low 4 bits of duart input
-	UINT8 m_duart_outport; // most recent duart output
-	UINT8 m_hack_self_test; // temp variable for hack below
+	uint16_t m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
+	uint8_t m_outfifo_count;
+	uint8_t m_outfifo_tail_ptr;
+	uint8_t m_outfifo_head_ptr;
+	uint8_t m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+	uint8_t m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed!
+	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves'
+	uint8_t m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
+	uint8_t m_tlc_tonedetect;
+	uint8_t m_tlc_ringdetect;
+	uint8_t m_tlc_dtmf; // dtmf holding reg
+	uint8_t m_duart_inport; // low 4 bits of duart input
+	uint8_t m_duart_outport; // most recent duart output
+	uint8_t m_hack_self_test; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
@@ -335,8 +335,8 @@ public:
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	void dectalk_outfifo_check ();
 	void dectalk_clear_all_fifos(  );
-	void dectalk_semaphore_w ( UINT16 data );
-	UINT16 dectalk_outfifo_r (  );
+	void dectalk_semaphore_w ( uint16_t data );
+	uint16_t dectalk_outfifo_r (  );
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 protected:
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
 
 READ8_MEMBER(dectalk_state::dectalk_duart_input)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	data |= m_duart_inport&0xF;
 	data |= (ioport("duart_in")->read()&0xF0);
 	if ((m_hack_self_test == 1) && (ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
@@ -406,7 +406,7 @@ void dectalk_state::dectalk_clear_all_fifos(  )
 }
 
 // helper for dsp infifo_semaphore flag to make dealing with interrupts easier
-void dectalk_state::dectalk_semaphore_w ( UINT16 data )
+void dectalk_state::dectalk_semaphore_w ( uint16_t data )
 {
 	m_infifo_semaphore = data&1;
 	if ((m_infifo_semaphore == 1) && (m_m68k_spcflags_latch&0x40))
@@ -421,9 +421,9 @@ void dectalk_state::dectalk_semaphore_w ( UINT16 data )
 }
 
 // read the output fifo and set the interrupt line active on the dsp
-UINT16 dectalk_state::dectalk_outfifo_r (  )
+uint16_t dectalk_state::dectalk_outfifo_r (  )
 {
-	UINT16 data = 0xFFFF;
+	uint16_t data = 0xFFFF;
 #ifdef USE_LOOSE_TIMING_OUTPUT
 	// if outfifo count is less than two, boost the interleave to prevent running the fifo out
 	if (m_outfifo_count < 2)
@@ -530,7 +530,7 @@ WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fif
 
 READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	data |= m_m68k_spcflags_latch; // bits 0 and 6
 	data |= m_spc_error_latch<<5; // bit 5
 	data |= m_infifo_semaphore<<7; // bit 7
@@ -601,7 +601,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 
 READ16_MEMBER(dectalk_state::m68k_tlcflags_r)// dtmf flags read
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	data |= m_m68k_tlcflags_latch; // bits 6, 8, 14;
 	data |= m_tlc_tonedetect<<7; // bit 7 is tone detect
 	data |= m_tlc_ringdetect<<14; // bit 15 is ring detect
@@ -676,7 +676,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 READ16_MEMBER(dectalk_state::m68k_tlc_dtmf_r)// dtmf chip read
 {
 #ifdef TLC_LOG
-	UINT16 data = 0xFFFF;
+	uint16_t data = 0xFFFF;
 	data = m_tlc_dtmf&0xF;
 	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
@@ -699,7 +699,7 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 
 READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 {
-	UINT16 data = 0xFFFF;
+	uint16_t data = 0xFFFF;
 	data = m_infifo[m_infifo_tail_ptr];
 #ifdef SPC_LOG_DSP
 	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
@@ -838,7 +838,7 @@ void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
-	UINT16 data;
+	uint16_t data;
 	data = dectalk_outfifo_r();
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);

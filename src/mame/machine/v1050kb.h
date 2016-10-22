@@ -36,7 +36,7 @@ class v1050_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
@@ -63,7 +63,7 @@ private:
 	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
 
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 };
 
 

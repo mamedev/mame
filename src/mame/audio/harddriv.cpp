@@ -27,7 +27,7 @@
 
 const device_type HARDDRIV_SOUND_BOARD_DEVICE = &device_creator<harddriv_sound_board_device>;
 
-harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),
 	m_soundcpu(*this, "soundcpu"),
 	m_dac(*this, "dac"),
@@ -300,8 +300,8 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_w)
 
 READ_LINE_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
 {
-	UINT64 cycles_since_last_bio = m_sounddsp->total_cycles() - m_last_bio_cycles;
-	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
+	uint64_t cycles_since_last_bio = m_sounddsp->total_cycles() - m_last_bio_cycles;
+	int32_t cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
 
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)

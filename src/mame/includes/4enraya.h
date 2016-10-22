@@ -28,17 +28,17 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	UINT8 m_videoram[0x1000];
-	UINT8 m_workram[0x1000];
+	uint8_t m_videoram[0x1000];
+	uint8_t m_workram[0x1000];
 
-	optional_region_ptr<UINT8> m_prom;
-	optional_region_ptr<UINT8> m_rom;
+	optional_region_ptr<uint8_t> m_prom;
+	optional_region_ptr<uint8_t> m_rom;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 
 	/* sound-related */
-	UINT8 m_soundlatch;
+	uint8_t m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(unkpacg);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	UINT32 screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

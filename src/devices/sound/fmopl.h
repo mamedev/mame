@@ -16,21 +16,21 @@
 /* compiler dependence */
 #ifndef __OSDCOMM_H__
 #define __OSDCOMM_H__
-typedef unsigned char   UINT8;   /* unsigned  8bit */
-typedef unsigned short  UINT16;  /* unsigned 16bit */
-typedef unsigned int    UINT32;  /* unsigned 32bit */
-typedef signed char     INT8;    /* signed  8bit   */
-typedef signed short    INT16;   /* signed 16bit   */
-typedef signed int      INT32;   /* signed 32bit   */
+typedef unsigned char   uint8_t;   /* unsigned  8bit */
+typedef unsigned short  uint16_t;  /* unsigned 16bit */
+typedef unsigned int    uint32_t;  /* unsigned 32bit */
+typedef signed char     int8_t;    /* signed  8bit   */
+typedef signed short    int16_t;   /* signed 16bit   */
+typedef signed int      int32_t;   /* signed 32bit   */
 #endif /* __OSDCOMM_H__ */
 
 typedef stream_sample_t OPLSAMPLE;
 /*
 #if (OPL_SAMPLE_BITS==16)
-typedef INT16 OPLSAMPLE;
+typedef int16_t OPLSAMPLE;
 #endif
 #if (OPL_SAMPLE_BITS==8)
-typedef INT8 OPLSAMPLE;
+typedef int8_t OPLSAMPLE;
 #endif
 */
 
@@ -43,8 +43,8 @@ typedef unsigned char (*OPL_PORTHANDLER_R)(void *param);
 
 #if BUILD_YM3812
 
-void *ym3812_init(device_t *device, UINT32 clock, UINT32 rate);
-void ym3812_clock_changed(void *chip, UINT32 clock, UINT32 rate);
+void *ym3812_init(device_t *device, uint32_t clock, uint32_t rate);
+void ym3812_clock_changed(void *chip, uint32_t clock, uint32_t rate);
 void ym3812_shutdown(void *chip);
 void ym3812_reset_chip(void *chip);
 int  ym3812_write(void *chip, int a, int v);
@@ -68,8 +68,8 @@ void ym3812_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void
 ** 'clock' is the chip clock in Hz
 ** 'rate' is sampling rate
 */
-void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate);
-void ym3526_clock_changed(void *chip, UINT32 clock, UINT32 rate);
+void *ym3526_init(device_t *device, uint32_t clock, uint32_t rate);
+void ym3526_clock_changed(void *chip, uint32_t clock, uint32_t rate);
 /* shutdown the YM3526 emulators*/
 void ym3526_shutdown(void *chip);
 void ym3526_reset_chip(void *chip);
@@ -99,7 +99,7 @@ void y8950_set_port_handler(void *chip, OPL_PORTHANDLER_W PortHandler_w, OPL_POR
 void y8950_set_keyboard_handler(void *chip, OPL_PORTHANDLER_W KeyboardHandler_w, OPL_PORTHANDLER_R KeyboardHandler_r, void *param);
 void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size );
 
-void * y8950_init(device_t *device, UINT32 clock, UINT32 rate);
+void * y8950_init(device_t *device, uint32_t clock, uint32_t rate);
 void y8950_shutdown(void *chip);
 void y8950_reset_chip(void *chip);
 int  y8950_write(void *chip, int a, int v);

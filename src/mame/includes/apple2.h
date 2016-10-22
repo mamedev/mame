@@ -101,9 +101,9 @@ enum bank_disposition_t
 
 struct apple2_meminfo
 {
-	UINT32 read_mem;
+	uint32_t read_mem;
 	read8_delegate *read_handler;
-	UINT32 write_mem;
+	uint32_t write_mem;
 	write8_delegate *write_handler;
 };
 
@@ -118,8 +118,8 @@ struct apple2_memmap_entry
 struct apple2_memmap_config
 {
 	int first_bank;
-	UINT8 *auxmem;
-	UINT32 auxmem_length;
+	uint8_t *auxmem;
+	uint32_t auxmem_length;
 	const apple2_memmap_entry *memmap;
 };
 
@@ -168,10 +168,10 @@ public:
 	optional_device<applefdc_base_device> m_laserudc;
 	optional_device<iwm_device> m_iicpiwm;
 
-	UINT32 m_flags, m_flags_mask;
-	INT32 m_a2_cnxx_slot;
-	UINT32 m_a2_mask;
-	UINT32 m_a2_set;
+	uint32_t m_flags, m_flags_mask;
+	int32_t m_a2_cnxx_slot;
+	uint32_t m_a2_mask;
+	uint32_t m_a2_set;
 	int m_a2_speaker_state;
 	double m_joystick_x1_time;
 	double m_joystick_y1_time;
@@ -180,30 +180,30 @@ public:
 	apple2_memmap_config m_mem_config;
 	std::unique_ptr<apple2_meminfo[]> m_current_meminfo;
 	int m_fdc_diskreg;
-	const UINT8 *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
-	UINT32 m_a2_videomask, m_textgfx_datalen;
-	UINT32 m_old_a2;
+	const uint8_t *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
+	uint32_t m_a2_videomask, m_textgfx_datalen;
+	uint32_t m_old_a2;
 	int m_fgcolor;
 	int m_bgcolor;
 	int m_flash;
 	int m_alt_charset_value;
-	std::unique_ptr<UINT16[]> m_hires_artifact_map;
-	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 	bool m_monochrome_dhr;
 	int m_inh_slot;
 	int m_reset_flag;
 
-	UINT8 *m_rambase;
+	uint8_t *m_rambase;
 
-	UINT8 *m_rom, *m_slot_ram;
-	UINT32 m_rom_length, m_slot_length;
+	uint8_t *m_rom, *m_slot_ram;
+	uint32_t m_rom_length, m_slot_length;
 
 	machine_type_t m_machinetype;
 
 	device_a2eauxslot_card_interface *m_auxslotdevice;
 
-	UINT16 m_lastchar, m_strobe;
-	UINT8 m_transchar;
+	uint16_t m_lastchar, m_strobe;
+	uint8_t m_transchar;
 
 	READ8_MEMBER(apple2_c0xx_r);
 	WRITE8_MEMBER(apple2_c0xx_w);
@@ -285,7 +285,7 @@ public:
 	WRITE8_MEMBER(apple2_cfff_w);
 
 	void apple2_refresh_delegates();
-	int apple2_pressed_specialkey(UINT8 key);
+	int apple2_pressed_specialkey(uint8_t key);
 
 	read8_delegate read_delegates_master[4];
 	write8_delegate write_delegates_master[3];
@@ -335,7 +335,7 @@ public:
 	DECLARE_VIDEO_START(apple2p);
 	DECLARE_VIDEO_START(apple2e);
 	DECLARE_VIDEO_START(apple2c);
-	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
@@ -348,31 +348,31 @@ public:
 	virtual void machine_reset() override;
 	void apple2_setup_memory(const apple2_memmap_config *config);
 	void apple2_update_memory();
-	inline UINT32 effective_a2();
-	UINT32 compute_video_address(int col, int row);
+	inline uint32_t effective_a2();
+	uint32_t compute_video_address(int col, int row);
 	void adjust_begin_and_end_row(const rectangle &cliprect, int *beginrow, int *endrow);
-	inline void apple2_plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-		const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2);
+	inline void apple2_plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+		const uint8_t *textgfx_data, uint32_t textgfx_datalen, uint32_t my_a2);
 	void apple2_text_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
 	void apple2_lores_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
 	void apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
-	void apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo);
-	void apple2_setvar(UINT32 val, UINT32 mask);
-	UINT8 apple2_getfloatingbusvalue();
+	void apple2_video_start(const uint8_t *vram, const uint8_t *aux_vram, uint32_t ignored_softswitches, int hires_modulo);
+	void apple2_setvar(uint32_t val, uint32_t mask);
+	uint8_t apple2_getfloatingbusvalue();
 	int apple2_fdc_has_35();
 	int apple2_fdc_has_525();
-	void apple2_iwm_setdiskreg(UINT8 data);
+	void apple2_iwm_setdiskreg(uint8_t data);
 	void apple2_init_common();
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
-	INT8 apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int8_t apple2_slotram_r(address_space &space, int slotnum, int offset);
 	int a2_no_ctrl_reset();
 
 private:
 	// Laser 128EX2 slot 5 Apple Memory Expansion emulation vars
-	UINT8 m_exp_bankhior;
+	uint8_t m_exp_bankhior;
 	int m_exp_addrmask;
-	UINT8 m_exp_regs[0x10];
-	std::unique_ptr<UINT8[]> m_exp_ram;
+	uint8_t m_exp_regs[0x10];
+	std::unique_ptr<uint8_t[]> m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 };
 /*----------- defined in drivers/apple2.c -----------*/

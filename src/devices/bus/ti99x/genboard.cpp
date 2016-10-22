@@ -209,7 +209,7 @@
 #define SRAM_PAR_TAG  ":sram"
 #define DRAM_PAR_TAG  ":dram"
 
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false),
 	m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false),
@@ -228,7 +228,7 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 
 INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 {
-	int number = (int)((UINT64)param&0x03);
+	int number = (int)((uint64_t)param&0x03);
 	int value = newval;
 
 	switch (number)
@@ -265,7 +265,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 */
 READ8_MEMBER( geneve_mapper_device::read_grom )
 {
-	UINT8 reply;
+	uint8_t reply;
 	if (offset & 0x0002)
 	{
 		// GROM address handling
@@ -312,7 +312,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 		}
 		else
 		{
-			m_grom_address = (m_grom_address & 0x00ff) | ((UINT16)data<<8);
+			m_grom_address = (m_grom_address & 0x00ff) | ((uint16_t)data<<8);
 			m_gromwaddr_LSB = true;
 		}
 	}
@@ -457,7 +457,7 @@ enum
 */
 READ8_MEMBER( geneve_mapper_device::readm )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	decdata *dec;
 	decdata debug;
@@ -1225,7 +1225,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 */
 READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 {
-	UINT8 value;
+	uint8_t value;
 	if (!m_pfm_output_enable) return 0;
 
 	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
@@ -1497,7 +1497,7 @@ const device_type GENEVE_MAPPER = &device_creator<geneve_mapper_device>;
 
 static const char *const KEYNAMES[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
-static const UINT8 MF1_CODE[0xe] =
+static const uint8_t MF1_CODE[0xe] =
 {
 	/* extended keys that are equivalent to non-extended keys */
 	0x1c,   /* keypad enter */
@@ -1525,7 +1525,7 @@ static const UINT8 MF1_CODE[0xe] =
 	0x53    /* delete */
 };
 
-geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__),
 	m_interrupt(*this), m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
 	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false),
@@ -1548,8 +1548,8 @@ void geneve_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 void geneve_keyboard_device::poll()
 {
-	UINT32 keystate;
-	UINT32 key_transitions;
+	uint32_t keystate;
+	uint32_t key_transitions;
 	int i, j;
 	int keycode;
 	int pressed;
@@ -1747,7 +1747,7 @@ void geneve_keyboard_device::poll()
 	}
 }
 
-UINT8 geneve_keyboard_device::get_recent_key()
+uint8_t geneve_keyboard_device::get_recent_key()
 {
 	if (m_key_in_buffer) return m_key_queue[m_key_queue_head];
 	else return 0;
@@ -1996,7 +1996,7 @@ const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
     Mouse support
 ****************************************************************************/
 
-geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__), m_v9938(nullptr), m_last_mx(0), m_last_my(0)
 {
 }

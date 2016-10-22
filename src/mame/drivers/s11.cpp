@@ -222,7 +222,7 @@ WRITE8_MEMBER( s11_state::lamp0_w )
 
 WRITE8_MEMBER( s11_state::dig0_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
@@ -244,7 +244,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 
 READ8_MEMBER( s11_state::pia28_w7_r )
 {
-	UINT8 ret = 0x80;
+	uint8_t ret = 0x80;
 
 	ret |= m_strobe;
 	ret |= m_diag << 4;
@@ -364,7 +364,7 @@ WRITE8_MEMBER( s11_state::pia40_pb_w )
 
 DRIVER_INIT_MEMBER( s11_state, s11 )
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
 	membank("bank0")->set_entry(0);

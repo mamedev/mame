@@ -1212,7 +1212,7 @@ DRIVER_INIT_MEMBER(m90_state,quizf1)
 
 DRIVER_INIT_MEMBER(m90_state,bomblord)
 {
-	UINT16 *ROM = (UINT16 *)(memregion("maincpu")->base());
+	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < 0x100000 / 2; i += 4)
 	{

@@ -84,9 +84,9 @@ bool fsd_format::supports_save() const
 	return false;
 }
 
-int fsd_format::identify(io_generic *io, UINT32 form_factor)
+int fsd_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 h[3];
+	uint8_t h[3];
 
 	io_generic_read(io, h, 0, 3);
 	if (memcmp(h, "FSD", 3) == 0) {
@@ -96,18 +96,18 @@ int fsd_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool fsd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	const char* result[255];
 	result[0x00] = "OK";
 	result[0x0e] = "Data CRC Error";
 	result[0x20] = "Deleted Data";
 
-	UINT64 size = io_generic_size(io);
-	std::vector<UINT8> img(size);
+	uint64_t size = io_generic_size(io);
+	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
-	UINT64 pos;
+	uint64_t pos;
 	std::string title;
 	for(pos=8; pos < size && img[pos] != '\0'; pos++)
 		title.append(1, img[pos]);
@@ -122,21 +122,21 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	LOG_FORMATS("FSD Release: %d\n", ((img[7] & 0xc0) / 64) * 256 + img[6]);
 
 	desc_pc_sector sects[256];
-	UINT8 total_tracks = img[pos++];
-	UINT8 tnum, hnum, snum, ssize, error;
+	uint8_t total_tracks = img[pos++];
+	uint8_t tnum, hnum, snum, ssize, error;
 
 	hnum = 0;
 	LOG_FORMATS("FSD Tracks: %02d\n", total_tracks+1);
 	LOG_FORMATS("Tr.#  No.S  Sec.# Tr.ID Head# SecID IDsiz REsiz Error\n");
 	for(int curr_track=0; curr_track <= total_tracks; curr_track++)
 	{
-		UINT8 track = img[pos++];
-		UINT8 spt = img[pos++];
+		uint8_t track = img[pos++];
+		uint8_t spt = img[pos++];
 
 		if (spt > 0) // formatted
 		{
 			LOG_FORMATS("%02X    %02X\n", track, spt);
-			UINT8 readable = img[pos++];
+			uint8_t readable = img[pos++];
 			for (int i = 0; i < spt; i++)
 			{
 				tnum = img[pos++];  // logical track

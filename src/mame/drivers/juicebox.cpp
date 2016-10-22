@@ -42,7 +42,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
-	UINT32 port[9];
+	uint32_t port[9];
 	jb_smc_t smc;
 
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
@@ -57,8 +57,8 @@ public:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset( );
 	void smc_init( );
-	UINT8 smc_read( );
-	void smc_write( UINT8 data);
+	uint8_t smc_read( );
+	void smc_write( uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
@@ -98,9 +98,9 @@ void juicebox_state::smc_init( )
 	smc_reset();
 }
 
-UINT8 juicebox_state::smc_read( )
+uint8_t juicebox_state::smc_read( )
 {
-	UINT8 data;
+	uint8_t data;
 	if (m_smartmedia->is_present())
 	{
 		data = m_smartmedia->data_r();
@@ -113,7 +113,7 @@ UINT8 juicebox_state::smc_read( )
 	return data;
 }
 
-void juicebox_state::smc_write( UINT8 data)
+void juicebox_state::smc_write( uint8_t data)
 {
 	verboselog(5, "smc_write %08X\n", data);
 	if (m_smartmedia->is_present())
@@ -138,7 +138,7 @@ void juicebox_state::smc_write( UINT8 data)
 
 READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 {
-	UINT32 data = port[offset];
+	uint32_t data = port[offset];
 	switch (offset)
 	{
 		case S3C44B0_GPIO_PORT_A :
@@ -221,7 +221,7 @@ WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
 
 READ32_MEMBER(juicebox_state::juicebox_nand_r)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	if (ACCESSING_BITS_0_7) data = data | (smc_read() <<  0);
 	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
 	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);

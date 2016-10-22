@@ -37,8 +37,8 @@ class z8002_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
-	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~z8002_device();
 
 	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
@@ -50,10 +50,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 2; }
-	virtual UINT32 execute_max_cycles() const override { return 744; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_max_cycles() const override { return 744; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -72,32 +72,32 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	devcb_write_line m_mo_out;
 
-	UINT32  m_op[4];      /* opcodes/data of current instruction */
-	UINT32  m_ppc;        /* previous program counter */
-	UINT32  m_pc;         /* program counter */
-	UINT16  m_psapseg;    /* program status pointer, segment (Z8001 only) */
-	UINT16  m_psapoff;    /* program status pointer, offset */
-	UINT16  m_fcw;        /* flags and control word */
-	UINT16  m_refresh;    /* refresh timer/counter */
-	UINT16  m_nspseg;     /* system stack pointer, segment (Z8001 only) */
-	UINT16  m_nspoff;     /* system stack pointer, offset */
-	UINT16  m_irq_req;    /* CPU is halted, interrupt or trap request */
-	UINT16  m_irq_vec;    /* interrupt vector */
-	UINT32  m_op_valid;   /* bit field indicating if given op[] field is already initialized */
+	uint32_t  m_op[4];      /* opcodes/data of current instruction */
+	uint32_t  m_ppc;        /* previous program counter */
+	uint32_t  m_pc;         /* program counter */
+	uint16_t  m_psapseg;    /* program status pointer, segment (Z8001 only) */
+	uint16_t  m_psapoff;    /* program status pointer, offset */
+	uint16_t  m_fcw;        /* flags and control word */
+	uint16_t  m_refresh;    /* refresh timer/counter */
+	uint16_t  m_nspseg;     /* system stack pointer, segment (Z8001 only) */
+	uint16_t  m_nspoff;     /* system stack pointer, offset */
+	uint16_t  m_irq_req;    /* CPU is halted, interrupt or trap request */
+	uint16_t  m_irq_vec;    /* interrupt vector */
+	uint32_t  m_op_valid;   /* bit field indicating if given op[] field is already initialized */
 	union
 	{
-		UINT8   B[16]; /* RL0,RH0,RL1,RH1...RL7,RH7 */
-		UINT16  W[16]; /* R0,R1,R2...R15 */
-		UINT32  L[8];  /* RR0,RR2,RR4..RR14 */
-		UINT64  Q[4];  /* RQ0,RQ4,..RQ12 */
+		uint8_t   B[16]; /* RL0,RH0,RL1,RH1...RL7,RH7 */
+		uint16_t  W[16]; /* R0,R1,R2...R15 */
+		uint32_t  L[8];  /* RR0,RR2,RR4..RR14 */
+		uint64_t  Q[4];  /* RQ0,RQ4,..RQ12 */
 	} m_regs;             /* registers */
 	int m_nmi_state;      /* NMI line state */
 	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
@@ -112,104 +112,104 @@ protected:
 	void clear_internal_state();
 	void register_debug_state();
 	virtual int segmented_mode();
-	static inline UINT32 addr_add(UINT32 addr, UINT32 addend);
-	static inline UINT32 addr_sub(UINT32 addr, UINT32 subtrahend);
-	inline UINT16 RDOP();
-	inline UINT32 get_operand(int opnum);
-	inline UINT32 get_addr_operand(int opnum);
-	inline UINT32 get_raw_addr_operand(int opnum);
-	virtual UINT32 adjust_addr_for_nonseg_mode(UINT32 addr);
-	inline UINT8 RDMEM_B(address_spacenum spacenum, UINT32 addr);
-	inline UINT16 RDMEM_W(address_spacenum spacenum, UINT32 addr);
-	inline UINT32 RDMEM_L(address_spacenum spacenum, UINT32 addr);
-	inline void WRMEM_B(address_spacenum spacenum, UINT32 addr, UINT8 value);
-	inline void WRMEM_W(address_spacenum spacenum, UINT32 addr, UINT16 value);
-	inline void WRMEM_L(address_spacenum spacenum, UINT32 addr, UINT32 value);
-	inline UINT8 RDPORT_B(int mode, UINT16 addr);
-	virtual UINT16 RDPORT_W(int mode, UINT16 addr);
-	inline void WRPORT_B(int mode, UINT16 addr, UINT8 value);
-	virtual void WRPORT_W(int mode, UINT16 addr, UINT16 value);
+	static inline uint32_t addr_add(uint32_t addr, uint32_t addend);
+	static inline uint32_t addr_sub(uint32_t addr, uint32_t subtrahend);
+	inline uint16_t RDOP();
+	inline uint32_t get_operand(int opnum);
+	inline uint32_t get_addr_operand(int opnum);
+	inline uint32_t get_raw_addr_operand(int opnum);
+	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr);
+	inline uint8_t RDMEM_B(address_spacenum spacenum, uint32_t addr);
+	inline uint16_t RDMEM_W(address_spacenum spacenum, uint32_t addr);
+	inline uint32_t RDMEM_L(address_spacenum spacenum, uint32_t addr);
+	inline void WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value);
+	inline void WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value);
+	inline void WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value);
+	inline uint8_t RDPORT_B(int mode, uint16_t addr);
+	virtual uint16_t RDPORT_W(int mode, uint16_t addr);
+	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);
+	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value);
 	inline void cycles(int cycles);
 	inline void set_irq(int type);
 	virtual void PUSH_PC();
-	virtual void CHANGE_FCW(UINT16 fcw);
-	static inline UINT32 make_segmented_addr(UINT32 addr);
-	static inline UINT32 segmented_addr(UINT32 addr);
-	inline UINT32 addr_from_reg(int regno);
-	inline void addr_to_reg(int regno, UINT32 addr);
-	inline void add_to_addr_reg(int regno, UINT16 addend);
-	inline void sub_from_addr_reg(int regno, UINT16 subtrahend);
-	inline void set_pc(UINT32 addr);
-	inline void PUSHW(UINT8 dst, UINT16 value);
-	inline UINT16 POPW(UINT8 src);
-	inline void PUSHL(UINT8 dst, UINT32 value);
-	inline UINT32 POPL(UINT8 src);
-	inline UINT8 ADDB(UINT8 dest, UINT8 value);
-	inline UINT16 ADDW(UINT16 dest, UINT16 value);
-	inline UINT32 ADDL(UINT32 dest, UINT32 value);
-	inline UINT8 ADCB(UINT8 dest, UINT8 value);
-	inline UINT16 ADCW(UINT16 dest, UINT16 value);
-	inline UINT8 SUBB(UINT8 dest, UINT8 value);
-	inline UINT16 SUBW(UINT16 dest, UINT16 value);
-	inline UINT32 SUBL(UINT32 dest, UINT32 value);
-	inline UINT8 SBCB(UINT8 dest, UINT8 value);
-	inline UINT16 SBCW(UINT16 dest, UINT16 value);
-	inline UINT8 ORB(UINT8 dest, UINT8 value);
-	inline UINT16 ORW(UINT16 dest, UINT16 value);
-	inline UINT8 ANDB(UINT8 dest, UINT8 value);
-	inline UINT16 ANDW(UINT16 dest, UINT16 value);
-	inline UINT8 XORB(UINT8 dest, UINT8 value);
-	inline UINT16 XORW(UINT16 dest, UINT16 value);
-	inline void CPB(UINT8 dest, UINT8 value);
-	inline void CPW(UINT16 dest, UINT16 value);
-	inline void CPL(UINT32 dest, UINT32 value);
-	inline UINT8 COMB(UINT8 dest);
-	inline UINT16 COMW(UINT16 dest);
-	inline UINT8 NEGB(UINT8 dest);
-	inline UINT16 NEGW(UINT16 dest);
-	inline void TESTB(UINT8 result);
-	inline void TESTW(UINT16 dest);
-	inline void TESTL(UINT32 dest);
-	inline UINT8 INCB(UINT8 dest, UINT8 value);
-	inline UINT16 INCW(UINT16 dest, UINT16 value);
-	inline UINT8 DECB(UINT8 dest, UINT8 value);
-	inline UINT16 DECW(UINT16 dest, UINT16 value);
-	inline UINT32 MULTW(UINT16 dest, UINT16 value);
-	inline UINT64 MULTL(UINT32 dest, UINT32 value);
-	inline UINT32 DIVW(UINT32 dest, UINT16 value);
-	inline UINT64 DIVL(UINT64 dest, UINT32 value);
-	inline UINT8 RLB(UINT8 dest, UINT8 twice);
-	inline UINT16 RLW(UINT16 dest, UINT8 twice);
-	inline UINT8 RLCB(UINT8 dest, UINT8 twice);
-	inline UINT16 RLCW(UINT16 dest, UINT8 twice);
-	inline UINT8 RRB(UINT8 dest, UINT8 twice);
-	inline UINT16 RRW(UINT16 dest, UINT8 twice);
-	inline UINT8 RRCB(UINT8 dest, UINT8 twice);
-	inline UINT16 RRCW(UINT16 dest, UINT8 twice);
-	inline UINT8 SDAB(UINT8 dest, INT8 count);
-	inline UINT16 SDAW(UINT16 dest, INT8 count);
-	inline UINT32 SDAL(UINT32 dest, INT8 count);
-	inline UINT8 SDLB(UINT8 dest, INT8 count);
-	inline UINT16 SDLW(UINT16 dest, INT8 count);
-	inline UINT32 SDLL(UINT32 dest, INT8 count);
-	inline UINT8 SLAB(UINT8 dest, UINT8 count);
-	inline UINT16 SLAW(UINT16 dest, UINT8 count);
-	inline UINT32 SLAL(UINT32 dest, UINT8 count);
-	inline UINT8 SLLB(UINT8 dest, UINT8 count);
-	inline UINT16 SLLW(UINT16 dest, UINT8 count);
-	inline UINT32 SLLL(UINT32 dest, UINT8 count);
-	inline UINT8 SRAB(UINT8 dest, UINT8 count);
-	inline UINT16 SRAW(UINT16 dest, UINT8 count);
-	inline UINT32 SRAL(UINT32 dest, UINT8 count);
-	inline UINT8 SRLB(UINT8 dest, UINT8 count);
-	inline UINT16 SRLW(UINT16 dest, UINT8 count);
-	inline UINT32 SRLL(UINT32 dest, UINT8 count);
+	virtual void CHANGE_FCW(uint16_t fcw);
+	static inline uint32_t make_segmented_addr(uint32_t addr);
+	static inline uint32_t segmented_addr(uint32_t addr);
+	inline uint32_t addr_from_reg(int regno);
+	inline void addr_to_reg(int regno, uint32_t addr);
+	inline void add_to_addr_reg(int regno, uint16_t addend);
+	inline void sub_from_addr_reg(int regno, uint16_t subtrahend);
+	inline void set_pc(uint32_t addr);
+	inline void PUSHW(uint8_t dst, uint16_t value);
+	inline uint16_t POPW(uint8_t src);
+	inline void PUSHL(uint8_t dst, uint32_t value);
+	inline uint32_t POPL(uint8_t src);
+	inline uint8_t ADDB(uint8_t dest, uint8_t value);
+	inline uint16_t ADDW(uint16_t dest, uint16_t value);
+	inline uint32_t ADDL(uint32_t dest, uint32_t value);
+	inline uint8_t ADCB(uint8_t dest, uint8_t value);
+	inline uint16_t ADCW(uint16_t dest, uint16_t value);
+	inline uint8_t SUBB(uint8_t dest, uint8_t value);
+	inline uint16_t SUBW(uint16_t dest, uint16_t value);
+	inline uint32_t SUBL(uint32_t dest, uint32_t value);
+	inline uint8_t SBCB(uint8_t dest, uint8_t value);
+	inline uint16_t SBCW(uint16_t dest, uint16_t value);
+	inline uint8_t ORB(uint8_t dest, uint8_t value);
+	inline uint16_t ORW(uint16_t dest, uint16_t value);
+	inline uint8_t ANDB(uint8_t dest, uint8_t value);
+	inline uint16_t ANDW(uint16_t dest, uint16_t value);
+	inline uint8_t XORB(uint8_t dest, uint8_t value);
+	inline uint16_t XORW(uint16_t dest, uint16_t value);
+	inline void CPB(uint8_t dest, uint8_t value);
+	inline void CPW(uint16_t dest, uint16_t value);
+	inline void CPL(uint32_t dest, uint32_t value);
+	inline uint8_t COMB(uint8_t dest);
+	inline uint16_t COMW(uint16_t dest);
+	inline uint8_t NEGB(uint8_t dest);
+	inline uint16_t NEGW(uint16_t dest);
+	inline void TESTB(uint8_t result);
+	inline void TESTW(uint16_t dest);
+	inline void TESTL(uint32_t dest);
+	inline uint8_t INCB(uint8_t dest, uint8_t value);
+	inline uint16_t INCW(uint16_t dest, uint16_t value);
+	inline uint8_t DECB(uint8_t dest, uint8_t value);
+	inline uint16_t DECW(uint16_t dest, uint16_t value);
+	inline uint32_t MULTW(uint16_t dest, uint16_t value);
+	inline uint64_t MULTL(uint32_t dest, uint32_t value);
+	inline uint32_t DIVW(uint32_t dest, uint16_t value);
+	inline uint64_t DIVL(uint64_t dest, uint32_t value);
+	inline uint8_t RLB(uint8_t dest, uint8_t twice);
+	inline uint16_t RLW(uint16_t dest, uint8_t twice);
+	inline uint8_t RLCB(uint8_t dest, uint8_t twice);
+	inline uint16_t RLCW(uint16_t dest, uint8_t twice);
+	inline uint8_t RRB(uint8_t dest, uint8_t twice);
+	inline uint16_t RRW(uint16_t dest, uint8_t twice);
+	inline uint8_t RRCB(uint8_t dest, uint8_t twice);
+	inline uint16_t RRCW(uint16_t dest, uint8_t twice);
+	inline uint8_t SDAB(uint8_t dest, int8_t count);
+	inline uint16_t SDAW(uint16_t dest, int8_t count);
+	inline uint32_t SDAL(uint32_t dest, int8_t count);
+	inline uint8_t SDLB(uint8_t dest, int8_t count);
+	inline uint16_t SDLW(uint16_t dest, int8_t count);
+	inline uint32_t SDLL(uint32_t dest, int8_t count);
+	inline uint8_t SLAB(uint8_t dest, uint8_t count);
+	inline uint16_t SLAW(uint16_t dest, uint8_t count);
+	inline uint32_t SLAL(uint32_t dest, uint8_t count);
+	inline uint8_t SLLB(uint8_t dest, uint8_t count);
+	inline uint16_t SLLW(uint16_t dest, uint8_t count);
+	inline uint32_t SLLL(uint32_t dest, uint8_t count);
+	inline uint8_t SRAB(uint8_t dest, uint8_t count);
+	inline uint16_t SRAW(uint16_t dest, uint8_t count);
+	inline uint32_t SRAL(uint32_t dest, uint8_t count);
+	inline uint8_t SRLB(uint8_t dest, uint8_t count);
+	inline uint16_t SRLW(uint16_t dest, uint8_t count);
+	inline uint32_t SRLL(uint32_t dest, uint8_t count);
 	inline void Interrupt();
-	virtual UINT32 GET_PC(UINT32 VEC);
-	virtual UINT16 GET_FCW(UINT32 VEC);
-	virtual UINT32 F_SEG_Z8001();
-	virtual UINT32 PSA_ADDR();
-	virtual UINT32 read_irq_vector();
+	virtual uint32_t GET_PC(uint32_t VEC);
+	virtual uint16_t GET_FCW(uint32_t VEC);
+	virtual uint32_t F_SEG_Z8001();
+	virtual uint32_t PSA_ADDR();
+	virtual uint32_t read_irq_vector();
 
 public:
 	void zinvalid();
@@ -630,7 +630,7 @@ class z8001_device : public z8002_device
 {
 public:
 	// construction/destruction
-	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -650,21 +650,21 @@ protected:
 	}
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
 
 	address_space_config m_data_config;
 
 	virtual int segmented_mode() override;
-	virtual UINT32 adjust_addr_for_nonseg_mode(UINT32 addr) override;
-	virtual UINT16 RDPORT_W(int mode, UINT16 addr) override;
-	virtual void WRPORT_W(int mode, UINT16 addr, UINT16 value) override;
+	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;
+	virtual uint16_t RDPORT_W(int mode, uint16_t addr) override;
+	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value) override;
 	virtual void PUSH_PC() override;
-	virtual void CHANGE_FCW(UINT16 fcw) override;
-	virtual UINT32 GET_PC(UINT32 VEC) override;
-	virtual UINT16 GET_FCW(UINT32 VEC) override;
-	virtual UINT32 F_SEG_Z8001() override;
-	virtual UINT32 PSA_ADDR() override;
-	virtual UINT32 read_irq_vector() override;
+	virtual void CHANGE_FCW(uint16_t fcw) override;
+	virtual uint32_t GET_PC(uint32_t VEC) override;
+	virtual uint16_t GET_FCW(uint32_t VEC) override;
+	virtual uint32_t F_SEG_Z8001() override;
+	virtual uint32_t PSA_ADDR() override;
+	virtual uint32_t read_irq_vector() override;
 
 private:
 	void z8k_disass_mode(int ref, int params, const char *param[]);

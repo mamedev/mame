@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(mainsnk_state, mainsnk)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int num_colors = 0x400;
 
@@ -123,7 +123,7 @@ WRITE8_MEMBER(mainsnk_state::bgram_w)
 void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	const UINT8 *source, *finish;
+	const uint8_t *source, *finish;
 	source =  m_spriteram;
 	finish =  source + 25*4;
 
@@ -162,7 +162,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0, 0);

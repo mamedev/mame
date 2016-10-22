@@ -88,7 +88,7 @@ WRITE64_MEMBER(segasp_state::sp_bank_w)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
-	UINT16 bank = data & 0xffff;
+	uint16_t bank = data & 0xffff;
 	if (bank != m_sp_bank)
 		logerror("SystemSP: G2 Bank set to %08X%s\n", (bank & 0x3fff) << 16, (bank & 0x4000) ? " decrypt ON" :"" );
 	m_sp_bank = bank;
@@ -139,7 +139,7 @@ READ64_MEMBER(segasp_state::sp_rombdflg_r)
 
 READ64_MEMBER(segasp_state::sp_io_r)
 {
-	UINT64 retval;
+	uint64_t retval;
 
 	int reg = offset * 2;
 	int shift = 0;

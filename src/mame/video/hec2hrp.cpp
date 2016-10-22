@@ -40,7 +40,7 @@
 
 void hec2hrp_state::Init_Hector_Palette()
 {
-	UINT8 *hector_color = m_hector_color;
+	uint8_t *hector_color = m_hector_color;
 	// basic colors !
 	hector_color[0] = 0;  // fond (noir)
 	hector_color[1] = 1;  // HECTOR HRX (rouge)
@@ -68,13 +68,13 @@ void hec2hrp_state::Init_Hector_Palette()
 	m_palette->set_pen_color( 15,rgb_t(128,128,128));//Blanc
 }
 
-void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
+void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram)
 {
-	UINT8 *hector_color = m_hector_color;
-	UINT8 gfx,y;
-	UINT16 sy=0,ma=0,x;
+	uint8_t *hector_color = m_hector_color;
+	uint8_t gfx,y;
+	uint16_t sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
-		UINT16  *p = &bitmap.pix16(sy++);
+		uint16_t  *p = &bitmap.pix16(sy++);
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (4 pixels !) */
@@ -87,12 +87,12 @@ void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int y
 	}
 }
 
-void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
+void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram)
 {
-	UINT8 gfx,y;
-	UINT16 sy=0,ma=0,x;
+	uint8_t gfx,y;
+	uint16_t sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
-		UINT16  *p = &bitmap.pix16(sy++);
+		uint16_t  *p = &bitmap.pix16(sy++);
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (8 pixels !) */
@@ -115,10 +115,10 @@ VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 	Init_Hector_Palette();
 }
 
-UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8 *videoram_HR = m_hector_videoram;
+	uint8_t *videoram = m_videoram;
+	uint8_t *videoram_HR = m_hector_videoram;
 	if (m_hector_flag_hr==1)
 		{
 		if (m_hector_flag_80c==0)

@@ -1373,12 +1373,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
-	UINT8 dec_base[32] =
+	uint8_t dec_base[32] =
 	{
 		0x00, 0x43, 0x45, 0x06, 0xc3, 0x80, 0x86, 0xc5,
 		0x84, 0xc7, 0xc1, 0x82, 0x47, 0x04, 0x02, 0x41,
@@ -1425,7 +1425,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, piccolop)
 
 */
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// NOP'ing the mortal jump...
 	rom[0x154b] = 0x00;

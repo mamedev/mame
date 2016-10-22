@@ -160,8 +160,8 @@ void wpc_dot_state::machine_reset()
 
 DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 {
-	UINT8 *fixed = memregion("code")->base();
-	UINT32 codeoff = memregion("code")->bytes() - 0x8000;
+	uint8_t *fixed = memregion("code")->base();
+	uint32_t codeoff = memregion("code")->bytes() - 0x8000;
 	m_cpubank->configure_entries(0, 64, &fixed[0], 0x4000);
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &fixed[codeoff],0x8000);
@@ -209,7 +209,7 @@ WRITE8_MEMBER(wpc_dot_state::wpc_rombank_w)
 
 WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
 {
-	UINT8 page = offset >> 4;
+	uint8_t page = offset >> 4;
 
 	switch(offset & 0x07)
 	{
@@ -273,11 +273,11 @@ WRITE8_MEMBER(wpc_dot_state::wpc_sound_data_w)
 	m_wpcsnd->data_w(data);
 }
 
-UINT32 wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,bit;
-	UINT32 offset = (m_wpc->get_visible_page() * 0x200);
-	UINT32 col;
+	uint8_t x,y,bit;
+	uint32_t offset = (m_wpc->get_visible_page() * 0x200);
+	uint32_t col;
 
 	for(y=0;y<32;y++)  // scanline
 	{

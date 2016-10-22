@@ -87,9 +87,9 @@ public:
 		m_palette(*this, "palette"){ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_bg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	optional_shared_ptr<uint8_t> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -98,8 +98,8 @@ public:
 	int m_hopper;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_out[3];
-	UINT8 m_protection_res;
+	uint8_t m_out[3];
+	uint8_t m_protection_res;
 
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
@@ -128,8 +128,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(cpokerpk);
-	UINT32 screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
 };
 
@@ -208,7 +208,7 @@ void igspoker_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -225,7 +225,7 @@ VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
-UINT32 igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -361,7 +361,7 @@ CUSTOM_INPUT_MEMBER(igspoker_state::hopper_r)
 
 READ8_MEMBER(igspoker_state::exp_rom_r)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	return rom[offset+0x10000];
 }
 
@@ -1935,7 +1935,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -1949,7 +1949,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 
 DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1979,7 +1979,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 DRIVER_INIT_MEMBER(igspoker_state,cska)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -1996,7 +1996,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -2157,7 +2157,7 @@ Clocks
 
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
 {
-	UINT8 *src = (UINT8 *) (memregion("maincpu")->base());
+	uint8_t *src = (uint8_t *) (memregion("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -2232,7 +2232,7 @@ DRIVER_INIT_MEMBER(igspoker_state,chleague)
 {
 	int A;
 	int length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
@@ -2442,7 +2442,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 {
 	int A;
 	int length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
@@ -2476,7 +2476,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	/* Descramble graphic */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	std::vector<UINT8> tmp(length);
+	std::vector<uint8_t> tmp(length);
 	memcpy(&tmp[0],rom,length);
 	for (A = 0; A < length; A++)
 	{
@@ -2521,7 +2521,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x0714; A < 0xF000; A += 0x1000)
 		rom[A] ^= 0x20;
@@ -2589,7 +2589,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000; A++)
@@ -2668,7 +2668,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state, kungfu)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x4000;A < 0x10000; A++)
 	{

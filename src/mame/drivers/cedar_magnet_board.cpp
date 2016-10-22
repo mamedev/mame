@@ -8,7 +8,7 @@
 
 //const device_type CEDAR_MAGNET_BASE = &device_creator<cedar_magnet_board_device>;
 
-cedar_magnet_board_device::cedar_magnet_board_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+cedar_magnet_board_device::cedar_magnet_board_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 //	m_ram(*this, "ram")
 {
@@ -23,14 +23,14 @@ void cedar_magnet_board_device::device_start()
 {
 }
 
-void cedar_magnet_board_device::write_cpu_bus(int offset, UINT8 data)
+void cedar_magnet_board_device::write_cpu_bus(int offset, uint8_t data)
 {
 	device_t* cpu = m_cpu;
 	address_space& ap = cpu->memory().space(AS_PROGRAM);
 	ap.write_byte(offset, data);
 }
 
-UINT8 cedar_magnet_board_device::read_cpu_bus(int offset)
+uint8_t cedar_magnet_board_device::read_cpu_bus(int offset)
 {
 	device_t* cpu = m_cpu;
 	address_space& ap = cpu->memory().space(AS_PROGRAM);

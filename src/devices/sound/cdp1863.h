@@ -47,13 +47,13 @@ class cdp1863_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_clock2(device_t &device, int clock2);
 
 	DECLARE_WRITE8_MEMBER( str_w );
-	void str_w(UINT8 data);
+	void str_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 
@@ -76,7 +76,7 @@ private:
 	// sound state
 	int m_oe;                       // output enable
 	int m_latch;                    // sound latch
-	INT16 m_signal;                 // current signal
+	int16_t m_signal;                 // current signal
 	int m_incr;                     // initial wave state
 };
 

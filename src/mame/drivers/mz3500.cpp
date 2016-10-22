@@ -61,22 +61,22 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd765a_device> m_fdc;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<beep_device> m_beeper;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_ipl_rom;
-	UINT8 *m_basic_rom;
-	std::unique_ptr<UINT8[]> m_work_ram;
-	std::unique_ptr<UINT8[]> m_shared_ram;
-	UINT8 *m_char_rom;
+	uint8_t *m_ipl_rom;
+	uint8_t *m_basic_rom;
+	std::unique_ptr<uint8_t[]> m_work_ram;
+	std::unique_ptr<uint8_t[]> m_shared_ram;
+	uint8_t *m_char_rom;
 
-	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
-	UINT8 m_crtc[0x10];
+	uint8_t m_ma,m_mo,m_ms,m_me2,m_me1;
+	uint8_t m_crtc[0x10];
 
-	UINT8 m_srdy;
+	uint8_t m_srdy;
 
-	UINT8 m_fdd_sel;
+	uint8_t m_fdd_sel;
 
 	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
 	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -158,11 +158,11 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 	int xi,yi;
 	int tile;
 	int attr;
-	UINT8 tile_data;
-	UINT8 width80;
-	UINT8 char_size;
-	UINT8 hires;
-	UINT8 color_mode;
+	uint8_t tile_data;
+	uint8_t width80;
+	uint8_t char_size;
+	uint8_t hires;
+	uint8_t color_mode;
 
 //  popmessage("%02x",m_crtc[6]);
 
@@ -232,7 +232,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 
 }
 
-UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(m_palette->pen((m_crtc[4] & 2) ? m_crtc[3] & 7 : 0), cliprect);
 
@@ -741,8 +741,8 @@ void mz3500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_basic_rom = memregion("basic")->base();
 	m_char_rom = memregion("gfx1")->base();
-	m_work_ram = make_unique_clear<UINT8[]>(0x40000);
-	m_shared_ram = make_unique_clear<UINT8[]>(0x800);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x40000);
+	m_shared_ram = make_unique_clear<uint8_t[]>(0x800);
 
 	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 

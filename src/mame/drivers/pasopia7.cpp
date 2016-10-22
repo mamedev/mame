@@ -81,34 +81,34 @@ public:
 	DECLARE_DRIVER_INIT(p7_raster);
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
-	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 m_vram_sel;
-	UINT8 m_mio_sel;
-	std::unique_ptr<UINT8[]> m_p7_pal;
-	UINT8 m_bank_reg;
-	UINT16 m_cursor_addr;
-	UINT8 m_cursor_blink;
-	UINT8 m_cursor_raster;
-	UINT8 m_plane_reg;
-	UINT8 m_attr_data;
-	UINT8 m_attr_wrap;
-	UINT8 m_attr_latch;
-	UINT8 m_pal_sel;
-	UINT8 m_x_width;
-	UINT8 m_gfx_mode;
-	UINT8 m_nmi_mask;
-	UINT8 m_nmi_enable_reg;
-	UINT8 m_nmi_trap;
-	UINT8 m_nmi_reset;
-	UINT16 m_pac2_index[2];
-	UINT32 m_kanji_index;
-	UINT8 m_pac2_bank_select;
-	UINT8 m_screen_type;
+	uint8_t m_vram_sel;
+	uint8_t m_mio_sel;
+	std::unique_ptr<uint8_t[]> m_p7_pal;
+	uint8_t m_bank_reg;
+	uint16_t m_cursor_addr;
+	uint8_t m_cursor_blink;
+	uint8_t m_cursor_raster;
+	uint8_t m_plane_reg;
+	uint8_t m_attr_data;
+	uint8_t m_attr_wrap;
+	uint8_t m_attr_latch;
+	uint8_t m_pal_sel;
+	uint8_t m_x_width;
+	uint8_t m_gfx_mode;
+	uint8_t m_nmi_mask;
+	uint8_t m_nmi_enable_reg;
+	uint8_t m_nmi_trap;
+	uint8_t m_nmi_reset;
+	uint16_t m_pac2_index[2];
+	uint32_t m_kanji_index;
+	uint8_t m_pac2_bank_select;
+	uint8_t m_screen_type;
 	int m_addr_latch;
 	void pasopia_nmi_trap();
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 	virtual void machine_reset() override;
 	void fdc_irq(bool state);
 	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
@@ -141,12 +141,12 @@ TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 
 VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 {
-	m_p7_pal = std::make_unique<UINT8[]>(0x10);
+	m_p7_pal = std::make_unique<uint8_t[]>(0x10);
 }
 
 void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -177,8 +177,8 @@ void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 
 void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = memregion("vram")->base();
-	UINT8 *gfx_data = memregion("font")->base();
+	uint8_t *vram = memregion("vram")->base();
+	uint8_t *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -235,8 +235,8 @@ void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = memregion("vram")->base();
-	UINT8 *gfx_data = memregion("font")->base();
+	uint8_t *vram = memregion("vram")->base();
+	uint8_t *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -312,7 +312,7 @@ void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cli
 	}
 }
 
-UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int width;
 
@@ -333,12 +333,12 @@ UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER( pasopia7_state::vram_r )
 {
-	UINT8 *vram = memregion("vram")->base();
-	UINT8 res;
+	uint8_t *vram = memregion("vram")->base();
+	uint8_t res;
 
 	if (m_vram_sel == 0)
 	{
-		UINT8 *work_ram = memregion("maincpu")->base();
+		uint8_t *work_ram = memregion("maincpu")->base();
 
 		return work_ram[offset+0x8000];
 	}
@@ -363,7 +363,7 @@ READ8_MEMBER( pasopia7_state::vram_r )
 
 WRITE8_MEMBER( pasopia7_state::vram_w )
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 
 	if (m_vram_sel)
 	{
@@ -386,7 +386,7 @@ WRITE8_MEMBER( pasopia7_state::vram_w )
 	}
 	else
 	{
-		UINT8 *work_ram = memregion("maincpu")->base();
+		uint8_t *work_ram = memregion("maincpu")->base();
 
 		work_ram[offset+0x8000] = data;
 	}
@@ -394,8 +394,8 @@ WRITE8_MEMBER( pasopia7_state::vram_w )
 
 WRITE8_MEMBER( pasopia7_state::pasopia7_memory_ctrl_w )
 {
-	UINT8 *work_ram = memregion("maincpu")->base();
-	UINT8 *basic = memregion("basic")->base();
+	uint8_t *work_ram = memregion("maincpu")->base();
+	uint8_t *basic = memregion("basic")->base();
 
 	switch(data & 3)
 	{
@@ -450,7 +450,7 @@ WRITE8_MEMBER( pasopia7_state::pac2_w )
 			case 1: m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0xff) | ((data & 0x7f) << 8); break;
 			case 2: // PAC2 RAM write
 			{
-				UINT8 *pac2_ram;
+				uint8_t *pac2_ram;
 
 				pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
@@ -485,7 +485,7 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 	{
 		if(m_pac2_bank_select == 3 || m_pac2_bank_select == 4)
 		{
-			UINT8 *pac2_ram;
+			uint8_t *pac2_ram;
 
 			pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
@@ -493,7 +493,7 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 		}
 		else if(m_pac2_bank_select == 2)
 		{
-			UINT8 *kanji_rom = memregion("kanji")->base();
+			uint8_t *kanji_rom = memregion("kanji")->base();
 
 			return kanji_rom[m_kanji_index];
 		}
@@ -509,7 +509,7 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
 WRITE8_MEMBER( pasopia7_state::ram_bank_w )
 {
-	UINT8 *work_ram = memregion("maincpu")->base();
+	uint8_t *work_ram = memregion("maincpu")->base();
 
 	work_ram[offset] = data;
 }
@@ -583,7 +583,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 
 READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 {
-	UINT16 io_port;
+	uint16_t io_port;
 
 	if(m_mio_sel)
 	{
@@ -634,7 +634,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 
 WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 {
-	UINT16 io_port;
+	uint16_t io_port;
 
 	if(m_mio_sel)
 	{
@@ -735,7 +735,7 @@ GFXDECODE_END
 
 READ8_MEMBER( pasopia7_state::keyb_r )
 {
-	UINT8 i,j,res = 0;
+	uint8_t i,j,res = 0;
 	for (j=0; j<3; j++)
 	{
 		if (BIT(m_mux_data, 4+j))
@@ -769,8 +769,8 @@ READ8_MEMBER( pasopia7_state::crtc_portb_r )
 	// --x- ---- vsync bit
 	// ---x ---- hardcoded bit, defines if the system screen is raster (1) or LCD (0)
 	// ---- x--- disp bit
-	UINT8 vdisp = (machine().first_screen()->vpos() < (m_screen_type ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
-	UINT8 vsync = vdisp ? 0x00 : 0x20;
+	uint8_t vdisp = (machine().first_screen()->vpos() < (m_screen_type ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
+	uint8_t vsync = vdisp ? 0x00 : 0x20;
 
 	return 0x40 | (m_attr_latch & 0x87) | vsync | vdisp | (m_screen_type << 4);
 }
@@ -872,7 +872,7 @@ READ8_MEMBER( pasopia7_state::nmi_portb_r )
 
 void pasopia7_state::machine_reset()
 {
-	UINT8 *bios = memregion("maincpu")->base();
+	uint8_t *bios = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(bios + 0x10000);
 	membank("bank2")->set_base(bios + 0x10000);

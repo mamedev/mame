@@ -326,7 +326,7 @@ READ8_MEMBER( m5_state::sts_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// cassette input
 	data |= m_cassette->input() >= 0 ? 1 : 0;

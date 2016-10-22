@@ -205,7 +205,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 
 WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 {
-	UINT8 *SAMPLES = memregion("adpcm")->base();
+	uint8_t *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
@@ -699,7 +699,7 @@ DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
 	    023A: 00          nop
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

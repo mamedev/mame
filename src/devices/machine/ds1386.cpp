@@ -29,7 +29,7 @@
 const device_type DS1386_8K = &device_creator<ds1386_8k_device>;
 const device_type DS1386_32K = &device_creator<ds1386_32k_device>;
 
-ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, size_t size)
+ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_nvram_interface(mconfig, *this)
 	, m_tod_alarm(0)
@@ -59,12 +59,12 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ds1386_8k_device::ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds1386_8k_device::ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ds1386_device(mconfig, DS1386_8K, "DS1386-8K", tag, owner, clock, "ds1386_8k", 8192)
 {
 }
 
-ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ds1386_device(mconfig, DS1386_32K, "DS1386-32K", tag, owner, clock, "ds1386_32k", 32768)
 {
 }
@@ -120,7 +120,7 @@ void ds1386_device::device_start()
 	save_item(NAME(m_watchdog_alarm));
 	save_item(NAME(m_square));
 
-	m_ram = std::make_unique<UINT8[]>(m_ram_size);
+	m_ram = std::make_unique<uint8_t[]>(m_ram_size);
 	memset(&m_ram[0], 0, m_ram_size);
 }
 
@@ -265,9 +265,9 @@ void ds1386_device::advance_hundredths()
 	}
 	if (carry)
 	{
-		UINT8 value = 0;
-		UINT8 min_value = 0;
-		UINT8 max_value = 0;
+		uint8_t value = 0;
+		uint8_t min_value = 0;
+		uint8_t max_value = 0;
 		if (m_hours & HOURS_12_24)
 		{
 			value = m_hours & 0x1f;
@@ -309,13 +309,13 @@ void ds1386_device::advance_hundredths()
 
 	if (carry)
 	{
-		UINT8 maxdays;
-		static const UINT8 daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+		uint8_t maxdays;
+		static const uint8_t daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
 		time_helper::inc_bcd(&m_days, 0x07, 0x01, 0x07);
 
-		UINT8 month = time_helper::from_bcd(m_months_enables);
-		UINT8 year = time_helper::from_bcd(m_years);
+		uint8_t month = time_helper::from_bcd(m_months_enables);
+		uint8_t year = time_helper::from_bcd(m_years);
 
 		if (month == 2 && (year % 4) == 0)
 		{
@@ -334,7 +334,7 @@ void ds1386_device::advance_hundredths()
 	}
 	if (carry)
 	{
-		UINT8 enables = m_months_enables & 0xc0;
+		uint8_t enables = m_months_enables & 0xc0;
 		carry = time_helper::inc_bcd(&m_months_enables, 0x1f, 0x01, 0x12);
 		m_months_enables &= 0x3f;
 		m_months_enables |= enables;
@@ -378,7 +378,7 @@ void ds1386_device::copy_registers_to_ram()
 
 void ds1386_device::check_tod_alarm()
 {
-	UINT8 mode = BIT(m_days_alarm, 7) | (BIT(m_hours_alarm, 5) << 1) | (BIT(m_minutes_alarm, 3) << 2);
+	uint8_t mode = BIT(m_days_alarm, 7) | (BIT(m_hours_alarm, 5) << 1) | (BIT(m_minutes_alarm, 3) << 2);
 	bool zeroes = (m_hundredths == 0 && m_seconds == 0);
 	if (zeroes && (m_ram[REGISTER_COMMAND] & COMMAND_TDF) == 0)
 	{
@@ -465,9 +465,9 @@ WRITE8_MEMBER( ds1386_device::data_w )
 
 			case 0x09: // months
 			{
-				UINT8 old_value = m_ram[offset];
+				uint8_t old_value = m_ram[offset];
 				m_ram[offset] = data & 0xdf;
-				UINT8 changed = old_value ^ data;
+				uint8_t changed = old_value ^ data;
 				if (changed & DISABLE_SQW)
 				{
 					if (m_ram[offset] & DISABLE_SQW)
@@ -506,8 +506,8 @@ WRITE8_MEMBER( ds1386_device::data_w )
 						safe_inta_cb(0);
 				}
 				m_ram[offset] = data;
-				UINT8 wd_hundredths = m_ram[REGISTER_WATCHDOG_HUNDREDTHS];
-				UINT8 wd_seconds = m_ram[REGISTER_WATCHDOG_SECONDS];
+				uint8_t wd_hundredths = m_ram[REGISTER_WATCHDOG_HUNDREDTHS];
+				uint8_t wd_seconds = m_ram[REGISTER_WATCHDOG_SECONDS];
 				int total_hundredths = (wd_hundredths & 0xf) + ((wd_hundredths >> 4) & 0xf) * 10 + (wd_seconds & 0xf) * 100 + ((wd_seconds >> 4) & 0xf) * 1000;
 				m_watchdog_timer->adjust(attotime::from_msec(total_hundredths * 10));
 				break;
@@ -515,9 +515,9 @@ WRITE8_MEMBER( ds1386_device::data_w )
 
 			case 0x0b: // command
 			{
-				UINT8 old = m_ram[offset];
+				uint8_t old = m_ram[offset];
 				m_ram[offset] = data & 0xfc;
-				UINT8 changed = old ^ m_ram[offset];
+				uint8_t changed = old ^ m_ram[offset];
 				if (changed & COMMAND_IPSW)
 				{
 					int old_a = (old & COMMAND_IPSW) ? m_tod_alarm : m_watchdog_alarm;

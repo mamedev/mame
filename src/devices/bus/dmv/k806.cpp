@@ -75,7 +75,7 @@ const device_type DMV_K806 = &device_creator<dmv_k806_device>;
 //  dmv_k806_device - constructor
 //-------------------------------------------------
 
-dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, DMV_K806, "K806 mouse", tag, owner, clock, "dmv_k806", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_mcu(*this, "mcu"),
@@ -136,16 +136,16 @@ const tiny_rom_entry *dmv_k806_device::device_rom_region() const
 	return ROM_NAME( dmv_k806 );
 }
 
-void dmv_k806_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_k806_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
-	UINT8 jumpers = m_jumpers->read();
+	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 		data = m_mcu->upi41_master_r(space, offset & 1);
 }
 
-void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
-	UINT8 jumpers = m_jumpers->read();
+	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 	{
 		m_mcu->upi41_master_w(space, offset & 1, data);
@@ -164,7 +164,7 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	// -x-- ----   YB / X1
 	// x--- ----   not used
 
-	UINT8 data = m_mouse_buttons->read() & 0x07;
+	uint8_t data = m_mouse_buttons->read() & 0x07;
 
 	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 0x08);
 	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 0x10);

@@ -147,7 +147,7 @@ class z80scc_channel : public device_t,
 	friend class z80scc_device;
 
 public:
-	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -161,54 +161,54 @@ public:
 	virtual void rcv_complete() override;
 
 	// read register handlers
-	UINT8 do_sccreg_rr0();
-	UINT8 do_sccreg_rr1();
-	UINT8 do_sccreg_rr2();
-	UINT8 do_sccreg_rr3();
-	UINT8 do_sccreg_rr4();
-	UINT8 do_sccreg_rr5();
-	UINT8 do_sccreg_rr6();
-	UINT8 do_sccreg_rr7();
-	UINT8 do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode 
-	// UINT8 do_sccreg_rr8(); Short cutted due to frequent use
-	UINT8 do_sccreg_rr9();
-	UINT8 do_sccreg_rr10();
-	UINT8 do_sccreg_rr11();
-	UINT8 do_sccreg_rr12();
-	UINT8 do_sccreg_rr13();
-	UINT8 do_sccreg_rr14();
-	UINT8 do_sccreg_rr15();
+	uint8_t do_sccreg_rr0();
+	uint8_t do_sccreg_rr1();
+	uint8_t do_sccreg_rr2();
+	uint8_t do_sccreg_rr3();
+	uint8_t do_sccreg_rr4();
+	uint8_t do_sccreg_rr5();
+	uint8_t do_sccreg_rr6();
+	uint8_t do_sccreg_rr7();
+	uint8_t do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode 
+	// uint8_t do_sccreg_rr8(); Short cutted due to frequent use
+	uint8_t do_sccreg_rr9();
+	uint8_t do_sccreg_rr10();
+	uint8_t do_sccreg_rr11();
+	uint8_t do_sccreg_rr12();
+	uint8_t do_sccreg_rr13();
+	uint8_t do_sccreg_rr14();
+	uint8_t do_sccreg_rr15();
 
 	// write register handlers
-	void do_sccreg_wr0(UINT8 data);
-	void do_sccreg_wr0_resets(UINT8 data);
-	void do_sccreg_wr1(UINT8 data);
-	void do_sccreg_wr2(UINT8 data);
-	void do_sccreg_wr3(UINT8 data);
-	void do_sccreg_wr4(UINT8 data);
-	void do_sccreg_wr5(UINT8 data);
-	void do_sccreg_wr6(UINT8 data);
-	void do_sccreg_wr7(UINT8 data);
-	void do_sccreg_wr7p(UINT8 data){}; // Needs to be implemented for Synchronous mode 
-	void do_sccreg_wr8(UINT8 data);
-	void do_sccreg_wr9(UINT8 data);
-	void do_sccreg_wr10(UINT8 data);
-	void do_sccreg_wr11(UINT8 data);
-	void do_sccreg_wr12(UINT8 data);
-	void do_sccreg_wr13(UINT8 data);
-	void do_sccreg_wr14(UINT8 data);
-	void do_sccreg_wr15(UINT8 data);
+	void do_sccreg_wr0(uint8_t data);
+	void do_sccreg_wr0_resets(uint8_t data);
+	void do_sccreg_wr1(uint8_t data);
+	void do_sccreg_wr2(uint8_t data);
+	void do_sccreg_wr3(uint8_t data);
+	void do_sccreg_wr4(uint8_t data);
+	void do_sccreg_wr5(uint8_t data);
+	void do_sccreg_wr6(uint8_t data);
+	void do_sccreg_wr7(uint8_t data);
+	void do_sccreg_wr7p(uint8_t data){}; // Needs to be implemented for Synchronous mode 
+	void do_sccreg_wr8(uint8_t data);
+	void do_sccreg_wr9(uint8_t data);
+	void do_sccreg_wr10(uint8_t data);
+	void do_sccreg_wr11(uint8_t data);
+	void do_sccreg_wr12(uint8_t data);
+	void do_sccreg_wr13(uint8_t data);
+	void do_sccreg_wr14(uint8_t data);
+	void do_sccreg_wr15(uint8_t data);
 
-	UINT8 control_read();
-	void control_write(UINT8 data);
+	uint8_t control_read();
+	void control_write(uint8_t data);
 
-	UINT8 data_read();
-	void data_write(UINT8 data);
+	uint8_t data_read();
+	void data_write(uint8_t data);
 
-	void receive_data(UINT8 data);
+	void receive_data(uint8_t data);
 	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
-	UINT8 m_rx_fifo_rp_data();
+	uint8_t m_rx_fifo_rp_data();
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -223,42 +223,42 @@ public:
 
 	// Register state
 	// read registers     enum
-	UINT8 m_rr0; // REG_RR0_STATUS
-	UINT8 m_rr1; // REG_RR1_SPEC_RCV_COND
-	UINT8 m_rr2; // REG_RR2_INTERRUPT_VECT
-	UINT8 m_rr3; // REG_RR3_INTERUPPT_PEND
-	UINT8 m_rr4; // REG_RR4_WR4_OR_RR0
-	UINT8 m_rr5; // REG_RR5_WR5_OR_RR0
-	UINT8 m_rr6; // REG_RR6_LSB_OR_RR2
-	UINT8 m_rr7; // REG_RR7_MSB_OR_RR3
-	UINT8 m_rr7p;
-	UINT8 m_rr8; // REG_RR8_RECEIVE_DATA
-	UINT8 m_rr9; //  REG_RR9_WR3_OR_RR13
-	UINT8 m_rr10; // REG_RR10_MISC_STATUS
-	UINT8 m_rr11; // REG_RR11_WR10_OR_RR15
-	UINT8 m_rr12; // REG_RR12_LO_TIME_CONST
-	UINT8 m_rr13; // REG_RR13_HI_TIME_CONST
-	UINT8 m_rr14; // REG_RR14_WR7_OR_R10
-	UINT8 m_rr15; // REG_RR15_WR15_EXT_STAT
+	uint8_t m_rr0; // REG_RR0_STATUS
+	uint8_t m_rr1; // REG_RR1_SPEC_RCV_COND
+	uint8_t m_rr2; // REG_RR2_INTERRUPT_VECT
+	uint8_t m_rr3; // REG_RR3_INTERUPPT_PEND
+	uint8_t m_rr4; // REG_RR4_WR4_OR_RR0
+	uint8_t m_rr5; // REG_RR5_WR5_OR_RR0
+	uint8_t m_rr6; // REG_RR6_LSB_OR_RR2
+	uint8_t m_rr7; // REG_RR7_MSB_OR_RR3
+	uint8_t m_rr7p;
+	uint8_t m_rr8; // REG_RR8_RECEIVE_DATA
+	uint8_t m_rr9; //  REG_RR9_WR3_OR_RR13
+	uint8_t m_rr10; // REG_RR10_MISC_STATUS
+	uint8_t m_rr11; // REG_RR11_WR10_OR_RR15
+	uint8_t m_rr12; // REG_RR12_LO_TIME_CONST
+	uint8_t m_rr13; // REG_RR13_HI_TIME_CONST
+	uint8_t m_rr14; // REG_RR14_WR7_OR_R10
+	uint8_t m_rr15; // REG_RR15_WR15_EXT_STAT
 
 		// write registers    enum
-	UINT8 m_wr0; // REG_WR0_COMMAND_REGPT
-	UINT8 m_wr1; // REG_WR1_INT_DMA_ENABLE
-	UINT8 m_wr2; // REG_WR2_INT_VECTOR
-	UINT8 m_wr3; // REG_WR3_RX_CONTROL
-	UINT8 m_wr4; // REG_WR4_RX_TX_MODES
-	UINT8 m_wr5; // REG_WR5_TX_CONTROL
-	UINT8 m_wr6; // REG_WR6_SYNC_OR_SDLC_A
-	UINT8 m_wr7; // REG_WR7_SYNC_OR_SDLC_F
-	UINT8 m_wr7p; // 
-	UINT8 m_wr8;  // REG_WR8_TRANSMIT_DATA
-	//	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
-	UINT8 m_wr10; // REG_WR10_MSC_RX_TX_CTRL
-	UINT8 m_wr11; // REG_WR11_CLOCK_MODES
-	UINT8 m_wr12; // REG_WR12_LO_BAUD_GEN
-	UINT8 m_wr13; // REG_WR13_HI_BAUD_GEN
-	UINT8 m_wr14; // REG_WR14_MISC_CTRL
-	UINT8 m_wr15; // REG_WR15_EXT_ST_INT_CTRL
+	uint8_t m_wr0; // REG_WR0_COMMAND_REGPT
+	uint8_t m_wr1; // REG_WR1_INT_DMA_ENABLE
+	uint8_t m_wr2; // REG_WR2_INT_VECTOR
+	uint8_t m_wr3; // REG_WR3_RX_CONTROL
+	uint8_t m_wr4; // REG_WR4_RX_TX_MODES
+	uint8_t m_wr5; // REG_WR5_TX_CONTROL
+	uint8_t m_wr6; // REG_WR6_SYNC_OR_SDLC_A
+	uint8_t m_wr7; // REG_WR7_SYNC_OR_SDLC_F
+	uint8_t m_wr7p; // 
+	uint8_t m_wr8;  // REG_WR8_TRANSMIT_DATA
+	//	uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
+	uint8_t m_wr10; // REG_WR10_MSC_RX_TX_CTRL
+	uint8_t m_wr11; // REG_WR11_CLOCK_MODES
+	uint8_t m_wr12; // REG_WR12_LO_BAUD_GEN
+	uint8_t m_wr13; // REG_WR13_HI_BAUD_GEN
+	uint8_t m_wr14; // REG_WR14_MISC_CTRL
+	uint8_t m_wr15; // REG_WR15_EXT_ST_INT_CTRL
 
 protected:
 	enum
@@ -541,15 +541,15 @@ protected:
 
 #if LOCAL_BRG
 	emu_timer *baudtimer;
-	UINT16 m_brg_counter;
+	uint16_t m_brg_counter;
 #else
 	unsigned int m_brg_rate;
 #endif
 	unsigned int m_delayed_tx_brg_change;
 	unsigned int m_brg_const;
 
-	void scc_register_write(UINT8 reg, UINT8 data);
-	UINT8 scc_register_read(UINT8 reg);
+	void scc_register_write(uint8_t reg, uint8_t data);
+	uint8_t scc_register_read(uint8_t reg);
 	void update_serial();
 	void set_dtr(int state);
 	void set_rts(int state);
@@ -562,9 +562,9 @@ protected:
 	void safe_transmit_register_reset();
 
 	// receiver state
-	UINT8 m_rx_data_fifo[8];    // receive data FIFO
-	UINT8 m_rx_error_fifo[8];   // receive error FIFO
-	UINT8 m_rx_error;       // current receive error
+	uint8_t m_rx_data_fifo[8];    // receive data FIFO
+	uint8_t m_rx_error_fifo[8];   // receive error FIFO
+	uint8_t m_rx_error;       // current receive error
 	//int m_rx_fifo         // receive FIFO pointer
 	int m_rx_fifo_rp;       // receive FIFO read pointer
 	int m_rx_fifo_wp;       // receive FIFO write pointer
@@ -573,7 +573,7 @@ protected:
 	int m_rx_clock;         // receive clock pulse count
 	int m_rx_first;         // first character received
 	int m_rx_break;         // receive break condition
-	UINT8 m_rx_rr0_latch;   // read register 0 latched
+	uint8_t m_rx_rr0_latch;   // read register 0 latched
 
 	int m_rxd;
 	int m_ri;       // ring indicator latch
@@ -581,20 +581,20 @@ protected:
 	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data_fifo[4];   // data FIFO
-	UINT8 m_tx_error_fifo[4];  // error FIFO
+	uint8_t m_tx_data_fifo[4];   // data FIFO
+	uint8_t m_tx_error_fifo[4];  // error FIFO
 	int m_tx_fifo_rp;           // FIFO read pointer
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
-	UINT8 m_tx_error;           // current error
-	//	UINT8 m_tx_data;    // transmit data register
+	uint8_t m_tx_error;           // current error
+	//	uint8_t m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready
 	int m_rts;      // request to send
 
 	// synchronous state
-	UINT16 m_sync;      // sync character
+	uint16_t m_sync;      // sync character
 
 	int m_rcv_mode;
 	int m_index;
@@ -602,7 +602,7 @@ protected:
 
 	// SCC specifics
 	int m_ph;       // Point high command to access regs 08-0f
-	UINT8 m_zc;
+	uint8_t m_zc;
 };
 
 
@@ -615,8 +615,8 @@ class z80scc_device :  public device_t
 
 public:
 	// construction/destruction
-	z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-	z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80scc_device &>(device).m_out_txda_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80scc_device &>(device).m_out_dtra_cb.set_callback(object); }
@@ -668,7 +668,7 @@ public:
 	int m1_r();
 
 	// Single registers instances accessed from both channels
-	UINT8 m_wr9;  // REG_WR9_MASTER_INT_CTRL
+	uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
 
 	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
@@ -700,7 +700,7 @@ protected:
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
-	UINT8 modify_vector(UINT8 vect, int i, UINT8 src);
+	uint8_t modify_vector(uint8_t vect, int i, uint8_t src);
 	void trigger_interrupt(int index, int state);
 
 
@@ -765,55 +765,55 @@ protected:
 	int m_int_source[6]; // interrupt source
 
 	int m_variant;
-	UINT8 m_wr0_ptrbits;
+	uint8_t m_wr0_ptrbits;
 };
 
 class scc8030_device : public z80scc_device
 {
 public :
-	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc80C30_device : public z80scc_device
 {
 public :
-	scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc80230_device : public z80scc_device
 {
 public :
-	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc8530_device : public z80scc_device
 {
 public :
-	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc85C30_device : public z80scc_device
 {
 public :
-	scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc85230_device : public z80scc_device
 {
 public :
-	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc85233_device : public z80scc_device
 {
 public :
-	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class scc8523L_device : public z80scc_device
 {
 public :
-	scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition

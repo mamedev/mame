@@ -190,8 +190,8 @@ const g65816_opcode_struct g65816_opcode_struct::s_opcodes[256] =
 
 } // anonymous namespace
 
-static const UINT8 *base_oprom;
-static UINT32 base_pc;
+static const uint8_t *base_oprom;
+static uint32_t base_pc;
 
 static inline unsigned int read_8(unsigned int address)
 {
@@ -241,7 +241,7 @@ static inline char* int_16_str(unsigned int val)
 }
 
 
-unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag)
+unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
 {
 	unsigned int instruction;
 	const g65816_opcode_struct* opcode;
@@ -278,7 +278,7 @@ unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const 
 			sprintf(ptr, "A");
 			break;
 		case RELB:
-			var = (INT8) read_8(address+1);
+			var = (int8_t) read_8(address+1);
 			length++;
 			sprintf(ptr, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_8_str(var));
 			break;

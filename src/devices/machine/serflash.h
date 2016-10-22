@@ -42,7 +42,7 @@ class serflash_device :    public device_t,
 public:
 
 	// construction/destruction
-	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( flash_ready_r );
 	DECLARE_READ8_MEMBER( flash_io_r );
@@ -70,31 +70,31 @@ protected:
 
 	// runtime state
 	size_t                      m_length;
-	UINT8* m_region;
+	uint8_t* m_region;
 
 
 	flash_state_t m_flash_state;
 
-	UINT8 m_flash_enab;
+	uint8_t m_flash_enab;
 
-	UINT8 m_flash_cmd_seq;
-	UINT32 m_flash_cmd_prev;
+	uint8_t m_flash_cmd_seq;
+	uint32_t m_flash_cmd_prev;
 
-	UINT8 m_flash_addr_seq;
-	UINT8 m_flash_read_seq;
+	uint8_t m_flash_addr_seq;
+	uint8_t m_flash_read_seq;
 
-	UINT16 m_flash_row, m_flash_col;
+	uint16_t m_flash_row, m_flash_col;
 	int m_flash_page_addr;
-	UINT16 m_flash_page_index;
+	uint16_t m_flash_page_index;
 
 
-	std::vector<UINT8> m_flashwritemap;
+	std::vector<uint8_t> m_flashwritemap;
 
-	UINT8 m_last_flash_cmd;
+	uint8_t m_last_flash_cmd;
 
-	UINT32 m_flash_addr;
+	uint32_t m_flash_addr;
 
-	UINT8 m_flash_page_data[FLASH_PAGE_SIZE];
+	uint8_t m_flash_page_data[FLASH_PAGE_SIZE];
 
 
 

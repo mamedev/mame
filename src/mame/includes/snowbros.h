@@ -29,12 +29,12 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // not snowbro3
 
 	optional_device<kaneko_pandora_device> m_pandora;
-	optional_shared_ptr<UINT16> m_hyperpac_ram;
-	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
+	optional_shared_ptr<uint16_t> m_hyperpac_ram;
+	optional_shared_ptr<uint16_t> m_bootleg_spriteram16;
 
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
-	UINT8 m_semicom_prot_offset;
+	uint8_t m_semicom_prot_offset;
 
 	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
@@ -66,11 +66,11 @@ public:
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
 
-	UINT32 screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_snowbros(screen_device &screen, bool state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);

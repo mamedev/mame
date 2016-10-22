@@ -62,8 +62,8 @@ public:
 	}
 
 	required_device<m68000_device> m_maincpu;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_fontram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_fontram;
 	required_device<ns16450_device> m_uart0, m_uart1;
 	required_device<screen_device> m_screen;
 	required_device<kbdc8042_device> m_kbdc;
@@ -75,7 +75,7 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(tvi1111_r);
 	DECLARE_WRITE16_MEMBER(tvi1111_w);
@@ -89,7 +89,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
 private:
-	UINT16 tvi1111_regs[(0x100/2)+2];
+	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
 };
@@ -180,15 +180,15 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 		m_beep->set_state(tvi1111_regs[0x17] & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, pixels2;
-	UINT16 *vram = (UINT16 *)m_vram.target();
-	UINT8 *fontram = (UINT8 *)m_fontram.target();
-	UINT16 *curchar;
-	UINT8 *fontptr;
+	uint8_t pixels, pixels2;
+	uint16_t *vram = (uint16_t *)m_vram.target();
+	uint8_t *fontram = (uint8_t *)m_fontram.target();
+	uint16_t *curchar;
+	uint8_t *fontptr;
 	int miny = cliprect.min_y / m_rowh;
 	int maxy = cliprect.max_y / m_rowh;
 
@@ -216,19 +216,19 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			for (x = minx; x < maxx; x++)
 			{
-				UINT8 chr = curchar[x - minx] >> 8;
-				UINT8 attr = curchar[x - minx] & 0xff;
+				uint8_t chr = curchar[x - minx] >> 8;
+				uint8_t attr = curchar[x - minx] & 0xff;
 				if((attr & 2) && (m_screen->frame_number() & 32)) // blink rate?
 					continue;
 
-				fontptr = (UINT8 *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
+				fontptr = (uint8_t *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
 
-				UINT32 palette[2];
+				uint32_t palette[2];
 
 				int cursor_pos = tvi1111_regs[0x16] + 133;
 				if(BIT(tvi1111_regs[0x1b], 0) && (x == (cursor_pos % 134)) && (y == (cursor_pos / 134)))
 				{
-					UINT8 attrchg;
+					uint8_t attrchg;
 					if(tvi1111_regs[0x15] & 0xff00) // what does this really mean? it looks like a mask but that doesn't work in 8line char mode
 						attrchg = 8;
 					else

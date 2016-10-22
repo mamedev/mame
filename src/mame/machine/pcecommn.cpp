@@ -37,14 +37,14 @@ WRITE8_MEMBER(pce_common_state::pce_joystick_w)
 	}
 }
 
-UINT8 pce_common_state::joy_read()
+uint8_t pce_common_state::joy_read()
 {
 	return ioport("JOY")->read();
 }
 
 READ8_MEMBER(pce_common_state::pce_joystick_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 	int data = joy_read();
 	if (m_joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | m_io_port_options;
@@ -59,7 +59,7 @@ DRIVER_INIT_MEMBER(pce_common_state,pce_common)
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-UINT32 pce_common_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pce_common_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
 	return 0;

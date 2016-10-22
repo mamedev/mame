@@ -48,7 +48,7 @@ extern const device_type MIDWAY_SQUAWK_N_TALK = &device_creator<midway_squawk_n_
 //  midway_ssio_device - constructor
 //-------------------------------------------------
 
-midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_SSIO, "Midway SSIO Sound Board", tag, owner, clock, "midssio", __FILE__),
 		device_mixer_interface(mconfig, *this, 2),
 		m_cpu(*this, "cpu"),
@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 
 READ8_MEMBER(midway_ssio_device::ioport_read)
 {
-	UINT8 result = m_ports[offset].read_safe(0xff);
+	uint8_t result = m_ports[offset].read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
 		result = (result & ~m_custom_input_mask[offset]) |
 					(m_custom_input[offset](space, offset, 0xff) & m_custom_input_mask[offset]);
@@ -141,7 +141,7 @@ WRITE8_MEMBER(midway_ssio_device::ioport_write)
 //  reader
 //-------------------------------------------------
 
-void midway_ssio_device::set_custom_input(int which, UINT8 mask, read8_delegate handler)
+void midway_ssio_device::set_custom_input(int which, uint8_t mask, read8_delegate handler)
 {
 	m_custom_input[which] = handler;
 	m_custom_input_mask[which] = mask;
@@ -153,7 +153,7 @@ void midway_ssio_device::set_custom_input(int which, UINT8 mask, read8_delegate 
 //  writer
 //-------------------------------------------------
 
-void midway_ssio_device::set_custom_output(int which, UINT8 mask, write8_delegate handler)
+void midway_ssio_device::set_custom_output(int which, uint8_t mask, write8_delegate handler)
 {
 	m_custom_output[which/4] = handler;
 	m_custom_output_mask[which/4] = mask;
@@ -202,7 +202,7 @@ void midway_ssio_device::compute_ay8910_modulation()
 	//
 
 	// loop over all possible values of the duty cycle
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 	for (int volval = 0; volval < 16; volval++)
 	{
 		// loop over all the clocks until we run out; look up in the PROM
@@ -491,7 +491,7 @@ void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int 
 //  midway_chip_squeak_deluxe_device - constructor
 //-------------------------------------------------
 
-midway_chip_squeak_deluxe_device::midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midway_chip_squeak_deluxe_device::midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_CHIP_SQUEAK_DELUXE, "Midway Chip Squeak Deluxe Sound Board", tag, owner, clock, "midcsd", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -554,7 +554,7 @@ WRITE8_MEMBER(midway_chip_squeak_deluxe_device::portb_w)
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
 
-	UINT8 z_mask = m_pia->port_b_z_mask();
+	uint8_t z_mask = m_pia->port_b_z_mask();
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  m_status = (m_status & ~2) | ((data >> 4) & 2);
 }
@@ -690,7 +690,7 @@ void midway_chip_squeak_deluxe_device::device_timer(emu_timer &timer, device_tim
 //  midway_sounds_good_device - constructor
 //-------------------------------------------------
 
-midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, "Midway Sounds Good Sound Board", tag, owner, clock, "midsg", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -751,7 +751,7 @@ WRITE8_MEMBER(midway_sounds_good_device::porta_w)
 
 WRITE8_MEMBER(midway_sounds_good_device::portb_w)
 {
-	UINT8 z_mask = m_pia->port_b_z_mask();
+	uint8_t z_mask = m_pia->port_b_z_mask();
 
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
@@ -861,7 +861,7 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 //  midway_turbo_chip_squeak_device - constructor
 //-------------------------------------------------
 
-midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_TURBO_CHIP_SQUEAK, "Midway Turbo Chip Squeak Sound Board", tag, owner, clock, "midtcs", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
@@ -1025,7 +1025,7 @@ void midway_turbo_chip_squeak_device::device_timer(emu_timer &timer, device_time
 //  midway_squawk_n_talk_device - constructor
 //-------------------------------------------------
 
-midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, "Midway Squawk 'n' Talk Sound Board", tag, owner, clock, "midsnt", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),

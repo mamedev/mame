@@ -336,9 +336,9 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
-		UINT16 addr = code << 4 | (ra & 0x0f);
-		UINT8 data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
+		uint8_t code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		uint16_t addr = code << 4 | (ra & 0x0f);
+		uint8_t data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
 		{
@@ -392,7 +392,7 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_busy;
 	data |= (m_centronics_fault << 1);
@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 	if (state)
 	{
-		UINT16 data = m_kbc->b_r();
+		uint16_t data = m_kbc->b_r();
 
 		m_key_data[0] = BIT(data, 6);
 		m_key_data[1] = BIT(data, 3);

@@ -20,9 +20,9 @@
 
 TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 {
-	UINT32 code = m_fgram[tile_index + 0x000];
-	UINT32 attr = m_fgram[tile_index + 0x400];
-	UINT32 colour = attr >> 4;
+	uint32_t code = m_fgram[tile_index + 0x000];
+	uint32_t attr = m_fgram[tile_index + 0x400];
+	uint32_t colour = attr >> 4;
 
 	code |= (attr & 0x3) << 8;
 
@@ -111,7 +111,7 @@ WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
  *
  *************************************/
 
-void divebomb_state::decode_proms(const UINT8 * rgn, int size, int index, bool inv)
+void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool inv)
 {
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
 
@@ -124,16 +124,16 @@ void divebomb_state::decode_proms(const UINT8 * rgn, int size, int index, bool i
 								4, resistances, bweights, 0, 0);
 
 	/* create a lookup table for the palette */
-	for (UINT32 i = 0; i < size; ++i)
+	for (uint32_t i = 0; i < size; ++i)
 	{
-		UINT32 rdata = rgn[i + size*2] & 0x0f;
-		UINT32 r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+		uint32_t rdata = rgn[i + size*2] & 0x0f;
+		uint32_t r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
 
-		UINT32 gdata = rgn[i + size] & 0x0f;
-		UINT32 g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+		uint32_t gdata = rgn[i + size] & 0x0f;
+		uint32_t g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
 
-		UINT32 bdata = rgn[i] & 0x0f;
-		UINT32 b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+		uint32_t bdata = rgn[i] & 0x0f;
+		uint32_t b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
 
 		if (!inv)
 			m_palette->set_pen_color(index + i, rgb_t(r, g, b));
@@ -169,18 +169,18 @@ VIDEO_START_MEMBER(divebomb_state,divebomb)
 
 void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *spriteram = m_spriteram;
+	const uint8_t *spriteram = m_spriteram;
 
-	for (UINT32 i = 0; i < m_spriteram.bytes(); i += 4)
+	for (uint32_t i = 0; i < m_spriteram.bytes(); i += 4)
 	{
-		UINT32 sy = spriteram[i + 3];
-		UINT32 sx = spriteram[i + 0];
-		UINT32 code = spriteram[i + 2];
-		UINT32 attr = spriteram[i + 1];
+		uint32_t sy = spriteram[i + 3];
+		uint32_t sx = spriteram[i + 0];
+		uint32_t code = spriteram[i + 2];
+		uint32_t attr = spriteram[i + 1];
 
 		code += (attr & 0x0f) << 8;
 
-		UINT32 colour = attr >> 4;
+		uint32_t colour = attr >> 4;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy, 0);
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy-256, 0);
@@ -188,7 +188,7 @@ void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k051316_1->wraparound_enable(roz1_wrap);
 	m_k051316_2->wraparound_enable(roz2_wrap);

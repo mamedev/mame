@@ -23,7 +23,7 @@ const tiny_rom_entry *omti5100_device::device_rom_region() const
 }
 #endif
 
-omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scsihd_device(mconfig, OMTI5100, "OMTI 5100", tag, owner, clock, "omti5100", __FILE__),
 		m_image0(*this, "image0"),
 		m_image1(*this, "image1")
@@ -95,7 +95,7 @@ void omti5100_device::ExecCommand()
 			int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / m_param[drive].sectors;
 			if(((track % m_param[drive].heads) <= info->heads) && (track < (info->cylinders * m_param[drive].heads)))
 			{
-				std::vector<UINT8> sector(info->sectorbytes);
+				std::vector<uint8_t> sector(info->sectorbytes);
 				memset(&sector[0], 0xe5, info->sectorbytes);
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -119,7 +119,7 @@ void omti5100_device::ExecCommand()
 	}
 }
 
-void omti5100_device::ReadData( UINT8 *data, int dataLength )
+void omti5100_device::ReadData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -136,7 +136,7 @@ void omti5100_device::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void omti5100_device::WriteData( UINT8 *data, int dataLength )
+void omti5100_device::WriteData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{

@@ -113,10 +113,10 @@ public:
 	DECLARE_MACHINE_RESET(s7);
 	DECLARE_DRIVER_INIT(s7);
 private:
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	UINT8 m_nvram[0x100];
+	uint8_t m_sound_data;
+	uint8_t m_strobe;
+	uint8_t m_kbdrow;
+	uint8_t m_nvram[0x100];
 	bool m_data_ok;
 	bool m_memprotect;
 	emu_timer* m_irq_timer;
@@ -280,7 +280,7 @@ WRITE8_MEMBER( s7_state::sol3_w )
 
 WRITE8_MEMBER( s7_state::sound_w )
 {
-	UINT8 sound_data = (ioport("SND")->read() & 0xe0) | (data & 0x1f);
+	uint8_t sound_data = (ioport("SND")->read() & 0xe0) | (data & 0x1f);
 
 	bool cb1 = ((sound_data & 0x9f) != 0x9f);
 
@@ -296,7 +296,7 @@ WRITE8_MEMBER( s7_state::lamp0_w )
 
 WRITE8_MEMBER( s7_state::dig0_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_strobe = data & 15;
 	data ^= 0xf0; // inverted by ic33
 	m_data_ok = true;
@@ -305,7 +305,7 @@ WRITE8_MEMBER( s7_state::dig0_w )
 
 WRITE8_MEMBER( s7_state::dig1_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
 		output().set_digit_value(m_strobe+16, patterns[data&15]);

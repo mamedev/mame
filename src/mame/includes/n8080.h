@@ -20,8 +20,8 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_colorram;      // for helifire
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_colorram;      // for helifire
 
 	/* video-related */
 	emu_timer* m_cannon_timer;
@@ -30,7 +30,7 @@ public:
 	int m_sheriff_color_mode;
 	int m_sheriff_color_data;
 	int m_helifire_flash;
-	UINT8 m_helifire_LSFR[63];
+	uint8_t m_helifire_LSFR[63];
 	unsigned m_helifire_mv;
 	unsigned m_helifire_sc; /* IC56 */
 
@@ -40,10 +40,10 @@ public:
 	int m_helifire_dac_phase;
 	double m_helifire_dac_volume;
 	double m_helifire_dac_timing;
-	UINT16 m_prev_sound_pins;
-	UINT16 m_curr_sound_pins;
+	uint16_t m_prev_sound_pins;
+	uint16_t m_curr_sound_pins;
 	int m_mono_flop[3];
-	UINT8 m_prev_snd_data;
+	uint8_t m_prev_snd_data;
 
 	/* other */
 	unsigned m_shift_data;
@@ -93,9 +93,9 @@ public:
 	DECLARE_SOUND_RESET(helifire);
 	DECLARE_MACHINE_START(n8080);
 	DECLARE_MACHINE_RESET(n8080);
-	UINT32 screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_helifire(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(spacefev_stop_red_cannon);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);

@@ -39,11 +39,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	UINT32 m_seed;
-	UINT32 m_magic;
-	UINT32 m_state;
+	uint32_t m_seed;
+	uint32_t m_magic;
+	uint32_t m_state;
 
-	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<uint32_t> m_ram;
 
 	PXA255_DMA_Regs m_dma_regs;
 	PXA255_I2S_Regs m_i2s_regs;
@@ -54,13 +54,13 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	UINT32 m_pxa255_lcd_palette[0x100];
-	UINT8 m_pxa255_lcd_framebuffer[0x100000];
+	uint32_t m_pxa255_lcd_palette[0x100];
+	uint8_t m_pxa255_lcd_framebuffer[0x100000];
 
 
 	//FILE* audio_dump;
-	UINT32 m_words[0x800];
-	INT16 m_samples[0x1000];
+	uint32_t m_words[0x800];
+	int16_t m_samples[0x1000];
 	DECLARE_READ32_MEMBER(pxa255_i2s_r);
 	DECLARE_WRITE32_MEMBER(pxa255_i2s_w);
 	DECLARE_READ32_MEMBER(pxa255_dma_r);
@@ -79,7 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(39in1);
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
-	UINT32 screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
 	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
 	TIMER_CALLBACK_MEMBER(pxa255_ostimer_match);
@@ -88,8 +88,8 @@ public:
 	void pxa255_dma_load_descriptor_and_start(int channel);
 	void pxa255_ostimer_irq_check();
 	void pxa255_update_interrupts();
-	void pxa255_set_irq_line(UINT32 line, int state);
-	void pxa255_lcd_load_dma_descriptor(address_space & space, UINT32 address, int channel);
+	void pxa255_set_irq_line(uint32_t line, int state);
+	void pxa255_lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel);
 	void pxa255_lcd_irq_check();
 	void pxa255_lcd_dma_kickoff(int channel);
 	void pxa255_lcd_check_load_next_branch(int channel);
@@ -302,13 +302,13 @@ void _39in1_state::pxa255_dma_load_descriptor_and_start(int channel)
 TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 {
 	PXA255_DMA_Regs *dma_regs = &m_dma_regs;
-	UINT32 sadr = dma_regs->dsadr[param];
-	UINT32 tadr = dma_regs->dtadr[param];
-	UINT32 count = dma_regs->dcmd[param] & 0x00001fff;
-	UINT32 index = 0;
-	UINT8 temp8;
-	UINT16 temp16;
-	UINT32 temp32;
+	uint32_t sadr = dma_regs->dsadr[param];
+	uint32_t tadr = dma_regs->dtadr[param];
+	uint32_t count = dma_regs->dcmd[param] & 0x00001fff;
+	uint32_t index = 0;
+	uint8_t temp8;
+	uint16_t temp16;
+	uint32_t temp32;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	switch(param)
@@ -317,8 +317,8 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 			for(index = 0; index < count; index += 4)
 			{
 				m_words[index >> 2] = space.read_dword(sadr);
-				m_samples[(index >> 1) + 0] = (INT16)(m_words[index >> 2] >> 16);
-				m_samples[(index >> 1) + 1] = (INT16)(m_words[index >> 2] & 0xffff);
+				m_samples[(index >> 1) + 0] = (int16_t)(m_words[index >> 2] >> 16);
+				m_samples[(index >> 1) + 1] = (int16_t)(m_words[index >> 2] & 0xffff);
 				sadr += 4;
 			}
 			dmadac_transfer(&m_dmadac[0], 2, 2, 2, count/4, m_samples);
@@ -718,7 +718,7 @@ void _39in1_state::pxa255_update_interrupts()
 	m_maincpu->set_input_line(ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void _39in1_state::pxa255_set_irq_line(UINT32 line, int irq_state)
+void _39in1_state::pxa255_set_irq_line(uint32_t line, int irq_state)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -1046,7 +1046,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_gpio_w)
 
 */
 
-void _39in1_state::pxa255_lcd_load_dma_descriptor(address_space & space, UINT32 address, int channel)
+void _39in1_state::pxa255_lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel)
 {
 	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
@@ -1101,7 +1101,7 @@ void _39in1_state::pxa255_lcd_dma_kickoff(int channel)
 			int index = 0;
 			for(index = 0; index < length; index += 2)
 			{
-				UINT16 color = space.read_word((lcd_regs->dma[channel].fsadr &~ 1) + index);
+				uint16_t color = space.read_word((lcd_regs->dma[channel].fsadr &~ 1) + index);
 				m_pxa255_lcd_palette[index >> 1] = (((((color >> 11) & 0x1f) << 3) | (color >> 13)) << 16) | (((((color >> 5) & 0x3f) << 2) | ((color >> 9) & 0x3)) << 8) | (((color & 0x1f) << 3) | ((color >> 2) & 0x7));
 				m_palette->set_pen_color(index >> 1, (((color >> 11) & 0x1f) << 3) | (color >> 13), (((color >> 5) & 0x3f) << 2) | ((color >> 9) & 0x3), ((color & 0x1f) << 3) | ((color >> 2) & 0x7));
 			}
@@ -1386,8 +1386,8 @@ READ32_MEMBER(_39in1_state::cpld_r)
 		}
 		else if (m_state == 2)                      // 29c0: 53 ac 0c 2b a2 07 e6 be 31
 		{
-			UINT32 seed = m_seed;
-			UINT32 magic = m_magic;
+			uint32_t seed = m_seed;
+			uint32_t magic = m_magic;
 
 			magic = ( (((~(seed >> 16))       ^ (magic >> 1))        & 0x01) |
 				(((~((seed >> 19) << 1))        ^ ((magic >> 5) << 1)) & 0x02) |
@@ -1498,14 +1498,14 @@ static INPUT_PORTS_START( 39in1 )
 	PORT_SERVICE_NO_TOGGLE( 0x80000000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-UINT32 _39in1_state::screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t _39in1_state::screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x = 0;
 	int y = 0;
 
 	for(y = 0; y <= (m_lcd_regs.lccr2 & PXA255_LCCR2_LPP); y++)
 	{
-		UINT32 *d = &bitmap.pix32(y);
+		uint32_t *d = &bitmap.pix32(y);
 		for(x = 0; x <= (m_lcd_regs.lccr1 & PXA255_LCCR1_PPL); x++)
 		{
 			d[x] = m_pxa255_lcd_palette[m_pxa255_lcd_framebuffer[y*((m_lcd_regs.lccr1 & PXA255_LCCR1_PPL) + 1) + x]];
@@ -1543,7 +1543,7 @@ void _39in1_state::pxa255_start()
 
 void _39in1_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)
@@ -1556,7 +1556,7 @@ void _39in1_state::machine_start()
 
 MACHINE_START_MEMBER(_39in1_state,60in1)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)

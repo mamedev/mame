@@ -37,8 +37,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68328_device> m_lsi;
 	required_device<ram_device> m_ram;
-	UINT8 m_port_f_latch;
-	UINT16 m_spim_data;
+	uint8_t m_port_f_latch;
+	uint16_t m_spim_data;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
@@ -56,7 +56,7 @@ public:
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
 
-	offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 };
 
 
@@ -66,7 +66,7 @@ public:
 
 INPUT_CHANGED_MEMBER(palm_state::pen_check)
 {
-	UINT8 button = m_io_penb->read();
+	uint8_t button = m_io_penb->read();
 
 	if(button)
 		m_lsi->set_penirq_line(1);
@@ -76,7 +76,7 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
-	UINT8 button_state = m_io_portd->read();
+	uint8_t button_state = m_io_portd->read();
 	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
@@ -107,8 +107,8 @@ READ16_MEMBER(palm_state::palm_spim_in)
 
 WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 {
-	UINT8 x = m_io_penx->read();
-	UINT8 y = m_io_peny->read();
+	uint8_t x = m_io_penx->read();
+	uint8_t y = m_io_peny->read();
 
 	switch (m_port_f_latch & 0x0f)
 	{
@@ -136,7 +136,7 @@ void palm_state::machine_start()
 void palm_state::machine_reset()
 {
 	// Copy boot ROM
-	UINT8* bios = memregion("bios")->base();
+	uint8_t* bios = memregion("bios")->base();
 	memset(m_ram->pointer(), 0, m_ram->size());
 	memcpy(m_ram->pointer(), bios, 0x20000);
 

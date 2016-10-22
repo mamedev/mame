@@ -34,7 +34,7 @@
 const device_type NES_GGENIE = &device_creator<nes_ggenie_device>;
 
 
-nes_ggenie_device::nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_ggenie_device::nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_GGENIE, "NES Cart Game Genie PCB", tag, owner, clock, "nes_ggenie", __FILE__),
 						m_ggslot(*this, "gg_slot"),
 	m_gg_bypass(0)
@@ -48,7 +48,7 @@ void nes_ggenie_device::device_start()
 	save_item(NAME(m_gg_bypass));
 }
 
-void nes_ggenie_device::pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted)
+void nes_ggenie_device::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
 {
 	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
 	if (m_ggslot->m_cart)
@@ -170,7 +170,7 @@ READ8_MEMBER(nes_ggenie_device::read_h)
 {
 	if (m_gg_bypass && m_ggslot->m_cart)
 	{
-		UINT8 rom_value = m_ggslot->m_cart->hi_access_rom(offset);
+		uint8_t rom_value = m_ggslot->m_cart->hi_access_rom(offset);
 
 		// check if GG code has to act on this address
 		for (int i = 0; i < 3; i++)

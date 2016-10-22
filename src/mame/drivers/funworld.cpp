@@ -1079,11 +1079,11 @@ static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static UINT8 funquiz_question_bank = 0x80;
+static uint8_t funquiz_question_bank = 0x80;
 
 READ8_MEMBER(funworld_state::questions_r)
 {
-	UINT8* quiz = memregion("questions")->base();
+	uint8_t* quiz = memregion("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
 
 	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
@@ -2950,13 +2950,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 
 MACHINE_START_MEMBER(funworld_state, lunapark)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
 MACHINE_RESET_MEMBER(funworld_state, lunapark)
 {
-	UINT8 seldsw = (ioport("SELDSW")->read() );
+	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
 
 	membank("bank1")->set_entry(seldsw);
@@ -6042,7 +6042,7 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 *****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion( "gfx1" )->base();
 
 
 	for (x=0x0000; x < 0x10000; x++)
@@ -6073,7 +6073,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 
 ******************************************************************/
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xc1c6] = 0x92;
 }
@@ -6083,8 +6083,8 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memregion( "gfx1" )->base();
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *src = memregion( "gfx1" )->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -6104,7 +6104,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 DRIVER_INIT_MEMBER(funworld_state, mongolnw)
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x9115] = 0xa5;
 
@@ -6116,7 +6116,7 @@ DRIVER_INIT_MEMBER(funworld_state, mongolnw)
 DRIVER_INIT_MEMBER(funworld_state, soccernw)
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
@@ -6149,15 +6149,15 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 *************************************************/
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *gfxrom = memregion("gfx1")->base();
+	uint8_t *gfxrom = memregion("gfx1")->base();
 	int sizeg = memregion("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t *prom = memregion("proms")->base();
 	int sizep = memregion("proms")->bytes();
 	int startp = 0;
 
@@ -6175,7 +6175,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	}
 
 	{
-		std::vector<UINT8> buffer(size);
+		std::vector<uint8_t> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6194,7 +6194,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	******************************/
 
 	{
-		std::vector<UINT8> buffer(sizeg);
+		std::vector<uint8_t> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -6219,7 +6219,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	}
 
 	{
-		std::vector<UINT8> buffer(sizep);
+		std::vector<uint8_t> buffer(sizep);
 		memcpy(&buffer[0], prom, sizep);
 
 
@@ -6244,14 +6244,14 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 
 ******************************************************/
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	int x;
 
 	for (x=0x8000; x < 0x10000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x91;
-		UINT8 code;
+		uint8_t code;
 
 		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
 
@@ -6275,14 +6275,14 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 
 ******************************************************/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	int x;
 
 	for (x=0x8000; x < 0x10000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x22;
-		UINT8 code;
+		uint8_t code;
 
 		// this seems correct for the data, plaintext decrypts fine
 		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
@@ -6332,11 +6332,11 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 ******************************************************/
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *gfxrom = memregion("gfx1")->base();
+	uint8_t *gfxrom = memregion("gfx1")->base();
 	int sizeg = memregion("gfx1")->bytes();
 	int startg = 0;
 
@@ -6354,7 +6354,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	}
 
 	{
-		std::vector<UINT8> buffer(size);
+		std::vector<uint8_t> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6373,7 +6373,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	******************************/
 
 	{
-		std::vector<UINT8> buffer(sizeg);
+		std::vector<uint8_t> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -6395,11 +6395,11 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 *********************************************************/
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0x8000;
 
-	//UINT8 *buffer;
+	//uint8_t *buffer;
 	int i;// a;
 
 	/*****************************
@@ -6413,7 +6413,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
 	}
 
-	//buffer = std::make_unique<UINT8[]>(size);
+	//buffer = std::make_unique<uint8_t[]>(size);
 	//memcpy(buffer, rom, size);
 
 
@@ -6422,8 +6422,8 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 	*****************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memregion( "gfx1" )->base();
-	//UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *src = memregion( "gfx1" )->base();
+	//uint8_t *ROM = memregion("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -6438,7 +6438,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 }
 
 
-static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT8 *src)
+static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, uint8_t *src)
 {
 	int start = 0x0000;
 
@@ -6458,7 +6458,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 	}
 
 	{
-		std::vector<UINT8> buffer(size);
+		std::vector<uint8_t> buffer(size);
 		memcpy(&buffer[0], rom, size);
 
 
@@ -6477,7 +6477,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 	******************************/
 
 	{
-		std::vector<UINT8> buffer(sizeg);
+		std::vector<uint8_t> buffer(sizeg);
 		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
@@ -6503,7 +6503,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 
 
 
-static UINT8 rcdino4_add[] =
+static uint8_t rcdino4_add[] =
 {
 /*      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f*/
 /*0*/   1, 9, 9, 9, 9, 2, 9, 9, 1, 2, 1, 9, 9, 3, 9, 9,
@@ -6524,7 +6524,7 @@ static UINT8 rcdino4_add[] =
 /*f*/   2, 9, 9, 9, 9, 2, 9, 9, 1, 3, 1, 9, 9, 3, 9, 9
 };
 
-static UINT8 rcdino4_keys40[] =
+static uint8_t rcdino4_keys40[] =
 {
 /*  40    41    42    43    44    45    46    47    48    49    4a    4b    4c    4d*/
 	0x36, 0x54, 0x47, 0x6b, 0xce, 0x95, 0xa2, 0x66, 0x3a, 0x46, 0x53, 0xd7, 0xc4, 0xa4,
@@ -6534,7 +6534,7 @@ static UINT8 rcdino4_keys40[] =
 	0x56
 };
 
-static UINT8 rcdino4_keys80[] =
+static uint8_t rcdino4_keys80[] =
 {
 /*  81    82    83    84    85 */
 	0xb8, 0x32, 0x1c, 0x23, 0xe2,
@@ -6601,7 +6601,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 ******************************************************/
 {
 	int i, j;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	decrypt_rcdino4(rom, memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
 
@@ -6609,13 +6609,13 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 
 	for (i = 0x40; i < (0x40 + ARRAY_LENGTH(rcdino4_keys40));)
 	{
-		UINT8 key;
+		uint8_t key;
 
 		key = rcdino4_keys40[i - 0x40];
 
 		do
 		{
-			UINT8 c;
+			uint8_t c;
 			int add;
 
 			c = rom[(i << 8) + j] ^ key;
@@ -6643,13 +6643,13 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 
 	do
 	{
-		UINT8 key;
+		uint8_t key;
 
 		key = rcdino4_keys80[i - 0x81];
 
 		do
 		{
-			UINT8 c;
+			uint8_t c;
 			int add;
 
 			c = rom[(i << 8) + j] ^ key;

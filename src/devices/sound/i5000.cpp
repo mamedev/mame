@@ -23,7 +23,7 @@
 // device type definition
 const device_type I5000_SND = &device_creator<i5000snd_device>;
 
-i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I5000_SND, "I5000", tag, owner, clock, "i5000snd", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_rom_base(nullptr), m_rom_mask(0)
 {
@@ -45,7 +45,7 @@ void i5000snd_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400);
 
-	m_rom_base = (UINT16 *)device().machine().root_device().memregion(":i5000snd")->base();
+	m_rom_base = (uint16_t *)device().machine().root_device().memregion(":i5000snd")->base();
 	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;
 
 	// register for savestates
@@ -93,7 +93,7 @@ bool i5000snd_device::read_sample(int ch)
 	// handle command
 	if (m_channels[ch].sample == 0x7f7f)
 	{
-		UINT16 cmd = m_rom_base[m_channels[ch].address];
+		uint16_t cmd = m_rom_base[m_channels[ch].address];
 		m_channels[ch].address = (m_channels[ch].address + 1) & m_rom_mask;
 
 		// volume envelope? or loop sample?
@@ -117,8 +117,8 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 {
 	for (int i = 0; i < samples; i++)
 	{
-		INT32 mix_l = 0;
-		INT32 mix_r = 0;
+		int32_t mix_l = 0;
+		int32_t mix_r = 0;
 
 		// loop over all channels
 		for (int ch = 0; ch < 16; ch++)
@@ -162,7 +162,7 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 }
 
 
-void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
+void i5000snd_device::write_reg16(uint8_t reg, uint16_t data)
 {
 	// channel regs
 	if (reg < 0x40)
@@ -199,9 +199,9 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				{
 					if (data & (1 << ch) && !m_channels[ch].is_playing)
 					{
-						UINT32 address = m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2];
-						UINT16 start = m_rom_base[(address + 0) & m_rom_mask];
-						UINT16 param = m_rom_base[(address + 1) & m_rom_mask];
+						uint32_t address = m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2];
+						uint16_t start = m_rom_base[(address + 0) & m_rom_mask];
+						uint16_t param = m_rom_base[(address + 1) & m_rom_mask];
 
 						// check sample start ID
 						if (start != 0x7f7f)
@@ -267,7 +267,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 
 READ16_MEMBER( i5000snd_device::read )
 {
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 	m_stream->update();
 
 	switch (offset)

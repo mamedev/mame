@@ -90,7 +90,7 @@ AT-2
 #include "sound/volt_reg.h"
 
 
-static const UINT16 mAmazonProtData[] =
+static const uint16_t mAmazonProtData[] =
 {
 	/* default high scores (0x40db4) - wrong data ? */
 	0x0000,0x5000,0x5341,0x4b45,0x5349,0x4755,0x5245,
@@ -104,7 +104,7 @@ static const UINT16 mAmazonProtData[] =
 	0xc800 /* checksum */
 };
 
-static const UINT16 mAmatelasProtData[] =
+static const uint16_t mAmatelasProtData[] =
 {
 	/* default high scores (0x40db4) */
 	0x0000,0x5000,0x5341,0x4b45,0x5349,0x4755,0x5245,
@@ -118,7 +118,7 @@ static const UINT16 mAmatelasProtData[] =
 	0x6100 /* checksum */
 };
 
-static const UINT16 mHoreKidProtData[] =
+static const uint16_t mHoreKidProtData[] =
 {
 	/* N/A */
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
@@ -148,7 +148,7 @@ READ16_MEMBER(terracre_state::amazon_protection_r)
 	offset = m_mAmazonProtReg[2];
 	if( offset<=0x56 )
 	{
-		UINT16 data;
+		uint16_t data;
 		data = m_mpProtData[offset/2];
 		if( offset&1 ) return data&0xff;
 		return data>>8;

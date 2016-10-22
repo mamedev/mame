@@ -32,7 +32,7 @@
 struct objtype_entry
 {
 	objtype_entry *     next;
-	UINT32              type;
+	uint32_t              type;
 	const char *        friendly;
 	void                (*destructor)(void *, size_t);
 };

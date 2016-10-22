@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ipds_b1_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
@@ -49,7 +49,7 @@ READ8_MEMBER( ipds_state::ipds_b0_r )
 
 READ8_MEMBER( ipds_state::ipds_b1_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -86,8 +86,8 @@ I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = memregion("chargen")->base();
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	uint8_t *charmap = memregion("chargen")->base();
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
 	if (vsp)
 		pixels = 0;

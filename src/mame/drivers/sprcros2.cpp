@@ -78,15 +78,15 @@ public:
 	required_device<cpu_device> m_slave_cpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_fgvram;
-	required_shared_ptr<UINT8> m_fgattr;
-	required_shared_ptr<UINT8> m_bgvram;
-	required_shared_ptr<UINT8> m_bgattr;
-	required_shared_ptr<UINT8> m_sprram;
+	required_shared_ptr<uint8_t> m_fgvram;
+	required_shared_ptr<uint8_t> m_fgattr;
+	required_shared_ptr<uint8_t> m_bgvram;
+	required_shared_ptr<uint8_t> m_bgattr;
+	required_shared_ptr<uint8_t> m_sprram;
 
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(sprcros2);
 	DECLARE_WRITE8_MEMBER(master_output_w);
 	DECLARE_WRITE8_MEMBER(slave_output_w);
@@ -100,7 +100,7 @@ public:
 	bool m_master_irq_enable;
 	bool m_slave_nmi_enable;
 	bool m_screen_enable;
-	UINT8 m_bg_scrollx, m_bg_scrolly;
+	uint8_t m_bg_scrollx, m_bg_scrolly;
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -127,10 +127,10 @@ void sprcros2_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		for (int x=0;x<32;x++)
 		{
-			UINT16 tile = m_bgvram[count];
+			uint16_t tile = m_bgvram[count];
 			tile |= (m_bgattr[count] & 7) << 8;
 			bool flipx = bool(m_bgattr[count] & 0x08);
-			UINT8 color = (m_bgattr[count] & 0xf0) >> 4;
+			uint8_t color = (m_bgattr[count] & 0xf0) >> 4;
 
 			gfx_0->opaque(bitmap,cliprect,tile,color,flipx,0,x*8-m_bg_scrollx,y*8-m_bg_scrolly);
 			gfx_0->opaque(bitmap,cliprect,tile,color,flipx,0,x*8+256-m_bg_scrollx,y*8-m_bg_scrolly);
@@ -149,7 +149,7 @@ void sprcros2_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 	for(int count=0x40-4;count>-1;count-=4)
 	{
-		UINT8 x,y,tile,color;
+		uint8_t x,y,tile,color;
 		bool flipx;
 
 		y = 224-m_sprram[count+2];
@@ -170,9 +170,9 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		for (int x=0;x<32;x++)
 		{
-			UINT16 tile = m_fgvram[count];
+			uint16_t tile = m_fgvram[count];
 			tile |= (m_fgattr[count] & 3) << 8;
-			UINT8 color = (m_fgattr[count] & 0xfc) >> 2;
+			uint8_t color = (m_fgattr[count] & 0xfc) >> 2;
 
 			// TODO: was using tileinfo.group, which I don't know what's for at all.
 			//       This guess seems as good as the original one for all I know.
@@ -189,7 +189,7 @@ void sprcros2_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 
 
 
-UINT32 sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t sprcros2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	if(m_screen_enable == false)
 	{
@@ -370,7 +370,7 @@ void sprcros2_state::machine_reset()
 
 PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -406,14 +406,14 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 	/* bg */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | ((color_prom[i + 0x100] & 0x0f) << 4);
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | ((color_prom[i + 0x100] & 0x0f) << 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites & fg */
 	for (i = 0x100; i < 0x300; i++)
 	{
-		UINT8 ctabentry = color_prom[i + 0x100];
+		uint8_t ctabentry = color_prom[i + 0x100];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

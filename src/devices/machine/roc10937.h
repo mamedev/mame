@@ -59,15 +59,15 @@
 
 class rocvfd_t : public device_t {
 public:
-	rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
 	virtual void update_display();
-	UINT8   m_port_val;
+	uint8_t   m_port_val;
 	void shift_clock(int data);
 	void write_char(int data);
-	UINT32 set_display(UINT32 segin);
+	uint32_t set_display(uint32_t segin);
 	DECLARE_WRITE_LINE_MEMBER( sclk );
 	DECLARE_WRITE_LINE_MEMBER( data );
 	DECLARE_WRITE_LINE_MEMBER( por );
@@ -85,9 +85,9 @@ protected:
 	int m_duty;
 	int m_disp;
 	int m_sclk;
-	UINT8 m_cursor;
-	UINT32 m_chars[16];
-	UINT32 m_outputs[16];
+	uint8_t m_cursor;
+	uint32_t m_chars[16];
+	uint32_t m_outputs[16];
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -97,29 +97,29 @@ protected:
 
 class roc10937_t : public rocvfd_t {
 public:
-	roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class msc1937_t : public rocvfd_t {
 public:
-	msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mic10937_t : public rocvfd_t {
 public:
-	mic10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mic10937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class roc10957_t : public rocvfd_t {
 public:
-	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write_char(int data);
 };
 
 class s16lf01_t : public rocvfd_t {
 public:
-	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ROC10937;

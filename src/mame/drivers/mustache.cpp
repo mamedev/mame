@@ -237,14 +237,14 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 
 	int G1 = memregion("gfx1")->bytes()/3;
 	int G2 = memregion("gfx2")->bytes()/2;
-	UINT8 *gfx1 = memregion("gfx1")->base();
-	UINT8 *gfx2 = memregion("gfx2")->base();
-	std::vector<UINT8> buf(G2*2);
+	uint8_t *gfx1 = memregion("gfx1")->base();
+	uint8_t *gfx2 = memregion("gfx2")->base();
+	std::vector<uint8_t> buf(G2*2);
 
 	/* BG data lines */
 	for (i=0;i<G1; i++)
 	{
-		UINT16 w;
+		uint16_t w;
 
 		buf[i] = BITSWAP8(gfx1[i], 0,5,2,6,4,1,7,3);
 
@@ -262,7 +262,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	/* SPR data lines */
 	for (i=0;i<G2; i++)
 	{
-		UINT16 w;
+		uint16_t w;
 
 		w = (gfx2[i] << 8) | gfx2[i+G2];
 		w = BITSWAP16(w, 5,7,11,4,15,10,3,14, 9,2,13,8,1,12,0,6 );

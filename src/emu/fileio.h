@@ -88,8 +88,8 @@ class emu_file
 {
 public:
 	// file open/creation
-	emu_file(UINT32 openflags);
-	emu_file(std::string &&searchpath, UINT32 openflags);
+	emu_file(uint32_t openflags);
+	emu_file(std::string &&searchpath, uint32_t openflags);
 	virtual ~emu_file();
 
 	// getters
@@ -97,14 +97,14 @@ public:
 	bool is_open() const { return bool(m_file); }
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
-	UINT32 openflags() const { return m_openflags; }
+	uint32_t openflags() const { return m_openflags; }
 	util::hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
 	bool part_of_mediapath(std::string path);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
-	void set_openflags(UINT32 openflags) { assert(!m_file); m_openflags = openflags; }
+	void set_openflags(uint32_t openflags) { assert(!m_file); m_openflags = openflags; }
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
@@ -112,31 +112,31 @@ public:
 	osd_file::error open(const std::string &name1, const std::string &name2);
 	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
 	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
-	osd_file::error open(const std::string &name, UINT32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, UINT32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, UINT32 crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, UINT32 crc);
+	osd_file::error open(const std::string &name, uint32_t crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, uint32_t crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, uint32_t crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, uint32_t crc);
 	osd_file::error open_next();
-	osd_file::error open_ram(const void *data, UINT32 length);
+	osd_file::error open_ram(const void *data, uint32_t length);
 	void close();
 
 	// control
 	osd_file::error compress(int compress);
 
 	// position
-	int seek(INT64 offset, int whence);
-	UINT64 tell();
+	int seek(int64_t offset, int whence);
+	uint64_t tell();
 	bool eof();
-	UINT64 size();
+	uint64_t size();
 
 	// reading
-	UINT32 read(void *buffer, UINT32 length);
+	uint32_t read(void *buffer, uint32_t length);
 	int getc();
 	int ungetc(int c);
 	char *gets(char *s, int n);
 
 	// writing
-	UINT32 write(const void *buffer, UINT32 length);
+	uint32_t write(const void *buffer, uint32_t length);
 	int puts(const char *s);
 	int vprintf(util::format_argument_pack<std::ostream> const &args);
 	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
@@ -160,13 +160,13 @@ private:
 	util::core_file::ptr m_file;                    // core file pointer
 	path_iterator   m_iterator;                     // iterator for paths
 	path_iterator   m_mediapaths;                   // media-path iterator
-	UINT32          m_crc;                          // file's CRC
-	UINT32          m_openflags;                    // flags we used for the open
+	uint32_t          m_crc;                          // file's CRC
+	uint32_t          m_openflags;                    // flags we used for the open
 	util::hash_collection m_hashes;                 // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
-	std::vector<UINT8>  m_zipdata;                      // ZIP file data
-	UINT64          m_ziplength;                    // ZIP file length
+	std::vector<uint8_t>  m_zipdata;                      // ZIP file data
+	uint64_t          m_ziplength;                    // ZIP file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing
 	bool            m_restrict_to_mediapath;        // flag: restrict to paths inside the media-path

@@ -277,7 +277,7 @@ public:
 	{
 		event_based_device::poll();
 
-		INT32 xpos = 0, ypos = 0;
+		int32_t xpos = 0, ypos = 0;
 		POINT mousepos;
 
 		// if we are using the shared axis hack, the data is updated via Windows messages only

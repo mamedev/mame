@@ -333,7 +333,7 @@ READ8_MEMBER(fortyl_state::pix2_r)
                         fake MCU (undoukai and field day)
 ****************************************************************************/
 
-static const UINT8 mcu_data0[0x80] =
+static const uint8_t mcu_data0[0x80] =
 {
 	0x0a,0x08,0x0f,0x07,0x06,0x05,0x04,0x00,
 	0x0a,0x0b,0x15,0x02,0x03,0x15,0x0a,0x08,
@@ -354,7 +354,7 @@ static const UINT8 mcu_data0[0x80] =
 	0x23,0xc5,0xc9,0xee,0x37,0x28,0xc0,0xc5
 };
 
-static const UINT8 mcu_data1[0x80] =
+static const uint8_t mcu_data1[0x80] =
 {
 	0x00,0x78,0xef,0x66,0xdc,0x50,0xc2,0x33,
 	0xa1,0x0c,0x74,0xd9,0x3a,0x96,0xef,0x42,
@@ -374,7 +374,7 @@ static const UINT8 mcu_data1[0x80] =
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-static const UINT8 mcu_data2[0x80] =
+static const uint8_t mcu_data2[0x80] =
 {
 	0x00,0x04,0x08,0x00,0x11,0x16,0x1a,0x1f,
 	0x23,0x28,0x2c,0x30,0x35,0x39,0x3d,0x42,
@@ -572,7 +572,7 @@ READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
 
 DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	m_pix_color[0] = 0x000;
@@ -583,14 +583,14 @@ DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 
 DRIVER_INIT_MEMBER(fortyl_state,40love)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
 		    to show a white line on the opponent side */
 
-		UINT8 *ROM = memregion("gfx2")->base();
+		uint8_t *ROM = memregion("gfx2")->base();
 		int adr = 0x10 * 0x022b;
 		ROM[adr + 0x000a] = 0x00;
 		ROM[adr + 0x000b] = 0x00;

@@ -46,30 +46,30 @@ public:
 	optional_ioport_array<5> m_inp_matrix; // max 5
 
 	// misc common
-	UINT8 m_l;                          // MCU port L write data
-	UINT8 m_g;                          // MCU port G write data
-	UINT8 m_d;                          // MCU port D write data
+	uint8_t m_l;                          // MCU port L write data
+	uint8_t m_g;                          // MCU port G write data
+	uint8_t m_d;                          // MCU port D write data
 	int m_so;                           // MCU SO line state
 	int m_sk;                           // MCU SK line state
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
-	UINT16 read_inputs(int columns);
+	uint16_t read_inputs(int columns);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	uint32_t m_display_cache[0x20];       // (internal use)
+	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(UINT32 digits, UINT32 mask);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
+	void set_display_segmask(uint32_t digits, uint32_t mask);
+	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -129,7 +129,7 @@ void hh_cop400_state::machine_reset()
 
 void hh_cop400_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -142,7 +142,7 @@ void hh_cop400_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -197,7 +197,7 @@ void hh_cop400_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_cop400_state::set_display_segmask(UINT32 digits, UINT32 mask)
+void hh_cop400_state::set_display_segmask(uint32_t digits, uint32_t mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -208,12 +208,12 @@ void hh_cop400_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
+void hh_cop400_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -224,10 +224,10 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 
 // generic input handlers
 
-UINT16 hh_cop400_state::read_inputs(int columns)
+uint16_t hh_cop400_state::read_inputs(int columns)
 {
 	// active low
-	UINT16 ret = 0xffff;
+	uint16_t ret = 0xffff;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -381,8 +381,8 @@ WRITE8_MEMBER(h2hbaskb_state::write_g)
 WRITE8_MEMBER(h2hbaskb_state::write_l)
 {
 	// D2,D3 double as multiplexer
-	UINT16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
-	UINT16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
+	uint16_t mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
+	uint16_t sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
 
 	// D2+G0,G1 are 7segs
 	set_display_segmask(3, 0x7f);
@@ -501,8 +501,8 @@ void einvaderc_state::prepare_display()
 		m_display_segmask[y] = 0x7f;
 
 	// update display
-	UINT8 l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
-	UINT16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
+	uint8_t l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
+	uint16_t grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
 	display_matrix(8, 10, l, grid);
 }
 
@@ -899,7 +899,7 @@ public:
 
 void lightfgt_state::prepare_display()
 {
-	UINT8 grid = (m_so | m_d << 1) ^ 0x1f;
+	uint8_t grid = (m_so | m_d << 1) ^ 0x1f;
 	display_matrix(5, 5, m_l, grid);
 }
 

@@ -35,7 +35,7 @@
 
 TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -111,7 +111,7 @@ void atarigx2_state::scanline_update(screen_device &screen, int scanline)
 	/* update the playfield scrolls */
 	for (i = 0; i < 8; i++)
 	{
-		UINT16 word = m_alpha_tilemap->basemem_read(offset++);
+		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
 
 		if (word & 0x8000)
 		{
@@ -164,7 +164,7 @@ void atarigx2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-UINT32 atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
@@ -191,9 +191,9 @@ UINT32 atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind1
 		/* now blend with the playfield */
 		for (y = top; y < bottom; y++)
 		{
-			UINT16 *pf = &bitmap.pix16(y);
-			UINT16 *mo = &mo_bitmap.pix16(y);
-			UINT8 *pri = &priority_bitmap.pix8(y);
+			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mo_bitmap.pix16(y);
+			uint8_t *pri = &priority_bitmap.pix8(y);
 			for (x = left; x < right; x++)
 				if (mo[x] && (mo[x] >> ATARIRLE_PRIORITY_SHIFT) >= pri[x])
 					pf[x] = mo[x] & ATARIRLE_DATA_MASK;

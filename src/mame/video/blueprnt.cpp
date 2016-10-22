@@ -28,7 +28,7 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		UINT8 pen;
+		uint8_t pen;
 		int r, g, b;
 
 		if (i < 0x200)
@@ -151,7 +151,7 @@ void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

@@ -94,21 +94,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
 protected:
-	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
-	required_shared_ptr<UINT32> m_bss;
-	required_shared_ptr<UINT32> m_ptmap;
+	required_shared_ptr<uint32_t> m_bss;
+	required_shared_ptr<uint32_t> m_ptmap;
 	required_device<mc146818_device> m_rtc;
 private:
-	UINT8 m_mbut;
-	UINT16 m_mquad;
-	UINT16 m_tdbase;
-	UINT16 m_tdlmt;
-	UINT16 m_stkbase;
-	UINT16 m_stklmt;
-	UINT8 m_parctl;
-	UINT8 m_mbp;
+	uint8_t m_mbut;
+	uint16_t m_mquad;
+	uint16_t m_tdbase;
+	uint16_t m_tdlmt;
+	uint16_t m_stkbase;
+	uint16_t m_stklmt;
+	uint8_t m_parctl;
+	uint8_t m_mbp;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
@@ -183,7 +183,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
-	UINT8 ret = m_rtc->read(space, 1);
+	uint8_t ret = m_rtc->read(space, 1);
 	verboselog(1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -196,7 +196,7 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
-	UINT8 ret = m_rtc->read(space, 0);
+	uint8_t ret = m_rtc->read(space, 0);
 	verboselog(1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
@@ -487,8 +487,8 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
 {
-	UINT32 *src = (UINT32*)(memregion("maincpu")->base());
-	UINT32 *dst = m_mainram;
+	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
+	uint32_t *dst = m_mainram;
 	memcpy(dst, src, 8);
 
 	m_maincpu->reset();

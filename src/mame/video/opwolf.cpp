@@ -35,7 +35,7 @@ WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
 
 /***************************************************************************/
 
-UINT32 opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[2];
 

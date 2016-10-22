@@ -18,7 +18,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 	AM_RANGE(0x8, 0xf) AM_READWRITE(mac_r, mac_w) // Mapping limitation, real is up to 0xd
 ADDRESS_MAP_END
 
-mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
 	device_network_interface(mconfig, *this, 10), txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0), drq_tx(false),
 	drq_rx(false), irq_tx(false), irq_rx(false), timer_tx(nullptr), timer_rx(nullptr),
@@ -72,7 +72,7 @@ void mb8795_device::device_reset()
 	start_send();
 }
 
-void mb8795_device::recv_cb(UINT8 *buf, int len)
+void mb8795_device::recv_cb(uint8_t *buf, int len)
 {
 	memcpy(rxbuf, buf, len);
 	rxlen = len;
@@ -191,7 +191,7 @@ void mb8795_device::start_send()
 	timer_tx->adjust(attotime::zero);
 }
 
-void mb8795_device::tx_dma_w(UINT8 data, bool eof)
+void mb8795_device::tx_dma_w(uint8_t data, bool eof)
 {
 	txbuf[txlen++] = data;
 	if(txstat & EN_TXS_READY) {
@@ -226,7 +226,7 @@ void mb8795_device::tx_dma_w(UINT8 data, bool eof)
 		timer_tx->adjust(attotime::from_nsec(800));
 }
 
-void mb8795_device::rx_dma_r(UINT8 &data, bool &eof)
+void mb8795_device::rx_dma_r(uint8_t &data, bool &eof)
 {
 	drq_rx = false;
 	if(!drq_rx_cb.isnull())

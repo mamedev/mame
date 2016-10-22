@@ -94,7 +94,7 @@ bool mfi_format::supports_save() const
 	return true;
 }
 
-int mfi_format::identify(io_generic *io, UINT32 form_factor)
+int mfi_format::identify(io_generic *io, uint32_t form_factor)
 {
 	header h;
 
@@ -108,7 +108,7 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool mfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	header h;
 	entry entries[84*2*4];
@@ -119,7 +119,7 @@ bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	image->set_variant(h.variant);
 
-	std::vector<UINT8> compressed;
+	std::vector<uint8_t> compressed;
 
 	entry *ent = entries;
 	for(unsigned int cyl=0; cyl <= (h.cyl_count - 1) << 2; cyl += 4 >> resolution)
@@ -138,16 +138,16 @@ bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			io_generic_read(io, &compressed[0], ent->offset, ent->compressed_size);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
-			std::vector<UINT32> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);;
+			std::vector<uint32_t> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);;
 			trackbuf.resize(cell_count);
 
 			uLongf size = ent->uncompressed_size;
 			if(uncompress((Bytef *)&trackbuf[0], &size, &compressed[0], ent->compressed_size) != Z_OK)
 				return false;
 
-			UINT32 cur_time = 0;
+			uint32_t cur_time = 0;
 			for(unsigned int i=0; i != cell_count; i++) {
-				UINT32 next_cur_time = cur_time + (trackbuf[i] & TIME_MASK);
+				uint32_t next_cur_time = cur_time + (trackbuf[i] & TIME_MASK);
 				trackbuf[i] = (trackbuf[i] & MG_MASK) | cur_time;
 				cur_time = next_cur_time;
 			}
@@ -187,12 +187,12 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 
 	int pos = sizeof(header) + (tracks << resolution)*heads*sizeof(entry);
 	int epos = 0;
-	auto precomp = global_alloc_array(UINT32, max_track_size);
-	auto postcomp = global_alloc_array(UINT8, max_track_size*4 + 1000);
+	auto precomp = global_alloc_array(uint32_t, max_track_size);
+	auto postcomp = global_alloc_array(uint8_t, max_track_size*4 + 1000);
 
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			std::vector<UINT32> &buffer = image->get_buffer(track >> 2, head, track & 3);
+			std::vector<uint32_t> &buffer = image->get_buffer(track >> 2, head, track & 3);
 			int tsize = buffer.size();
 			if(!tsize) {
 				epos++;

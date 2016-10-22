@@ -233,7 +233,7 @@ static unsigned char noise_tbl[]=
 const device_type UPD1771C = &device_creator<upd1771c_device>;
 
 
-upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock, "upd1771c", __FILE__),
 					device_sound_interface(mconfig, *this),
 					m_ack_handler(*this)
@@ -391,13 +391,13 @@ WRITE8_MEMBER( upd1771c_device::write )
 				m_index = 0;
 
 				m_nw_timbre = (m_packet[1] & 0xe0) >> 5;
-				m_nw_period = ((UINT32)m_packet[2] + 1) << 7;
+				m_nw_period = ((uint32_t)m_packet[2] + 1) << 7;
 				m_nw_volume = m_packet[3] & 0x1f;
 
 				//very long clocked periods.. used for engine drones
-				m_n_period[0] = (((UINT32)m_packet[4]) + 1) << 7;
-				m_n_period[1] = (((UINT32)m_packet[5]) + 1) << 7;
-				m_n_period[2] = (((UINT32)m_packet[6]) + 1) << 7;
+				m_n_period[0] = (((uint32_t)m_packet[4]) + 1) << 7;
+				m_n_period[1] = (((uint32_t)m_packet[5]) + 1) << 7;
+				m_n_period[2] = (((uint32_t)m_packet[6]) + 1) << 7;
 
 				m_n_volume[0] = m_packet[7] & 0x1f;
 				m_n_volume[1] = m_packet[8] & 0x1f;

@@ -116,16 +116,16 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	UINT8 m_cop_port_l;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	uint8_t m_cop_port_l;
 
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
 
 	/* sound state */
-	UINT8       m_sound[8];
+	uint8_t       m_sound[8];
 
 	int     m_last;
 
@@ -157,7 +157,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(looping);
-	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -178,7 +178,7 @@ public:
 
 PALETTE_INIT_MEMBER(looping_state, looping)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -297,7 +297,7 @@ WRITE8_MEMBER(looping_state::looping_colorram_w)
 
 void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *source;
+	const uint8_t *source;
 
 	for (source = m_spriteram; source < m_spriteram + 0x40; source += 4)
 	{
@@ -325,7 +325,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 looping_state::screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t looping_state::screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -893,7 +893,7 @@ ROM_END
 DRIVER_INIT_MEMBER(looping_state,looping)
 {
 	int length = memregion("maincpu")->bytes();
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	m_cop_port_l = 0;

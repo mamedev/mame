@@ -30,7 +30,7 @@ class isa8_ibm_mfc_device : public device_t,
 {
 public:
 	// Construction/destruction
-	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( ppi0_i_a );
 	DECLARE_WRITE8_MEMBER( ppi0_o_b );
@@ -68,12 +68,12 @@ private:
 	void                            update_pc_interrupts(void);
 	void                            update_z80_interrupts(void);
 
-	UINT8                           m_tcr;
-	UINT8                           m_pc_ppi_c;
-	UINT8                           m_z80_ppi_c;
+	uint8_t                           m_tcr;
+	uint8_t                           m_pc_ppi_c;
+	uint8_t                           m_z80_ppi_c;
 
-	UINT8                           m_pc_irq_state;
-	UINT8                           m_z80_irq_state;
+	uint8_t                           m_pc_irq_state;
+	uint8_t                           m_z80_irq_state;
 
 	required_device<cpu_device>     m_cpu;
 	required_device<ym2151_device>  m_ym2151;

@@ -42,8 +42,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define UPD7220_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, UINT32 address)
-#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
+#define UPD7220_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, uint32_t address)
+#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
 
 
 #define MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(_class, _method) \
@@ -70,8 +70,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, UINT32 address)> upd7220_display_pixels_delegate;
-typedef device_delegate<void (bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)> upd7220_draw_text_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)> upd7220_display_pixels_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)> upd7220_draw_text_delegate;
 
 
 // ======================> upd7220_device
@@ -82,7 +82,7 @@ class upd7220_device :  public device_t,
 {
 public:
 	// construction/destruction
-	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_display_pixels_callback(device_t &device, upd7220_display_pixels_delegate callback) { downcast<upd7220_device &>(device).m_display_cb = callback; }
 	static void static_set_draw_text_callback(device_t &device, upd7220_draw_text_delegate callback) { downcast<upd7220_device &>(device).m_draw_text_cb = callback; }
@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
@@ -119,35 +119,35 @@ private:
 		TIMER_BLANK
 	};
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
-	inline UINT16 readword(offs_t address);
-	inline void writeword(offs_t address, UINT16 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
+	inline uint16_t readword(offs_t address);
+	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();
 	inline int fifo_param_count();
 	inline void fifo_set_direction(int dir);
-	inline void queue(UINT8 data, int flag);
-	inline void dequeue(UINT8 *data, int *flag);
+	inline void queue(uint8_t data, int flag);
+	inline void dequeue(uint8_t *data, int *flag);
 	inline void update_vsync_timer(int state);
 	inline void update_hsync_timer(int state);
 	inline void update_blank_timer(int state);
 	inline void recompute_parameters();
 	inline void reset_figs_param();
-	inline void read_vram(UINT8 type, UINT8 mod);
-	inline void write_vram(UINT8 type, UINT8 mod);
-	inline void get_text_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
-	inline void get_graphics_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
+	inline void read_vram(uint8_t type, uint8_t mod);
+	inline void write_vram(uint8_t type, uint8_t mod);
+	inline void get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
+	inline void get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 
-	void draw_pixel(int x, int y, int xi, UINT16 tile_data);
+	void draw_pixel(int x, int y, int xi, uint16_t tile_data);
 	void draw_line(int x, int y);
 	void draw_rectangle(int x, int y);
 	void draw_arc(int x, int y);
 	void draw_char(int x, int y);
-	int translate_command(UINT8 data);
+	int translate_command(uint8_t data);
 	void process_fifo();
 	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch);
+	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
 	upd7220_display_pixels_delegate     m_display_cb;
@@ -158,26 +158,26 @@ private:
 	devcb_write_line   m_write_vsync;
 	devcb_write_line   m_write_blank;
 
-	UINT16 m_mask;                  // mask register
-	UINT8 m_pitch;                  // number of word addresses in display memory in the horizontal direction
-	UINT32 m_ead;                   // execute word address
-	UINT16 m_dad;                   // dot address within the word
-	UINT32 m_lad;                   // light pen address
+	uint16_t m_mask;                  // mask register
+	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
+	uint32_t m_ead;                   // execute word address
+	uint16_t m_dad;                   // dot address within the word
+	uint32_t m_lad;                   // light pen address
 
-	UINT8 m_ra[16];                 // parameter RAM
+	uint8_t m_ra[16];                 // parameter RAM
 	int m_ra_addr;                  // parameter RAM address
 
-	UINT8 m_sr;                     // status register
-	UINT8 m_cr;                     // command register
-	UINT8 m_pr[17];                 // parameter byte register
+	uint8_t m_sr;                     // status register
+	uint8_t m_cr;                     // command register
+	uint8_t m_pr[17];                 // parameter byte register
 	int m_param_ptr;                // parameter pointer
 
-	UINT8 m_fifo[16];               // FIFO data queue
+	uint8_t m_fifo[16];               // FIFO data queue
 	int m_fifo_flag[16];            // FIFO flag queue
 	int m_fifo_ptr;                 // FIFO pointer
 	int m_fifo_dir;                 // FIFO direction
 
-	UINT8 m_mode;                   // mode of operation
+	uint8_t m_mode;                   // mode of operation
 
 	int m_de;                       // display enabled
 	int m_m;                        // 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
@@ -200,17 +200,17 @@ private:
 	int m_disp;                     // display zoom factor
 	int m_gchr;                     // zoom factor for graphics character writing and area filling
 
-	UINT8 m_bitmap_mod;
+	uint8_t m_bitmap_mod;
 
 	struct {
-		UINT8 m_dir;                // figs param 0: drawing direction
-		UINT8 m_figure_type;        // figs param 1: figure type
-		UINT16 m_dc;                // figs param 2:
-		UINT8  m_gd;                // mixed mode only
-		UINT16 m_d;                 // figs param 3:
-		UINT16 m_d1;                // figs param 4:
-		UINT16 m_d2;                // figs param 5:
-		UINT16 m_dm;                // figs param 6:
+		uint8_t m_dir;                // figs param 0: drawing direction
+		uint8_t m_figure_type;        // figs param 1: figure type
+		uint16_t m_dc;                // figs param 2:
+		uint8_t  m_gd;                // mixed mode only
+		uint16_t m_d;                 // figs param 3:
+		uint16_t m_d1;                // figs param 4:
+		uint16_t m_d2;                // figs param 5:
+		uint16_t m_dm;                // figs param 6:
 	} m_figs;
 
 	// timers

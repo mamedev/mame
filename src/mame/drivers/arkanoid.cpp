@@ -2047,8 +2047,8 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 {
 	// the graphics on this bootleg have the data scrambled
 	int tile;
-	UINT8* srcgfx = memregion("gfx1")->base();
-	std::vector<UINT8> buffer(0x18000);
+	uint8_t* srcgfx = memregion("gfx1")->base();
+	std::vector<uint8_t> buffer(0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{
@@ -2103,7 +2103,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
 
 DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -2117,7 +2117,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 
 DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 #if 0
 
 
@@ -2147,7 +2147,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
 
 DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 {
-	UINT8 *RAM = memregion("protdata")->base();
+	uint8_t *RAM = memregion("protdata")->base();
 
 	for (int i=0x000;i<0x200;i++)
 		m_protram[i+0x600] = RAM[i];

@@ -271,7 +271,7 @@ static void init_mem_names(int feature_set, const char **mem_names)
 
 }
 
-static const char *get_data_address( const char **mem_names, UINT8 arg )
+static const char *get_data_address( const char **mem_names, uint8_t arg )
 {
 	static char buffer_array[4][32];
 	static int whichbuf;
@@ -284,7 +284,7 @@ static const char *get_data_address( const char **mem_names, UINT8 arg )
 	return buffer;
 }
 
-static const char *get_bit_address( const char **mem_names, UINT8 arg )
+static const char *get_bit_address( const char **mem_names, uint8_t arg )
 {
 	static char buffer[32];
 
@@ -315,14 +315,14 @@ static const char *get_bit_address( const char **mem_names, UINT8 arg )
 
 /*Just display the actual memory address for data & bit address access*/
 
-static const char *get_data_address( UINT8 arg )
+static const char *get_data_address( uint8_t arg )
 {
 	static char buffer[32];
 	sprintf(buffer,"$%02X",arg);
 	return buffer;
 }
 
-static const char *get_bit_address( UINT8 arg )
+static const char *get_bit_address( uint8_t arg )
 {
 	static char buffer[32];
 	sprintf(buffer,"$%02X",arg);
@@ -331,14 +331,14 @@ static const char *get_bit_address( UINT8 arg )
 
 #endif
 
-static offs_t mcs51_dasm( const char **mem_names, char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static offs_t mcs51_dasm( const char **mem_names, char *dst, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	unsigned PC = pc;
 	const char *sym, *sym2;
-	UINT8 op, data;
-	UINT16 addr;
-	INT8 rel;
+	uint8_t op, data;
+	uint16_t addr;
+	int8_t rel;
 
 	op = oprom[PC++ - pc];
 	switch( op )

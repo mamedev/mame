@@ -12,7 +12,7 @@
 class wpc_lamp_device : public device_t
 {
 public:
-	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_lamp_device();
 
 	DECLARE_WRITE8_MEMBER(row_w);
@@ -21,8 +21,8 @@ public:
 	void set_names(const char *const *lamp_names);
 
 protected:
-	UINT8 state[64];
-	UINT8 col, row;
+	uint8_t state[64];
+	uint8_t col, row;
 	emu_timer *timer;
 	const char *const *names;
 

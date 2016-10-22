@@ -22,7 +22,7 @@ struct mess_hard_disk_file
 
 
 /* create a new hard disk */
-imgtoolerr_t imghd_create(imgtool::stream &stream, UINT32 blocksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen);
+imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t blocksize, uint32_t cylinders, uint32_t heads, uint32_t sectors, uint32_t seclen);
 
 /* opens a hard disk given an Imgtool stream */
 imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *hard_disk);
@@ -31,10 +31,10 @@ imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *har
 void imghd_close(struct mess_hard_disk_file *disk);
 
 /* reads data from a hard disk */
-imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void *buffer);
+imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, void *buffer);
 
 /* writes data to a hard disk */
-imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, const void *buffer);
+imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer);
 
 /* gets the header from a hard disk */
 const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk);

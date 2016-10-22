@@ -51,7 +51,7 @@ const d64_format::format d64_format::file_formats[] = {
 	{}
 };
 
-const UINT32 d64_format::cell_size[] =
+const uint32_t d64_format::cell_size[] =
 {
 	4000, // 16MHz/16/4
 	3750, // 16MHz/15/4
@@ -79,20 +79,20 @@ const int d64_format::speed_zone[] =
 	0, 0                                               // 41-42
 };
 
-int d64_format::find_size(io_generic *io, UINT32 form_factor) const
+int d64_format::find_size(io_generic *io, uint32_t form_factor) const
 {
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].sector_count; i++) {
 		const format &f = formats[i];
-		if(size == (UINT32) f.sector_count*f.sector_base_size*f.head_count)
+		if(size == (uint32_t) f.sector_count*f.sector_base_size*f.head_count)
 			return i;
-		if(size == (UINT32) (f.sector_count*f.sector_base_size*f.head_count) + f.sector_count)
+		if(size == (uint32_t) (f.sector_count*f.sector_base_size*f.head_count) + f.sector_count)
 			return i;
 	}
 	return -1;
 }
 
-int d64_format::identify(io_generic *io, UINT32 form_factor)
+int d64_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -114,9 +114,9 @@ int d64_format::get_disk_id_offset(const format &f)
 	return 0x165a2;
 }
 
-void d64_format::get_disk_id(const format &f, io_generic *io, UINT8 &id1, UINT8 &id2)
+void d64_format::get_disk_id(const format &f, io_generic *io, uint8_t &id1, uint8_t &id2)
 {
-	UINT8 id[2];
+	uint8_t id[2];
 	io_generic_read(io, id, get_disk_id_offset(f), 2);
 	id1 = id[0];
 	id2 = id[1];
@@ -141,7 +141,7 @@ int d64_format::compute_track_size(const format &f, int track)
 	return this->get_sectors_per_track(f, track) * f.sector_base_size;
 }
 
-UINT32 d64_format::get_cell_size(const format &f, int track)
+uint32_t d64_format::get_cell_size(const format &f, int track)
 {
 	return cell_size[speed_zone[track]];
 }
@@ -151,7 +151,7 @@ int d64_format::get_sectors_per_track(const format &f, int track)
 	return sectors_per_track[track];
 }
 
-floppy_image_format_t::desc_e* d64_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)
+floppy_image_format_t::desc_e* d64_format::get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2)
 {
 	static floppy_image_format_t::desc_e desc[] = {
 		/* 00 */ { SECTOR_LOOP_START, 0, -1 },
@@ -186,7 +186,7 @@ floppy_image_format_t::desc_e* d64_format::get_sector_desc(const format &f, int 
 	return desc;
 }
 
-void d64_format::build_sector_description(const format &f, UINT8 *sectdata, UINT32 sect_offs, UINT32 error_offs, desc_s *sectors, int sector_count) const
+void d64_format::build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, uint32_t error_offs, desc_s *sectors, int sector_count) const
 {
 	for (int i = 0; i < sector_count; i++) {
 		sectors[i].data = sectdata + sect_offs;
@@ -206,7 +206,7 @@ void d64_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_
 	desc[22].p1 >>= remaining_size & 0x01;
 }
 
-bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool d64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -214,10 +214,10 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	const format &f = formats[type];
 
-	UINT64 size = io_generic_size(io);
-	std::vector<UINT8> img;
+	uint64_t size = io_generic_size(io);
+	std::vector<uint8_t> img;
 
-	if(size == (UINT32)f.sector_count*f.sector_base_size) {
+	if(size == (uint32_t)f.sector_count*f.sector_base_size) {
 		img.resize(size + f.sector_count);
 		memset(&img[0], ERROR_00, size + f.sector_count);
 	}
@@ -229,7 +229,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	int track_offset = 0, error_offset = f.sector_count*f.sector_base_size;
 
-	UINT8 id1 = 0, id2 = 0;
+	uint8_t id1 = 0, id2 = 0;
 	get_disk_id(f, io, id1, id2);
 
 	for (int head = 0; head < f.head_count; head++) {
@@ -272,7 +272,7 @@ bool d64_format::save(io_generic *io, floppy_image *image)
 		for(int track=0; track < f.track_count; track++) {
 			int sector_count = this->get_sectors_per_track(f, track);
 			int track_size = compute_track_size(f, track);
-			UINT8 sectdata[40*256] = { 0 };
+			uint8_t sectdata[40*256] = { 0 };
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
 
@@ -287,8 +287,8 @@ bool d64_format::save(io_generic *io, floppy_image *image)
 
 void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
 {
-	UINT8 bitstream[500000/8];
-	UINT8 sectdata[50000];
+	uint8_t bitstream[500000/8];
+	uint8_t sectdata[50000];
 	desc_xs sectors[256];
 	int physical_track = this->get_physical_track(f, head, track);
 	int cell_size = this->get_cell_size(f, track);
@@ -305,7 +305,7 @@ void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *s
 			memset((void *)ds.data, 0, ds.size);
 		else if(xs.size < ds.size) {
 			memcpy((void *)ds.data, xs.data, xs.size);
-			memset((UINT8 *)ds.data + xs.size, 0, xs.size - ds.size);
+			memset((uint8_t *)ds.data + xs.size, 0, xs.size - ds.size);
 		} else
 			memcpy((void *)ds.data, xs.data, ds.size);
 	}

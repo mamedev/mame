@@ -38,7 +38,7 @@ const device_type HARDDISK = &device_creator<harddisk_image_device>;
 //  harddisk_image_device - constructor
 //-------------------------------------------------
 
-harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock, "harddisk_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -52,7 +52,7 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 //  harddisk_image_device - constructor for subclasses
 //-------------------------------------------------
-harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
@@ -135,8 +135,8 @@ image_init_result harddisk_image_device::call_load()
 image_init_result harddisk_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
-	UINT32 sectorsize, hunksize;
-	UINT32 cylinders, heads, sectors, totalsectors;
+	uint32_t sectorsize, hunksize;
+	uint32_t cylinders, heads, sectors, totalsectors;
 
 	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
 	cylinders   = create_args->lookup_int('C');
@@ -149,7 +149,7 @@ image_init_result harddisk_image_device::call_create(int create_format, util::op
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_origchd.create(image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
+	err = m_origchd.create(image_core_file(), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 

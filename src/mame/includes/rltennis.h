@@ -21,18 +21,18 @@ public:
 	required_device<dac_byte_interface> m_dac1;
 	required_device<dac_byte_interface> m_dac2;
 
-	UINT16 m_blitter[RLT_NUM_BLITTER_REGS];
-	INT32 m_data760000;
-	INT32 m_data740000;
-	INT32 m_dac_counter;
-	INT32 m_sample_rom_offset_1;
-	INT32 m_sample_rom_offset_2;
-	INT32 m_offset_shift;
-	INT32 m_unk_counter;
+	uint16_t m_blitter[RLT_NUM_BLITTER_REGS];
+	int32_t m_data760000;
+	int32_t m_data740000;
+	int32_t m_dac_counter;
+	int32_t m_sample_rom_offset_1;
+	int32_t m_sample_rom_offset_2;
+	int32_t m_offset_shift;
+	int32_t m_unk_counter;
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
-	UINT8 *m_samples_1;
-	UINT8 *m_samples_2;
-	UINT8 *m_gfx;
+	uint8_t *m_samples_1;
+	uint8_t *m_samples_2;
+	uint8_t *m_gfx;
 	emu_timer *m_timer;
 
 	DECLARE_READ16_MEMBER(io_r);
@@ -44,7 +44,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);

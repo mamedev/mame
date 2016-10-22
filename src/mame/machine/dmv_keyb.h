@@ -34,7 +34,7 @@ class dmv_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -58,7 +58,7 @@ private:
 	required_device<upi41_cpu_device> m_maincpu;
 	required_ioport_array<16> m_keyboard;
 
-	UINT8   m_col;
+	uint8_t   m_col;
 	int     m_sd_data_state;
 	int     m_sd_poll_state;
 };

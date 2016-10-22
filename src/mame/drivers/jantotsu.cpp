@@ -111,19 +111,19 @@ public:
 		m_palette(*this, "palette"){ }
 
 	/* sound-related */
-	UINT32   m_adpcm_pos;
-	UINT8    m_adpcm_idle;
+	uint32_t   m_adpcm_pos;
+	uint8_t    m_adpcm_idle;
 	int      m_adpcm_data;
-	UINT8    m_adpcm_trigger;
+	uint8_t    m_adpcm_trigger;
 
 	/* misc */
-	UINT8    m_mux_data;
+	uint8_t    m_mux_data;
 
 	/* video-related */
-	UINT8    m_vram_bank;
-	UINT8    m_col_bank;
-	UINT8    m_display_on;
-	UINT8    m_bitmap[0x8000];
+	uint8_t    m_vram_bank;
+	uint8_t    m_col_bank;
+	uint8_t    m_display_on;
+	uint8_t    m_bitmap[0x8000];
 	DECLARE_READ8_MEMBER(jantotsu_bitmap_r);
 	DECLARE_WRITE8_MEMBER(jantotsu_bitmap_w);
 	DECLARE_WRITE8_MEMBER(bankaddr_w);
@@ -135,7 +135,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jantotsu);
-	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
@@ -154,11 +154,11 @@ void jantotsu_state::video_start()
 	save_item(NAME(m_bitmap));
 }
 
-UINT32 jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y, i;
 	int count = 0;
-	UINT8 pen_i;
+	uint8_t pen_i;
 
 	if(!m_display_on)
 		return 0;
@@ -167,7 +167,7 @@ UINT32 jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb3
 	{
 		for (x = 0; x < 256; x += 8)
 		{
-			UINT8 color;
+			uint8_t color;
 
 			for (i = 0; i < 8; i++)
 			{
@@ -211,7 +211,7 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 
 PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, r, g, b;
 	int i;
 
@@ -246,7 +246,7 @@ READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
 {
 	const char *const portnames[] = { "PL1_1", "PL1_2", "PL1_3", "PL1_4",
 										"PL2_1", "PL2_2", "PL2_3", "PL2_4" };
-	UINT8 i,res;
+	uint8_t i,res;
 
 	//  printf("%02x\n", m_mux_data);
 	res = ioport("COINS")->read();
@@ -307,7 +307,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);

@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 
 private:
 	required_device<cosmac_device> m_maincpu;
@@ -65,14 +65,14 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT16 m_resetcnt;
+	uint16_t m_resetcnt;
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 
 	/* video state */
-	UINT8 m_color_ram[0xc0];
-	UINT8 m_color;
+	uint8_t m_color_ram[0xc0];
+	uint8_t m_color;
 	bool m_color_on;
 };
 

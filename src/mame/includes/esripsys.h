@@ -25,13 +25,13 @@
 #define ESRIPSYS_VBLANK_END     (0)
 
 #define CMOS_RAM_SIZE           (2048)
-#define FDT_RAM_SIZE            (2048 * sizeof(UINT16))
+#define FDT_RAM_SIZE            (2048 * sizeof(uint16_t))
 
 struct line_buffer_t
 {
-	std::unique_ptr<UINT8[]> colour_buf;
-	std::unique_ptr<UINT8[]> intensity_buf;
-	std::unique_ptr<UINT8[]> priority_buf;
+	std::unique_ptr<uint8_t[]> colour_buf;
+	std::unique_ptr<uint8_t[]> intensity_buf;
+	std::unique_ptr<uint8_t[]> priority_buf;
 };
 
 class esripsys_state : public driver_device
@@ -54,40 +54,40 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<tms5220_device> m_tms;
 
-	UINT8 m_g_iodata;
-	UINT8 m_g_ioaddr;
-	UINT8 m_coin_latch;
-	UINT8 m_keypad_status;
-	UINT8 m_g_status;
-	UINT8 m_f_status;
+	uint8_t m_g_iodata;
+	uint8_t m_g_ioaddr;
+	uint8_t m_coin_latch;
+	uint8_t m_keypad_status;
+	uint8_t m_g_status;
+	uint8_t m_f_status;
 	int m_io_firq_status;
-	UINT8 m_cmos_ram_a2_0;
-	UINT8 m_cmos_ram_a10_3;
-	std::unique_ptr<UINT8[]> m_cmos_ram;
-	UINT8 m_u56a;
-	UINT8 m_u56b;
-	UINT8 m_g_to_s_latch1;
-	UINT8 m_g_to_s_latch2;
-	UINT8 m_s_to_g_latch1;
-	UINT8 m_s_to_g_latch2;
-	UINT8 m_dac_msb;
-	UINT8 m_tms_data;
-	std::unique_ptr<UINT8[]> m_fdt_a;
-	std::unique_ptr<UINT8[]> m_fdt_b;
+	uint8_t m_cmos_ram_a2_0;
+	uint8_t m_cmos_ram_a10_3;
+	std::unique_ptr<uint8_t[]> m_cmos_ram;
+	uint8_t m_u56a;
+	uint8_t m_u56b;
+	uint8_t m_g_to_s_latch1;
+	uint8_t m_g_to_s_latch2;
+	uint8_t m_s_to_g_latch1;
+	uint8_t m_s_to_g_latch2;
+	uint8_t m_dac_msb;
+	uint8_t m_tms_data;
+	std::unique_ptr<uint8_t[]> m_fdt_a;
+	std::unique_ptr<uint8_t[]> m_fdt_b;
 	struct line_buffer_t m_line_buffer[2];
 	int m_fasel;
 	int m_fbsel;
 	int m_hblank;
-	required_shared_ptr<UINT8> m_pal_ram;
+	required_shared_ptr<uint8_t> m_pal_ram;
 	int m_frame_vbl;
 	int m_12sel;
 	int m_video_firq_en;
 	emu_timer *m_hblank_end_timer;
 	emu_timer *m_hblank_start_timer;
-	std::unique_ptr<UINT8[]> m_fig_scale_table;
-	std::unique_ptr<UINT8[]> m_scale_table;
+	std::unique_ptr<uint8_t[]> m_fig_scale_table;
+	std::unique_ptr<uint8_t[]> m_scale_table;
 	int m_video_firq;
-	UINT8 m_bg_intensity;
+	uint8_t m_bg_intensity;
 	DECLARE_WRITE8_MEMBER(uart_w);
 	DECLARE_READ8_MEMBER(uart_r);
 	DECLARE_READ8_MEMBER(g_status_r);
@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 	DECLARE_DRIVER_INIT(esripsys);
 	virtual void video_start() override;
-	UINT32 screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);

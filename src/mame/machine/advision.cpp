@@ -86,7 +86,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 
 READ8_MEMBER( advision_state::ext_ram_r )
 {
-	UINT8 data = m_ext_ram[m_rambank + offset];
+	uint8_t data = m_ext_ram[m_rambank + offset];
 
 	if (!m_video_enable)
 	{
@@ -176,8 +176,8 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = m_joy->read();
-	UINT8 data = in | 0x0f;
+	uint8_t in = m_joy->read();
+	uint8_t data = in | 0x0f;
 
 	// Get buttons
 	if (in & 0x02) data = data & 0xf7; /* Button 3 */

@@ -13,7 +13,7 @@ const device_type MSX_CART_SOUND_SDSNATCHER = &device_creator<msx_cart_konami_so
 const device_type MSX_CART_KEYBOARD_MASTER = &device_creator<msx_cart_keyboard_master>;
 
 
-msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_KONAMI, "MSX Cartridge - KONAMI", tag, owner, clock, "msx_cart_konami", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -61,14 +61,14 @@ void msx_cart_konami::device_reset()
 
 void msx_cart_konami::initialize_cartridge()
 {
-	UINT32 size = get_rom_size();
+	uint32_t size = get_rom_size();
 
 	if ( get_rom_size() > 256 * 0x2000 )
 	{
 		fatalerror("konami: ROM is too big\n");
 	}
 
-	UINT16 banks = size / 0x2000;
+	uint16_t banks = size / 0x2000;
 
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
@@ -120,7 +120,7 @@ WRITE8_MEMBER(msx_cart_konami::write_cart)
 
 
 
-msx_cart_konami_scc::msx_cart_konami_scc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_konami_scc::msx_cart_konami_scc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_KONAMI_SCC, "MSX Cartridge - KONAMI+SCC", tag, owner, clock, "msx_cart_konami_scc", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_k051649(*this, "k051649")
@@ -186,14 +186,14 @@ void msx_cart_konami_scc::device_reset()
 
 void msx_cart_konami_scc::initialize_cartridge()
 {
-	UINT32 size = get_rom_size();
+	uint32_t size = get_rom_size();
 
 	if ( get_rom_size() > 256 * 0x2000 )
 	{
 		fatalerror("konami_scc: ROM is too big\n");
 	}
 
-	UINT16 banks = size / 0x2000;
+	uint16_t banks = size / 0x2000;
 
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
@@ -296,7 +296,7 @@ WRITE8_MEMBER(msx_cart_konami_scc::write_cart)
 
 
 
-msx_cart_gamemaster2::msx_cart_gamemaster2(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_gamemaster2::msx_cart_gamemaster2(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_GAMEMASTER2, "MSX Cartridge - GAMEMASTER2", tag, owner, clock, "msx_cart_gamemaster2", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 {
@@ -319,7 +319,7 @@ void msx_cart_gamemaster2::device_start()
 }
 
 
-void msx_cart_gamemaster2::setup_bank(UINT8 bank)
+void msx_cart_gamemaster2::setup_bank(uint8_t bank)
 {
 	switch (bank)
 	{
@@ -402,7 +402,7 @@ void msx_cart_gamemaster2::initialize_cartridge()
 
 READ8_MEMBER(msx_cart_gamemaster2::read_cart)
 {
-	UINT8 bank = offset >> 13;
+	uint8_t bank = offset >> 13;
 
 	switch (bank)
 	{
@@ -466,7 +466,7 @@ WRITE8_MEMBER(msx_cart_gamemaster2::write_cart)
 
 
 
-msx_cart_synthesizer::msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_synthesizer::msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_SYNTHESIZER, "MSX Cartridge - Synthesizer", tag, owner, clock, "msx_cart_synthesizer", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_base(nullptr)
@@ -527,7 +527,7 @@ WRITE8_MEMBER(msx_cart_synthesizer::write_cart)
 
 
 
-msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, msx_cart_interface(mconfig, *this)
 	, m_k052539(*this, "k052539")
@@ -588,7 +588,7 @@ void msx_cart_konami_sound::restore_banks()
 }
 
 
-void msx_cart_konami_sound::setup_bank(UINT8 bank)
+void msx_cart_konami_sound::setup_bank(uint8_t bank)
 {
 	switch (bank)
 	{
@@ -671,7 +671,7 @@ READ8_MEMBER(msx_cart_konami_sound::read_cart)
 		return 0xff;
 	}
 
-	UINT8 *base = m_bank_base[offset >> 13];
+	uint8_t *base = m_bank_base[offset >> 13];
 
 	if (base != nullptr)
 	{
@@ -823,7 +823,7 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 }
 
 
-msx_cart_konami_sound_snatcher::msx_cart_konami_sound_snatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_konami_sound_snatcher::msx_cart_konami_sound_snatcher(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_konami_sound(mconfig, MSX_CART_SOUND_SNATCHER, "MSX Cartridge - Sound Snatcher", tag, owner, clock, "msx_cart_sound_snatcher", __FILE__)
 {
 }
@@ -847,7 +847,7 @@ void msx_cart_konami_sound_snatcher::initialize_cartridge()
 }
 
 
-msx_cart_konami_sound_sdsnatcher::msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_konami_sound_sdsnatcher::msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_konami_sound(mconfig, MSX_CART_SOUND_SDSNATCHER, "MSX Cartridge - Sound SD Snatcher", tag, owner, clock, "msx_cart_sound_sdsnatcher", __FILE__)
 {
 }
@@ -873,7 +873,7 @@ void msx_cart_konami_sound_sdsnatcher::initialize_cartridge()
 
 
 
-msx_cart_keyboard_master::msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_keyboard_master::msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, "MSX Cartridge - Keyboard Master", tag, owner, clock, "msx_cart_keyboard_master", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_vlm5030(*this, "vlm5030")

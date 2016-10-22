@@ -591,24 +591,24 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 void raiden_state::common_decrypt()
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
 	{
-		static const UINT16 xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0x00c0 };
-		UINT16 data = RAM[0xc0000/2 + i];
+		static const uint16_t xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0x00c0 };
+		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x0f];
 		data = BITSWAP16(data, 15,14,10,12,11,13,9,8,3,2,5,4,7,1,6,0);
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)memregion("sub")->base();
+	RAM = (uint16_t *)memregion("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{
-		static const UINT16 xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
-		UINT16 data = RAM[0xc0000/2 + i];
+		static const uint16_t xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
+		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x07];
 		data = BITSWAP16(data, 15,14,13,9,11,10,12,8,2,0,5,4,7,3,1,6);
 		RAM[0xc0000/2 + i] = data;

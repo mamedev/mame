@@ -247,7 +247,7 @@
  */
 void alto2_cpu_device::bs_early_emu_disp()
 {
-	UINT16 r = IR_DISP(m_emu.ir);
+	uint16_t r = IR_DISP(m_emu.ir);
 	if (IR_X(m_emu.ir)) {
 		r = ((signed char)r) & 0177777;
 	}
@@ -304,7 +304,7 @@ void alto2_cpu_device::f1_late_emu_load_esrb()
  */
 void alto2_cpu_device::f1_early_rsnf()
 {
-	UINT16 r = 0177400 | m_ether_id;
+	uint16_t r = 0177400 | m_ether_id;
 	LOG((this,LOG_EMU,2,"    <-RSNF; (%#o)\n", r));
 	m_bus &= r;
 }
@@ -354,7 +354,7 @@ void alto2_cpu_device::f1_early_startf()
  */
 void alto2_cpu_device::f2_late_busodd()
 {
-	UINT16 r = m_bus & 1;
+	uint16_t r = m_bus & 1;
 	LOG((this,LOG_EMU,2,"    BUSODD; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -424,22 +424,22 @@ void alto2_cpu_device::f2_early_load_dns()
  */
 void alto2_cpu_device::f2_late_load_dns()
 {
-	UINT8 IR10 = X_BIT(m_emu.ir,16,10);
-	UINT8 IR11 = X_BIT(m_emu.ir,16,11);
-	UINT8 IR12 = X_BIT(m_emu.ir,16,12);
-	UINT8 IR13 = X_BIT(m_emu.ir,16,13);
-	UINT8 IR14 = X_BIT(m_emu.ir,16,14);
-	UINT8 IR15 = X_BIT(m_emu.ir,16,15);
-	UINT8 exorB = IR11 ^ IR10;
-	UINT8 CARRY = m_emu.cy ^ 1;
-	UINT8 ORA = (exorB | CARRY) ^ 1;
-	UINT8 exorC = ORA ^ (IR11 ^ 1);
-	UINT8 exorD = exorC ^ m_laluc0;
-	UINT8 XC = exorD;
-	UINT8 NEWCARRY;
-	UINT8 DCARRY;
-	UINT8 DSKIP;
-	UINT8 SHZERO;
+	uint8_t IR10 = X_BIT(m_emu.ir,16,10);
+	uint8_t IR11 = X_BIT(m_emu.ir,16,11);
+	uint8_t IR12 = X_BIT(m_emu.ir,16,12);
+	uint8_t IR13 = X_BIT(m_emu.ir,16,13);
+	uint8_t IR14 = X_BIT(m_emu.ir,16,14);
+	uint8_t IR15 = X_BIT(m_emu.ir,16,15);
+	uint8_t exorB = IR11 ^ IR10;
+	uint8_t CARRY = m_emu.cy ^ 1;
+	uint8_t ORA = (exorB | CARRY) ^ 1;
+	uint8_t exorC = ORA ^ (IR11 ^ 1);
+	uint8_t exorD = exorC ^ m_laluc0;
+	uint8_t XC = exorD;
+	uint8_t NEWCARRY;
+	uint8_t DCARRY;
+	uint8_t DSKIP;
+	uint8_t SHZERO;
 
 	switch (f1()) {
 	case f1_l_rsh_1:    // <-L RSH 1
@@ -534,7 +534,7 @@ void alto2_cpu_device::bitblt_info()
  */
 void alto2_cpu_device::f2_late_load_ir()
 {
-	UINT16 r = (X_BIT(m_bus,16,0) << 3) | X_RDBITS(m_bus,16,5,7);
+	uint16_t r = (X_BIT(m_bus,16,0) << 3) | X_RDBITS(m_bus,16,5,7);
 
 #if ALTO2_DEBUG
 	/* special logging of some opcodes */
@@ -599,7 +599,7 @@ void alto2_cpu_device::f2_late_load_ir()
  */
 void alto2_cpu_device::f2_late_idisp()
 {
-	UINT16 r;
+	uint16_t r;
 
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */
@@ -633,7 +633,7 @@ void alto2_cpu_device::f2_early_acsource()
  */
 void alto2_cpu_device::f2_late_acsource()
 {
-	UINT16 r;
+	uint16_t r;
 
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */

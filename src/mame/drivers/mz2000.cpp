@@ -74,24 +74,24 @@ public:
 
 	floppy_image_device *m_floppy;
 
-	UINT8 m_ipl_enable;
-	UINT8 m_tvram_enable;
-	UINT8 m_gvram_enable;
-	UINT8 m_gvram_bank;
+	uint8_t m_ipl_enable;
+	uint8_t m_tvram_enable;
+	uint8_t m_gvram_enable;
+	uint8_t m_gvram_bank;
 
-	UINT8 m_key_mux;
+	uint8_t m_key_mux;
 
-	UINT8 m_old_portc;
-	UINT8 m_width80;
-	UINT8 m_tvram_attr;
-	UINT8 m_gvram_mask;
+	uint8_t m_old_portc;
+	uint8_t m_width80;
+	uint8_t m_tvram_attr;
+	uint8_t m_gvram_mask;
 
-	UINT8 m_color_mode;
-	UINT8 m_has_fdc;
-	UINT8 m_hi_mode;
+	uint8_t m_color_mode;
+	uint8_t m_has_fdc;
+	uint8_t m_hi_mode;
 
-	UINT8 m_porta_latch;
-	UINT8 m_tape_ctrl;
+	uint8_t m_porta_latch;
+	uint8_t m_tape_ctrl;
 	DECLARE_READ8_MEMBER(mz2000_ipl_r);
 	DECLARE_READ8_MEMBER(mz2000_wram_r);
 	DECLARE_WRITE8_MEMBER(mz2000_wram_w);
@@ -109,7 +109,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(mz2000_porta_r);
@@ -145,14 +145,14 @@ void mz2000_state::video_start()
 {
 }
 
-UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *tvram = m_region_tvram->base();
-	UINT8 *gvram = m_region_gvram->base();
-	UINT8 *gfx_data = m_region_chargen->base();
+	uint8_t *tvram = m_region_tvram->base();
+	uint8_t *gvram = m_region_gvram->base();
+	uint8_t *gfx_data = m_region_chargen->base();
 	int x,y,xi,yi;
-	UINT8 x_size;
-	UINT32 count;
+	uint8_t x_size;
+	uint32_t count;
 
 	count = 0;
 
@@ -181,8 +181,8 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 	{
 		for(x=0;x<x_size;x++)
 		{
-			UINT8 tile = tvram[y*x_size+x];
-			UINT8 color = m_tvram_attr & 7;
+			uint8_t tile = tvram[y*x_size+x];
+			uint8_t color = m_tvram_attr & 7;
 
 			for(yi=0;yi<8*(m_hi_mode+1);yi++)
 			{
@@ -190,7 +190,7 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 				{
 					int pen;
 					int res_x,res_y;
-					UINT16 tile_offset;
+					uint16_t tile_offset;
 
 					res_x = x * 8 + xi;
 					res_y = y * (8 *(m_hi_mode+1)) + yi;
@@ -279,7 +279,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
 
 READ8_MEMBER(mz2000_state::mz2000_mem_r)
 {
-	UINT8 page_mem;
+	uint8_t page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
@@ -297,7 +297,7 @@ READ8_MEMBER(mz2000_state::mz2000_mem_r)
 			return mz2000_gvram_r(space,offset & 0x3fff);
 		else
 		{
-			UINT16 wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
+			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
 			return mz2000_wram_r(space,offset & wram_mask);
 		}
 	}
@@ -307,7 +307,7 @@ READ8_MEMBER(mz2000_state::mz2000_mem_r)
 
 WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
 {
-	UINT8 page_mem;
+	uint8_t page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
@@ -322,7 +322,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
 			mz2000_gvram_w(space,offset & 0x3fff,data);
 		else
 		{
-			UINT16 wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
+			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
 
 			mz2000_wram_w(space,offset & wram_mask,data);
 		}
@@ -693,7 +693,7 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	---- x--- end of tape reached
 	---- ---x "blank" control
 	*/
-	UINT8 res = 0x80;
+	uint8_t res = 0x80;
 
 	if(m_cass->get_image() != nullptr)
 	{

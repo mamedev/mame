@@ -35,7 +35,7 @@ gladiatr and Great Swordsman set.
 
 const device_type TAITO8741_4PACK = &device_creator<taito8741_4pack_device>;
 
-taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO8741_4PACK, "I8741 MCU Simulation (Taito 4Pack)", tag, owner, clock, "taito8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
@@ -70,7 +70,7 @@ int taito8741_4pack_device::hostcmd_r(I8741 *st)
 
 /* TAITO8741 I8741 emulation */
 
-void taito8741_4pack_device::serial_rx(I8741 *st,UINT8 *data)
+void taito8741_4pack_device::serial_rx(I8741 *st,uint8_t *data)
 {
 	memcpy(st->rxd,data,8);
 }
@@ -321,7 +321,7 @@ void taito8741_4pack_device::command_w(int num, int data)
 	update(num);
 }
 
-UINT8 taito8741_4pack_device::port_read(int num, int offset)
+uint8_t taito8741_4pack_device::port_read(int num, int offset)
 {
 	switch(num)
 	{
@@ -347,7 +347,7 @@ joshi Vollyball set.
 
 const device_type JOSVOLLY8741_4PACK = &device_creator<josvolly8741_4pack_device>;
 
-josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JOSVOLLY8741_4PACK, "I8741 MCU Simulation (Joshi Volleyball)", tag, owner, clock, "josvolly8741_4pack", __FILE__),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
@@ -478,7 +478,7 @@ void josvolly8741_4pack_device::write(int num, int offset, int data)
 	update(num);
 }
 
-UINT8 josvolly8741_4pack_device::read(int num,int offset)
+uint8_t josvolly8741_4pack_device::read(int num,int offset)
 {
 	JV8741 *mcu = &m_i8741[num];
 	int ret;
@@ -501,7 +501,7 @@ UINT8 josvolly8741_4pack_device::read(int num,int offset)
 	return ret;
 }
 
-UINT8 josvolly8741_4pack_device::port_read(int num)
+uint8_t josvolly8741_4pack_device::port_read(int num)
 {
 	switch(num)
 	{

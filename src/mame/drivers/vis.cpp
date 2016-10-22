@@ -13,24 +13,24 @@ class vis_audio_device : public device_t,
 						 public device_isa16_card_interface
 {
 public:
-	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void dack16_w(int line, UINT16 data) override { if(m_samples < 2) m_sample[m_samples++] = data; else m_isa->drq7_w(CLEAR_LINE); }
+	virtual void dack16_w(int line, uint16_t data) override { if(m_samples < 2) m_sample[m_samples++] = data; else m_isa->drq7_w(CLEAR_LINE); }
 	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 	required_device<dac_word_interface> m_rdac;
 	required_device<dac_word_interface> m_ldac;
-	UINT16 m_count;
-	UINT16 m_sample[2];
-	UINT8 m_index[2]; // unknown indexed registers, volume?
-	UINT8 m_data[2][16];
-	UINT8 m_mode;
-	UINT8 m_stat;
+	uint16_t m_count;
+	uint16_t m_sample[2];
+	uint8_t m_index[2]; // unknown indexed registers, volume?
+	uint8_t m_data[2][16];
+	uint8_t m_mode;
+	uint8_t m_stat;
 	unsigned int m_sample_byte;
 	unsigned int m_samples;
 	emu_timer *m_pcm;
@@ -38,7 +38,7 @@ private:
 
 const device_type VIS_AUDIO = &device_creator<vis_audio_device>;
 
-vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIS_AUDIO, "vis_pcm", tag, owner, clock, "vis_pcm", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_rdac(*this, "rdac"),
@@ -72,7 +72,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	{
 		case 0x80: // 8bit mono
 		{
-			UINT8 sample = m_sample[m_sample_byte >> 1] >> ((m_sample_byte & 1) * 8);
+			uint8_t sample = m_sample[m_sample_byte >> 1] >> ((m_sample_byte & 1) * 8);
 			m_ldac->write(sample << 8);
 			m_rdac->write(sample << 8);
 			m_sample_byte++;
@@ -223,12 +223,12 @@ public:
 protected:
 	void machine_reset() override;
 private:
-	UINT8 m_sysctl;
-	UINT8 m_unkidx;
-	UINT8 m_unk[16];
-	UINT8 m_pad[4];
-	UINT8 m_crtcidx;
-	UINT8 m_gfxidx;
+	uint8_t m_sysctl;
+	uint8_t m_unkidx;
+	uint8_t m_unk[16];
+	uint8_t m_pad[4];
+	uint8_t m_crtcidx;
+	uint8_t m_gfxidx;
 };
 
 void vis_state::machine_reset()

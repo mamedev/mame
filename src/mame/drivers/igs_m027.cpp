@@ -38,7 +38,7 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
-	optional_shared_ptr<UINT32> m_igs_mainram;
+	optional_shared_ptr<uint32_t> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
@@ -59,7 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(amazoni2);
 
 	virtual void video_start() override;
-	UINT32 screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
 
 	void sdwx_gfx_decrypt();
@@ -125,7 +125,7 @@ void igs_m027_state::video_start()
 
 
 
-UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
 	return 0;
@@ -180,7 +180,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 #if 0
-static const UINT8 sdwx_tab[] =
+static const uint8_t sdwx_tab[] =
 {
 	0x49,0x47,0x53,0x30,0x30,0x35,0x35,0x52,0x44,0x34,0x30,0x32,0x30,0x36,0x32,0x31,
 	0x8A,0xBB,0x20,0x67,0x97,0xA5,0x20,0x45,0x6B,0xC0,0xE8,0x0C,0x80,0xFB,0x49,0xAA,
@@ -207,8 +207,8 @@ void igs_m027_state::sdwx_gfx_decrypt()
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (memregion("tilemaps")->base());
-	std::vector<UINT8> result_data(rom_size);
+	uint8_t *src = (uint8_t *) (memregion("tilemaps")->base());
+	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
@@ -975,7 +975,7 @@ ROM_END
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 
 	// fill with RX 14
 	int i;

@@ -48,7 +48,7 @@
 int leland_state::dial_compute_value(int new_val, int indx)
 {
 	int delta = new_val - (int)m_dial_last_input[indx];
-	UINT8 result = m_dial_last_result[indx] & 0x80;
+	uint8_t result = m_dial_last_result[indx] & 0x80;
 
 	m_dial_last_input[indx] = new_val;
 
@@ -135,8 +135,8 @@ WRITE8_MEMBER(leland_state::alleymas_joystick_kludge)
 
 void leland_state::update_dangerz_xy()
 {
-	UINT8 newy = ioport("AN0")->read();
-	UINT8 newx = ioport("AN1")->read();
+	uint8_t newy = ioport("AN0")->read();
+	uint8_t newx = ioport("AN1")->read();
 	int deltay = newy - m_dial_last_input[0];
 	int deltax = newx - m_dial_last_input[1];
 
@@ -185,7 +185,7 @@ READ8_MEMBER(leland_state::dangerz_input_upper_r)
  *
  *************************************/
 
-static const UINT8 redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0, 0x30, 0x70 };
+static const uint8_t redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0, 0x30, 0x70 };
 
 READ8_MEMBER(leland_state::redline_pedal_1_r)
 {
@@ -318,7 +318,7 @@ WRITE8_MEMBER(leland_state::indyheat_analog_w)
 MACHINE_START_MEMBER(leland_state,leland)
 {
 	/* allocate extra stuff */
-	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
+	m_battery_ram = reinterpret_cast<uint8_t *>(memshare("battery")->ptr());
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::leland_interrupt_callback),this));
@@ -367,8 +367,8 @@ MACHINE_RESET_MEMBER(leland_state,leland)
 MACHINE_START_MEMBER(leland_state,ataxx)
 {
 	/* set the odd data banks */
-	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
-	m_extra_tram = std::make_unique<UINT8[]>(ATAXX_EXTRA_TRAM_SIZE);
+	m_battery_ram = reinterpret_cast<uint8_t *>(memshare("battery")->ptr());
+	m_extra_tram = std::make_unique<uint8_t[]>(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
@@ -483,7 +483,7 @@ void leland_state::cerberus_bankswitch()
 /* bankswitching for Mayhem 2002, Power Play, World Series Baseball, and Alley Master */
 void leland_state::mayhem_bankswitch()
 {
-	UINT8 *address;
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_sound_port_bank & 0x24) == 0);
 
@@ -498,7 +498,7 @@ void leland_state::mayhem_bankswitch()
 /* bankswitching for Danger Zone */
 void leland_state::dangerz_bankswitch()
 {
-	UINT8 *address;
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_top_board_bank & 0x80) != 0);
 
@@ -513,7 +513,7 @@ void leland_state::dangerz_bankswitch()
 /* bankswitching for Baseball the Season II, Super Baseball, and Strike Zone */
 void leland_state::basebal2_bankswitch()
 {
-	UINT8 *address;
+	uint8_t *address;
 
 	m_battery_ram_enable = (m_top_board_bank & 0x80);
 
@@ -531,8 +531,8 @@ void leland_state::basebal2_bankswitch()
 /* bankswitching for Red Line Racer */
 void leland_state::redline_bankswitch()
 {
-	static const UINT32 bank_list[] = { 0x10000, 0x18000, 0x02000, 0x02000 };
-	UINT8 *address;
+	static const uint32_t bank_list[] = { 0x10000, 0x18000, 0x02000, 0x02000 };
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 3) == 1);
 
@@ -547,8 +547,8 @@ void leland_state::redline_bankswitch()
 /* bankswitching for Viper, Quarterback, Team Quarterback, and All American Football */
 void leland_state::viper_bankswitch()
 {
-	static const UINT32 bank_list[] = { 0x02000, 0x10000, 0x18000, 0x02000 };
-	UINT8 *address;
+	static const uint32_t bank_list[] = { 0x02000, 0x10000, 0x18000, 0x02000 };
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 0x04) != 0);
 
@@ -568,8 +568,8 @@ void leland_state::viper_bankswitch()
 /* bankswitching for Super Offroad, Super Offroad Track Pack, and Pig Out */
 void leland_state::offroad_bankswitch()
 {
-	static const UINT32 bank_list[] = { 0x02000, 0x02000, 0x10000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000 };
-	UINT8 *address;
+	static const uint32_t bank_list[] = { 0x02000, 0x02000, 0x10000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000 };
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_alternate_bank & 7) == 1);
 
@@ -589,12 +589,12 @@ void leland_state::offroad_bankswitch()
 /* bankswitching for Ataxx, WSF, Indy Heat, and Brute Force */
 void leland_state::ataxx_bankswitch()
 {
-	static const UINT32 bank_list[] =
+	static const uint32_t bank_list[] =
 	{
 		0x02000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000, 0x40000, 0x48000,
 		0x50000, 0x58000, 0x60000, 0x68000, 0x70000, 0x78000, 0x80000, 0x88000
 	};
-	UINT8 *address;
+	uint8_t *address;
 
 	m_battery_ram_enable = ((m_master_bank & 0x30) == 0x10);
 
@@ -625,11 +625,11 @@ void leland_state::ataxx_bankswitch()
  *
  *************************************/
 
-void leland_state::leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
+void leland_state::leland_init_eeprom(uint8_t default_val, const uint16_t *data, uint8_t serial_offset, uint8_t serial_type)
 {
-	UINT8 xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
-	UINT8 eeprom_data[64*2];
-	UINT32 serial;
+	uint8_t xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
+	uint8_t eeprom_data[64*2];
+	uint32_t serial;
 
 	/*
 	    NOTE: This code is just illustrative, and explains how to generate the
@@ -736,12 +736,12 @@ void leland_state::leland_init_eeprom(UINT8 default_val, const UINT16 *data, UIN
  *
  *************************************/
 
-void leland_state::ataxx_init_eeprom(const UINT16 *data)
+void leland_state::ataxx_init_eeprom(const uint16_t *data)
 {
-	UINT8 eeprom_data[128*2];
-	UINT8 serial_offset = 0;
-	UINT8 default_val = 0;
-	UINT32 serial;
+	uint8_t eeprom_data[128*2];
+	uint8_t serial_offset = 0;
+	uint8_t default_val = 0;
+	uint32_t serial;
 
 	/*
 	    NOTE: This code is just illustrative, and explains how to generate the
@@ -899,7 +899,7 @@ WRITE8_MEMBER(leland_state::ataxx_battery_ram_w)
 
         for (i = 16, b = 0x70, r = 0x08; i < 128; i++, b--, r += 0x10)
         {
-            UINT8 a = original_data[i] ^ 0xff;
+            uint8_t a = original_data[i] ^ 0xff;
             a = (a >> 3) | (a << 5);
             a = (((a ^ r) + 1 + b) ^ b) - b;
             encrypted_data[i] = a;
@@ -1407,8 +1407,8 @@ void leland_state::leland_rotate_memory(const char *cpuname)
 {
 	int startaddr = 0x10000;
 	int banks = (memregion(cpuname)->bytes() - startaddr) / 0x8000;
-	UINT8 *ram = memregion(cpuname)->base();
-	UINT8 temp[0x2000];
+	uint8_t *ram = memregion(cpuname)->base();
+	uint8_t temp[0x2000];
 	int i;
 
 	for (i = 0; i < banks; i++)

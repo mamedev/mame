@@ -172,7 +172,7 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 {
 	if (ACCESSING_BITS_8_15) {
-		UINT8 ebyte=(data>>8)&0xff;
+		uint8_t ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
 			m_eeprom->clk_write((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(ebyte & 0x1);
@@ -239,7 +239,7 @@ READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 
 READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 {
-	UINT32 retdata = 0;
+	uint32_t retdata = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -272,8 +272,8 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -281,7 +281,7 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -846,15 +846,15 @@ ROM_END
 void deco_mlc_state::descramble_sound(  )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = memregion("ymz")->base();
+	uint8_t *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	std::vector<UINT8> buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	for (x=0;x<length;x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,
@@ -871,8 +871,8 @@ void deco_mlc_state::descramble_sound(  )
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	UINT32 a=m_mlc_ram[0x89a0/4];
-	UINT32 p=space.device().safe_pc();
+	uint32_t a=m_mlc_ram[0x89a0/4];
+	uint32_t p=space.device().safe_pc();
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
 

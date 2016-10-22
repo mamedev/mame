@@ -99,7 +99,7 @@ public:
 	int m_view_roms;
 
 	/* misc */
-	UINT16 m_c00006;
+	uint16_t m_c00006;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +107,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory */
-	UINT8   m_colorram[256 * 3];
+	uint8_t   m_colorram[256 * 3];
 	DECLARE_WRITE16_MEMBER(colordac_w);
 	DECLARE_WRITE16_MEMBER(lastfght_hi_w);
 	DECLARE_WRITE16_MEMBER(lastfght_x_w);
@@ -130,7 +130,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -150,14 +150,14 @@ void lastfght_state::video_start()
 }
 
 
-UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	int x, y, count = 0;
-	UINT8 *gfxdata = memregion("gfx1")->base();
-	UINT8 data;
+	uint8_t *gfxdata = memregion("gfx1")->base();
+	uint8_t data;
 
 	if (machine().input().code_pressed_once(KEYCODE_ENTER)) m_view_roms ^= 1;
 	if (m_view_roms)
@@ -328,7 +328,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
-		UINT8 *gfxdata = memregion( "gfx1" )->base();
+		uint8_t *gfxdata = memregion( "gfx1" )->base();
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
 #if 0
@@ -601,7 +601,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

@@ -41,8 +41,8 @@ WRITE8_MEMBER(renegade_state::scroll_msb_w)
 
 TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 {
-	const UINT8 *source = &m_bg_videoram[tile_index];
-	UINT8 attributes = source[0x400]; /* CCC??BBB */
+	const uint8_t *source = &m_bg_videoram[tile_index];
+	uint8_t attributes = source[0x400]; /* CCC??BBB */
 	SET_TILE_INFO_MEMBER(1 + (attributes & 0x7),
 		source[0],
 		attributes >> 5,
@@ -51,8 +51,8 @@ TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 
 TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
 {
-	const UINT8 *source = &m_fg_videoram[tile_index];
-	UINT8 attributes = source[0x400];
+	const uint8_t *source = &m_fg_videoram[tile_index];
+	uint8_t attributes = source[0x400];
 	SET_TILE_INFO_MEMBER(0,
 		(attributes & 3) * 256 + source[0],
 		attributes >> 6,
@@ -72,8 +72,8 @@ void renegade_state::video_start()
 
 void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *source = m_spriteram;
-	UINT8 *finish = source + 96 * 4;
+	uint8_t *source = m_spriteram;
+	uint8_t *finish = source + 96 * 4;
 
 	while (source < finish)
 	{
@@ -121,7 +121,7 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 renegade_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t renegade_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 , 0);

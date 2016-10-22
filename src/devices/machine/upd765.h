@@ -72,10 +72,10 @@
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
 public:
-	typedef delegate<UINT8 ()> byte_read_cb;
-	typedef delegate<void (UINT8)> byte_write_cb;
+	typedef delegate<uint8_t ()> byte_read_cb;
+	typedef delegate<void (uint8_t)> byte_write_cb;
 
-	pc_fdc_interface(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source) {}
+	pc_fdc_interface(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source) {}
 
 	/* Note that the address map must cover and handle the whole 0-7
 	 * range.  The upd765, while conforming to the rest of the
@@ -84,18 +84,18 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 
-	virtual UINT8 dma_r() = 0;
-	virtual void dma_w(UINT8 data) = 0;
+	virtual uint8_t dma_r() = 0;
+	virtual void dma_w(uint8_t data) = 0;
 
 	virtual void tc_w(bool val) = 0;
-	virtual UINT8 do_dir_r() = 0;
+	virtual uint8_t do_dir_r() = 0;
 };
 
 class upd765_family_device : public pc_fdc_interface {
 public:
 	enum { MODE_AT, MODE_PS2, MODE_M30 };
 
-	upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(object); }
@@ -116,10 +116,10 @@ public:
 	DECLARE_READ8_MEMBER (dir_r);
 	DECLARE_WRITE8_MEMBER(ccr_w);
 
-	virtual UINT8 do_dir_r() override;
+	virtual uint8_t do_dir_r() override;
 
-	UINT8 dma_r() override;
-	void dma_w(UINT8 data) override;
+	uint8_t dma_r() override;
+	void dma_w(uint8_t data) override;
 
 	// Same as the previous ones, but as memory-mappable members
 	DECLARE_READ8_MEMBER(mdma_r);
@@ -285,7 +285,7 @@ protected:
 		int id;
 		int main_state, sub_state;
 		int dir, counter;
-		UINT8 pcn, st0;
+		uint8_t pcn, st0;
 		bool st0_filled;
 		bool live, index, ready;
 	};
@@ -296,12 +296,12 @@ protected:
 		attotime tm;
 		int state, next_state;
 		floppy_info *fi;
-		UINT16 shift_reg;
-		UINT16 crc;
+		uint16_t shift_reg;
+		uint16_t crc;
 		int bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
-		UINT8 data_reg;
-		UINT8 idbuf[6];
+		uint8_t data_reg;
+		uint8_t idbuf[6];
 		fdc_pll_t pll;
 	};
 
@@ -321,11 +321,11 @@ protected:
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
 	bool fifo_write;
-	UINT8 dor, dsr, msr, fifo[16], command[16], result[16];
-	UINT8 st1, st2, st3;
-	UINT8 fifocfg, dor_reset;
-	UINT8 precomp, perpmode;
-	UINT16 spec;
+	uint8_t dor, dsr, msr, fifo[16], command[16], result[16];
+	uint8_t st1, st2, st3;
+	uint8_t fifocfg, dor_reset;
+	uint8_t precomp, perpmode;
+	uint16_t spec;
 	int sector_size;
 	int cur_rate;
 
@@ -360,14 +360,14 @@ protected:
 	void delay_cycles(emu_timer *tm, int cycles);
 	void check_irq();
 	void fifo_expect(int size, bool write);
-	void fifo_push(UINT8 data, bool internal);
-	UINT8 fifo_pop(bool internal);
+	void fifo_push(uint8_t data, bool internal);
+	uint8_t fifo_pop(bool internal);
 	void set_drq(bool state);
 	bool get_ready(int fid);
 
 	void enable_transfer();
 	void disable_transfer();
-	int calc_sector_size(UINT8 size);
+	int calc_sector_size(uint8_t size);
 
 	void run_drive_ready_polling();
 
@@ -407,9 +407,9 @@ protected:
 	void live_delay(int state);
 	void live_sync();
 	void live_run(attotime limit = attotime::never);
-	void live_write_raw(UINT16 raw);
-	void live_write_fm(UINT8 fm);
-	void live_write_mfm(UINT8 mfm);
+	void live_write_raw(uint16_t raw);
+	void live_write_fm(uint8_t fm);
+	void live_write_mfm(uint8_t mfm);
 
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
@@ -417,77 +417,77 @@ protected:
 
 class upd765a_device : public upd765_family_device {
 public:
-	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class upd765b_device : public upd765_family_device {
 public:
-	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class i8272a_device : public upd765_family_device {
 public:
-	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class smc37c78_device : public upd765_family_device {
 public:
-	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class upd72065_device : public upd765_family_device {
 public:
-	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class n82077aa_device : public upd765_family_device {
 public:
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class pc_fdc_superio_device : public upd765_family_device {
 public:
-	pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class dp8473_device : public upd765_family_device {
 public:
-	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class pc8477a_device : public upd765_family_device {
 public:
-	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class wd37c65c_device : public upd765_family_device {
 public:
-	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 class mcs3201_device : public upd765_family_device {
 public:
-	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_input_handler(device_t &device, _Object object) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(object); }
@@ -504,7 +504,7 @@ private:
 
 class tc8566af_device : public upd765_family_device {
 public:
-	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 
@@ -514,7 +514,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	UINT8 m_cr1;
+	uint8_t m_cr1;
 };
 
 extern const device_type UPD765A;

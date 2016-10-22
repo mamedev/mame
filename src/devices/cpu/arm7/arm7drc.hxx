@@ -68,7 +68,7 @@
     descriptor
 -------------------------------------------------*/
 
-static inline UINT32 epc(const opcode_desc *desc)
+static inline uint32_t epc(const opcode_desc *desc)
 {
 	return desc->pc;
 }
@@ -129,12 +129,12 @@ void arm7_cpu_device::arm7_drc_init()
 {
 	drc_cache *cache;
 	drcbe_info beinfo;
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	/* allocate enough space for the cache and the core */
 	cache = auto_alloc(machine(), drc_cache(CACHE_SIZE));
 	if (cache == nullptr)
-		fatalerror("Unable to allocate cache of size %d\n", (UINT32)(CACHE_SIZE));
+		fatalerror("Unable to allocate cache of size %d\n", (uint32_t)(CACHE_SIZE));
 
 	/* allocate the implementation-specific state from the full cache */
 	memset(&m_impstate, 0, sizeof(m_impstate));
@@ -241,7 +241,7 @@ void arm7_cpu_device::arm7_drc_exit()
     arm7drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void arm7_cpu_device::arm7drc_set_options(UINT32 options)
+void arm7_cpu_device::arm7drc_set_options(uint32_t options)
 {
 	m_impstate.drcoptions = options;
 }
@@ -252,7 +252,7 @@ void arm7_cpu_device::arm7drc_set_options(UINT32 options)
     region
 -------------------------------------------------*/
 
-void arm7_cpu_device::arm7drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+void arm7_cpu_device::arm7drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
 	if (m_impstate.fastram_select < ARRAY_LENGTH(m_impstate.fastram))
 	{
@@ -269,7 +269,7 @@ void arm7_cpu_device::arm7drc_add_fastram(offs_t start, offs_t end, UINT8 readon
     arm7drc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void arm7_cpu_device::arm7drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles)
+void arm7_cpu_device::arm7drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles)
 {
 	if (m_impstate.hotspot_select < ARRAY_LENGTH(m_impstate.hotspot))
 	{
@@ -326,7 +326,7 @@ void arm7_cpu_device::code_flush_cache()
     given mode at the specified pc
 -------------------------------------------------*/
 
-void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
+void arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	drcuml_state *drcuml = m_impstate.drcuml;
 	compiler_state compiler = { 0 };
@@ -354,7 +354,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 			for (const opcode_desc *seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -454,7 +454,7 @@ void arm7_cpu_device::cfunc_get_cycles()
 
 void arm7_cpu_device::cfunc_unimplemented()
 {
-	UINT32 opcode = m_impstate.arg0;
+	uint32_t opcode = m_impstate.arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X\n", m_r[eR15], opcode);
 }
 
@@ -620,9 +620,9 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, nopabt = label++);                          // jmpz     nound
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_UND, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_UND, 0, MODE_FLAG
-	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
+	UML_MOV(block, uml::I1, (uint64_t)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
-	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
+	UML_MOVc(block, uml::COND_NZ, uml::I1, (uint64_t)-2);                                   // movnz    i1, -2
 	UML_ADD(block, uml::mem(&GetRegister(14)), uml::I0, uml::I1);                // add      LR, i0, i1
 	UML_MOV(block, uml::mem(&GetRegister(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
@@ -638,9 +638,9 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, done = label++);                            // jmpz     done
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_SVC, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_SVC, 0, MODE_FLAG
-	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
+	UML_MOV(block, uml::I1, (uint64_t)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
-	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
+	UML_MOVc(block, uml::COND_NZ, uml::I1, (uint64_t)-2);                                   // movnz    i1, -2
 	UML_ADD(block, uml::mem(&GetRegister(14)), uml::I0, uml::I1);                // add      LR, i0, i1
 
 	UML_TEST(block, uml::mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
@@ -1053,8 +1053,8 @@ void arm7_cpu_device::static_generate_memory_accessor(int size, bool istlb, bool
 		{
 			if (m_impstate.fastram[ramnum].base != nullptr && (!iswrite || !m_impstate.fastram[ramnum].readonly))
 			{
-				void *fastbase = (UINT8 *)m_impstate.fastram[ramnum].base - m_impstate.fastram[ramnum].start;
-				UINT32 skip = label++;
+				void *fastbase = (uint8_t *)m_impstate.fastram[ramnum].base - m_impstate.fastram[ramnum].start;
+				uint32_t skip = label++;
 				if (m_impstate.fastram[ramnum].end != 0xffffffff)
 				{
 					UML_CMP(block, uml::I0, m_impstate.fastram[ramnum].end);     // cmp     i0, end
@@ -1202,7 +1202,7 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UINT32 sum = seqhead->opptr.l[0];
+			uint32_t sum = seqhead->opptr.l[0];
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);             // load    i0,base,0,dword
 
@@ -1223,7 +1223,7 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 	/* full verification; sum up everything */
 	else
 	{
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc);
 		UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);                 // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
@@ -1321,7 +1321,7 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block *block, compile
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
-void arm7_cpu_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
+void arm7_cpu_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg)
 {
 	compiler_state compiler_temp = *compiler;
 
@@ -1368,7 +1368,7 @@ void arm7_cpu_device::saturate_qbit_overflow(drcuml_block *block)
 	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I1);
 }
 
-bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 insn)
+bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t insn)
 {
 	uml::code_label done;
 	/* Branch and Exchange (BX) */
@@ -1382,17 +1382,17 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff000f0) == 0x01600010) // CLZ - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rd = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rd = (insn>>12)&0xf;
 
 		UML_LZCNT(block, DRC_REG(rd), DRC_REG(rm));
 		UML_ADD(block, DRC_PC, DRC_PC, 4);
 	}
 	else if ((insn & 0x0ff000f0) == 0x01000050) // QADD - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>16)&0xf;
-		UINT32 rd = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>16)&0xf;
+		uint32_t rd = (insn>>12)&0xf;
 		UML_DSEXT(block, uml::I0, DRC_REG(rm), uml::SIZE_DWORD);
 		UML_DSEXT(block, uml::I1, DRC_REG(rn), uml::SIZE_DWORD);
 		UML_DADD(block, uml::I0, uml::I0, uml::I1);
@@ -1402,9 +1402,9 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff000f0) == 0x01400050) // QDADD - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>16)&0xf;
-		UINT32 rd = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>16)&0xf;
+		uint32_t rd = (insn>>12)&0xf;
 
 		UML_DSEXT(block, uml::I1, DRC_REG(rn), uml::SIZE_DWORD);
 		UML_DADD(block, uml::I0, uml::I1, uml::I1);
@@ -1421,9 +1421,9 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff000f0) == 0x01200050) // QSUB - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>16)&0xf;
-		UINT32 rd = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>16)&0xf;
+		uint32_t rd = (insn>>12)&0xf;
 
 		UML_DSEXT(block, uml::I0, DRC_REG(rm), uml::SIZE_DWORD);
 		UML_DSEXT(block, uml::I1, DRC_REG(rn), uml::SIZE_DWORD);
@@ -1434,9 +1434,9 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff000f0) == 0x01600050) // QDSUB - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>16)&0xf;
-		UINT32 rd = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>16)&0xf;
+		uint32_t rd = (insn>>12)&0xf;
 
 		UML_DSEXT(block, uml::I1, DRC_REG(rn), uml::SIZE_DWORD);
 		UML_DADD(block, uml::I0, uml::I1, uml::I1);
@@ -1453,10 +1453,10 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff00090) == 0x01000080) // SMLAxy - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>8)&0xf;
-		UINT32 rd = (insn>>16)&0xf;
-		UINT32 ra = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>8)&0xf;
+		uint32_t rd = (insn>>16)&0xf;
+		uint32_t ra = (insn>>12)&0xf;
 
 		UML_MOV(block, uml::I0, DRC_REG(rm));
 		UML_MOV(block, uml::I1, DRC_REG(rn));
@@ -1487,10 +1487,10 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff00090) == 0x01400080) // SMLALxy - v5
 	{
-		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>8)&0xf;
-		UINT32 rdh = (insn>>16)&0xf;
-		UINT32 rdl = (insn>>12)&0xf;
+		uint32_t rm = insn&0xf;
+		uint32_t rn = (insn>>8)&0xf;
+		uint32_t rdh = (insn>>16)&0xf;
+		uint32_t rdl = (insn>>12)&0xf;
 
 		UML_DSEXT(block, uml::I0, DRC_REG(rm), uml::SIZE_DWORD);
 		UML_DSEXT(block, uml::I1, DRC_REG(rn), uml::SIZE_DWORD);
@@ -1508,9 +1508,9 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{
-		INT32 src1 = GetRegister(insn&0xf);
-		INT32 src2 = GetRegister((insn>>8)&0xf);
-		INT32 res;
+		int32_t src1 = GetRegister(insn&0xf);
+		int32_t src2 = GetRegister((insn>>8)&0xf);
+		int32_t res;
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
 		if (insn & 0x20)
@@ -1541,9 +1541,9 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	}
 	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
 	{
-		INT32 src1 = GetRegister(insn&0xf);
-		INT32 src2 = GetRegister((insn>>8)&0xf);
-		INT64 res;
+		int32_t src1 = GetRegister(insn&0xf);
+		int32_t src2 = GetRegister((insn>>8)&0xf);
+		int64_t res;
 
 		if (insn & 0x40)
 		{
@@ -1558,16 +1558,16 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 			}
 		}
 
-		res = (INT64)src1 * (INT64)src2;
+		res = (int64_t)src1 * (int64_t)src2;
 		res >>= 16;
-		SetRegister((insn>>16)&0xf, (UINT32)res);
+		SetRegister((insn>>16)&0xf, (uint32_t)res);
 	}
 	else if ((insn & 0x0ff000b0) == 0x01200080) // SMLAWy - v5
 	{
-		INT32 src1 = GetRegister(insn&0xf);
-		INT32 src2 = GetRegister((insn>>8)&0xf);
-		INT32 src3 = GetRegister((insn>>12)&0xf);
-		INT64 res;
+		int32_t src1 = GetRegister(insn&0xf);
+		int32_t src2 = GetRegister((insn>>8)&0xf);
+		int32_t src3 = GetRegister((insn>>12)&0xf);
+		int64_t res;
 
 		if (insn & 0x40)
 		{
@@ -1582,17 +1582,17 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 			}
 		}
 
-		res = (INT64)src1 * (INT64)src2;
+		res = (int64_t)src1 * (int64_t)src2;
 		res >>= 16;
 
 		// check for overflow and set the Q bit
-		saturate_qbit_overflow((INT64)src3 + res);
+		saturate_qbit_overflow((int64_t)src3 + res);
 
 		// do the real accumulate
-		src3 += (INT32)res;
+		src3 += (int32_t)res;
 
 		// write the result back
-		SetRegister((insn>>16)&0xf, (UINT32)res);
+		SetRegister((insn>>16)&0xf, (uint32_t)res);
 	}
 	else
 	/* Multiply OR Swap OR Half Word Data Transfer */
@@ -1650,32 +1650,32 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 	return true;
 }
 
-bool arm7_cpu_device::drcarm7ops_4567(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_4567(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
 
-bool arm7_cpu_device::drcarm7ops_89(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_89(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
 
-bool arm7_cpu_device::drcarm7ops_ab(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_ab(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
 
-bool arm7_cpu_device::drcarm7ops_cd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_cd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
 
-bool arm7_cpu_device::drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
 
-bool arm7_cpu_device::drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+bool arm7_cpu_device::drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op)
 {
 	return false;
 }
@@ -1688,8 +1688,8 @@ bool arm7_cpu_device::drcarm7ops_f(drcuml_block *block, compiler_state *compiler
 int arm7_cpu_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	//int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = desc->opptr.l[0];
-	UINT8 opswitch = op >> 26;
+	uint32_t op = desc->opptr.l[0];
+	uint8_t opswitch = op >> 26;
 	uml::code_label skip;
 	uml::code_label contdecode;
 	uml::code_label unexecuted;

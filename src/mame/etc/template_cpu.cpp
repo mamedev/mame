@@ -40,7 +40,7 @@ void xxx_cpu_device::xxx_illegal()
 /* Execute cycles */
 void cp1610_cpu_device::execute_run()
 {
-	UINT16 opcode;
+	uint16_t opcode;
 
 	do
 	{
@@ -100,7 +100,7 @@ void xxx_cpu_device::execute_set_input(int irqline, int state)
 }
 #endif
 
-xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, XXX, "XXX", tag, owner, clock, "xxx", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 32, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 32, 0)
@@ -123,7 +123,7 @@ void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::s
 }
 
 
-offs_t xxx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT32 *oprom, const UINT32 *opram, UINT32 options)
+offs_t xxx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( xxx );
 	return CPU_DISASSEMBLE_NAME(xxx)(this, buffer, pc, oprom, opram, options);

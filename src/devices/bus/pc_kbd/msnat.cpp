@@ -228,7 +228,7 @@ ROM_START( microsoft_natural )
 ROM_END
 
 
-pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, "Microsoft Natural Keyboard", tag, owner, clock, "ms_natural", __FILE__)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_cpu(*this, "ms_natrl_cpu")
@@ -315,7 +315,7 @@ WRITE_LINE_MEMBER( pc_kbd_microsoft_natural_device::data_write )
 
 READ8_MEMBER( pc_kbd_microsoft_natural_device::p0_read )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if (LOG)
 		logerror("%s: P0 read. P1 = %02x, P2 = %02x\n", tag(), m_p1, m_p2 );
@@ -424,7 +424,7 @@ WRITE8_MEMBER( pc_kbd_microsoft_natural_device::p2_write )
 
 READ8_MEMBER( pc_kbd_microsoft_natural_device::p3_read )
 {
-	UINT8 data = m_p3 & ~0x21;
+	uint8_t data = m_p3 & ~0x21;
 
 	// (Incoming) Clock signal is tied to the T1/P3.5 pin
 	data |= (clock_signal() ? 0x20 : 0x00);

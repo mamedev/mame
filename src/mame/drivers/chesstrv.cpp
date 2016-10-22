@@ -34,9 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER( diplomat_display_w );
 	DECLARE_READ8_MEMBER( diplomat_keypad_r );
 
-	UINT8 m_ram_addr;
-	UINT8 *m_ram;
-	UINT8 m_matrix;
+	uint8_t m_ram_addr;
+	uint8_t *m_ram;
+	uint8_t m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
@@ -63,7 +63,7 @@ WRITE8_MEMBER( chesstrv_state::ram_w )
 
 WRITE8_MEMBER( chesstrv_state::display_w )
 {
-	UINT8 seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	uint8_t seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
 		output().set_digit_value( 3, seg_data );
@@ -82,7 +82,7 @@ WRITE8_MEMBER( chesstrv_state::matrix_w )
 
 READ8_MEMBER( chesstrv_state::keypad_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= ioport("LINE1")->read();
 	data |= ioport("LINE2")->read();
@@ -103,7 +103,7 @@ WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
 
 READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 {
-	UINT8 data = m_matrix & 0x07;
+	uint8_t data = m_matrix & 0x07;
 
 	switch (m_matrix & 7)
 	{

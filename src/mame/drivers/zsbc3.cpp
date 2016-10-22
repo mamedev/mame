@@ -54,7 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(zsbc3_2a_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -63,7 +63,7 @@ private:
 
 READ8_MEMBER( zsbc3_state::zsbc3_28_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

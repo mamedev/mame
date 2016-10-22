@@ -26,14 +26,14 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(tape_status_r);
 	DECLARE_READ8_MEMBER(tape_data_r);
 	DECLARE_WRITE8_MEMBER(tape_data_w);
 	virtual void video_start() override;
-	UINT32 screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

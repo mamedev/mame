@@ -25,15 +25,15 @@ public:
 	required_device<cpu_device> m_audioslave;
 	required_device<tms34010_device> m_slave;
 
-	required_shared_ptr<UINT16> m_master_videoram;
-	required_shared_ptr<UINT16> m_slave_videoram;
+	required_shared_ptr<uint16_t> m_master_videoram;
+	required_shared_ptr<uint16_t> m_slave_videoram;
 
-	UINT8 m_aimpos[2];
-	UINT8 m_trackball_old[2];
-	UINT8 m_master_sound_latch;
-	UINT8 m_slave_sound_latch;
-	UINT8 m_sound_control;
-	UINT16 m_last;
+	uint8_t m_aimpos[2];
+	uint8_t m_trackball_old[2];
+	uint8_t m_master_sound_latch;
+	uint8_t m_slave_sound_latch;
+	uint8_t m_sound_control;
+	uint16_t m_last;
 
 	DECLARE_WRITE16_MEMBER(exterm_host_data_w);
 	DECLARE_READ16_MEMBER(exterm_host_data_r);
@@ -55,5 +55,5 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_master);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_slave);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
-	UINT16 exterm_trackball_port_r(int which, UINT16 mem_mask);
+	uint16_t exterm_trackball_port_r(int which, uint16_t mem_mask);
 };

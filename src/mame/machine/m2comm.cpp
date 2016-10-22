@@ -197,7 +197,7 @@ machine_config_constructor m2comm_device::device_mconfig_additions() const
 //  m2comm_device - constructor
 //-------------------------------------------------
 
-m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M2COMM, "MODEL2 COMMUNICATION BD", tag, owner, clock, "m2comm", __FILE__),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
@@ -238,7 +238,7 @@ void m2comm_device::device_reset()
 
 READ8_MEMBER(m2comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
+	uint8_t result = m_zfg | 0xFE;
 #ifdef __M2COMM_VERBOSE__
 	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -255,7 +255,7 @@ WRITE8_MEMBER(m2comm_device::zfg_w)
 
 READ8_MEMBER(m2comm_device::share_r)
 {
-	UINT8 result = m_shared[offset];
+	uint8_t result = m_shared[offset];
 #ifdef __M2COMM_VERBOSE__
 	osd_printf_verbose("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 #endif

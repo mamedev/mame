@@ -54,8 +54,8 @@ class a8sio_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a8sio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a8sio_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a8sio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a8sio_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,8 +80,8 @@ class a8sio_device : public device_t
 {
 public:
 	// construction/destruction
-	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a8sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a8sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration
 	template<class _Object> static devcb_base &set_clock_in_callback(device_t &device, _Object object) { return downcast<a8sio_device &>(device).m_out_clock_in_cb.set_callback(object); }

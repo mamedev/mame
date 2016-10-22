@@ -29,24 +29,24 @@
 struct psion_file
 {
 	char filename[9];
-	UINT8 type;
-	UINT8 id;
+	uint8_t type;
+	uint8_t id;
 
-	UINT16 name_rec;
-	UINT16 data_rec;
+	uint16_t name_rec;
+	uint16_t data_rec;
 };
 
 struct psion_pack
 {
 	imgtool::stream *stream;
 
-	UINT16 eop;
+	uint16_t eop;
 	struct psion_file pack_index[MAXFILES];
 };
 
 struct psion_iter
 {
-	UINT16 index;
+	uint16_t index;
 };
 
 static psion_pack *get_psion_pack(imgtool::image &image)
@@ -54,9 +54,9 @@ static psion_pack *get_psion_pack(imgtool::image &image)
 	return (psion_pack*)image.extra_bytes();
 }
 
-UINT16 head_checksum(UINT8* data)
+uint16_t head_checksum(uint8_t* data)
 {
-	UINT16 checksum = 0;
+	uint16_t checksum = 0;
 
 	for (int i=0; i<6; i+=2)
 		checksum += (data[i]<<8 | data[i+1]);
@@ -64,9 +64,9 @@ UINT16 head_checksum(UINT8* data)
 	return checksum;
 }
 
-UINT16 get_long_rec_size(imgtool::stream &stream)
+uint16_t get_long_rec_size(imgtool::stream &stream)
 {
-	UINT8 size_h, size_l;
+	uint8_t size_h, size_l;
 
 	stream.read(&size_h, 1);
 	stream.read(&size_l, 1);
@@ -74,11 +74,11 @@ UINT16 get_long_rec_size(imgtool::stream &stream)
 	return (size_h<<8) | size_l;
 }
 
-UINT32 update_pack_index(psion_pack *pack)
+uint32_t update_pack_index(psion_pack *pack)
 {
-	UINT8 data, type;
-	UINT16 size;
-	UINT16 index = 0;
+	uint8_t data, type;
+	uint16_t size;
+	uint16_t index = 0;
 
 	memset(pack->pack_index, 0, sizeof(psion_file) * MAXFILES);
 
@@ -132,10 +132,10 @@ UINT32 update_pack_index(psion_pack *pack)
 	return FALSE;
 }
 
-int seek_next_record(imgtool::stream &stream, UINT8 id)
+int seek_next_record(imgtool::stream &stream, uint8_t id)
 {
-	UINT8 data, rec_id;
-	UINT16 size;
+	uint8_t data, rec_id;
+	uint16_t size;
 
 	do
 	{
@@ -172,7 +172,7 @@ int seek_next_record(imgtool::stream &stream, UINT8 id)
 // if there are multiple files with the same name, only the first is found
 int seek_file_name(psion_pack *pack, const char *filename)
 {
-	UINT16 index = 0;
+	uint16_t index = 0;
 
 	while (pack->pack_index[index].name_rec)
 	{
@@ -185,9 +185,9 @@ int seek_file_name(psion_pack *pack, const char *filename)
 	return -1;
 }
 
-UINT8 get_free_file_id(psion_pack *pack)
+uint8_t get_free_file_id(psion_pack *pack)
 {
-	for (UINT8 file_id=0x91; file_id<0xff; file_id++)
+	for (uint8_t file_id=0x91; file_id<0xff; file_id++)
 	{
 		int index = 0;
 
@@ -199,7 +199,7 @@ UINT8 get_free_file_id(psion_pack *pack)
 	return 0xff;
 }
 
-static void put_name_record(imgtool::stream &stream, const char* filename, UINT8 record_type, UINT8 record_id)
+static void put_name_record(imgtool::stream &stream, const char* filename, uint8_t record_type, uint8_t record_id)
 {
 	char data[0x10];
 	int i = 0;
@@ -221,16 +221,16 @@ static void put_name_record(imgtool::stream &stream, const char* filename, UINT8
 
 static void update_opk_head(imgtool::stream &stream)
 {
-	UINT16 size = stream.size() - 6;
+	uint16_t size = stream.size() - 6;
 
 	stream.seek(4, SEEK_SET);
 	stream.putc((size>>8) & 0xff);
 	stream.putc(size & 0xff);
 }
 
-char *stream_getline(imgtool::stream &source, UINT16 max_len)
+char *stream_getline(imgtool::stream &source, uint16_t max_len)
 {
-	UINT16 pos = 0;
+	uint16_t pos = 0;
 	char data;
 	char *line = (char*)malloc(max_len);
 	memset(line, 0, max_len);
@@ -260,19 +260,19 @@ char *stream_getline(imgtool::stream &source, UINT16 max_len)
 	return NULL;
 }
 
-UINT16 put_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 file_id)
+uint16_t put_odb(imgtool::stream &instream, imgtool::stream &outstream, uint8_t file_id)
 {
 	char *line;
-	UINT16 out_size = 0;
+	uint16_t out_size = 0;
 
 	// reset stream
 	instream.seek(0, SEEK_SET);
 
 	while ((line = stream_getline(instream, 256)))
 	{
-		UINT16 len = strlen(line);
+		uint16_t len = strlen(line);
 
-		outstream.putc((UINT8)len);
+		outstream.putc((uint8_t)len);
 		outstream.putc(file_id);
 		outstream.write(line, len);
 
@@ -287,10 +287,10 @@ UINT16 put_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 file
 	return out_size + 4;
 }
 
-UINT16 put_ob3(imgtool::stream &instream, imgtool::stream &outstream)
+uint16_t put_ob3(imgtool::stream &instream, imgtool::stream &outstream)
 {
-	UINT16 size = instream.size() - 6;
-	std::vector<UINT8> buffer(size);
+	uint16_t size = instream.size() - 6;
+	std::vector<uint8_t> buffer(size);
 
 	instream.seek(6, SEEK_SET);
 	instream.read(&buffer[0], size);
@@ -303,10 +303,10 @@ UINT16 put_ob3(imgtool::stream &instream, imgtool::stream &outstream)
 	return size;
 }
 
-UINT16 put_opl(imgtool::stream &instream, imgtool::stream &outstream)
+uint16_t put_opl(imgtool::stream &instream, imgtool::stream &outstream)
 {
-	UINT16 out_size = 0;
-	UINT32 rec_start = outstream.tell();
+	uint16_t out_size = 0;
+	uint32_t rec_start = outstream.tell();
 	char *line;
 
 	// reset stream
@@ -338,17 +338,17 @@ UINT16 put_opl(imgtool::stream &instream, imgtool::stream &outstream)
 	return out_size + 4;
 }
 
-UINT16 get_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type, UINT8 file_id)
+uint16_t get_odb(imgtool::stream &instream, imgtool::stream &outstream, uint8_t type, uint8_t file_id)
 {
-	UINT8 data, *buffer;
-	UINT16 out_size = 0;
+	uint8_t data, *buffer;
+	uint16_t out_size = 0;
 
 	if (file_id >= 0x90)
 		while (seek_next_record(instream, file_id))
 		{
 			instream.read(&data, 1);
 			instream.seek(1, SEEK_CUR);
-			buffer = (UINT8*)malloc(data);
+			buffer = (uint8_t*)malloc(data);
 			instream.read(buffer, data);
 			outstream.write(buffer, data);
 			outstream.putc('\r');
@@ -360,10 +360,10 @@ UINT16 get_odb(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type
 	return out_size;
 }
 
-UINT16 get_ob3(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type, UINT8 file_id)
+uint16_t get_ob3(imgtool::stream &instream, imgtool::stream &outstream, uint8_t type, uint8_t file_id)
 {
-	UINT8 data, *buffer = NULL;
-	UINT16 size = 0;
+	uint8_t data, *buffer = NULL;
+	uint16_t size = 0;
 	static const char ob3_magic[3] = {'O', 'R', 'G'};
 
 	instream.read(&data, 1);
@@ -372,7 +372,7 @@ UINT16 get_ob3(imgtool::stream &instream, imgtool::stream &outstream, UINT8 type
 	{
 		instream.seek(1, SEEK_CUR);
 		size = get_long_rec_size(instream);
-		buffer = (UINT8*)malloc(size);
+		buffer = (uint8_t*)malloc(size);
 		instream.read(buffer, size);
 	}
 
@@ -416,9 +416,9 @@ static imgtoolerr_t datapack_open(imgtool::image &image, imgtool::stream::ptr &&
 static imgtoolerr_t datapack_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	psion_pack *pack = get_psion_pack(image);
-	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
-	UINT8 pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
-	UINT16 checksum;
+	static const uint8_t opk_magic[4] = {'O', 'P', 'K', 0x00};
+	uint8_t pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
+	uint16_t checksum;
 
 	pack_head[0] |= (opts->lookup_int('R')) ? 0x00 : 0x02;
 	pack_head[0] |= (opts->lookup_int('P')) ? 0x04 : 0x00;
@@ -475,7 +475,7 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_
 	imgtool::image &image(enumeration.image());
 	psion_pack *pack = get_psion_pack(image);
 	psion_iter *iter = (psion_iter*)enumeration.extra_bytes();
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!pack->pack_index[iter->index].name_rec)
 	{
@@ -507,11 +507,11 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_free_space(imgtool::partition &partition, UINT64 *size)
+static imgtoolerr_t datapack_free_space(imgtool::partition &partition, uint64_t *size)
 {
 	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
-	UINT32 pack_size = 0;
+	uint32_t pack_size = 0;
 
 	pack->stream->seek(0x07, SEEK_SET);
 	pack->stream->read(&pack_size, 1);
@@ -558,11 +558,11 @@ static imgtoolerr_t datapack_write_file(imgtool::partition &partition, const cha
 {
 	imgtool::image &image(partition.image());
 	psion_pack *pack = get_psion_pack(image);
-	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
-	UINT8 head[3];
-	UINT16 size = 0;
-	UINT8 type = opts->lookup_int('T');
-	UINT8 file_id = opts->lookup_int('I');
+	static const uint8_t data_head[4] = {0x02, 0x80, 0x00, 0x00};
+	uint8_t head[3];
+	uint16_t size = 0;
+	uint8_t type = opts->lookup_int('T');
+	uint8_t file_id = opts->lookup_int('I');
 
 	if (!pack->eop)
 		return IMGTOOLERR_CORRUPTIMAGE;
@@ -661,7 +661,7 @@ OPTION_GUIDE_START( psion_write_optguide )
 	OPTION_INT( 'I', "id", "File ID" )
 OPTION_GUIDE_END
 
-void psion_get_info( const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void psion_get_info( const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch (state)
 	{

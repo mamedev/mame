@@ -332,37 +332,37 @@ public:
 	}
 
 	// Blitter state
-	UINT16 m_textBytesToWrite;
-	INT16  m_blitterSerialCount;
-	UINT8  m_blitterMode;
-	UINT8  m_blittype;
-	UINT16 m_blitterAddr;
-	UINT16 m_textOffset;
-	UINT32 m_blitterClearMode;
-	INT16 m_blitterClearCount;
+	uint16_t m_textBytesToWrite;
+	int16_t  m_blitterSerialCount;
+	uint8_t  m_blitterMode;
+	uint8_t  m_blittype;
+	uint16_t m_blitterAddr;
+	uint16_t m_textOffset;
+	uint32_t m_blitterClearMode;
+	int16_t m_blitterClearCount;
 	pen_t m_tilepals[0x10000];
 	pen_t m_fadedpals[0x8000];
 
 	// store the blit params here
-	UINT32 m_spriteblit[12];
-	UINT32 m_vregs_address;
+	uint32_t m_spriteblit[12];
+	uint32_t m_vregs_address;
 
-	UINT32 m_clipvals[2][3];
-	UINT8  m_clipblitterMode[2]; // hack
+	uint32_t m_clipvals[2][3];
+	uint8_t  m_clipblitterMode[2]; // hack
 
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
-	required_shared_ptr<UINT32> m_framebuffer_vram;
-	required_shared_ptr<UINT32> m_txt_vram;
-	required_shared_ptr<UINT32> m_sysh1_txt_blit;
-	required_shared_ptr<UINT32> m_sysh1_workram_h;
-	required_shared_ptr<UINT32> m_sound_dma;
-	required_shared_ptr<UINT16> m_soundram;
-	required_shared_ptr<UINT16> m_soundram2;
-	required_shared_ptr<UINT32> m_rom;
+	required_shared_ptr<uint32_t> m_framebuffer_vram;
+	required_shared_ptr<uint32_t> m_txt_vram;
+	required_shared_ptr<uint32_t> m_sysh1_txt_blit;
+	required_shared_ptr<uint32_t> m_sysh1_workram_h;
+	required_shared_ptr<uint32_t> m_sound_dma;
+	required_shared_ptr<uint16_t> m_soundram;
+	required_shared_ptr<uint16_t> m_soundram2;
+	required_shared_ptr<uint32_t> m_rom;
 	required_ioport m_io_an0;
 	required_ioport m_io_an1;
 	required_ioport m_io_an2;
@@ -386,15 +386,15 @@ public:
 
 	bitmap_ind16 m_screen1_bitmap;
 	bitmap_ind16 m_screen2_bitmap;
-	UINT8 an_mux_data;
-	UINT8 sound_data, sound_fifo;
+	uint8_t an_mux_data;
+	uint8_t sound_data, sound_fifo;
 
-	UINT8* m_compressedgfx;
-	std::unique_ptr<UINT16[]> m_expanded_10bit_gfx;
-	std::unique_ptr<UINT16[]> m_rearranged_16bit_gfx;
+	uint8_t* m_compressedgfx;
+	std::unique_ptr<uint16_t[]> m_expanded_10bit_gfx;
+	std::unique_ptr<uint16_t[]> m_rearranged_16bit_gfx;
 
-	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
-	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
+	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
+	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
 	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
@@ -424,38 +424,38 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 m_colbase;
+	uint32_t m_colbase;
 
 	void coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty);
+		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty);
 
 	void coolriders_drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 transpen);
+		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		uint32_t transpen);
 
 	void draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	UINT32 screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	uint32_t screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 
-	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
+	void sysh1_dma_transfer( address_space &space, uint16_t dma_index );
 
 	int debug_randompal;
 
-	std::unique_ptr<UINT16[]> m_h1_vram;
-	std::unique_ptr<UINT8[]> m_h1_pcg;
-	std::unique_ptr<UINT16[]> m_h1_pal;
+	std::unique_ptr<uint16_t[]> m_h1_vram;
+	std::unique_ptr<uint8_t[]> m_h1_pcg;
+	std::unique_ptr<uint16_t[]> m_h1_pal;
 	int m_gfx_index;
 	int m_color_bank;
 	struct {
-		UINT32 setting;
-		UINT8 gradient;
+		uint32_t setting;
+		uint8_t gradient;
 	}m_rgb_ctrl[2];
-	UINT32 m_pen_fill[2];
+	uint32_t m_pen_fill[2];
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_object_threaded(void *param, int threadid);
@@ -463,15 +463,15 @@ public:
 
 	struct cool_render_object
 	{
-		UINT8* indirect_tiles;
-		UINT32* indirect_zoom;
-		UINT32 spriteblit[12];
+		uint8_t* indirect_tiles;
+		uint32_t* indirect_zoom;
+		uint32_t spriteblit[12];
 		bitmap_ind16* drawbitmap;
 		//bitmap_ind16* zbitmap;
-		UINT16 zpri;
-		UINT8 blittype;
+		uint16_t zpri;
+		uint8_t blittype;
 		coolridr_state* state;
-		UINT32 clipvals[3];
+		uint32_t clipvals[3];
 		int screen;
 		int colbase;
 	};
@@ -494,21 +494,21 @@ public:
 	struct objectcache
 	{
 		// these needs to be all the elements actually going to affect the decode of an individual tile for any given object
-		UINT32 lastromoffset;
-		UINT16 lastused_flipx;
-		UINT16 lastused_flipy;
-		UINT32 lastblit_rotate;
-		UINT32 lastb1mode;
-		UINT32 lastb1colorNumber;
-		UINT32 lastb2colorNumber;
-		UINT32 lastb2altpenmask;
-		UINT16 lastused_hCellCount;
-		UINT16 lastused_vCellCount;
+		uint32_t lastromoffset;
+		uint16_t lastused_flipx;
+		uint16_t lastused_flipy;
+		uint32_t lastblit_rotate;
+		uint32_t lastb1mode;
+		uint32_t lastb1colorNumber;
+		uint32_t lastb2colorNumber;
+		uint32_t lastb2altpenmask;
+		uint16_t lastused_hCellCount;
+		uint16_t lastused_vCellCount;
 		int repeatcount;
 
 		struct dectile
 		{
-			UINT16 tempshape_multi[16*16];
+			uint16_t tempshape_multi[16*16];
 			bool tempshape_multi_decoded;
 			bool is_blank;
 		};
@@ -523,7 +523,7 @@ public:
 		objectcache objcache[DECODECACHE_NUMOBJECTCACHES];
 
 		// fallback decode buffer for certain cases (indirect sprites, sprites too big for our buffer..)
-		UINT16 tempshape[16*16];
+		uint16_t tempshape[16*16];
 	};
 
 	objcachemanager decode[2];
@@ -583,11 +583,11 @@ void coolridr_state::video_start()
 #define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                               \
 do {                                                                                    \
 	do {                                                                                \
-		const UINT8 *srcdata;                                                           \
-		INT32 destendx, destendy;                                                       \
-		INT32 srcx, srcy;                                                               \
-		INT32 curx, cury;                                                               \
-		INT32 dy;                                                                       \
+		const uint8_t *srcdata;                                                           \
+		int32_t destendx, destendy;                                                       \
+		int32_t srcx, srcy;                                                               \
+		int32_t curx, cury;                                                               \
+		int32_t dy;                                                                       \
 																						\
 		assert(dest.valid());                                                           \
 		assert(gfx != nullptr);                                                            \
@@ -648,8 +648,8 @@ do {                                                                            
 		srcdata = gfx->get_data(code);                                      \
 																						\
 		/* compute how many blocks of 4 pixels we have */                           \
-		UINT32 numblocks = (destendx + 1 - destx) / 4;                              \
-		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
+		uint32_t numblocks = (destendx + 1 - destx) / 4;                              \
+		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
 																					\
 		/* adjust srcdata to point to the first source pixel of the row */          \
 		srcdata += srcy * gfx->rowbytes() + srcx;                                   \
@@ -661,7 +661,7 @@ do {                                                                            
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const UINT8 *srcptr = srcdata;                                      \
+				const uint8_t *srcptr = srcdata;                                      \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -693,7 +693,7 @@ do {                                                                            
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const UINT8 *srcptr = srcdata;                                      \
+				const uint8_t *srcptr = srcdata;                                      \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -731,7 +731,7 @@ while (0)
 #define COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN(DEST, SOURCE)                             \
 do                                                                                  \
 {                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                      \
+	uint32_t srcdata = (SOURCE);                                                      \
 	if (srcdata != transpen)                                                        \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
@@ -740,16 +740,16 @@ while (0)
 
 
 void coolridr_state::coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
+		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty)
 {
 	const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	code %= gfx->elements();
-	COOLRIDERS_DRAWGFX_CORE(UINT16, COOLRIDERS_PIXEL_OP_REMAP_OPAQUE);
+	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_OPAQUE);
 }
 
 void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 transpen)
+		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		uint32_t transpen)
 {
 	// special case invalid pens to opaque
 	if (transpen > 0xff)
@@ -760,7 +760,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage(code);
+		uint32_t usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -771,7 +771,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 
 	// render
 		const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
-	COOLRIDERS_DRAWGFX_CORE(UINT16, COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN);
+	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN);
 }
 
 void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
@@ -796,11 +796,11 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 	}
 	else
 	{
-		UINT32 base_offset;
+		uint32_t base_offset;
 		int tile,vram_data,color;
 		int scrollx;
 		int scrolly;
-		UINT8 transpen_setting;
+		uint8_t transpen_setting;
 		gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 		#define VREG(_offs) \
 			space.read_dword(m_vregs_address+_offs+which*0x40)
@@ -819,10 +819,10 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bitmap.fill(VREG(0x3c),cliprect);
 
 
-		UINT16 basey = scrolly>>4;
+		uint16_t basey = scrolly>>4;
 		for (int y=0;y<25;y++)
 		{
-			UINT16 basex = scrollx>>4;
+			uint16_t basex = scrollx>>4;
 			for (int x=0;x<32;x++)
 			{
 				vram_data = (m_h1_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
@@ -841,7 +841,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 
 }
 
-UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	if(m_rgb_ctrl[which].gradient)
 	{
@@ -899,8 +899,8 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 	{
 		for (int y=0;y<384;y++)
 		{
-			UINT16* linesrc = &m_screen1_bitmap.pix16(y);
-			UINT16* linedest = &bitmap.pix16(y);
+			uint16_t* linesrc = &m_screen1_bitmap.pix16(y);
+			uint16_t* linedest = &bitmap.pix16(y);
 
 			for (int x=0;x<496;x++)
 			{
@@ -912,8 +912,8 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 	{
 		for (int y=0;y<384;y++)
 		{
-			UINT16* linesrc = &m_screen2_bitmap.pix16(y);
-			UINT16* linedest = &bitmap.pix16(y);
+			uint16_t* linesrc = &m_screen2_bitmap.pix16(y);
+			uint16_t* linedest = &bitmap.pix16(y);
 
 			for (int x=0;x<496;x++)
 			{
@@ -925,7 +925,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #if 0
 	if (machine().input().code_pressed_once(KEYCODE_W))
@@ -943,7 +943,7 @@ UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
 
-UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update_coolridr(screen,bitmap,cliprect,1);
 }
@@ -967,13 +967,13 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			while (data_written<256) \
 			{ \
 		\
-				const UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i]; \
+				const uint16_t compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i]; \
 		\
 				if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) /* 3bpp */ \
 				{ \
 					/* mm ccrr rrr0 */ \
 					int encodelength = (compdata & 0x03e)>>1; \
-					const UINT16 rledata =  rearranged_16bit_gfx[color_offs + ((compdata & 0x1c0) >> 6)]; \
+					const uint16_t rledata =  rearranged_16bit_gfx[color_offs + ((compdata & 0x1c0) >> 6)]; \
 					/* guess, blank tiles have the following form */ \
 					/* 00120 (00000024,0) | 010 03f */ \
 					if (compdata&1) encodelength = 255; \
@@ -990,7 +990,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 				{ \
 					/* mm cccc ccrr */ \
 					int encodelength = (compdata & 0x003);           \
-					const UINT16 rledata = rearranged_16bit_gfx[color_offs + ((compdata & 0x0fc) >> 2) + 8]; \
+					const uint16_t rledata = rearranged_16bit_gfx[color_offs + ((compdata & 0x0fc) >> 2) + 8]; \
 					while (data_written<256 && encodelength >=0) \
 					{ \
 						tempshape[data_written^writeaddrxor] = rledata; /* + 0x8 crt test, most of red, green, start of blue */ \
@@ -1002,7 +1002,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 				else /* 8bpp */ \
 				{ \
 					/* mm cccc cccc */ \
-					UINT16 rawdat = (compdata & 0x0ff); \
+					uint16_t rawdat = (compdata & 0x0ff); \
 					if (b1mode && (rawdat > (b2altpenmask + 0x48))) /* does this have to be turned on by b1mode? road ends up with some bad pixels otherwise but maybe the calc is wrong... does it affect the other colour depths too? */ \
 						tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs2 + (rawdat )+0x48]; /* bike wheels + brake light */ \
 					else \
@@ -1020,7 +1020,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
 				else \
 					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
-				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((UINT64)(void*)tempshape)&0xffffffff);*/ \
+				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((uint64_t)(void*)tempshape)&0xffffffff);*/ \
 			} \
 		} \
 	}
@@ -1103,7 +1103,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			} \
 		} \
 	} \
-	UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
+	uint32_t spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 
 #define DO_XCLIP_REAL \
 	if (drawx>clipmaxX) { break; } \
@@ -1115,8 +1115,8 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 
 
 #define GET_CURRENT_LINESCROLLZOOM \
-	UINT32 dword = object->indirect_zoom[v*16+realy]; \
-	UINT16 hZoomHere = hZoom + (dword>>16); \
+	uint32_t dword = object->indirect_zoom[v*16+realy]; \
+	uint16_t hZoomHere = hZoom + (dword>>16); \
 	if (!hZoomHere) { drawy++; continue; } \
 	/* bit 0x8000 does get set too, but only on some lines, might have another meaning? */ \
 	int linescroll = dword&0x7fff; \
@@ -1162,7 +1162,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 		if (pixelOffsetX>clipmaxX)  { drawy++; continue; } \
 		if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX) \
 		{ \
-			UINT32 incx = 0x8000000 / hZoomHere; \
+			uint32_t incx = 0x8000000 / hZoomHere; \
 			int drawx = pixelOffsetX; \
 			for (int x = 0; x < blockwide; x++) \
 			{ \
@@ -1174,7 +1174,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 		} \
 		else \
 		{ \
-			UINT32 incx = 0x8000000 / hZoomHere; \
+			uint32_t incx = 0x8000000 / hZoomHere; \
 			int drawx = pixelOffsetX; \
 			for (int x = 0; x < blockwide; x++) \
 			{ \
@@ -1262,7 +1262,7 @@ TODO: fix anything that isn't text.
 			} \
 			else \
 			{ \
-				UINT16 source = line[drawx]; \
+				uint16_t source = line[drawx]; \
 				int src_r = ((source>>10)&0x1f) * blit4blendlevelinv; \
 				int src_g = ((source>>5)&0x1f)  * blit4blendlevelinv; \
 				int src_b = ((source>>0)&0x1f)  * blit4blendlevelinv; \
@@ -1281,9 +1281,9 @@ TODO: fix anything that isn't text.
 //object->expanded_10bit_gfx
 
 #define GET_PIX_ROTATED \
-		UINT16 pix = tempshape[realx*16+realy];
+		uint16_t pix = tempshape[realx*16+realy];
 #define GET_PIX_NORMAL \
-		UINT16 pix = tempshape[realy*16+realx];
+		uint16_t pix = tempshape[realy*16+realx];
 
 void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
@@ -1292,14 +1292,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	/************* object->spriteblit[3] *************/
 
-	UINT32 blit3_unused = object->spriteblit[3] & 0xffe00000;
-	UINT32 b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
+	uint32_t blit3_unused = object->spriteblit[3] & 0xffe00000;
+	uint32_t b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
 
 	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
 
 	/************* object->spriteblit[5] *************/
 
-	UINT32 blit5_unused = object->spriteblit[5]&0xfffefffe;
+	uint32_t blit5_unused = object->spriteblit[5]&0xfffefffe;
 	// this might enable the text indirection thing?
 	int indirect_tile_enable = (object->spriteblit[5] & 0x00010000)>>16;
 	int indirect_zoom_enable = (object->spriteblit[5] & 0x00000001);
@@ -1312,21 +1312,21 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
-	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx.get();
-	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx.get();
+	uint16_t* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx.get();
+	uint16_t* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx.get();
 
-	INT16 clipminX = CLIPMINX_FULL;
-	INT16 clipmaxX = CLIPMAXX_FULL;
-	INT16 clipminY = CLIPMINY_FULL;
-	INT16 clipmaxY = CLIPMAXY_FULL;
+	int16_t clipminX = CLIPMINX_FULL;
+	int16_t clipmaxX = CLIPMAXX_FULL;
+	int16_t clipminY = CLIPMINY_FULL;
+	int16_t clipmaxY = CLIPMAXY_FULL;
 
 
 	/************* object->spriteblit[1] *************/
 
 	// 000u0ccc  - c = colour? u = 0/1
-	UINT32 blit1_unused = object->spriteblit[1] & 0xfffef800;
-	UINT32 b1mode = (object->spriteblit[1] & 0x00010000)>>16;
-	UINT32 b1colorNumber = (object->spriteblit[1] & 0x000007ff);    // Probably more bits
+	uint32_t blit1_unused = object->spriteblit[1] & 0xfffef800;
+	uint32_t b1mode = (object->spriteblit[1] & 0x00010000)>>16;
+	uint32_t b1colorNumber = (object->spriteblit[1] & 0x000007ff);    // Probably more bits
 
 	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[1]);
 
@@ -1339,9 +1339,9 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	/************* object->spriteblit[3] *************/
 
 	// seems to be more complex than just transparency
-	UINT32 blit2_unused = object->spriteblit[2]&0xff80f800;
-	UINT32 b2altpenmask = (object->spriteblit[2] & 0x007f0000)>>16;
-	UINT32 b2colorNumber = (object->spriteblit[2] & 0x000007ff);
+	uint32_t blit2_unused = object->spriteblit[2]&0xff80f800;
+	uint32_t b2altpenmask = (object->spriteblit[2] & 0x007f0000)>>16;
+	uint32_t b2colorNumber = (object->spriteblit[2] & 0x000007ff);
 
 	if (b2colorNumber != b1colorNumber)
 	{
@@ -1370,17 +1370,17 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	/************* object->spriteblit[4] *************/
 
-	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefeee;
-	UINT16 blit4blendlevel = (object->spriteblit[4] & 0x07000000)>>24;
-	UINT16 blit4blendlevelinv = blit4blendlevel^0x7;
+	uint32_t blit4_unused = object->spriteblit[4] & 0xf8fefeee;
+	uint16_t blit4blendlevel = (object->spriteblit[4] & 0x07000000)>>24;
+	uint16_t blit4blendlevelinv = blit4blendlevel^0x7;
 	blit4blendlevel+=1; // make our maths easier later (not sure about accuracy)
 	//object->zpri = 7-blit4;
 	// unknown bits in blit word 4 -  00000010 - australia (and various other times)
 
-	UINT32 blit_flipx = object->spriteblit[4] & 0x00000001;
-	UINT32 blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
-	UINT32 blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
-	//UINT32 b4_unk = object->spriteblit[4] & 0x00000010;
+	uint32_t blit_flipx = object->spriteblit[4] & 0x00000001;
+	uint32_t blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
+	uint32_t blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
+	//uint32_t b4_unk = object->spriteblit[4] & 0x00000010;
 
 	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
 
@@ -1413,14 +1413,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	/************* object->spriteblit[6] *************/
 
-	UINT16 vCellCount = (object->spriteblit[6] & 0x03ff0000) >> 16;
-	UINT16 hCellCount = (object->spriteblit[6] & 0x000003ff);
+	uint16_t vCellCount = (object->spriteblit[6] & 0x03ff0000) >> 16;
+	uint16_t hCellCount = (object->spriteblit[6] & 0x000003ff);
 
 	/************* object->spriteblit[7] *************/
 
-	UINT16 vOrigin = (object->spriteblit[7] & 0x00030000) >> 16;
-	UINT16 hOrigin = (object->spriteblit[7] & 0x00000003);
-	UINT16 OriginUnused = (object->spriteblit[7] & 0xfffcfffc);
+	uint16_t vOrigin = (object->spriteblit[7] & 0x00030000) >> 16;
+	uint16_t hOrigin = (object->spriteblit[7] & 0x00000003);
+	uint16_t OriginUnused = (object->spriteblit[7] & 0xfffcfffc);
 
 	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
 
@@ -1428,8 +1428,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	/************* object->spriteblit[8] *************/
 
-	UINT16 vZoom = (object->spriteblit[8] & 0xffff0000) >> 16;
-	UINT16 hZoom = (object->spriteblit[8] & 0x0000ffff);
+	uint16_t vZoom = (object->spriteblit[8] & 0xffff0000) >> 16;
+	uint16_t hZoom = (object->spriteblit[8] & 0x0000ffff);
 
 	// if we have no vertical zoom value there's no point in going any further
 	// because there are no known vertical indirect modes
@@ -1458,11 +1458,11 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	/************* object->spriteblit[10] *************/
 
 	// pointer to per-line zoom and scroll data for sprites
-	//UINT32 blit10 = 0; // we've cached the data here already
+	//uint32_t blit10 = 0; // we've cached the data here already
 
 	/************* object->spriteblit[11] *************/
 
-	//UINT32 textlookup = 0; // we've cached the data here already
+	//uint32_t textlookup = 0; // we've cached the data here already
 
 	/*
 	    sample data from attract mode 'filmstrip'
@@ -1753,10 +1753,10 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	if (object->clipvals[2] & 0x0000007) // clearly this isn't the enable flag, probably just enabled until next frame / it gets disabled
 	{
 		// these go negative when things scroll off the left in attract mode
-		INT16 minx = ((object->clipvals[1]&0xffff0000)>>16) - (((object->clipvals[2]&0x0000ffff)>>0));
-		INT16 maxx = ((object->clipvals[1]&0x0000ffff)>>0)  - (((object->clipvals[2]&0x0000ffff)>>0));
-		INT16 miny = ((object->clipvals[0]&0xffff0000)>>16); // maybe subtract the top 16 bits of clipvals[2], but not used?
-		INT16 maxy = ((object->clipvals[0]&0x0000ffff)>>0);
+		int16_t minx = ((object->clipvals[1]&0xffff0000)>>16) - (((object->clipvals[2]&0x0000ffff)>>0));
+		int16_t maxx = ((object->clipvals[1]&0x0000ffff)>>0)  - (((object->clipvals[2]&0x0000ffff)>>0));
+		int16_t miny = ((object->clipvals[0]&0xffff0000)>>16); // maybe subtract the top 16 bits of clipvals[2], but not used?
+		int16_t maxy = ((object->clipvals[0]&0x0000ffff)>>0);
 
 
 		clipminX = minx -1;
@@ -1780,10 +1780,10 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	}
 
 	/* DRAW */
-	UINT16 used_hCellCount = hCellCount;
-	UINT16 used_vCellCount = vCellCount;
-	UINT16 used_flipx = blit_flipx;
-	UINT16 used_flipy = blit_flipy;
+	uint16_t used_hCellCount = hCellCount;
+	uint16_t used_vCellCount = vCellCount;
+	uint16_t used_flipx = blit_flipx;
+	uint16_t used_flipy = blit_flipy;
 
 	if (blit_rotate)
 	{
@@ -1805,7 +1805,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	int size = used_hCellCount * used_vCellCount;
 
-	UINT16* tempshape;
+	uint16_t* tempshape;
 	int screen = object->screen;
 	int use_object = 0;
 
@@ -1942,8 +1942,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			}
 		}
 
-		UINT32 lastSpriteNumber = 0xffffffff;
-		UINT16 blankcount = 0;
+		uint32_t lastSpriteNumber = 0xffffffff;
+		uint16_t blankcount = 0;
 		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
 		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
@@ -1957,8 +1957,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 				/*
 				if (object->screen==0)
 				{
-				    if (current_decoded) printf("setting temp shape to %04x tile is marked as decoded %08x \n", v*used_hCellCount + h, ((UINT64)(void*)tempshape)&0xffffffff);
-				    else printf("setting temp shape to %04x tile is marked as NOT decoded %08x \n", v*used_hCellCount + h, ((UINT64)(void*)tempshape)&0xffffffff);
+				    if (current_decoded) printf("setting temp shape to %04x tile is marked as decoded %08x \n", v*used_hCellCount + h, ((uint64_t)(void*)tempshape)&0xffffffff);
+				    else printf("setting temp shape to %04x tile is marked as NOT decoded %08x \n", v*used_hCellCount + h, ((uint64_t)(void*)tempshape)&0xffffffff);
 				}
 				*/
 			}
@@ -1971,11 +1971,11 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
-			UINT32 incy = 0x8000000 / vZoom;
+			uint32_t incy = 0x8000000 / vZoom;
 
 			// DEBUG: Draw 16x16 block
-			UINT16* line;
-			//UINT16* zline;
+			uint16_t* line;
+			//uint16_t* zline;
 
 
 			if (indirect_zoom_enable)
@@ -2064,7 +2064,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					const int pixelOffsetnextX = ((hPosition) + ((h+1)* 16 * hZoom)) / 0x40;
 
 					int blockwide = pixelOffsetnextX-pixelOffsetX;
-					UINT32 incx = 0x8000000 / (object->spriteblit[8] & 0x0000ffff);
+					uint32_t incx = 0x8000000 / (object->spriteblit[8] & 0x0000ffff);
 
 					if (pixelOffsetX+blockwide < clipminX)
 						continue;
@@ -2174,7 +2174,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	//
 	// the sprites with 1 set appear to have 0x00000000 in everything after the 4th write (blit4 and above)
 	// so likely have some other meaning and are NOT regular sprite data
-	UINT32 blit0 = m_spriteblit[0];
+	uint32_t blit0 = m_spriteblit[0];
 
 	if (blit0==0)
 	{
@@ -2247,11 +2247,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	if (test_indirect_tile_enable)
 	{
-		UINT32 test_textlookup =  m_spriteblit[11];
-		UINT16 test_hCellCount = (m_spriteblit[6] & 0x00003ff);
-		UINT16 test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
+		uint32_t test_textlookup =  m_spriteblit[11];
+		uint16_t test_hCellCount = (m_spriteblit[6] & 0x00003ff);
+		uint16_t test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
 		int bytes = test_vCellCount*test_hCellCount;
-		testobject->indirect_tiles = (UINT8*)malloc(bytes);
+		testobject->indirect_tiles = (uint8_t*)malloc(bytes);
 		for (int i=0;i<bytes;i++)
 		{
 			testobject->indirect_tiles[i] = space.read_byte(test_textlookup + i);
@@ -2265,10 +2265,10 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	int test_indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
 	if (test_indirect_zoom_enable)
 	{
-		UINT32 test_blit10 =  m_spriteblit[10];
-		UINT16 test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
+		uint32_t test_blit10 =  m_spriteblit[10];
+		uint16_t test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
 		int bytes = test_vCellCount * 4 * 16;
-		testobject->indirect_zoom = (UINT32*)malloc(bytes);
+		testobject->indirect_zoom = (uint32_t*)malloc(bytes);
 		for (int i=0;i<bytes/4;i++)
 		{
 			testobject->indirect_zoom[i] = space.read_dword(test_blit10 + i*4);
@@ -2416,7 +2416,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 	else if (m_blitterMode == 0x10)
 	{
 		// Could be a full clear of VRAM?
-		for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
+		for(uint32_t vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
 			space.write_dword(vramAddr, 0x00000000);
 
 		m_blitterSerialCount = 0;
@@ -2716,11 +2716,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 
 
 
-void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
+void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_index )
 {
-	UINT32 src = 0,dst = 0,size = 0;
-	UINT8 end_dma_mark;
-	UINT8 cmd;
+	uint32_t src = 0,dst = 0,size = 0;
+	uint8_t end_dma_mark;
+	uint8_t cmd;
 
 	end_dma_mark = 0;
 
@@ -2890,7 +2890,7 @@ WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
 
 READ8_MEMBER( coolridr_state::analog_mux_r )
 {
-	UINT8 adc_data = 0;
+	uint8_t adc_data = 0;
 	switch(an_mux_data)
 	{
 		case 0x0: adc_data = m_io_an0->read(); break;
@@ -2965,9 +2965,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 	{
 		if(data & 1 && (!(m_sound_dma[2] & 1))) // 0 -> 1 transition enables DMA
 		{
-			UINT32 src = m_sound_dma[0];
-			UINT32 dst = m_sound_dma[1];
-			UINT32 size = (m_sound_dma[2]>>16)*0x40;
+			uint32_t src = m_sound_dma[0];
+			uint32_t dst = m_sound_dma[1];
+			uint32_t size = (m_sound_dma[2]>>16)*0x40;
 
 			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
 
@@ -2984,9 +2984,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 	{
 		if(data & 1 && (!(m_sound_dma[6] & 1))) // 0 -> 1 transition enables DMA
 		{
-			UINT32 src = m_sound_dma[4];
-			UINT32 dst = m_sound_dma[5];
-			UINT32 size = (m_sound_dma[6]>>16)*0x40;
+			uint32_t src = m_sound_dma[4];
+			uint32_t dst = m_sound_dma[5];
+			uint32_t size = (m_sound_dma[6]>>16)*0x40;
 
 			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
 
@@ -3561,9 +3561,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 #define READ_COMPRESSED_ROM(chip) \
 	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1];
 // this helps you feth the 20bit words from an address in the compressed data
-UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
+uint32_t coolridr_state::get_20bit_data(uint32_t romoffset, int _20bitwordnum)
 {
-	UINT16 testvalue, testvalue2;
+	uint16_t testvalue, testvalue2;
 
 	int temp = _20bitwordnum & 3;
 	int inc = 0;
@@ -3598,9 +3598,9 @@ UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
 
 }
 
-UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
+uint16_t coolridr_state::get_10bit_data(uint32_t romoffset, int _10bitwordnum)
 {
-	UINT32 data = get_20bit_data(romoffset, _10bitwordnum>>1);
+	uint32_t data = get_20bit_data(romoffset, _10bitwordnum>>1);
 	if (_10bitwordnum&1) return data & 0x3ff;
 	else return (data>>10) & 0x3ff;
 }
@@ -3611,7 +3611,7 @@ void coolridr_state::machine_start()
 	size_t  size    = memregion( "compressedgfx" )->bytes();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
-	m_expanded_10bit_gfx = std::make_unique<UINT16[]>(((size/10)*16)/2);
+	m_expanded_10bit_gfx = std::make_unique<uint16_t[]>(((size/10)*16)/2);
 
 	for (int i=0;i<(0x800000*8)/2;i++)
 	{
@@ -3620,9 +3620,9 @@ void coolridr_state::machine_start()
 
 	// do a rearranged version too with just the 16-bit words in a different order, palettes seem to
 	// be referenced this way?!
-	m_rearranged_16bit_gfx = std::make_unique<UINT16[]>(size/2);
+	m_rearranged_16bit_gfx = std::make_unique<uint16_t[]>(size/2);
 
-	UINT16* compressed = (UINT16*)memregion( "compressedgfx" )->base();
+	uint16_t* compressed = (uint16_t*)memregion( "compressedgfx" )->base();
 	int count = 0;
 	for (int i=0;i<size/2/10;i++)
 	{
@@ -3650,16 +3650,16 @@ void coolridr_state::machine_start()
 		{
 			for (int i=0;i<(0x800000*8);i++)
 			{
-				fwrite((UINT8*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
+				fwrite((uint8_t*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
 
 		}
 	}
 
-	m_h1_vram = make_unique_clear<UINT16[]>(VRAM_SIZE);
-	m_h1_pcg = make_unique_clear<UINT8[]>(VRAM_SIZE);
-	m_h1_pal = make_unique_clear<UINT16[]>(VRAM_SIZE);
+	m_h1_vram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
+	m_h1_pcg = make_unique_clear<uint8_t[]>(VRAM_SIZE);
+	m_h1_pal = make_unique_clear<uint16_t[]>(VRAM_SIZE);
 
 	m_cool_render_object_list1 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
 	m_listcount1 = 0;

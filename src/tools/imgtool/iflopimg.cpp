@@ -48,7 +48,7 @@ static void imgtool_floppy_closeproc(void *file)
 	delete reinterpret_cast<imgtool::stream *>(file);
 }
 
-static int imgtool_floppy_seekproc(void *file, INT64 offset, int whence)
+static int imgtool_floppy_seekproc(void *file, int64_t offset, int whence)
 {
 	reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
 	return 0;
@@ -65,7 +65,7 @@ static size_t imgtool_floppy_writeproc(void *file, const void *buffer, size_t le
 	return length;
 }
 
-static UINT64 imgtool_floppy_filesizeproc(void *file)
+static uint64_t imgtool_floppy_filesizeproc(void *file)
 {
 	return reinterpret_cast<imgtool::stream *>(file)->size();
 }
@@ -212,10 +212,10 @@ static void imgtool_floppy_close(imgtool::image &img)
 
 
 
-static imgtoolerr_t imgtool_floppy_read_sector(imgtool::image &image, UINT32 track, UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
+static imgtoolerr_t imgtool_floppy_read_sector(imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer)
 {
 	floperr_t ferr;
-	UINT32 sector_size;
+	uint32_t sector_size;
 
 	// get the sector length
 	ferr = floppy_get_sector_length(imgtool_floppy(image), head, track, sector, &sector_size);
@@ -236,7 +236,7 @@ static imgtoolerr_t imgtool_floppy_read_sector(imgtool::image &image, UINT32 tra
 
 
 
-static imgtoolerr_t imgtool_floppy_write_sector(imgtool::image &image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
+static imgtoolerr_t imgtool_floppy_write_sector(imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len, int ddam)
 {
 	floperr_t ferr;
 
@@ -249,7 +249,7 @@ static imgtoolerr_t imgtool_floppy_write_sector(imgtool::image &image, UINT32 tr
 
 
 
-static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+static void imgtool_floppy_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	const struct FloppyFormat *format;
 	imgtool_class derived_class;
@@ -324,7 +324,7 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool::image 
 {
 	floperr_t err;
 	floppy_image_legacy *floppy;
-	std::vector<UINT8> buffer;
+	std::vector<uint8_t> buffer;
 
 	floppy = imgtool_floppy(img);
 

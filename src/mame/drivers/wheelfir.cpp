@@ -222,7 +222,7 @@ static const int NUM_COLORS=256;
 
 struct scroll_info
 {
-		INT32 x,y,unkbits;
+		int32_t x,y,unkbits;
 };
 
 
@@ -243,26 +243,26 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<INT32[]> m_zoom_table;
-	std::unique_ptr<UINT16[]> m_blitter_data;
+	std::unique_ptr<int32_t[]> m_zoom_table;
+	std::unique_ptr<uint16_t[]> m_blitter_data;
 
-	std::unique_ptr<UINT8[]> m_palette_ptr;
-	INT32 m_palpos;
+	std::unique_ptr<uint8_t[]> m_palette_ptr;
+	int32_t m_palpos;
 
 	scroll_info *m_scanlines;
 
-	INT32 m_direct_write_x0;
-	INT32 m_direct_write_x1;
-	INT32 m_direct_write_y0;
-	INT32 m_direct_write_y1;
-	INT32 m_direct_write_idx;
+	int32_t m_direct_write_x0;
+	int32_t m_direct_write_x1;
+	int32_t m_direct_write_y0;
+	int32_t m_direct_write_y1;
+	int32_t m_direct_write_idx;
 
-	INT16 m_scanline_cnt;
+	int16_t m_scanline_cnt;
 
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2];
 
-	INT32 get_scale(INT32 index)
+	int32_t get_scale(int32_t index)
 	{
 		while(index<ZOOM_TABLE_SIZE)
 		{
@@ -285,7 +285,7 @@ public:
 	DECLARE_WRITE16_MEMBER(coin_cnt_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_wheelfir(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 };
@@ -336,7 +336,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 		{
-			UINT8 *rom = memregion("gfx1")->base();
+			uint8_t *rom = memregion("gfx1")->base();
 
 			int width = m_screen->width();
 			int height = m_screen->height();
@@ -523,14 +523,14 @@ void wheelfir_state::video_start()
 	m_tmp_bitmap[1] = std::make_unique<bitmap_ind16>(512, 512);
 }
 
-UINT32 wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	for(int y=cliprect.min_y; y < cliprect.max_y; y++)
 	{
-		UINT16 *source = &m_tmp_bitmap[LAYER_BG]->pix16(( (m_scanlines[y].y)&511));
-		UINT16 *dest = &bitmap.pix16(y);
+		uint16_t *source = &m_tmp_bitmap[LAYER_BG]->pix16(( (m_scanlines[y].y)&511));
+		uint16_t *dest = &bitmap.pix16(y);
 
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
@@ -586,8 +586,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		//{UINT16 x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
-		//{UINT16 x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
+		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
+		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
 		m_eeprom->di_write(BIT(data, 9));
 		m_eeprom->clk_write(BIT(data, 8));
 		m_eeprom->cs_write(BIT(data, 10));
@@ -603,7 +603,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 
 READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -735,11 +735,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 
 void wheelfir_state::machine_start()
 {
-	m_zoom_table = std::make_unique<INT32[]>(ZOOM_TABLE_SIZE);
-	m_blitter_data = std::make_unique<UINT16[]>(16);
+	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
+	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
-	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), UINT8, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
-	m_palette_ptr = std::make_unique<UINT8[]>(NUM_COLORS*3);
+	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), uint8_t, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
+	m_palette_ptr = std::make_unique<uint8_t[]>(NUM_COLORS*3);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
@@ -747,7 +747,7 @@ void wheelfir_state::machine_start()
 		m_zoom_table[i]=-1;
 	}
 
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	for(int j=0;j<400;++j)
 	{

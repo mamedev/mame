@@ -660,10 +660,10 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void segas16a_state::dumpmtmt_i8751_sim()
 {
-	UINT8 flag = m_workram[0x200/2] >> 8;
-	UINT8 tick = m_workram[0x200/2] & 0xff;
-	UINT8 sec = m_workram[0x202/2] >> 8;
-	UINT8 min = m_workram[0x202/2] & 0xff;
+	uint8_t flag = m_workram[0x200/2] >> 8;
+	uint8_t tick = m_workram[0x200/2] & 0xff;
+	uint8_t sec = m_workram[0x202/2] >> 8;
+	uint8_t min = m_workram[0x202/2] & 0xff;
 
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
@@ -792,9 +792,9 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// upper bit of the trackball controls
 				case 0:
 				{
-					UINT8 buttons = ioport("SERVICE")->read();
-					UINT8 analog1 = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
-					UINT8 analog2 = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
+					uint8_t buttons = ioport("SERVICE")->read();
+					uint8_t analog1 = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					uint8_t analog2 = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -804,8 +804,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// player 1 select switch mapped to bit 7
 				case 1:
 				{
-					UINT8 buttons = ioport("BUTTONS1")->read();
-					UINT8 analog = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					uint8_t buttons = ioport("BUTTONS1")->read();
+					uint8_t analog = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -816,8 +816,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 						return (ioport("ANALOGZ1")->read() >> 4) | (ioport("ANALOGZ2")->read() & 0xf0);
 					else
 					{
-						UINT8 buttons1 = ioport("BUTTONS1")->read();
-						UINT8 buttons2 = ioport("BUTTONS2")->read();
+						uint8_t buttons1 = ioport("BUTTONS1")->read();
+						uint8_t buttons2 = ioport("BUTTONS2")->read();
 
 						if (!(buttons1 & 0x01))
 							m_last_buttons1 = 0;
@@ -845,8 +845,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// player 2 select switch mapped to bit 7
 				case 3:
 				{
-					UINT8 buttons = ioport("BUTTONS2")->read();
-					UINT8 analog = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
+					uint8_t buttons = ioport("BUTTONS2")->read();
+					uint8_t analog = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
@@ -936,7 +936,7 @@ READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 }
 
 
-void segas16a_state::sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
+void segas16a_state::sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval)
 {
 	if ((changed & 4) && (newval & 4))
 		m_mj_input_num = (m_mj_input_num + 1) % 6;

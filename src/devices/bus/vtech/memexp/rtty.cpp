@@ -38,7 +38,7 @@ const tiny_rom_entry *rtty_interface_device::device_rom_region() const
 //  rtty_interface_device - constructor
 //-------------------------------------------------
 
-rtty_interface_device::rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rtty_interface_device::rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, RTTY_INTERFACE, "DSE VZ-200/300 RTTY Interface", tag, owner, clock, "vz_rtty", __FILE__),
 	device_memexp_interface(mconfig, *this)
 {

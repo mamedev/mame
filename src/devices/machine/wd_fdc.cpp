@@ -65,7 +65,7 @@ const device_type WD1773 = &device_creator<wd1773_t>;
 // Show state machine
 #define TRACE_STATE 0
 
-wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -1058,7 +1058,7 @@ void wd_fdc_t::do_cmd_w()
 	}
 }
 
-void wd_fdc_t::cmd_w(UINT8 val)
+void wd_fdc_t::cmd_w(uint8_t val)
 {
 	if (TRACE_COMP) logerror("Initiating command %02x\n", val);
 	if (inverted_bus) val ^= 0xff;
@@ -1088,7 +1088,7 @@ void wd_fdc_t::cmd_w(UINT8 val)
 	}
 }
 
-UINT8 wd_fdc_t::status_r()
+uint8_t wd_fdc_t::status_r()
 {
 	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
@@ -1125,7 +1125,7 @@ UINT8 wd_fdc_t::status_r()
 			status &= ~S_NRDY;
 	}
 
-	UINT8 val = status;
+	uint8_t val = status;
 	if (inverted_bus) val ^= 0xff;
 
 	return val;
@@ -1137,7 +1137,7 @@ void wd_fdc_t::do_track_w()
 	track_buffer = -1;
 }
 
-void wd_fdc_t::track_w(UINT8 val)
+void wd_fdc_t::track_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1149,9 +1149,9 @@ void wd_fdc_t::track_w(UINT8 val)
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-UINT8 wd_fdc_t::track_r()
+uint8_t wd_fdc_t::track_r()
 {
-	UINT8 val = track;
+	uint8_t val = track;
 	if (inverted_bus) val ^= 0xff;
 
 	return val;
@@ -1163,7 +1163,7 @@ void wd_fdc_t::do_sector_w()
 	sector_buffer = -1;
 }
 
-void wd_fdc_t::sector_w(UINT8 val)
+void wd_fdc_t::sector_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1181,15 +1181,15 @@ void wd_fdc_t::sector_w(UINT8 val)
 		delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-UINT8 wd_fdc_t::sector_r()
+uint8_t wd_fdc_t::sector_r()
 {
-	UINT8 val = sector;
+	uint8_t val = sector;
 	if (inverted_bus) val ^= 0xff;
 
 	return val;
 }
 
-void wd_fdc_t::data_w(UINT8 val)
+void wd_fdc_t::data_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1197,17 +1197,17 @@ void wd_fdc_t::data_w(UINT8 val)
 	drop_drq();
 }
 
-UINT8 wd_fdc_t::data_r()
+uint8_t wd_fdc_t::data_r()
 {
 	drop_drq();
 
-	UINT8 val = data;
+	uint8_t val = data;
 	if (inverted_bus) val ^= 0xff;
 
 	return val;
 }
 
-void wd_fdc_t::gen_w(int reg, UINT8 val)
+void wd_fdc_t::gen_w(int reg, uint8_t val)
 {
 	switch(reg) {
 	case 0: cmd_w(val); break;
@@ -1217,7 +1217,7 @@ void wd_fdc_t::gen_w(int reg, UINT8 val)
 	}
 }
 
-UINT8 wd_fdc_t::gen_r(int reg)
+uint8_t wd_fdc_t::gen_r(int reg)
 {
 	switch(reg) {
 	case 0: return status_r();
@@ -1495,17 +1495,17 @@ bool wd_fdc_t::write_one_bit(const attotime &limit)
 	return false;
 }
 
-void wd_fdc_t::live_write_raw(UINT16 raw)
+void wd_fdc_t::live_write_raw(uint16_t raw)
 {
 	if (TRACE_WRITE) logerror("write raw %04x, CRC=%04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
 
-void wd_fdc_t::live_write_mfm(UINT8 mfm)
+void wd_fdc_t::live_write_mfm(uint8_t mfm)
 {
 	bool context = cur_live.data_bit_context;
-	UINT16 raw = 0;
+	uint16_t raw = 0;
 	for(int i=0; i<8; i++) {
 		bool bit = mfm & (0x80 >> i);
 		if(!(bit || context))
@@ -1520,9 +1520,9 @@ void wd_fdc_t::live_write_mfm(UINT8 mfm)
 }
 
 
-void wd_fdc_t::live_write_fm(UINT8 fm)
+void wd_fdc_t::live_write_fm(uint8_t fm)
 {
-	UINT16 raw = 0xaaaa;
+	uint16_t raw = 0xaaaa;
 	for(int i=0; i<8; i++)
 		if(fm & (0x80 >> i))
 			raw |= 0x4000 >> (2*i);
@@ -2123,7 +2123,7 @@ void wd_fdc_t::drop_drq()
 	}
 }
 
-int wd_fdc_t::calc_sector_size(UINT8 size, UINT8 command) const
+int wd_fdc_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	return 128 << (size & 3);
 }
@@ -2133,7 +2133,7 @@ int wd_fdc_t::settle_time() const
 	return 60000;
 }
 
-wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	wd_fdc_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	clock_ratio = 1;
@@ -2185,7 +2185,7 @@ bool wd_fdc_analog_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_de
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
 
-wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	wd_fdc_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	clock_ratio = 4;
@@ -2278,7 +2278,7 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
 			transition_time = counter;
 		if(slot < 8) {
-			UINT8 mask = 1 << slot;
+			uint8_t mask = 1 << slot;
 			if(phase_add & mask)
 				counter += 226;
 			else if(phase_sub & mask)
@@ -2302,15 +2302,15 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
-		static const UINT8 pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
-		static const UINT8 phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
-		static const UINT8 freqa[4][8] = {
+		static const uint8_t pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
+		static const uint8_t phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
+		static const uint8_t freqa[4][8] = {
 			{ 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0, 0, 0 }
 		};
-		static const UINT8 freqs[4][8] = {
+		static const uint8_t freqs[4][8] = {
 			{ 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
@@ -2364,7 +2364,7 @@ bool wd_fdc_digital_t::digital_pll_t::write_next_bit(bool bit, attotime &tm, flo
 		attotime etime = ctime+delays[slot];
 		if(etime > limit)
 			return true;
-		UINT16 pre_counter = counter;
+		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
 			if(write_position < ARRAY_LENGTH(write_buffer))
@@ -2394,7 +2394,7 @@ void wd_fdc_digital_t::digital_pll_t::commit(floppy_image_device *floppy, const 
 	write_position = 0;
 }
 
-fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1771, "FD1771", tag, owner, clock, "fd1771", __FILE__)
+fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1771, "FD1771", tag, owner, clock, "fd1771", __FILE__)
 {
 	const static int fd1771_step_times[4] = { 12000, 12000, 20000, 40000 };
 
@@ -2411,7 +2411,7 @@ fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1771_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1771_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2419,7 +2419,7 @@ int fd1771_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return size ? size << 4 : 4096;
 }
 
-fd1781_t::fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1781, "FD1781", tag, owner, clock, "fd1781", __FILE__)
+fd1781_t::fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1781, "FD1781", tag, owner, clock, "fd1781", __FILE__)
 {
 	const static int fd1781_step_times[4] = { 6000, 12000, 20000, 40000 };
 
@@ -2436,7 +2436,7 @@ fd1781_t::fd1781_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1781_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1781_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2447,7 +2447,7 @@ int fd1781_t::calc_sector_size(UINT8 size, UINT8 command) const
 const int wd_fdc_t::fd179x_step_times[4] = {  6000, 12000, 20000, 30000 };
 const int wd_fdc_t::fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
 
-fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1791, "FD1791", tag, owner, clock, "fd1791", __FILE__)
+fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1791, "FD1791", tag, owner, clock, "fd1791", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2463,7 +2463,7 @@ fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1792, "FD1792", tag, owner, clock, "fd1792", __FILE__)
+fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1792, "FD1792", tag, owner, clock, "fd1792", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2479,7 +2479,7 @@ fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1793, "FD1793", tag, owner, clock, "fd1793", __FILE__)
+fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1793, "FD1793", tag, owner, clock, "fd1793", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2495,7 +2495,7 @@ fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, KR1818VG93, "KR1818VG93", tag, owner, clock, "kr1818vg93", __FILE__)
+kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, KR1818VG93, "KR1818VG93", tag, owner, clock, "kr1818vg93", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2511,7 +2511,7 @@ kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, devic
 	nonsticky_immint = true;
 }
 
-fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1794, "FD1794", tag, owner, clock, "fd1794", __FILE__)
+fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1794, "FD1794", tag, owner, clock, "fd1794", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2527,7 +2527,7 @@ fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1795, "FD1795", tag, owner, clock, "fd1795", __FILE__)
+fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1795, "FD1795", tag, owner, clock, "fd1795", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2543,7 +2543,7 @@ fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1795_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1795_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2551,7 +2551,7 @@ int fd1795_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1797, "FD1797", tag, owner, clock, "fd1797", __FILE__)
+fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1797, "FD1797", tag, owner, clock, "fd1797", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2567,7 +2567,7 @@ fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1797_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1797_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2575,7 +2575,7 @@ int fd1797_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8866, "MB8866", tag, owner, clock, "mb8866", __FILE__)
+mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, MB8866, "MB8866", tag, owner, clock, "mb8866", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2591,7 +2591,7 @@ mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8876, "MB8876", tag, owner, clock, "mb8876", __FILE__)
+mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, MB8876, "MB8876", tag, owner, clock, "mb8876", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2607,7 +2607,7 @@ mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8877, "MB8877", tag, owner, clock, "mb8877", __FILE__)
+mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, MB8877, "MB8877", tag, owner, clock, "mb8877", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2623,7 +2623,7 @@ mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1761_t::fd1761_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1761, "FD1761", tag, owner, clock, "fd1761", __FILE__)
+fd1761_t::fd1761_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1761, "FD1761", tag, owner, clock, "fd1761", __FILE__)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2639,7 +2639,7 @@ fd1761_t::fd1761_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1763_t::fd1763_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1763, "FD1763", tag, owner, clock, "fd1763", __FILE__)
+fd1763_t::fd1763_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1763, "FD1763", tag, owner, clock, "fd1763", __FILE__)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2655,7 +2655,7 @@ fd1763_t::fd1763_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-fd1765_t::fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1765, "FD1765", tag, owner, clock, "fd1765", __FILE__)
+fd1765_t::fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1765, "FD1765", tag, owner, clock, "fd1765", __FILE__)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2671,7 +2671,7 @@ fd1765_t::fd1765_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1765_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1765_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2679,7 +2679,7 @@ int fd1765_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-fd1767_t::fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1767, "FD1767", tag, owner, clock, "fd1767", __FILE__)
+fd1767_t::fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, FD1767, "FD1767", tag, owner, clock, "fd1767", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -2695,7 +2695,7 @@ fd1767_t::fd1767_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int fd1767_t::calc_sector_size(UINT8 size, UINT8 command) const
+int fd1767_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2703,7 +2703,7 @@ int fd1767_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd2791_t::wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2791, "WD2791", tag, owner, clock, "wd2791", __FILE__)
+wd2791_t::wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, WD2791, "WD2791", tag, owner, clock, "wd2791", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -2719,7 +2719,7 @@ wd2791_t::wd2791_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2793, "WD2793", tag, owner, clock, "wd2793", __FILE__)
+wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, WD2793, "WD2793", tag, owner, clock, "wd2793", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -2735,7 +2735,7 @@ wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-wd2795_t::wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2795, "WD2795", tag, owner, clock, "wd2795", __FILE__)
+wd2795_t::wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, WD2795, "WD2795", tag, owner, clock, "wd2795", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -2751,7 +2751,7 @@ wd2795_t::wd2795_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int wd2795_t::calc_sector_size(UINT8 size, UINT8 command) const
+int wd2795_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2759,7 +2759,7 @@ int wd2795_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2797, "WD2797", tag, owner, clock, "wd2797", __FILE__)
+wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_t(mconfig, WD2797, "WD2797", tag, owner, clock, "wd2797", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -2775,7 +2775,7 @@ wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-int wd2797_t::calc_sector_size(UINT8 size, UINT8 command) const
+int wd2797_t::calc_sector_size(uint8_t size, uint8_t command) const
 {
 	if(command & 0x08)
 		return 128 << (size & 3);
@@ -2783,7 +2783,7 @@ int wd2797_t::calc_sector_size(UINT8 size, UINT8 command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1770, "WD1770", tag, owner, clock, "wd1770", __FILE__)
+wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_t(mconfig, WD1770, "WD1770", tag, owner, clock, "wd1770", __FILE__)
 {
 	step_times = wd_digital_step_times;
 	delay_register_commit = 32;
@@ -2799,7 +2799,7 @@ wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1772, "WD1772", tag, owner, clock, "wd1772", __FILE__)
+wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_t(mconfig, WD1772, "WD1772", tag, owner, clock, "wd1772", __FILE__)
 {
 	const static int wd1772_step_times[4] = { 12000, 24000, 4000, 6000 };
 
@@ -2822,7 +2822,7 @@ int wd1772_t::settle_time() const
 	return 30000;
 }
 
-wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1773, "WD1773", tag, owner, clock, "wd1773", __FILE__)
+wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_t(mconfig, WD1773, "WD1773", tag, owner, clock, "wd1773", __FILE__)
 {
 	step_times = wd_digital_step_times;
 	delay_register_commit = 32;

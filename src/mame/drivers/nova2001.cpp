@@ -975,9 +975,9 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
 
-	UINT8* const src = memregion(region)->base();
+	uint8_t* const src = memregion(region)->base();
 
-	std::vector<UINT8> temp(length);
+	std::vector<uint8_t> temp(length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 

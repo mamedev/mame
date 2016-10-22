@@ -60,7 +60,7 @@ public:
 
 private:
 	required_device<es5503_device> m_es5503;
-	required_region_ptr<UINT8> m_es5503_rom;
+	required_region_ptr<uint8_t> m_es5503_rom;
 };
 
 

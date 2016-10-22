@@ -17,15 +17,15 @@ class cedar_magnet_flop_device :  public device_t
 {
 public:
 	// construction/destruction
-	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT8 m_flopdat;
-	UINT8 m_flopcmd;
-	UINT8 m_flopsec;
-	UINT8 m_flopstat;
-	UINT8 m_floptrk;
+	uint8_t m_flopdat;
+	uint8_t m_flopcmd;
+	uint8_t m_flopsec;
+	uint8_t m_flopstat;
+	uint8_t m_floptrk;
 
-	UINT8 m_curtrack;
+	uint8_t m_curtrack;
 	int m_secoffs;
 
 	DECLARE_READ8_MEMBER(port60_r);

@@ -25,7 +25,7 @@ class tlcs90_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_constructor program_map);
+	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map);
 
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
@@ -41,13 +41,13 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 2; }
-	virtual UINT32 execute_max_cycles() const override { return 26; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_min_cycles() const override { return 2; }
+	virtual uint32_t execute_max_cycles() const override { return 26; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void execute_burn(INT32 cycles) override;
+	virtual void execute_burn(int32_t cycles) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
@@ -56,9 +56,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	enum e_mode {
@@ -74,62 +74,62 @@ private:
 
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
-	UINT8       m_halt, m_after_EI;
-	UINT16      m_irq_state, m_irq_mask;
+	uint8_t       m_halt, m_after_EI;
+	uint16_t      m_irq_state, m_irq_mask;
 	address_space *m_program;
 	address_space *m_io;
 	int     m_icount;
 	int         m_extra_cycles;       // extra cycles for interrupts
-	UINT8       m_internal_registers[48];
-	UINT32      m_ixbase,m_iybase;
+	uint8_t       m_internal_registers[48];
+	uint32_t      m_ixbase,m_iybase;
 
 	// Timers: 4 x 8-bit + 1 x 16-bit
 	emu_timer   *m_timer[4+1];
-	UINT8       m_timer_value[4];
-	UINT16      m_timer4_value;
+	uint8_t       m_timer_value[4];
+	uint16_t      m_timer4_value;
 	attotime    m_timer_period;
 
 	// Work registers
-	UINT8        m_op;
+	uint8_t        m_op;
 
 	e_mode  m_mode1;
-	UINT16  m_r1,m_r1b;
+	uint16_t  m_r1,m_r1b;
 
 	e_mode  m_mode2;
-	UINT16  m_r2,m_r2b;
+	uint16_t  m_r2,m_r2b;
 
 	int m_cyc_t,m_cyc_f;
 
-	UINT32  m_addr;
+	uint32_t  m_addr;
 
-	inline UINT8  RM8 (UINT32 a);
-	inline UINT16 RM16(UINT32 a);
-	inline void WM8 (UINT32 a, UINT8  v);
-	inline void WM16(UINT32 a, UINT16 v);
-	inline UINT8  RX8 (UINT32 a, UINT32 base);
-	inline UINT16 RX16(UINT32 a, UINT32 base);
-	inline void WX8 (UINT32 a, UINT8  v, UINT32 base);
-	inline void WX16(UINT32 a, UINT16 v, UINT32 base);
-	inline UINT8  READ8();
-	inline UINT16 READ16();
+	inline uint8_t  RM8 (uint32_t a);
+	inline uint16_t RM16(uint32_t a);
+	inline void WM8 (uint32_t a, uint8_t  v);
+	inline void WM16(uint32_t a, uint16_t v);
+	inline uint8_t  RX8 (uint32_t a, uint32_t base);
+	inline uint16_t RX16(uint32_t a, uint32_t base);
+	inline void WX8 (uint32_t a, uint8_t  v, uint32_t base);
+	inline void WX16(uint32_t a, uint16_t v, uint32_t base);
+	inline uint8_t  READ8();
+	inline uint16_t READ16();
 	void decode();
-	const char *internal_registers_names(UINT16 x);
-	int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mode, const UINT16 r, const UINT16 rb);
-	inline UINT16 r8( const UINT16 r );
-	inline void w8( const UINT16 r, UINT16 value );
-	inline UINT16 r16( const UINT16 r );
-	inline void w16( const UINT16 r, UINT16 value );
-	inline UINT8 Read1_8();
-	inline UINT16 Read1_16();
-	inline UINT8 Read2_8();
-	inline UINT16 Read2_16();
-	inline void Write1_8( UINT8 value );
-	inline void Write1_16( UINT16 value );
-	inline void Write2_8( UINT8 value );
-	inline void Write2_16( UINT16 value );
-	inline int Test( UINT8 cond );
-	inline void Push( UINT16 rr );
-	inline void Pop( UINT16 rr );
+	const char *internal_registers_names(uint16_t x);
+	int sprint_arg(char *buffer, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb);
+	inline uint16_t r8( const uint16_t r );
+	inline void w8( const uint16_t r, uint16_t value );
+	inline uint16_t r16( const uint16_t r );
+	inline void w16( const uint16_t r, uint16_t value );
+	inline uint8_t Read1_8();
+	inline uint16_t Read1_16();
+	inline uint8_t Read2_8();
+	inline uint16_t Read2_16();
+	inline void Write1_8( uint8_t value );
+	inline void Write1_16( uint16_t value );
+	inline void Write2_8( uint8_t value );
+	inline void Write2_16( uint16_t value );
+	inline int Test( uint8_t cond );
+	inline void Push( uint16_t rr );
+	inline void Pop( uint16_t rr );
 	inline void leave_halt();
 	void take_interrupt(tlcs90_e_irq irq);
 	void check_interrupts();
@@ -147,7 +147,7 @@ class tmp90840_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -155,7 +155,7 @@ class tmp90841_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -163,14 +163,14 @@ class tmp90845_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class tmp91640_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -178,7 +178,7 @@ class tmp91641_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

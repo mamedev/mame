@@ -660,7 +660,7 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 
 DEVICE_IMAGE_LOAD_MEMBER(spectrum_state, spectrum_cart)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x4000)
 	{

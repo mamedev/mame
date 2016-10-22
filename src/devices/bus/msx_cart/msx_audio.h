@@ -18,7 +18,7 @@ class msx_cart_msx_audio_hxmu900 : public device_t
 								, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +37,7 @@ class msx_cart_msx_audio_nms1205 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -63,7 +63,7 @@ class msx_cart_msx_audio_fsca1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -86,8 +86,8 @@ private:
 	required_device<y8950_device> m_y8950;
 	required_ioport m_io_config;
 	required_memory_region m_region_y8950;
-	UINT8 m_7ffe;
-	UINT8 m_7fff;
+	uint8_t m_7ffe;
+	uint8_t m_7fff;
 };
 
 #endif

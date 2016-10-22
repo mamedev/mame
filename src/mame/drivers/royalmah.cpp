@@ -115,26 +115,26 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<msm6242_device> m_rtc;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_input_port_select;
-	UINT8 m_dsw_select;
-	UINT8 m_rombank;
+	uint8_t m_input_port_select;
+	uint8_t m_dsw_select;
+	uint8_t m_rombank;
 	int m_palette_base;
-	std::unique_ptr<UINT8[]> m_janptr96_nvram;
-	UINT8 m_suzume_bank;
-	UINT8 m_gfx_adr_l;
-	UINT8 m_gfx_adr_m;
-	UINT8 m_gfx_adr_h;
-	UINT32 m_gfx_adr;
-	UINT8 m_gfxdata0;
-	UINT8 m_gfxdata1;
-	UINT8 m_jansou_colortable[16];
-	UINT8 m_mjifb_rom_enable;
-	UINT8 m_flip_screen;
+	std::unique_ptr<uint8_t[]> m_janptr96_nvram;
+	uint8_t m_suzume_bank;
+	uint8_t m_gfx_adr_l;
+	uint8_t m_gfx_adr_m;
+	uint8_t m_gfx_adr_h;
+	uint32_t m_gfx_adr;
+	uint8_t m_gfxdata0;
+	uint8_t m_gfxdata1;
+	uint8_t m_jansou_colortable[16];
+	uint8_t m_mjifb_rom_enable;
+	uint8_t m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
 	DECLARE_WRITE8_MEMBER(royalmah_rom_w);
@@ -210,7 +210,7 @@ public:
 	DECLARE_DRIVER_INIT(ippatsu);
 	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
-	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
@@ -224,14 +224,14 @@ public:
 PALETTE_INIT_MEMBER(royalmah_state, royalmah)
 {
 	offs_t i;
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 	int len = memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
-		UINT8 bit0, bit1, bit2, r, g, b;
+		uint8_t bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = prom[i];
+		uint8_t data = prom[i];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;
@@ -258,17 +258,17 @@ PALETTE_INIT_MEMBER(royalmah_state, royalmah)
 PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 {
 	offs_t i;
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 	int len = memregion("proms")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 	{
-		UINT16 data = (prom[i] << 8) | prom[i + 0x200];
+		uint16_t data = (prom[i] << 8) | prom[i + 0x200];
 
 		/* the bits are in reverse order */
-		UINT8 r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
-		UINT8 g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
-		UINT8 b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
+		uint8_t b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -304,9 +304,9 @@ WRITE8_MEMBER(royalmah_state::mjderngr_palbank_w)
 }
 
 
-UINT32 royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	offs_t offs;
 
@@ -314,15 +314,15 @@ UINT32 royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind1
 	{
 		int i;
 
-		UINT8 data1 = videoram[offs + 0x0000];
-		UINT8 data2 = videoram[offs + 0x4000];
+		uint8_t data1 = videoram[offs + 0x0000];
+		uint8_t data2 = videoram[offs + 0x4000];
 
-		UINT8 y = (m_flip_screen) ? 255 - (offs >> 6) : (offs >> 6);
-		UINT8 x = (m_flip_screen) ? 255 - (offs << 2) : (offs << 2);
+		uint8_t y = (m_flip_screen) ? 255 - (offs >> 6) : (offs >> 6);
+		uint8_t x = (m_flip_screen) ? 255 - (offs << 2) : (offs << 2);
 
 		for (i = 0; i < 4; i++)
 		{
-			UINT8 pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
+			uint8_t pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
 			bitmap.pix16(y, x) = (m_palette_base << 4) | pen;
 
@@ -412,7 +412,7 @@ READ8_MEMBER(royalmah_state::suzume_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::tahjong_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
@@ -427,7 +427,7 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(royalmah_state::suzume_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 	m_suzume_bank = data;
@@ -443,7 +443,7 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	m_rombank = data;
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
@@ -464,7 +464,7 @@ READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
@@ -482,7 +482,7 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 //logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
@@ -511,7 +511,7 @@ READ8_MEMBER(royalmah_state::daisyari_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 	m_dsw_select = (data & 0xc);
@@ -539,7 +539,7 @@ READ8_MEMBER(royalmah_state::mjclub_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int address;
 
 	m_dsw_select = data & 0xc0;
@@ -783,7 +783,7 @@ WRITE8_MEMBER(royalmah_state::jansou_6402_w)
 
 READ8_MEMBER(royalmah_state::jansou_6403_r)
 {
-	UINT8 *GFXROM = memregion("gfx1")->base();
+	uint8_t *GFXROM = memregion("gfx1")->base();
 	int d0 = GFXROM[m_gfx_adr];
 	int d1 = GFXROM[m_gfx_adr+1];
 	int c0 = m_jansou_colortable[d1 & 0x0f] & 0x0f;
@@ -882,7 +882,7 @@ READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -934,7 +934,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
 READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 {
 	if (m_mjifb_rom_enable)
-		return ((UINT8*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
+		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -952,7 +952,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
 	{
 		videoram[offset] = data;
@@ -980,7 +980,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 
 WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset + 0x4000] = data;
 }
 
@@ -1043,7 +1043,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 {
 	if (m_mjifb_rom_enable)
-		return ((UINT8*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
+		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -1061,7 +1061,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
 	{
 		videoram[offset] = data;
@@ -1244,7 +1244,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	if ((m_rombank & 0x70) != 0x70)
 	{
 		videoram[offset] = data;
@@ -4909,7 +4909,7 @@ DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
 
 DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 {
-	m_janptr96_nvram = std::make_unique<UINT8[]>(0x1000 * 9);
+	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
 	membank("bank3")->set_base(m_janptr96_nvram.get());
 	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }

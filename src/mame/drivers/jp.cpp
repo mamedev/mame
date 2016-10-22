@@ -40,8 +40,8 @@ public:
 	DECLARE_DRIVER_INIT(jp);
 private:
 	bool m_clock_bit;
-	UINT8 m_row;
-	UINT32 m_disp_data;
+	uint8_t m_row;
+	uint32_t m_disp_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -180,7 +180,7 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( jp_state::disp_w )
 {
-	UINT8 i;
+	uint8_t i;
 	m_row = data >> 3; // d3..d7 = switch strobes
 
 	// d0 = data; d1 = clock; d2 = strobe
@@ -193,7 +193,7 @@ WRITE8_MEMBER( jp_state::disp_w )
 
 	if (BIT(data, 2))
 	{
-		UINT8 segment, t = (m_disp_data >> 24) & 15;
+		uint8_t segment, t = (m_disp_data >> 24) & 15;
 		if (t == 8)
 		{ // ball number
 			segment = m_disp_data >> 6;

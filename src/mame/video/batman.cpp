@@ -19,7 +19,7 @@
 
 TILE_GET_INFO_MEMBER(batman_state::get_alpha_tile_info)
 {
-	UINT16 data = tilemap.basemem_read(tile_index);
+	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = ((data & 0x400) ? (m_alpha_tile_bank * 0x400) : 0) + (data & 0x3ff);
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
@@ -29,8 +29,8 @@ TILE_GET_INFO_MEMBER(batman_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(batman_state::get_playfield_tile_info)
 {
-	UINT16 data1 = tilemap.basemem_read(tile_index);
-	UINT16 data2 = tilemap.extmem_read(tile_index) & 0xff;
+	uint16_t data1 = tilemap.basemem_read(tile_index);
+	uint16_t data2 = tilemap.extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -40,8 +40,8 @@ TILE_GET_INFO_MEMBER(batman_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(batman_state::get_playfield2_tile_info)
 {
-	UINT16 data1 = tilemap.basemem_read(tile_index);
-	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = tilemap.basemem_read(tile_index);
+	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -102,7 +102,7 @@ VIDEO_START_MEMBER(batman_state,batman)
  *
  *************************************/
 
-UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_vad->mob().draw_async(cliprect);
@@ -124,9 +124,9 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
-			UINT8 *pri = &priority_bitmap.pix8(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
+			uint8_t *pri = &priority_bitmap.pix8(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
@@ -196,8 +196,8 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{

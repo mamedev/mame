@@ -8,7 +8,7 @@
 
 const device_type AD1848 = device_creator<ad1848_device>;
 
-ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AD1848, "Analog Devices AD1848", tag, owner, clock, "ad1848", __FILE__),
 	m_irq_cb(*this),
 	m_drq_cb(*this),

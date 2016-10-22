@@ -49,7 +49,7 @@
     data for the end user
 -------------------------------------------------*/
 
-static void log_quickload(running_machine &machine, const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
+static void log_quickload(running_machine &machine, const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format)
 {
 	std::ostringstream tempstring;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
@@ -118,7 +118,7 @@ static void spectrum_page_basicrom(running_machine &machine)
 
 SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	std::vector<UINT8> snapshot_data(snapshot_size);
+	std::vector<uint8_t> snapshot_data(snapshot_size);
 
 	image.fread(&snapshot_data[0], snapshot_size);
 
@@ -313,11 +313,11 @@ static void spectrum_border_update(running_machine &machine, int data)
 #endif
 }
 
-void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_sp(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, SP_OFFSET;
-	UINT8 intr;
-	UINT16 start, size, data, status;
+	uint8_t intr;
+	uint16_t start, size, data, status;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -395,7 +395,7 @@ void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
 		break;
 		case 2: // case 0: in version 0.99e of the emulator
 		case 3: // case 1: in version 0.99e of the emulator
-		LOAD_REG(cpu, Z80_IM, (UINT64)0);
+		LOAD_REG(cpu, Z80_IM, (uint64_t)0);
 	}
 
 	data = BIT(status, 0);
@@ -512,12 +512,12 @@ void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
  *      in which case it is included twice.
  *
  *******************************************************************/
-void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_sna(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j, usedbanks[8];
 	long bank_offset;
-	UINT8 intr;
-	UINT16 data, addr;
+	uint8_t intr;
+	uint16_t data, addr;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -732,11 +732,11 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      16640   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_setup_ach(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_ach(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 data;
+	uint8_t intr;
+	uint16_t data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -865,11 +865,11 @@ void spectrum_setup_ach(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_prg(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 addr, data;
+	uint8_t intr;
+	uint16_t addr, data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1035,11 +1035,11 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_plusd(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
-	UINT8 intr;
-	UINT16 addr = 0, data;
+	uint8_t intr;
+	uint16_t addr = 0, data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1203,11 +1203,11 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
  *      Following these data, there are optional POKE blocks
  *
  *******************************************************************/
-void spectrum_setup_sem(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_sem(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 data;
+	uint8_t intr;
+	uint16_t data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1322,11 +1322,11 @@ void spectrum_setup_sem(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      16412   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_setup_sit(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_sit(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 data;
+	uint8_t intr;
+	uint16_t data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1452,11 +1452,11 @@ void spectrum_setup_sit(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      49476   10      0x00 (reserved for future use)
  *
  *******************************************************************/
-void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_zx(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 data, mode;
+	uint8_t intr;
+	uint16_t data, mode;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1513,7 +1513,7 @@ void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
 	switch (mode)
 	{
 		case 0xffff:
-		LOAD_REG(cpu, Z80_IM, (UINT64)0);
+		LOAD_REG(cpu, Z80_IM, (uint64_t)0);
 		break;
 		case 0x00:
 		LOAD_REG(cpu, Z80_IM, 1);
@@ -1584,11 +1584,11 @@ void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
  *      49181   2       HL'
  *
  *******************************************************************/
-void spectrum_setup_snp(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_snp(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
-	UINT8 intr;
-	UINT16 data;
+	uint8_t intr;
+	uint16_t data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1764,10 +1764,10 @@ void spectrum_setup_snp(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *                      length of the block.
  *
  *******************************************************************/
-static void spectrum_snx_decompress_block(address_space &space, UINT8 *source, UINT16 dest, UINT16 size)
+static void spectrum_snx_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
 {
-	UINT8 counthi, countlo, compress, fill;
-	UINT16 block = 0, count, i, j, numbytes;
+	uint8_t counthi, countlo, compress, fill;
+	uint16_t block = 0, count, i, j, numbytes;
 	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 	i = SNX_HDR - 1;
 	numbytes = 0;
@@ -1811,10 +1811,10 @@ static void spectrum_snx_decompress_block(address_space &space, UINT8 *source, U
 	}
 }
 
-void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_snx(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
-	UINT8 intr;
-	UINT16 data, addr;
+	uint8_t intr;
+	uint16_t data, addr;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -1964,11 +1964,11 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
  *      The 8 16K banks are stored in the order 5, 2, 0, 1, 3, 4, 6, 7
  *
  *******************************************************************/
-void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_frz(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
-	UINT8 intr;
-	UINT16 addr, data;
+	uint8_t intr;
+	uint16_t addr, data;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -2039,7 +2039,7 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
 	/* Memory dump */
 	addr = 0;
-	static const UINT8 banks[] = { 5, 2, 0, 1, 3, 4, 6, 7 };
+	static const uint8_t banks[] = { 5, 2, 0, 1, 3, 4, 6, 7 };
 	state->logerror("Loading %05X bytes of RAM at %04X\n", 8*SPECTRUM_BANK, BASE_RAM);
 	for (i = 0; i < 8; i++)
 	{
@@ -2078,9 +2078,9 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 	//state->logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->m_port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
 }
 
-static void spectrum_z80_decompress_block(address_space &space, UINT8 *source, UINT16 dest, UINT16 size)
+static void spectrum_z80_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
 {
-	UINT8 ch;
+	uint8_t ch;
 	int i;
 
 	do
@@ -2094,8 +2094,8 @@ static void spectrum_z80_decompress_block(address_space &space, UINT8 *source, U
 			if (source[1] == 0x0ed)
 			{
 				/* 0x0ed, 0x0ed, xx yy - repetition */
-				UINT8 count;
-				UINT8 data;
+				uint8_t count;
+				uint8_t data;
 
 				count = source[2];
 
@@ -2138,9 +2138,9 @@ static void spectrum_z80_decompress_block(address_space &space, UINT8 *source, U
 	while (size > 0);
 }
 
-static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (UINT8 *snapdata, UINT32 snapsize)
+static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (uint8_t *snapdata, uint32_t snapsize)
 {
-	UINT8 lo, hi, data;
+	uint8_t lo, hi, data;
 
 	if (snapsize < 30)
 		return SPECTRUM_Z80_SNAPSHOT_INVALID;   /* Invalid file */
@@ -2186,11 +2186,11 @@ static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (UINT8 *snapdata, UINT32
 }
 
 /* now supports 48k & 128k .Z80 files */
-void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)
+void spectrum_setup_z80(running_machine &machine, uint8_t *snapdata, uint32_t snapsize)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int i;
-	UINT8 lo, hi, data;
+	uint8_t lo, hi, data;
 	SPECTRUM_Z80_SNAPSHOT_TYPE z80_type;
 	cpu_device *cpu = state->m_maincpu;
 	address_space &space = cpu->space(AS_PROGRAM);
@@ -2291,7 +2291,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 	/* Interrupt Flip/Flop */
 	if (snapdata[27] == 0)
 	{
-		cpu->set_state_int(Z80_IFF1, (UINT64)0);
+		cpu->set_state_int(Z80_IFF1, (uint64_t)0);
 		/* cpu->set_state_int(Z80_IRQ_STATE, 0); */
 	}
 	else
@@ -2340,7 +2340,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 	}
 	else
 	{
-		UINT8 *pSource;
+		uint8_t *pSource;
 		int header_size;
 
 		header_size = 30 + 2 + ((snapdata[30] & 0x0ff) | ((snapdata[31] & 0x0ff) << 8));
@@ -2371,7 +2371,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 		do
 		{
 			unsigned short length;
-			UINT8 page;
+			uint8_t page;
 			int Dest = 0;
 
 			length = (pSource[0] & 0x0ff) | ((pSource[1] & 0x0ff) << 8);
@@ -2450,7 +2450,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
 QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	std::vector<UINT8> quickload_data(quickload_size);
+	std::vector<uint8_t> quickload_data(quickload_size);
 
 	image.fread(&quickload_data[0], quickload_size);
 
@@ -2508,7 +2508,7 @@ error:
  *      SAVE "filename" CODE 16384,6144
  *
  *******************************************************************/
-void spectrum_setup_scr(running_machine &machine, UINT8 *quickdata, UINT32 quicksize)
+void spectrum_setup_scr(running_machine &machine, uint8_t *quickdata, uint32_t quicksize)
 {
 	int i;
 	address_space &space = machine.driver_data<spectrum_state>()->m_maincpu->space(AS_PROGRAM);
@@ -2545,11 +2545,11 @@ void spectrum_setup_scr(running_machine &machine, UINT8 *quickdata, UINT32 quick
  *      However, no image of such type has ever surfaced.
  *
  *******************************************************************/
-void spectrum_setup_raw(running_machine &machine, UINT8 *quickdata, UINT32 quicksize)
+void spectrum_setup_raw(running_machine &machine, uint8_t *quickdata, uint32_t quicksize)
 {
 	int i;
-	UINT8 data;
-	UINT16 start, len;
+	uint8_t data;
+	uint16_t start, len;
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 

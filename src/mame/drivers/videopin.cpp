@@ -27,7 +27,7 @@ solarwar
 
 void videopin_state::update_plunger()
 {
-	UINT8 val = ioport("IN2")->read();
+	uint8_t val = ioport("IN2")->read();
 
 	if (m_prev != val)
 	{
@@ -117,7 +117,7 @@ READ8_MEMBER(videopin_state::misc_r)
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = ioport("IN1")->read();
+	uint8_t val = ioport("IN1")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{

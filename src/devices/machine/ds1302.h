@@ -44,7 +44,7 @@ class ds1302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sclk_w );
@@ -76,13 +76,13 @@ private:
 	int m_io;
 	int m_state;
 	int m_bits;
-	UINT8 m_cmd;
-	UINT8 m_data;
+	uint8_t m_cmd;
+	uint8_t m_data;
 	int m_addr;
 
-	UINT8 m_reg[9];
-	UINT8 m_user[9];
-	UINT8 m_ram[0x20];
+	uint8_t m_reg[9];
+	uint8_t m_user[9];
+	uint8_t m_ram[0x20];
 
 	// timers
 	emu_timer *m_clock_timer;

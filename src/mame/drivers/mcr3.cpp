@@ -185,9 +185,9 @@ READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
 READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 {
 	/* this is a blatant hack, should really do a better implementation */
-	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
-	UINT8 start = ioport("MONO.IP0")->read();
-	UINT8 shift = ioport("SHIFT")->read();
+	static const uint8_t shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
+	uint8_t start = ioport("MONO.IP0")->read();
+	uint8_t shift = ioport("SHIFT")->read();
 
 	/* reset on a start */
 	if (!(start & 0x08))
@@ -349,7 +349,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 
 READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 {
-	UINT8 result = ioport("MONO.IP0")->read();
+	uint8_t result = ioport("MONO.IP0")->read();
 	if (m_input_mux)
 		result = (result & ~0x0a) | (ioport("MONO.IP0.ALT")->read() & 0x0a);
 	return (result & ~0x10) | ((m_sounds_good->read(space, 0) << 4) & 0x10);
@@ -1020,7 +1020,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const UINT32 spyhunt_charlayout_xoffset[64] =
+static const uint32_t spyhunt_charlayout_xoffset[64] =
 {
 		0,  0,  2,  2,  4,  4,  6,  6,  8,  8, 10, 10, 12, 12, 14, 14,
 		16, 16, 18, 18, 20, 20, 22, 22, 24, 24, 26, 26, 28, 28, 30, 30,

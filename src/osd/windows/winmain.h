@@ -241,8 +241,8 @@ enum input_event
 struct KeyPressEventArgs
 {
 	input_event event_id;
-	UINT8 vkey;
-	UINT8 scancode;
+	uint8_t vkey;
+	uint8_t scancode;
 };
 
 struct MouseButtonEventArgs
@@ -274,7 +274,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 
 	virtual void video_register() override;
 

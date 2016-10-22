@@ -30,7 +30,7 @@
 /* x B01234 G01234 R01234 */
 PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
@@ -48,7 +48,7 @@ PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 /* x xB0123 xG0123 xR0123 */
 PALETTE_INIT_MEMBER(dynax_state,janyuki)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
@@ -397,7 +397,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, memory_region *gfx, int s
 		return 0;
 
 	size_t rom_size = gfx->bytes();
-	UINT8* rom_data = gfx->base();
+	uint8_t* rom_data = gfx->base();
 
 	if (m_layer_layout == LAYOUT_HNORIDUR)   // e.g. yarunara
 		pen = ((pen >> 4) & 0xf) | ((mask & 0x10) ? ((pen & 0x08) << 1) : 0);
@@ -478,7 +478,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, memory_region *gfx, int s
 			return src;
 		}
 
-		UINT8 cmd = rom_data[src++];
+		uint8_t cmd = rom_data[src++];
 		src &= 0xfffff;
 		if (!(flags & 0x02))    // Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
 			pen = (pen & 0xf0) | ((cmd & 0xf0) >> 4);
@@ -874,14 +874,14 @@ void dynax_state::dynax_common_reset()
 
 VIDEO_START_MEMBER(dynax_state,hanamai)
 {
-	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<uint8_t[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HANAMAI;
@@ -898,14 +898,14 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 
 VIDEO_START_MEMBER(dynax_state,hnoridur)
 {
-	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<uint8_t[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HNORIDUR;
@@ -930,12 +930,12 @@ VIDEO_START_MEMBER(dynax_state,mcnpshnt)
 
 VIDEO_START_MEMBER(dynax_state,sprtmtch)
 {
-	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<uint8_t[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_DRGPUNCH;
@@ -950,22 +950,22 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 
 VIDEO_START_MEMBER(dynax_state,jantouki)
 {
-	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[4][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[4][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[5][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[5][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[6][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[6][1] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[7][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[7][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[4][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[4][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[5][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[5][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[6][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[6][1] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[7][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[7][1] = std::make_unique<uint8_t[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
@@ -991,8 +991,8 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 
 VIDEO_START_MEMBER(dynax_state,mjdialq2)
 {
-	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
-	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_MJDIALQ2;
@@ -1061,15 +1061,15 @@ void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	{
 		int dy, length, pen;
-		UINT8 *src1 = m_pixmap[i][1].get();
-		UINT8 *src2 = m_pixmap[i][0].get();
+		uint8_t *src1 = m_pixmap[i][1].get();
+		uint8_t *src2 = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
 		for (dy = 0; dy < 256; dy++)
 		{
-			UINT16 *dst;
-			UINT16 *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
+			uint16_t *dst;
+			uint16_t *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 2 * (256 - length);
@@ -1127,16 +1127,16 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 
 	{
 		int dy, length, pen;
-		UINT8 *src1 = m_pixmap[i][1].get();
-		UINT8 *src2 = m_pixmap[i][0].get();
+		uint8_t *src1 = m_pixmap[i][1].get();
+		uint8_t *src2 = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
 		for (dy = 0; dy < 256; dy++)
 		{
 			int sy = ((dy - scrolly) & 0xff) + y;
-			UINT16 *dst;
-			UINT16 *dstbase = &bitmap.pix16(sy);
+			uint16_t *dst;
+			uint16_t *dstbase = &bitmap.pix16(sy);
 
 			if ((sy < cliprect.min_y) || (sy > cliprect.max_y))
 			{
@@ -1190,14 +1190,14 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 
 	{
 		int dy, length, pen;
-		UINT8 *src = m_pixmap[i][0].get();
+		uint8_t *src = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
 		for (dy = 0; dy < 256; dy++)
 		{
-			UINT16 *dst;
-			UINT16 *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
+			uint16_t *dst;
+			uint16_t *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 256 - length;
@@ -1274,7 +1274,7 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 	if (machine().input().code_pressed_once(KEYCODE_T))   toggle = 1 - toggle;
 	if (m_gfxregions[0] && toggle)
 	{
-		UINT8 *RAM = m_gfxregions[0]->base();
+		uint8_t *RAM = m_gfxregions[0]->base();
 		size_t size = m_gfxregions[0]->bytes();
 		static int i = 0, c = 0, r = 0;
 
@@ -1297,10 +1297,10 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		m_blit_palbank  = (c >>  4) & 1;
 
 		bitmap.fill(0, cliprect);
-		memset(m_pixmap[0][0].get(), 0, sizeof(UINT8) * 0x100 * 0x100);
+		memset(m_pixmap[0][0].get(), 0, sizeof(uint8_t) * 0x100 * 0x100);
 
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
-			memset(m_pixmap[0][1].get(), 0, sizeof(UINT8) * 0x100 * 0x100);
+			memset(m_pixmap[0][1].get(), 0, sizeof(uint8_t) * 0x100 * 0x100);
 		for (m_hanamai_layer_half = 0; m_hanamai_layer_half < 2; m_hanamai_layer_half++)
 			blitter_drawgfx(0, 1, m_gfxregions[0], i, 0, cliprect.min_x, cliprect.min_y, 3, 0);
 
@@ -1319,7 +1319,7 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 
 
-UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_layer_enable;
 	int lay[4];
@@ -1354,7 +1354,7 @@ UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &b
 }
 
 
-UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~BITSWAP8(m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
 	int lay[4];
@@ -1390,7 +1390,7 @@ UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_layer_enable;
 
@@ -1407,7 +1407,7 @@ UINT32 dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-UINT32 dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1425,7 +1425,7 @@ UINT32 dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-UINT32 dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1445,7 +1445,7 @@ UINT32 dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_
 }
 
 
-UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_layer_enable;
 
@@ -1462,7 +1462,7 @@ UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 dynax_state::screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_layer_enable;
 

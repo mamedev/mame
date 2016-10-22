@@ -97,27 +97,27 @@ public:
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
-	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 
-	UINT32 m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
+	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 
-	UINT32 m_bios_bank; // ROM bank selection
-	UINT16 m_game_banksel;  // Game bank selection
-	UINT32 m_readpos;  // serial bank selection position (9-bit)
-	UINT32 m_bios_bank_addr;
+	uint32_t m_bios_bank; // ROM bank selection
+	uint16_t m_game_banksel;  // Game bank selection
+	uint32_t m_readpos;  // serial bank selection position (9-bit)
+	uint32_t m_bios_bank_addr;
 
-	UINT32 m_bios_width;  // determines the way the game info ROM is read
-	UINT8 m_bios_ctrl[6];
-	UINT8 m_bios_6600;
-	UINT8 m_bios_6403;
-	UINT8 m_bios_6404;
+	uint32_t m_bios_width;  // determines the way the game info ROM is read
+	uint8_t m_bios_ctrl[6];
+	uint8_t m_bios_6600;
+	uint8_t m_bios_6403;
+	uint8_t m_bios_6404;
 
-	std::unique_ptr<UINT16[]> m_ic36_ram;
-	std::unique_ptr<UINT8[]> m_ic37_ram;
+	std::unique_ptr<uint16_t[]> m_ic36_ram;
+	std::unique_ptr<uint8_t[]> m_ic37_ram;
 
-	required_shared_ptr<UINT8>           m_ic3_ram;
+	required_shared_ptr<uint8_t>           m_ic3_ram;
 	optional_device<sega315_5124_device> m_vdp1;
 	required_device<cpu_device>          m_bioscpu;
 };
@@ -438,8 +438,8 @@ READ16_MEMBER(mplay_state::mp_io_read)
 
 READ8_MEMBER(mplay_state::bank_r)
 {
-	UINT8* bank = memregion("mtbios")->base();
-	UINT32 fulladdress = m_bios_bank_addr + offset;
+	uint8_t* bank = memregion("mtbios")->base();
+	uint32_t fulladdress = m_bios_bank_addr + offset;
 
 	if (fulladdress <= 0x3fffff) // ROM addresses
 	{
@@ -474,7 +474,7 @@ READ8_MEMBER(mplay_state::bank_r)
 
 WRITE8_MEMBER(mplay_state::bank_w)
 {
-	UINT32 fulladdress = m_bios_bank_addr + offset;
+	uint32_t fulladdress = m_bios_bank_addr + offset;
 
 	if (fulladdress <= 0x3fffff && m_bios_width & 0x08) // ROM / Megaplay Custom Addresses
 	{
@@ -614,7 +614,7 @@ static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 ADDRESS_MAP_END
 
 
-UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen, bitmap, cliprect);
@@ -626,12 +626,12 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
 	{
-		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &m_vdp1->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+		uint32_t* lineptr = &bitmap.pix32(y);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 
 		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 		{
-			UINT32 src = srcptr[x] & 0xffffff;
+			uint32_t src = srcptr[x] & 0xffffff;
 
 			if (src)
 			{
@@ -878,20 +878,20 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 {
 	// copy game instruction rom to main map. maybe this should just be accessed
 	// through a handler instead?
-	UINT8 *instruction_rom = memregion("user1")->base();
-	UINT8 *game_rom = memregion("maincpu")->base();
+	uint8_t *instruction_rom = memregion("user1")->base();
+	uint8_t *game_rom = memregion("maincpu")->base();
 
 	for (int offs = 0; offs < 0x8000; offs++)
 	{
-		UINT8 dat = instruction_rom[offs];
+		uint8_t dat = instruction_rom[offs];
 
 		game_rom[0x300000 + offs * 2] = dat;
 		game_rom[0x300001 + offs * 2] = dat;
 	}
 
 	// to support the old code
-	m_ic36_ram = std::make_unique<UINT16[]>(0x10000 / 2);
-	m_ic37_ram = std::make_unique<UINT8[]>(0x10000);
+	m_ic36_ram = std::make_unique<uint16_t[]>(0x10000 / 2);
+	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	DRIVER_INIT_CALL(megadrij);
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);

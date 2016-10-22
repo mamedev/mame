@@ -220,7 +220,7 @@ public:
 	optional_memory_bank m_bank3;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_extra;
-	std::unique_ptr<UINT8[]> m_ram;
+	std::unique_ptr<uint8_t[]> m_ram;
 
 	int m_vint;
 	int m_interrupt_vdp0_state;
@@ -229,7 +229,7 @@ public:
 	int m_layer1_enabled;
 	int m_bank;
 	int m_psd_a15;
-	UINT16 m_questions_loword_address;
+	uint16_t m_questions_loword_address;
 
 	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
 	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
@@ -255,13 +255,13 @@ public:
 	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
 	DECLARE_MACHINE_START(meritm_crt260);
 	DECLARE_MACHINE_START(merit_common);
-	UINT32 screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 	void meritm_crt250_switch_banks(  );
 	void meritm_switch_banks(  );
 	int meritm_touch_coord_transform(int *touch_x, int *touch_y);
-	UINT8 binary_to_BCD(UINT8 data);
+	uint8_t binary_to_BCD(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
 };
@@ -331,7 +331,7 @@ void meritm_state::video_start()
 	save_item(NAME(m_interrupt_vdp1_state));
 }
 
-UINT32 meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
@@ -425,8 +425,8 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_hi_w)
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 {
-	UINT32 questions_address;
-	UINT8 *dst;
+	uint32_t questions_address;
+	uint8_t *dst;
 
 	if ((m_bank & 0x07) != 0)
 	{
@@ -491,7 +491,7 @@ WRITE8_MEMBER(meritm_state::meritm_ds1644_w)
 	}
 }
 
-UINT8 meritm_state::binary_to_BCD(UINT8 data)
+uint8_t meritm_state::binary_to_BCD(uint8_t data)
 {
 	data %= 100;
 
@@ -1055,7 +1055,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 {
-	m_ram = std::make_unique<UINT8[]>( 0x8000 );
+	m_ram = std::make_unique<uint8_t[]>( 0x8000 );
 	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
 	memset(m_ram.get(), 0x00, 0x8000);
 	m_bank1->configure_entries(0, 128, m_region_maincpu->base(), 0x8000);

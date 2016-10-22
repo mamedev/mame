@@ -111,7 +111,7 @@ public:
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
 
-	UINT8    m_blitterdata[4];
+	uint8_t    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
@@ -160,7 +160,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = memregion("gfx1")->base();
+		uint8_t *gfx_rom = memregion("gfx1")->base();
 
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
@@ -174,7 +174,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 
 			for (j = 0; j < 16; j++)
 			{
-				UINT8 data;
+				uint8_t data;
 
 				if (src & 1)
 					data = gfx_rom[src >> 1] & 0x0f;

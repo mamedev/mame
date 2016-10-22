@@ -64,8 +64,8 @@ WRITE8_MEMBER(speedspn_state::display_disable_w)
 void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *source = &m_vidram[0x1000];
-	UINT8 *finish = source + 0x1000;
+	uint8_t *source = &m_vidram[0x1000];
+	uint8_t *finish = source + 0x1000;
 
 	while( source<finish )
 	{
@@ -94,7 +94,7 @@ void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_display_disable)
 	{

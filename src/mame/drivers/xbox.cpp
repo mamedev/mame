@@ -147,7 +147,7 @@ void xbox_state::machine_reset()
 {
 	ata_mass_storage_device *devh;
 	atapi_cdrom_device *devc;
-	UINT16 *id;
+	uint16_t *id;
 
 	// set some neede parameters
 	devh = machine().device<ata_mass_storage_device>("ide:0:hdd");

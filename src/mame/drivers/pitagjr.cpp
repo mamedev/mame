@@ -168,7 +168,7 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(pitagjr);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -194,7 +194,7 @@ PALETTE_INIT_MEMBER(pitagjr_state, pitagjr)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-UINT32 pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

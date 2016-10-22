@@ -41,30 +41,30 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
 
-	required_shared_ptr<UINT16> m_mainram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_scroll;
-	required_shared_ptr<UINT16> m_irq_vectors;
-	optional_shared_ptr<UINT16> m_gdfs_tmapram;
-	optional_shared_ptr<UINT16> m_gdfs_tmapscroll;
+	required_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scroll;
+	required_shared_ptr<uint16_t> m_irq_vectors;
+	optional_shared_ptr<uint16_t> m_gdfs_tmapram;
+	optional_shared_ptr<uint16_t> m_gdfs_tmapscroll;
 	optional_device<st0020_device> m_gdfs_st0020;
-	optional_shared_ptr<UINT16> m_input_sel;
+	optional_shared_ptr<uint16_t> m_input_sel;
 
 	int m_tile_code[16];
 	int m_enable_video;
 	int m_shadow_pen_mask;
 	int m_shadow_pen_shift;
-	UINT8 m_requested_int;
-	UINT16 m_irq_enable;
-	std::unique_ptr<UINT16[]> m_eaglshot_gfxram;
+	uint8_t m_requested_int;
+	uint16_t m_irq_enable;
+	std::unique_ptr<uint16_t[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
 	int m_gdfs_lightgun_select;
-	UINT16 m_sxyreact_serial;
+	uint16_t m_sxyreact_serial;
 	int m_sxyreact_dial;
-	UINT16 m_gdfs_eeprom_old;
-	UINT32 m_latches[8];
-	UINT8 m_trackball_select;
+	uint16_t m_gdfs_eeprom_old;
+	uint32_t m_latches[8];
+	uint8_t m_trackball_select;
 
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(irq_enable_w);
@@ -130,16 +130,16 @@ public:
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,int shadow);
+	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,int shadow);
 	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

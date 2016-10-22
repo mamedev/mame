@@ -81,7 +81,7 @@ machine_config_constructor compis_fdc_device::device_mconfig_additions() const
 //  compis_fdc_device - constructor
 //-------------------------------------------------
 
-compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMPIS_FDC, "Compis FDC", tag, owner, clock, "compis_fdc", __FILE__),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
@@ -114,9 +114,9 @@ void compis_fdc_device::device_reset()
 //  mcs0_r - chip select 0 read
 //-------------------------------------------------
 
-UINT8 compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
+uint8_t compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (BIT(offset, 0))
 	{
@@ -132,7 +132,7 @@ UINT8 compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
 //  mcs0_w - chip select 0 write
 //-------------------------------------------------
 
-void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
+void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (BIT(offset, 0))
 	{
@@ -145,7 +145,7 @@ void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
 //  mdack_r - DMA acknowledge read
 //-------------------------------------------------
 
-UINT8 compis_fdc_device::mdack_r(address_space &space, offs_t offset)
+uint8_t compis_fdc_device::mdack_r(address_space &space, offs_t offset)
 {
 	return m_fdc->dma_r();
 }
@@ -155,7 +155,7 @@ UINT8 compis_fdc_device::mdack_r(address_space &space, offs_t offset)
 //  mdack_w - DMA acknowledge write
 //-------------------------------------------------
 
-void compis_fdc_device::mdack_w(address_space &space, offs_t offset, UINT8 data)
+void compis_fdc_device::mdack_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_fdc->dma_w(data);
 }

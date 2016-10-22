@@ -11,14 +11,14 @@
 #include "includes/z88.h"
 
 
-inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT16 color)
+inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color)
 {
 	if (x<Z88_SCREEN_WIDTH)
 		bitmap.pix16(y, x) = color;
 }
 
 // convert absolute offset into correct address to get data from
-inline UINT8* z88_state::convert_address(UINT32 offset)
+inline uint8_t* z88_state::convert_address(uint32_t offset)
 {
 	return (offset < 0x80000 ? m_bios : m_ram_base) + (offset & 0x7ffff);
 }
@@ -37,11 +37,11 @@ PALETTE_INIT_MEMBER(z88_state, z88)
 
 /* temp - change to gfxelement structure */
 
-void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx)
+void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx)
 {
 	for (int h=0; h<8; h++)
 	{
-		UINT8 data = gfx[h];
+		uint8_t data = gfx[h];
 
 		for (int b=0; b<8; b++)
 		{
@@ -52,11 +52,11 @@ void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, U
 	}
 }
 
-void z88_state::vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx)
+void z88_state::vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx)
 {
 	for (int h=0; h<8; h++)
 	{
-		UINT8 data = gfx[h]<<2;
+		uint8_t data = gfx[h]<<2;
 
 		for (int b=0; b<6; b++)
 		{
@@ -66,7 +66,7 @@ void z88_state::vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, U
 	}
 }
 
-void z88_state::vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen)
+void z88_state::vh_render_line(bitmap_ind16 &bitmap, int x, int y, uint16_t pen)
 {
 	for (int i=0; i<8; i++)
 		plot_pixel(bitmap, x + i, y + 7, pen);
@@ -81,7 +81,7 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 	}
 	else
 	{
-		UINT8 *vram = convert_address(sbf<<11);
+		uint8_t *vram = convert_address(sbf<<11);
 
 		for (int y=0; y<(Z88_SCREEN_HEIGHT>>3); y++)
 		{
@@ -89,10 +89,10 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 
 			while (x < Z88_SCREEN_WIDTH)
 			{
-				UINT16 pen0, pen1;
-				UINT8 *char_gfx;
-				UINT8 byte0 = vram[(y * 0x100) + c];
-				UINT8 byte1 = vram[(y * 0x100) + c + 1];
+				uint16_t pen0, pen1;
+				uint8_t *char_gfx;
+				uint8_t byte0 = vram[(y * 0x100) + c];
+				uint8_t byte1 = vram[(y * 0x100) + c + 1];
 
 				// inverted graphics?
 				if (byte1 & Z88_SCR_HW_REV)
@@ -113,7 +113,7 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 				else if (!(byte1 & Z88_SCR_HW_HRS) || (((byte1 & Z88_SCR_HW_CURS) == Z88_SCR_HW_CURS)))
 				{
 					// low-res 6x8
-					UINT16 ch = (byte0 | (byte1<<8)) & 0x1ff;
+					uint16_t ch = (byte0 | (byte1<<8)) & 0x1ff;
 
 					if ((ch & 0x01c0) == 0x01c0)
 					{
@@ -143,7 +143,7 @@ UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 				else if ((byte1 & Z88_SCR_HW_HRS) && !(byte1 & Z88_SCR_HW_REV))
 				{
 					// high-res 8x8
-					UINT16 ch = (byte0 | (byte1<<8)) & 0x3ff;
+					uint16_t ch = (byte0 | (byte1<<8)) & 0x3ff;
 
 					if (ch & 0x0100)
 					{

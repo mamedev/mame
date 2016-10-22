@@ -70,8 +70,8 @@ READ16_MEMBER(shuuz_state::leta_r)
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)ioport("TRACKX")->read();
-		int dy = (INT8)ioport("TRACKY")->read();
+		int dx = (int8_t)ioport("TRACKX")->read();
+		int dy = (int8_t)ioport("TRACKY")->read();
 
 		m_cur[0] = dx + dy;
 		m_cur[1] = dx - dy;

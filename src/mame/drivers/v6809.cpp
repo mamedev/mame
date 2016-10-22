@@ -93,15 +93,15 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	UINT8 *m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT16 m_video_address;
+	uint8_t *m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint16_t m_video_address;
 
 private:
 	bool m_speaker_en;
-	UINT8 m_video_index;
-	UINT8 m_term_data;
-	UINT8 m_vidbyte;
+	uint8_t m_video_index;
+	uint8_t m_term_data;
+	uint8_t m_vidbyte;
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -173,9 +173,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -218,7 +218,7 @@ WRITE8_MEMBER( v6809_state::v6809_address_w )
 
 WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
-	UINT16 temp = m_video_address;
+	uint16_t temp = m_video_address;
 
 	m_crtc->register_w( space, 0, data );
 
@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
 
 READ8_MEMBER( v6809_state::pb_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

@@ -419,7 +419,7 @@ void menu_select_software::handle()
 
 void menu_select_software::populate()
 {
-	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	m_has_empty_start = true;
 	int old_software = -1;
 

@@ -187,12 +187,12 @@ I/O ports
 //  VIDEO EMULATION
 //**************************************************************************
 
-UINT32 pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 256; y++)
 	{
 		// address of current line in PMD-85 video memory
-		UINT8 *line = m_ram->pointer() + 0xc000 + 0x40 * y;
+		uint8_t *line = m_ram->pointer() + 0xc000 + 0x40 * y;
 
 		for (int x = 0; x < 288/6; x++)
 		{

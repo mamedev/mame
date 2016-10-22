@@ -38,7 +38,7 @@ public:
 
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
@@ -69,7 +69,7 @@ INPUT_PORTS_END
 
 void cortex_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_p_ram, ROM, 0x6000);
 	m_maincpu->ready_line(ASSERT_LINE);
 }

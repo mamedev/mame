@@ -5,7 +5,7 @@
 
 const device_type H83008 = &device_creator<h83008_device>;
 
-h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_device(mconfig, H83008, "H8/3008", tag, owner, clock, "h83008", __FILE__, address_map_delegate(FUNC(h83008_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -188,9 +188,9 @@ void h83008_device::interrupt_taken()
 	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
 }
 
-void h83008_device::internal_update(UINT64 current_time)
+void h83008_device::internal_update(uint64_t current_time)
 {
-	UINT64 event_time = 0;
+	uint64_t event_time = 0;
 
 	add_event(event_time, adc->internal_update(current_time));
 	add_event(event_time, sci0->internal_update(current_time));

@@ -136,7 +136,7 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 
 READ8_MEMBER( vc4000_state::vc4000_key_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	switch(offset & 0x0f)
 	{
 	case 0x08:
@@ -400,7 +400,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	int i;
 	int exec_addr;
 	int quick_length;
-	std::vector<UINT8> quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 

@@ -269,7 +269,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	if (m_io_reset->read())
 		m_maincpu->reset();
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keylatch, 0))
 		data &= m_io_row0->read();

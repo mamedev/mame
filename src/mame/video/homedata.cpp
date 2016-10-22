@@ -42,7 +42,7 @@ void homedata_state::mrokumei_handleblit( address_space &space, int rom_base )
 	int dest_addr;
 	int base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = memregion("user1")->base() + rom_base;
+	uint8_t *pBlitData = memregion("user1")->base() + rom_base;
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -123,11 +123,11 @@ finish:
 void homedata_state::reikaids_handleblit( address_space &space, int rom_base )
 {
 	int i;
-	UINT16 dest_param;
+	uint16_t dest_param;
 	int flipx;
 	int source_addr, base_addr;
 	int dest_addr;
-	UINT8 *pBlitData = memregion("user1")->base() + rom_base;
+	uint8_t *pBlitData = memregion("user1")->base() + rom_base;
 
 	int opcode, data, num_tiles;
 
@@ -224,7 +224,7 @@ void homedata_state::pteacher_handleblit( address_space &space, int rom_base )
 	int source_addr;
 	int dest_addr, base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = memregion("user1")->base() + rom_base;
+	uint8_t *pBlitData = memregion("user1")->base() + rom_base;
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -314,7 +314,7 @@ finish:
 
 PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -337,7 +337,7 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 
 PALETTE_INIT_MEMBER(homedata_state,reikaids)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -360,7 +360,7 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 
 PALETTE_INIT_MEMBER(homedata_state,pteacher)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -383,7 +383,7 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 
 PALETTE_INIT_MEMBER(homedata_state,mirderby)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -793,7 +793,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 
 ***************************************************************************/
 
-UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flags,width;
 
@@ -837,7 +837,7 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 }
 
 #ifdef UNUSED_FUNCTION
-UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flags;
 	static const int pritable[8][4] =
@@ -871,7 +871,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 }
 #endif
 
-UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flags;
 	static const int pritable[2][8][4] =    /* table of priorities derived from the PROM */
@@ -917,7 +917,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flags, scroll_low, scroll_high;
 
@@ -1013,7 +1013,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 homedata_state::screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homedata_state::screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -26,7 +26,7 @@ class pc9801_86_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -52,15 +52,15 @@ protected:
 
 private:
 	int queue_count();
-	UINT8 queue_pop();
+	uint8_t queue_pop();
 
-	UINT8 m_joy_sel, m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
-	UINT16 m_head, m_tail, m_count, m_irq_rate;
+	uint8_t m_joy_sel, m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
+	uint16_t m_head, m_tail, m_count, m_irq_rate;
 	bool m_pcmirq, m_fmirq;
 	required_device<ym2608_device>  m_opna;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
-	std::vector<UINT8> m_queue;
+	std::vector<uint8_t> m_queue;
 	emu_timer *m_dac_timer;
 };
 

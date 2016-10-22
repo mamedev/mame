@@ -226,7 +226,7 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 //  trs80m2_keyboard_device - constructor
 //-------------------------------------------------
 
-trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock, "trs80m2kb", __FILE__),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
@@ -299,7 +299,7 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_t1_r )
 
 READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_keylatch < 12)
 	{

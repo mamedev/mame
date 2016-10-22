@@ -432,7 +432,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 {
-	UINT8 *ROM = memregion("adpcm")->base();
+	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
 	membank("bank4")->set_entry(0);

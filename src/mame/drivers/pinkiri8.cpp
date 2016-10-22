@@ -61,21 +61,21 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_janshi_back_vram;
-	required_shared_ptr<UINT8> m_janshi_vram1;
-	required_shared_ptr<UINT8> m_janshi_unk1;
-	required_shared_ptr<UINT8> m_janshi_widthflags;
-	required_shared_ptr<UINT8> m_janshi_unk2;
-	required_shared_ptr<UINT8> m_janshi_vram2;
-	required_shared_ptr<UINT8> m_janshi_paletteram;
-	required_shared_ptr<UINT8> m_janshi_paletteram2;
-	required_shared_ptr<UINT8> m_janshi_crtc_regs;
-	UINT32 m_vram_addr;
+	required_shared_ptr<uint8_t> m_janshi_back_vram;
+	required_shared_ptr<uint8_t> m_janshi_vram1;
+	required_shared_ptr<uint8_t> m_janshi_unk1;
+	required_shared_ptr<uint8_t> m_janshi_widthflags;
+	required_shared_ptr<uint8_t> m_janshi_unk2;
+	required_shared_ptr<uint8_t> m_janshi_vram2;
+	required_shared_ptr<uint8_t> m_janshi_paletteram;
+	required_shared_ptr<uint8_t> m_janshi_paletteram2;
+	required_shared_ptr<uint8_t> m_janshi_crtc_regs;
+	uint32_t m_vram_addr;
 	int m_prev_writes;
-	UINT8 m_mux_data;
-	UINT8 m_prot_read_index;
-	UINT8 m_prot_char[5];
-	UINT8 m_prot_index;
+	uint8_t m_mux_data;
+	uint8_t m_prot_read_index;
+	uint8_t m_prot_char[5];
+	uint8_t m_prot_index;
 	DECLARE_WRITE8_MEMBER(output_regs_w);
 	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -87,7 +87,7 @@ public:
 	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 	DECLARE_DRIVER_INIT(ronjan);
 	virtual void video_start() override;
-	UINT32 screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -103,7 +103,7 @@ class janshi_vdp_device : public device_t,
 							public device_memory_interface
 {
 public:
-	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
 	virtual void device_config_complete() override;
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
-janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
@@ -325,12 +325,12 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)
 	{
-		UINT16 val = (m_janshi_paletteram[pen]) | (m_janshi_paletteram2[pen]<<8);
+		uint16_t val = (m_janshi_paletteram[pen]) | (m_janshi_paletteram2[pen]<<8);
 		int r = (val & 0x001f) >> 0;
 		int g = (val & 0x03e0) >> 5;
 		int b = (val & 0x7c00) >> 10;

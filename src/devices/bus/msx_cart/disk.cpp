@@ -122,7 +122,7 @@ static SLOT_INTERFACE_START( msx_floppies )
 SLOT_INTERFACE_END
 
 
-msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_floppy0(*this, "fdc:0")
@@ -132,53 +132,53 @@ msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, co
 }
 
 
-msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_disk_wd::msx_cart_disk_wd(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_disk_type1::msx_cart_disk_type1(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname), m_side_control(0)
 		, m_control(0)
 {
 }
 
 
-msx_cart_disk_type2::msx_cart_disk_type2(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_disk_type2::msx_cart_disk_type2(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: msx_cart_disk_wd(mconfig, type, name, tag, owner, clock, shortname)
 	, m_control(0)
 {
 }
 
 
-msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_vy0010::msx_cart_vy0010(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_type1(mconfig, MSX_CART_VY0010, "MSX Cartridge - VY0010", tag, owner, clock, "msx_cart_vy0010")
 {
 }
 
 
-msx_cart_fsfd1::msx_cart_fsfd1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_fsfd1::msx_cart_fsfd1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_type1(mconfig, MSX_CART_FSFD1, "MSX Cartridge - FS-FD1", tag, owner, clock, "msx_cart_fsfd1")
 {
 }
 
 
-msx_cart_fscf351::msx_cart_fscf351(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_fscf351::msx_cart_fscf351(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_type2(mconfig, MSX_CART_FSCF351, "MSX Cartridge - FS-CF351", tag, owner, clock, "msx_cart_fscf351")
 {
 }
 
 
-msx_cart_disk_tc8566::msx_cart_disk_tc8566(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+msx_cart_disk_tc8566::msx_cart_disk_tc8566(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: msx_cart_disk(mconfig, type, name, tag, owner, clock, shortname)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_fsfd1a::msx_cart_fsfd1a(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_fsfd1a::msx_cart_fsfd1a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: msx_cart_disk_tc8566(mconfig, MSX_CART_FSFD1A, "MSX Cartridge - FS-FD1A", tag, owner, clock, "msx_cart_fsfd1a")
 {
 }
@@ -294,7 +294,7 @@ void msx_cart_disk_type1::device_start()
 
 void msx_cart_disk_type1::post_load()
 {
-	UINT8 data = m_control;
+	uint8_t data = m_control;
 
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
@@ -303,9 +303,9 @@ void msx_cart_disk_type1::post_load()
 }
 
 
-void msx_cart_disk_type1::set_control(UINT8 data)
+void msx_cart_disk_type1::set_control(uint8_t data)
 {
-	UINT8 old_m_control = m_control;
+	uint8_t old_m_control = m_control;
 
 	m_control = data;
 
@@ -340,7 +340,7 @@ void msx_cart_disk_type1::set_control(UINT8 data)
 }
 
 
-void msx_cart_disk_type1::set_side_control(UINT8 data)
+void msx_cart_disk_type1::set_side_control(uint8_t data)
 {
 	m_side_control = data;
 
@@ -455,7 +455,7 @@ void msx_cart_disk_type2::device_reset()
 
 void msx_cart_disk_type2::post_load()
 {
-	UINT8 data = m_control;
+	uint8_t data = m_control;
 
 	// To make sure the FDD busy led status gets set correctly
 	m_control ^= 0x40;
@@ -464,9 +464,9 @@ void msx_cart_disk_type2::post_load()
 }
 
 
-void msx_cart_disk_type2::set_control(UINT8 data)
+void msx_cart_disk_type2::set_control(uint8_t data)
 {
-	UINT8 old_m_control = m_control;
+	uint8_t old_m_control = m_control;
 
 	m_control = data;
 

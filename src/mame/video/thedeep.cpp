@@ -47,8 +47,8 @@ TILEMAP_MAPPER_MEMBER(thedeep_state::tilemap_scan_rows_back)
 
 TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
 {
-	UINT8 code  =   m_vram_0[ tile_index * 2 + 0 ];
-	UINT8 color =   m_vram_0[ tile_index * 2 + 1 ];
+	uint8_t code  =   m_vram_0[ tile_index * 2 + 0 ];
+	uint8_t color =   m_vram_0[ tile_index * 2 + 1 ];
 	SET_TILE_INFO_MEMBER(1,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
@@ -57,8 +57,8 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
 
 TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
 {
-	UINT8 code  =   m_vram_1[ tile_index * 2 + 0 ];
-	UINT8 color =   m_vram_1[ tile_index * 2 + 1 ];
+	uint8_t code  =   m_vram_1[ tile_index * 2 + 0 ];
+	uint8_t color =   m_vram_1[ tile_index * 2 + 1 ];
 	SET_TILE_INFO_MEMBER(2,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
@@ -86,7 +86,7 @@ WRITE8_MEMBER(thedeep_state::vram_1_w)
 
 PALETTE_INIT_MEMBER(thedeep_state, thedeep)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 512;i++)
 		palette.set_pen_color(i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
@@ -115,7 +115,7 @@ void thedeep_state::video_start()
 
 ***************************************************************************/
 
-UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = m_scroll[0] + (m_scroll[1]<<8);
 	int scrolly = m_scroll[2] + (m_scroll[3]<<8);
@@ -132,7 +132,7 @@ UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<UINT16 *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

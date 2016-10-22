@@ -9,7 +9,7 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 {
-	UINT8 val = m_p_ram[SM8521_CLKT] + 1;
+	uint8_t val = m_p_ram[SM8521_CLKT] + 1;
 	m_p_ram[SM8521_CLKT] = ( m_p_ram[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
@@ -52,7 +52,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 
 void gamecom_state::machine_reset()
 {
-	UINT8 *rom = m_region_kernel->base();
+	uint8_t *rom = m_region_kernel->base();
 	m_bank1->set_base(rom);
 	m_bank2->set_base(rom);
 	m_bank3->set_base(rom);
@@ -70,7 +70,7 @@ void gamecom_state::machine_reset()
 	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
-void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data)
+void gamecom_state::gamecom_set_mmu(uint8_t mmu, uint8_t data)
 {
 	if (data < 0x20)
 	{
@@ -101,10 +101,10 @@ void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data)
 
 void gamecom_state::handle_stylus_press( int column )
 {
-	UINT16 data = m_io_grid[column]->read();
+	uint16_t data = m_io_grid[column]->read();
 	if (data)
 	{
-		UINT16 stylus_y = data ^ 0x3ff;
+		uint16_t stylus_y = data ^ 0x3ff;
 		m_p_ram[SM8521_P0] = stylus_y;
 		m_p_ram[SM8521_P1] = ( m_p_ram[SM8521_P1] & 0xFC ) | ( stylus_y >> 8 );
 	}
@@ -115,7 +115,7 @@ void gamecom_state::handle_stylus_press( int column )
 	}
 }
 
-void gamecom_state::handle_input_press(UINT16 mux_data)
+void gamecom_state::handle_input_press(uint16_t mux_data)
 {
 	switch( mux_data )
 	{
@@ -458,7 +458,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
    which page for source or destination is used */
 WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 {
-	UINT8 dmc = m_p_ram[SM8521_DMC];
+	uint8_t dmc = m_p_ram[SM8521_DMC];
 	m_dma.overwrite_mode = dmc & 0x01;
 	m_dma.transfer_mode = dmc & 0x06;
 	m_dma.decrement_x = dmc & 0x08;
@@ -536,20 +536,20 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	{
 		for( x_count = 0; x_count <= m_dma.width_x; x_count++ )
 		{
-			UINT16 src_addr = m_dma.source_current & m_dma.source_mask;
-			UINT16 dest_addr = m_dma.dest_current & m_dma.dest_mask;
-			UINT8 dest_adj = (3 - (m_dma.dest_x_current & 3)) << 1;
-			UINT8 src_adj = (3 - (m_dma.source_x_current & 3)) << 1;
+			uint16_t src_addr = m_dma.source_current & m_dma.source_mask;
+			uint16_t dest_addr = m_dma.dest_current & m_dma.dest_mask;
+			uint8_t dest_adj = (3 - (m_dma.dest_x_current & 3)) << 1;
+			uint8_t src_adj = (3 - (m_dma.source_x_current & 3)) << 1;
 
 			/* handle DMA for 1 pixel */
 			// Get new pixel
-			UINT8 source_pixel = (m_dma.source_bank[src_addr] >> src_adj) & 3;
+			uint8_t source_pixel = (m_dma.source_bank[src_addr] >> src_adj) & 3;
 
 			// If overwrite mode, write new pixel
 			if ( m_dma.overwrite_mode || source_pixel)
 			{
 				// Get 4 pixels and remove the one about to be replaced
-				UINT8 other_pixels = m_dma.dest_bank[dest_addr] & ~(3 << dest_adj);
+				uint8_t other_pixels = m_dma.dest_bank[dest_addr] & ~(3 << dest_adj);
 				// Get palette of new pixel and place into the hole
 				m_dma.dest_bank[dest_addr] = other_pixels | (m_dma.palette[ source_pixel ] << dest_adj);
 			}
@@ -631,8 +631,8 @@ DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 
 image_init_result gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
-	UINT32 load_offset = 0;
+	uint32_t size = slot->common_get_size("rom");
+	uint32_t load_offset = 0;
 
 	if (size != 0x008000 && size != 0x040000 && size != 0x080000
 			&& size != 0x100000 && size != 0x1c0000 && size != 0x200000)
@@ -649,7 +649,7 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	// we load what we have
 	slot->common_load_rom(slot->get_rom_base() + load_offset, size, "rom");
 	// and then we mirror the content, instead of masking out larger accesses
-	UINT8 *crt = slot->get_rom_base();
+	uint8_t *crt = slot->get_rom_base();
 	if (size < 0x010000) { memcpy(crt + 0x008000, crt, 0x008000); } /* ->64KB */
 	if (size < 0x020000) { memcpy(crt + 0x010000, crt, 0x010000); } /* ->128KB */
 	if (size < 0x040000) { memcpy(crt + 0x020000, crt, 0x020000); } /* ->256KB */

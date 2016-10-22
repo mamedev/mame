@@ -47,7 +47,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch3;
 	required_device<generic_latch_8_device> m_soundlatch4;
 
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_ram;
 
 	int m_sound_flags;
 	int m_coin_flag;

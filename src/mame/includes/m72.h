@@ -59,30 +59,30 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
-	optional_shared_ptr<UINT16> m_m82_rowscrollram;
-	optional_shared_ptr<UINT16> m_spriteram2;
-	optional_shared_ptr<UINT8> m_soundram;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram1;
+	required_shared_ptr<uint16_t> m_videoram2;
+	optional_shared_ptr<uint16_t> m_m82_rowscrollram;
+	optional_shared_ptr<uint16_t> m_spriteram2;
+	optional_shared_ptr<uint8_t> m_soundram;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
 	optional_device<pic8259_device> m_upd71059c;
 
-	std::unique_ptr<UINT16[]> m_protection_ram;
+	std::unique_ptr<uint16_t[]> m_protection_ram;
 	emu_timer *m_scanline_timer;
-	const UINT8 *m_protection_code;
-	const UINT8 *m_protection_crc;
-	UINT32 m_raster_irq_position;
-	std::unique_ptr<UINT16[]> m_buffered_spriteram;
+	const uint8_t *m_protection_code;
+	const uint8_t *m_protection_crc;
+	uint32_t m_raster_irq_position;
+	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_large;
-	INT32 m_scrollx1;
-	INT32 m_scrolly1;
-	INT32 m_scrollx2;
-	INT32 m_scrolly2;
-	INT32 m_video_off;
+	int32_t m_scrollx1;
+	int32_t m_scrolly1;
+	int32_t m_scrollx2;
+	int32_t m_scrolly2;
+	int32_t m_video_off;
 
 	int m_fg_source;
 	int m_bg_source;
@@ -94,12 +94,12 @@ public:
 
 	// majtitle specific
 	int m_m82_rowscroll;
-	UINT16 m_m82_tmcontrol;
+	uint16_t m_m82_tmcontrol;
 
 	// m72_i8751 specific
-	UINT8 m_mcu_snd_cmd_latch;
-	UINT8 m_mcu_sample_latch;
-	UINT32 m_mcu_sample_addr;
+	uint8_t m_mcu_snd_cmd_latch;
+	uint8_t m_mcu_sample_latch;
+	uint32_t m_mcu_sample_addr;
 
 	// common
 	DECLARE_READ16_MEMBER(palette1_r);
@@ -185,15 +185,15 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
 
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
-	inline void m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum);
+	inline void m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum);
 	void register_savestate();
 	inline void changecolor(int color,int r,int g,int b);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes);
-	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
+	void copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes);
+	void install_protection_handler(const uint8_t *code,const uint8_t *crc);
 };

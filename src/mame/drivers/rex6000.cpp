@@ -76,27 +76,27 @@ public:
 	required_device<address_map_bank_device> m_bankdev0;
 	required_device<address_map_bank_device> m_bankdev1;
 	optional_device<intelfsh8_device> m_flash0b;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 	required_ioport m_battery;
 	optional_ioport m_pen_x;
 	optional_ioport m_pen_y;
 
-	UINT8 m_bank[4];
-	UINT8 m_beep_io[5];
-	UINT8 m_lcd_base[2];
-	UINT8 m_touchscreen[0x10];
-	UINT8 m_lcd_enabled;
-	UINT8 m_lcd_cmd;
+	uint8_t m_bank[4];
+	uint8_t m_beep_io[5];
+	uint8_t m_lcd_base[2];
+	uint8_t m_touchscreen[0x10];
+	uint8_t m_lcd_enabled;
+	uint8_t m_lcd_cmd;
 
-	UINT8 m_irq_mask;
-	UINT8 m_irq_flag;
-	UINT8 m_port6;
-	UINT8 m_beep_mode;
-	UINT8 m_power_on;
+	uint8_t m_irq_mask;
+	uint8_t m_irq_flag;
+	uint8_t m_port6;
+	uint8_t m_beep_mode;
+	uint8_t m_power_on;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -140,12 +140,12 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(oz750);
 
 	virtual void machine_reset() override;
-	UINT32 screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	int oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *tag, char *dest_buf);
+	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 
-	UINT16 m_kb_mask;
+	uint16_t m_kb_mask;
 };
 
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 				// the beeper frequency is update only if the bit 1 is set
 				if (BIT(data, 1))
 				{
-					UINT16 div = ((m_beep_io[2] | m_beep_io[3]<<8) & 0x0fff) + 2;
+					uint16_t div = ((m_beep_io[2] | m_beep_io[3]<<8) & 0x0fff) + 2;
 					m_beep->set_clock(16384 / div);
 				}
 			}
@@ -300,9 +300,9 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 
 READ8_MEMBER( rex6000_state::touchscreen_r )
 {
-	UINT16 x = m_pen_x->read();
-	UINT16 y = m_pen_y->read();
-	UINT16 battery = m_battery->read();
+	uint16_t x = m_pen_x->read();
+	uint16_t y = m_pen_y->read();
+	uint16_t battery = m_battery->read();
 
 	switch (offset)
 	{
@@ -334,7 +334,7 @@ WRITE8_MEMBER( rex6000_state::touchscreen_w )
 
 READ8_MEMBER( oz750_state::kb_status_r )
 {
-	UINT8 data = 0x6b;
+	uint8_t data = 0x6b;
 	if (m_battery->read() & 0x01)   data |= 0x80;
 
 	return data;
@@ -342,7 +342,7 @@ READ8_MEMBER( oz750_state::kb_status_r )
 
 READ8_MEMBER( oz750_state::kb_data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	for(int i=0; i<10; i++)
 	{
 		if (m_kb_mask & (1<<i))
@@ -569,7 +569,7 @@ INPUT_PORTS_END
 
 void rex6000_state::machine_start()
 {
-	membank("ram")->set_base((UINT8*)m_nvram + 0x4000);
+	membank("ram")->set_base((uint8_t*)m_nvram + 0x4000);
 }
 
 void rex6000_state::machine_reset()
@@ -593,16 +593,16 @@ void oz750_state::machine_reset()
 	m_kb_mask = 0;
 }
 
-UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled)
 	{
 		for (int y=0; y<120; y++)
 			for (int x=0; x<30; x++)
 			{
-				UINT8 data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
+				uint8_t data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
 
 				for (int b=0; b<8; b++)
 				{
@@ -619,16 +619,16 @@ UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled && m_power_on)
 	{
 		for (int y=0; y<=cliprect.max_y; y++)
 			for (int x=0; x<30; x++)
 			{
-				UINT8 data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
+				uint8_t data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
 
 				for (int b=0; b<8; b++)
 				{
@@ -703,9 +703,9 @@ PALETTE_INIT_MEMBER(rex6000_state, rex6000)
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
-	UINT32 img_start = 0;
+	uint32_t img_start = 0;
 
-	std::vector<UINT8> data(image.length());
+	std::vector<uint8_t> data(image.length());
 	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
@@ -714,16 +714,16 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
-	for (UINT32 i=0; i<image.length() - img_start ;i++)
+	for (uint32_t i=0; i<image.length() - img_start ;i++)
 		m_flash0b->write_raw(i, data[img_start + i]);
 
 	return image_init_result::PASS;
 }
 
-int oz750_state::oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *tag, char *dest_buf)
+int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf)
 {
 	int tag_len = strlen(tag);
-	UINT32 img_start = 0;
+	uint32_t img_start = 0;
 	for (img_start=0; img_start < data.size() - tag_len; img_start++)
 		if (data[img_start] && !memcmp(&data[img_start], tag, tag_len))
 			break;
@@ -742,7 +742,7 @@ int oz750_state::oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *
 
 	if (dest_buf)
 	{
-		UINT32 i;
+		uint32_t i;
 		for (i=0; data[img_start + i] != 0 && data[img_start + i] != '\n' && data[img_start + i] != '\r'; i++)
 			dest_buf[i] = data[img_start + i];
 
@@ -755,7 +755,7 @@ int oz750_state::oz_wzd_extract_tag(const std::vector<UINT8> &data, const char *
 QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 {
 	address_space* flash = &machine().device("flash0a")->memory().space(0);
-	std::vector<UINT8> data(image.length());
+	std::vector<uint8_t> data(image.length());
 	image.fread(&data[0], image.length());
 
 	const char *fs_type = "BSIC";
@@ -772,14 +772,14 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	if (!strncmp(file_name, "PFILE:", 6))
 		strcpy(file_name, file_name + 6);
 
-	UINT32 img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
+	uint32_t img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
 	if (img_start == 0)
 		return image_init_result::FAIL;
 
-	UINT16 icon_size = data[img_start++];
+	uint16_t icon_size = data[img_start++];
 
-	UINT32 pos = 0xc0000;
+	uint32_t pos = 0xc0000;
 	flash->write_byte(pos++, 0x4f);
 
 	for (int i=0; fs_type[i]; i++)
@@ -808,7 +808,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	for (int i=0, slen = strlen(app_name); i <= slen; i++)
 		flash->write_byte(pos++, app_name[i]);                  // title
 
-	UINT16 size = (UINT16)image.length() - img_start;
+	uint16_t size = (uint16_t)image.length() - img_start;
 	flash->write_byte(pos++, size);                             // data size LSB
 	flash->write_byte(pos++, size >> 8);                        // data size MSB
 

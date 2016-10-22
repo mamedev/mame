@@ -240,7 +240,7 @@ void hh_tms1k_state::machine_reset()
 
 void hh_tms1k_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -253,7 +253,7 @@ void hh_tms1k_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -315,7 +315,7 @@ void hh_tms1k_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_tms1k_state::set_display_segmask(UINT32 digits, UINT32 mask)
+void hh_tms1k_state::set_display_segmask(uint32_t digits, uint32_t mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -326,12 +326,12 @@ void hh_tms1k_state::set_display_segmask(UINT32 digits, UINT32 mask)
 	}
 }
 
-void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
+void hh_tms1k_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -342,9 +342,9 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 // generic input handlers
 
-UINT8 hh_tms1k_state::read_inputs(int columns)
+uint8_t hh_tms1k_state::read_inputs(int columns)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -354,10 +354,10 @@ UINT8 hh_tms1k_state::read_inputs(int columns)
 	return ret;
 }
 
-UINT8 hh_tms1k_state::read_rotated_inputs(int columns, UINT8 rowmask)
+uint8_t hh_tms1k_state::read_rotated_inputs(int columns, uint8_t rowmask)
 {
-	UINT8 ret = 0;
-	UINT16 colmask = (1 << columns) - 1;
+	uint8_t ret = 0;
+	uint16_t colmask = (1 << columns) - 1;
 
 	// read selected input columns
 	for (int i = 0; i < 8; i++)
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( matchnum )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 1")
 INPUT_PORTS_END
 
-static const INT16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( matchnum, matchnum_state )
 
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( mathmagi )
 INPUT_PORTS_END
 
 // output PLA is not decapped
-static const UINT16 mathmagi_output_pla[0x20] =
+static const uint16_t mathmagi_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0
 	lB+lC,                  // 1
@@ -759,7 +759,7 @@ WRITE16_MEMBER(amaztron_state::write_o)
 READ8_MEMBER(amaztron_state::read_k)
 {
 	// K: multiplexed inputs
-	UINT8 k = read_inputs(6);
+	uint8_t k = read_inputs(6);
 
 	// the 5th column is tied to K4+K8
 	if (k & 0x10) k |= 0xc;
@@ -952,7 +952,7 @@ static INPUT_PORTS_START( zodiac )
 INPUT_PORTS_END
 
 // output PLA is not decapped
-static const UINT16 zodiac_output_pla[0x20] =
+static const uint16_t zodiac_output_pla[0x20] =
 {
 	0x80,                   // empty/led 1/7
 	lC,                     // i/led 2/8
@@ -1040,7 +1040,7 @@ public:
 void cqback_state::prepare_display()
 {
 	// R9 selects between segments B/C or A'/D'
-	UINT16 seg = m_o;
+	uint16_t seg = m_o;
 	if (m_r & 0x200)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
@@ -1751,7 +1751,7 @@ static INPUT_PORTS_START( cnfball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static const INT16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( cnfball, cnfball_state )
 
@@ -1807,7 +1807,7 @@ public:
 void cnfball2_state::prepare_display()
 {
 	// R1 selects between segments B/C or A'/D'
-	UINT16 seg = m_o;
+	uint16_t seg = m_o;
 	if (~m_r & 2)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
@@ -1869,7 +1869,7 @@ static INPUT_PORTS_START( cnfball2 )
 INPUT_PORTS_END
 
 // output PLA is not decapped
-static const UINT16 cnfball2_output_pla[0x20] =
+static const uint16_t cnfball2_output_pla[0x20] =
 {
 	// first half was dumped electronically
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
@@ -2899,7 +2899,7 @@ void raisedvl_state::set_clock()
 	// 0:   R=47K  -> ~350kHz
 	// 2,3: R=35K8 -> ~425kHz (combined)
 	// 4:   R=32K  -> ~465kHz (combined)
-	UINT8 inp = m_inp_matrix[1]->read();
+	uint8_t inp = m_inp_matrix[1]->read();
 	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
 }
 
@@ -3430,7 +3430,7 @@ static INPUT_PORTS_START( elecdet )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static const INT16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
+static const int16_t elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
 
 static MACHINE_CONFIG_START( elecdet, elecdet_state )
 
@@ -3756,8 +3756,8 @@ void elecbowl_state::prepare_display()
 	}
 
 	// lamp muxes
-	UINT8 mask = 1 << (m_o & 7);
-	UINT8 d = (m_r & 2) ? mask : 0;
+	uint8_t mask = 1 << (m_o & 7);
+	uint8_t d = (m_r & 2) ? mask : 0;
 	if (~m_r & 1)
 		m_display_state[5] = (m_display_state[5] & ~mask) | d;
 	if (~m_r & 4)
@@ -3834,7 +3834,7 @@ static INPUT_PORTS_START( elecbowl )
 INPUT_PORTS_END
 
 // output PLA is not decapped
-static const UINT16 elecbowl_output_pla[0x20] =
+static const uint16_t elecbowl_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0
 	lB+lC,                  // 1
@@ -4640,7 +4640,7 @@ void ssimon_state::set_clock()
 	// 0 Simple: R=51K -> ~200kHz
 	// 1 Normal: R=37K -> ~275kHz
 	// 2 Super:  R=22K -> ~400kHz
-	UINT8 inp = m_inp_matrix[6]->read();
+	uint8_t inp = m_inp_matrix[6]->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
@@ -4828,7 +4828,7 @@ void bigtrak_state::machine_start()
 	save_item(NAME(m_gearbox_pos));
 }
 
-static const INT16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+static const int16_t bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
 static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
@@ -4952,7 +4952,7 @@ void mbdtower_state::prepare_display()
 	// update current state
 	if (~m_r & 0x10)
 	{
-		UINT8 o = BITSWAP8(m_o,7,0,4,3,2,1,6,5) & 0x7f;
+		uint8_t o = BITSWAP8(m_o,7,0,4,3,2,1,6,5) & 0x7f;
 		m_display_state[2] = (m_o & 0x80) ? o : 0;
 		m_display_state[1] = (m_o & 0x80) ? 0 : o;
 		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
@@ -5294,7 +5294,7 @@ static INPUT_PORTS_START( merlin )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("New Game")
 INPUT_PORTS_END
 
-static const INT16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+static const int16_t merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
@@ -5473,7 +5473,7 @@ static INPUT_PORTS_START( stopthief )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static const INT16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
+static const int16_t stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
 
 static MACHINE_CONFIG_START( stopthief, stopthief_state )
 
@@ -5807,7 +5807,7 @@ static INPUT_PORTS_START( lostreas )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Up")
 INPUT_PORTS_END
 
-static const INT16 lostreas_speaker_levels[16] =
+static const int16_t lostreas_speaker_levels[16] =
 {
 	0, 0x7fff/15, 0x7fff/14, 0x7fff/13, 0x7fff/12, 0x7fff/11, 0x7fff/10, 0x7fff/9,
 	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
@@ -5865,8 +5865,8 @@ public:
 void tcfball_state::prepare_display()
 {
 	// R8 enables leds, R9 enables digits
-	UINT16 mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
-	UINT16 sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
+	uint16_t mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
+	uint16_t sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
 
 	set_display_segmask(0x77, 0x7f);
 	set_display_segmask(0x08, 0xff); // R3 has DP
@@ -5981,7 +5981,7 @@ static INPUT_PORTS_START( tcfballa )
 INPUT_PORTS_END
 
 // output PLA is not decapped, dumped electronically
-static const UINT16 tcfballa_output_pla[0x20] =
+static const uint16_t tcfballa_output_pla[0x20] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x46, 0x70, 0x00, 0x00, 0x00,
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -6139,7 +6139,7 @@ static INPUT_PORTS_START( tandy12 )
 INPUT_PORTS_END
 
 // output PLA is not decapped
-static const UINT16 tandy12_output_pla[0x20] =
+static const uint16_t tandy12_output_pla[0x20] =
 {
 	// these are certain
 	0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
@@ -6404,7 +6404,7 @@ static INPUT_PORTS_START( copycat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const INT16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( copycat, copycat_state )
 
@@ -6619,7 +6619,7 @@ public:
 	{ }
 
 	required_device<tms1024_device> m_expander;
-	UINT8 m_exp_port[7];
+	uint8_t m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
 	void prepare_display();
@@ -7008,7 +7008,7 @@ static INPUT_PORTS_START( ssports4 )
 INPUT_PORTS_END
 
 // output PLA is not decapped, dumped electronically
-static const UINT16 ssports4_output_pla[0x20] =
+static const uint16_t ssports4_output_pla[0x20] =
 {
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40

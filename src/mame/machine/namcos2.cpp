@@ -23,9 +23,9 @@ void (*namcos2_kickstart)(running_machine &machine, int internal);
 
 READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 {
-	static const UINT16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
-	static const UINT16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
-	UINT16 data;
+	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
+	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
+	uint16_t data;
 
 	switch( offset )
 	{
@@ -102,7 +102,7 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	namcos2_kickstart = nullptr;
-	m_eeprom = std::make_unique<UINT8[]>(m_eeprom_size);
+	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos2_shared_state::namcos2_posirq_tick),this));
 }
@@ -163,7 +163,7 @@ WRITE16_MEMBER( namcos2_state::serial_comms_ram_w ){
 
 READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
 {
-	UINT16 retval = m_serial_comms_ctrl[offset];
+	uint16_t retval = m_serial_comms_ctrl[offset];
 
 	switch(offset){
 	case 0x00:
@@ -445,13 +445,13 @@ void namcos2_shared_state::init_c148()
 	}
 }
 
-UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset, UINT16 data, int bWrite )
+uint16_t namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset, uint16_t data, int bWrite )
 {
 	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
 	device_t *altcpu = nullptr;
-	UINT16 *pC148Reg = nullptr;
-	UINT16 *pC148RegAlt = nullptr;
-	UINT16 result = 0;
+	uint16_t *pC148Reg = nullptr;
+	uint16_t *pC148RegAlt = nullptr;
+	uint16_t result = 0;
 
 	if (&space.device() == m_maincpu)
 	{
@@ -675,7 +675,7 @@ INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 {
 	/* only used by namcos21 */
 	//int scanline = get_posirq_scanline();
-	INT32 scanline = 0x50+0x89; /* HACK for Winning Run */
+	int32_t scanline = 0x50+0x89; /* HACK for Winning Run */
 
 	//printf( "namcos2_68k_gpu_vblank(%d)\n",m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
 	adjust_posirq_timer(scanline);
@@ -688,8 +688,8 @@ INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 
 WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM= memregion("audiocpu")->base();
-	UINT32 max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
+	uint8_t *RAM= memregion("audiocpu")->base();
+	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max; /* 991104.CAB */
 	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }

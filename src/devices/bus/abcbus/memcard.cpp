@@ -109,7 +109,7 @@ const tiny_rom_entry *abc_memory_card_t::device_rom_region() const
 //  abc_memory_card_t - constructor
 //-------------------------------------------------
 
-abc_memory_card_t::abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_memory_card_t::abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC_MEMORY_CARD, "ABC Memory Card", tag, owner, clock, "abc_mem", __FILE__),
 	device_abcbus_card_interface(mconfig, *this),
 	m_dos_rom(*this, "dos"),
@@ -138,9 +138,9 @@ void abc_memory_card_t::device_start()
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-UINT8 abc_memory_card_t::abcbus_xmemfl(offs_t offset)
+uint8_t abc_memory_card_t::abcbus_xmemfl(offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset >= 0x6000 && offset < 0x7000)
 	{

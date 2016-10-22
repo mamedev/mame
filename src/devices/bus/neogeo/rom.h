@@ -12,8 +12,8 @@ class neogeo_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source);
-	neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
+	neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source);
+	neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -38,7 +38,7 @@ extern const device_type NEOGEO_ROM;
 class neogeo_vliner_cart : public neogeo_rom_device
 {
 public:
-	neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ16_MEMBER(ram_r) override { return m_cart_ram[offset]; }
 	virtual DECLARE_WRITE16_MEMBER(ram_w) override { COMBINE_DATA(&m_cart_ram[offset]); }
@@ -49,7 +49,7 @@ public:
 	virtual void device_reset() override;
 
 private:
-	UINT16 m_cart_ram[0x1000];
+	uint16_t m_cart_ram[0x1000];
 };
 
 extern const device_type NEOGEO_VLINER_CART;

@@ -192,7 +192,7 @@ class dac_device : public device_t,
 	protected _dac_code
 {
 protected:
-	dac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, double gain)
+	dac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		_dac_code(gain)
@@ -220,7 +220,7 @@ class dac_generator<dac_bit_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, double gain) :
+	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
 		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
 	{
 	}
@@ -235,7 +235,7 @@ class dac_generator<dac_byte_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, double gain) :
+	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
 		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
 	{
 	}
@@ -250,7 +250,7 @@ class dac_generator<dac_word_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, double gain) :
+	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
 		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
 	{
 	}
@@ -271,7 +271,7 @@ extern const device_type _dac_type; \
 class _dac_class : public dac_generator<_dac_interface, _dac_coding> \
 {\
 public: \
-	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : \
+	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : \
 		dac_generator(mconfig, _dac_type, _dac_description, tag, owner, clock, _dac_shortname, __FILE__, _dac_gain) {} \
 }; \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class)

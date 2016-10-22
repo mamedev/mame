@@ -19,7 +19,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(tankbatt_state, tankbatt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	#define RES_1   0xc0 /* this is a guess */
@@ -93,7 +93,7 @@ void tankbatt_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 tankbatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tankbatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_bullets(bitmap, cliprect);

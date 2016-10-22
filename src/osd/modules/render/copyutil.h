@@ -16,7 +16,7 @@
 class copy_util
 {
 public:
-	static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
+	static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 	{
 		for (int x = 0; x < width; x++)
 		{
@@ -25,7 +25,7 @@ public:
 		}
 	}
 
-	static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette)
+	static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 	{
 		for (int x = 0; x < width; x++)
 		{
@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette)
+	static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 	{
 		int x;
 
@@ -59,7 +59,7 @@ public:
 		}
 	}
 
-	static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette)
+	static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 	{
 		int x;
 		// palette (really RGB map) case
@@ -83,7 +83,7 @@ public:
 		}
 	}
 
-	static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
+	static inline uint32_t ycc_to_rgb(uint8_t y, uint8_t cb, uint8_t cr)
 	{
 		/* original equations:
 
@@ -124,7 +124,7 @@ public:
 		return 0xff000000 | (b << 16) | (g << 8) | r;
 	}
 
-	static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xprescale)
+	static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xprescale)
 	{
 		int x;
 
@@ -135,10 +135,10 @@ public:
 		{
 			for (x = 0; x < width / 2; x++)
 			{
-				UINT16 srcpix0 = *src++;
-				UINT16 srcpix1 = *src++;
-				UINT8 cb = srcpix0 & 0xff;
-				UINT8 cr = srcpix1 & 0xff;
+				uint16_t srcpix0 = *src++;
+				uint16_t srcpix1 = *src++;
+				uint8_t cb = srcpix0 & 0xff;
+				uint8_t cr = srcpix1 & 0xff;
 				for (int x2 = 0; x2 < xprescale; x2++)
 					*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 				for (int x2 = 0; x2 < xprescale; x2++)
@@ -151,10 +151,10 @@ public:
 		{
 			for (x = 0; x < width; x += 2)
 			{
-				UINT16 srcpix0 = *src++;
-				UINT16 srcpix1 = *src++;
-				UINT8 cb = srcpix0 & 0xff;
-				UINT8 cr = srcpix1 & 0xff;
+				uint16_t srcpix0 = *src++;
+				uint16_t srcpix1 = *src++;
+				uint8_t cb = srcpix0 & 0xff;
+				uint8_t cr = srcpix1 & 0xff;
 				for (int x2 = 0; x2 < xprescale; x2++)
 					*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 				for (int x2 = 0; x2 < xprescale; x2++)

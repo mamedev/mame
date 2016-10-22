@@ -34,7 +34,7 @@
 #include "debugger.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
-static const UINT32 pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
+static const uint32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
 
@@ -126,10 +126,10 @@ void archimedes_state::vidc_vblank()
 void archimedes_state::vidc_video_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	static UINT8 *vram = m_region_vram->base();
-	UINT32 size;
-	UINT32 m_vidc_ccur;
-	UINT32 offset_ptr;
+	static uint8_t *vram = m_region_vram->base();
+	uint32_t size;
+	uint32_t m_vidc_ccur;
+	uint32_t offset_ptr;
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
@@ -165,10 +165,10 @@ void archimedes_state::vidc_video_tick()
 void archimedes_state::vidc_audio_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 ulaw_comp;
-	INT16 res;
-	UINT8 ch;
-	static const INT16 mulawTable[256] =
+	uint8_t ulaw_comp;
+	int16_t res;
+	uint8_t ch;
+	static const int16_t mulawTable[256] =
 	{
 		-32124,-31100,-30076,-29052,-28028,-27004,-25980,-24956,
 		-23932,-22908,-21884,-20860,-19836,-18812,-17788,-16764,
@@ -206,7 +206,7 @@ void archimedes_state::vidc_audio_tick()
 
 	for(ch=0;ch<8;ch++)
 	{
-		UINT8 ulaw_temp = (space.read_byte(m_vidc_sndstart+m_vidc_sndcur + ch)) ^ 0xff;
+		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndstart+m_vidc_sndcur + ch)) ^ 0xff;
 
 		ulaw_comp = (ulaw_temp>>1) | ((ulaw_temp&1)<<7);
 
@@ -314,14 +314,14 @@ void archimedes_state::archimedes_init()
 
 READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 {
-	UINT32 page, poffs;
+	uint32_t page, poffs;
 
 	// are we mapping in the boot ROM?
 	if (m_memc_latchrom)
 	{
-		UINT32 *rom;
+		uint32_t *rom;
 
-		rom = (UINT32 *)m_region_maincpu->base();
+		rom = (uint32_t *)m_region_maincpu->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -352,7 +352,7 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 
 WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 {
-	UINT32 page, poffs;
+	uint32_t page, poffs;
 
 	// if the boot ROM is mapped, ignore writes
 	if (m_memc_latchrom)
@@ -381,14 +381,14 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 /* Aristocrat Mark 5 - same as normal AA except with Dram emulator */
 READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 {
-	UINT32 page, poffs;
+	uint32_t page, poffs;
 
 	// are we mapping in the boot ROM?
 	if (m_memc_latchrom)
 	{
-		UINT32 *rom;
+		uint32_t *rom;
 
-		rom = (UINT32 *)m_region_maincpu->base();
+		rom = (uint32_t *)m_region_maincpu->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -430,7 +430,7 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 
 void archimedes_state::archimedes_driver_init()
 {
-	m_archimedes_memc_physmem = reinterpret_cast<UINT32 *>(memshare("physicalram")->ptr());
+	m_archimedes_memc_physmem = reinterpret_cast<uint32_t *>(memshare("physicalram")->ptr());
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
 //  space.set_direct_update_handler(direct_update_delegate(FUNC(a310_setopbase), &machine));
 }
@@ -475,7 +475,7 @@ void archimedes_state::latch_timer_cnt(int tmr)
 {
 	double time = m_timer[tmr]->elapsed().as_double();
 	time *= 2000000.0;  // find out how many 2 MHz ticks have gone by
-	m_ioc_timerout[tmr] = m_ioc_timercnt[tmr] - (UINT32)time;
+	m_ioc_timerout[tmr] = m_ioc_timercnt[tmr] - (uint32_t)time;
 }
 
 bool archimedes_state::check_floppy_ready()
@@ -509,8 +509,8 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 	{
 		case CONTROL:
 		{
-			UINT8 i2c_data = 1;
-			UINT8 flyback; //internal name for vblank here
+			uint8_t i2c_data = 1;
+			uint8_t flyback; //internal name for vblank here
 			int vert_pos;
 			bool floppy_ready_state;
 
@@ -708,7 +708,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 
 READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 {
-	UINT32 ioc_addr;
+	uint32_t ioc_addr;
 
 	ioc_addr = offset*4;
 
@@ -779,7 +779,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 
 WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 {
-	UINT32 ioc_addr;
+	uint32_t ioc_addr;
 
 	ioc_addr = offset*4;
 
@@ -927,8 +927,8 @@ void archimedes_state::vidc_dynamic_res_change()
 
 WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 {
-	UINT32 reg = data>>24;
-	UINT32 val = data & 0xffffff;
+	uint32_t reg = data>>24;
+	uint32_t val = data & 0xffffff;
 	//#ifdef MAME_DEBUG
 	static const char *const vrnames[] =
 	{
@@ -1155,7 +1155,7 @@ The physical page is encoded differently depending on the page size :
 
 WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
 {
-	UINT32 log, phys, memc;
+	uint32_t log, phys, memc;
 
 //  perms = (data & 0x300)>>8;
 	log = phys = memc = 0;

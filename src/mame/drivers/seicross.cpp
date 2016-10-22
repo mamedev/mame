@@ -54,7 +54,7 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[32] = {
+	static const uint8_t init[32] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
 		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, };
 
@@ -594,7 +594,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(seicross_state,friskytb)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{

@@ -60,7 +60,7 @@ protected:
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
 	required_memory_bank rombank;
-	required_shared_ptr<UINT8> mainram;
+	required_shared_ptr<uint8_t> mainram;
 	required_device<nvram_device> nvram;
 	required_device<wpc_pic_device> pic;
 	required_device<wpc_lamp_device> lamp;
@@ -94,8 +94,8 @@ private:
 	static const char *const outputs_wd[54];
 	static const char *const lamps_wcs[64];
 	static const char *const outputs_wcs[54];
-	UINT8 firq_src, zc;
-	UINT16 rtc_base_day;
+	uint8_t firq_src, zc;
+	uint16_t rtc_base_day;
 };
 
 static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8, wpc_s_state )
@@ -166,9 +166,9 @@ READ8_MEMBER(wpc_s_state::rtc_r)
 	// This may get wonky if the game is running on year change.  Find
 	// something better to do at that time.
 
-	UINT8 day = (systime.local_time.day - rtc_base_day) & 31;
-	UINT8 hour = systime.local_time.hour;
-	UINT8 min = systime.local_time.minute;
+	uint8_t day = (systime.local_time.day - rtc_base_day) & 31;
+	uint8_t hour = systime.local_time.hour;
+	uint8_t min = systime.local_time.minute;
 
 	switch(offset) {
 	case 0:
@@ -187,7 +187,7 @@ READ8_MEMBER(wpc_s_state::firq_src_r)
 
 READ8_MEMBER(wpc_s_state::zc_r)
 {
-	UINT8 res = zc;
+	uint8_t res = zc;
 	zc &= 0x7f;
 	return res;
 }
@@ -242,7 +242,7 @@ void wpc_s_state::machine_reset()
 	mainram[0x1804] = systime.local_time.weekday+1;
 	mainram[0x1805] = 0;
 	mainram[0x1806] = 1;
-	UINT16 checksum = 0;
+	uint16_t checksum = 0;
 	for(int i=0x1800; i<=0x1806; i++)
 		checksum += mainram[i];
 	checksum = ~checksum;

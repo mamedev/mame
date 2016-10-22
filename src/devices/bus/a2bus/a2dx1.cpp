@@ -49,7 +49,7 @@ machine_config_constructor a2bus_dx1_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dac(*this, "dac"),
@@ -57,7 +57,7 @@ a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type ty
 {
 }
 
-a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_DX1, "Decillonix DX-1", tag, owner, clock, "a2dx1", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dac(*this, "dac"),
@@ -75,7 +75,7 @@ void a2bus_dx1_device::device_start()
 	set_a2bus_device();
 }
 
-UINT8 a2bus_dx1_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_dx1_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -92,7 +92,7 @@ UINT8 a2bus_dx1_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_dx1_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_dx1_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

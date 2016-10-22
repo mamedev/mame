@@ -236,7 +236,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
@@ -249,7 +249,7 @@ public:
 	MC6845_BEGIN_UPDATE( pet_begin_update );
 	MC6845_UPDATE_ROW( pet40_update_row );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
 	void update_speaker();
@@ -301,7 +301,7 @@ public:
 	};
 
 	// keyboard state
-	UINT8 m_key;
+	uint8_t m_key;
 
 	// video state
 	int m_sync;
@@ -313,7 +313,7 @@ public:
 	int m_via_cb2;
 	int m_pia1_pa7;
 
-	UINT8 m_via_pa;
+	uint8_t m_via_pa;
 
 	// interrupt state
 	int m_via_irq;
@@ -404,11 +404,11 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 m_cr;
+	uint8_t m_cr;
 };
 
 
-static void cbm_pet_quick_sethiaddress( address_space &space, UINT16 hiaddress )
+static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress )
 {
 	space.write_byte(0x2e, hiaddress & 0xff);
 	space.write_byte(0x2c, hiaddress & 0xff);
@@ -465,7 +465,7 @@ READ8_MEMBER( pet_state::read )
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(space, offset, sel);
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data = m_exp->read(space, offset, data, sel);
 
@@ -613,8 +613,8 @@ WRITE8_MEMBER( pet_state::write )
 void cbm8296_state::read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 	int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1)
 {
-	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
+	uint32_t data = m_pla1->read(input);
 
 	cswff = BIT(data, 0);
 	cs9 = BIT(data, 1);
@@ -631,10 +631,10 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
+	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
 	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
-	UINT8 data = m_ue6_rom->base()[input];
+	uint8_t data = m_ue6_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
 	cswff = BIT(data, 0);
@@ -654,8 +654,8 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 
 void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15)
 {
-	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
-	UINT32 data = m_pla2->read(input);
+	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t data = m_pla2->read(input);
 
 	endra = BIT(data, 4);
 	noscreen = BIT(data, 5);
@@ -667,10 +667,10 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
 	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
-	UINT8 data = m_ue5_rom->base()[input];
+	uint8_t data = m_ue5_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
 	endra = BIT(data, 4);
@@ -701,7 +701,7 @@ READ8_MEMBER( cbm8296_state::read )
 
 	//logerror("%s read  %04x : norom %u noio %u ramsela %u ramsel9 %u ramon %u / cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",machine().describe_context(),offset,norom,noio,ramsela,ramsel9,ramon,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	offs_t drma = fa15 << 15 | (offset & 0x7e00) | BIT(offset, 0) << 8 | (offset & 0x1fe) >> 1;
 
@@ -1146,7 +1146,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// video sync
 	data |= (m_crtc ? m_crtc->vsync_r() : m_sync) << 5;
@@ -1231,7 +1231,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= m_key;
@@ -1276,7 +1276,7 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 
 READ8_MEMBER( pet_state::pia1_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_key)
 	{
@@ -1297,7 +1297,7 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 
 READ8_MEMBER( pet2001b_state::pia1_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_key)
 	{
@@ -1365,7 +1365,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
 //  SCREEN_UPDATE( pet2001 )
 //-------------------------------------------------
 
-UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 
@@ -1375,11 +1375,11 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		{
 			int sy = y / 8;
 			offs_t video_addr = (sy * 40) + sx;
-			UINT8 lsd = m_video_ram[video_addr];
+			uint8_t lsd = m_video_ram[video_addr];
 
 			int ra = y & 0x07;
 			offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
-			UINT8 data = m_char_rom->base()[char_addr];
+			uint8_t data = m_char_rom->base()[char_addr];
 
 			for (int x = 0; x < 8; x++, data <<= 1)
 			{
@@ -1411,8 +1411,8 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
 		int invert = BIT(ma, 12);
 		int chr_option = BIT(ma, 13);
@@ -1459,8 +1459,8 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
 		int invert = BIT(ma, 12);
 		int chr_option = BIT(ma, 13);
@@ -1491,8 +1491,8 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 lsd = 0, data = 0;
-		UINT8 rra = ra & 0x07;
+		uint8_t lsd = 0, data = 0;
+		uint8_t rra = ra & 0x07;
 		int no_row = !BIT(ra, 3);
 		int ra4 = BIT(ra, 4);
 		int chr_option = BIT(ma, 13);
@@ -1552,7 +1552,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 	m_video_ram.allocate(m_video_ram_size);
 
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

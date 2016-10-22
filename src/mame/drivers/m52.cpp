@@ -327,7 +327,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const UINT32 bgcharlayout_xoffset[256] =
+static const uint32_t bgcharlayout_xoffset[256] =
 {
 	STEP4(0x000,1), STEP4(0x008,1), STEP4(0x010,1), STEP4(0x018,1),
 	STEP4(0x020,1), STEP4(0x028,1), STEP4(0x030,1), STEP4(0x038,1),
@@ -347,7 +347,7 @@ static const UINT32 bgcharlayout_xoffset[256] =
 	STEP4(0x1e0,1), STEP4(0x1e8,1), STEP4(0x1f0,1), STEP4(0x1f8,1)
 };
 
-static const UINT32 bgcharlayout_yoffset[64] =
+static const uint32_t bgcharlayout_yoffset[64] =
 {
 	STEP32(0x0000,0x200), STEP32(0x4000,0x200)
 };

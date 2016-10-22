@@ -46,11 +46,11 @@ public:
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_bullet_ram;
-	optional_shared_ptr<UINT8> m_cvs_4_bit_dac_data;
-	optional_shared_ptr<UINT8> m_tms5110_ctl_data;
-	optional_shared_ptr<UINT8> m_dac3_state;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_bullet_ram;
+	optional_shared_ptr<uint8_t> m_cvs_4_bit_dac_data;
+	optional_shared_ptr<uint8_t> m_tms5110_ctl_data;
+	optional_shared_ptr<uint8_t> m_dac3_state;
 
 	/* video-related */
 	struct cvs_star m_stars[CVS_MAX_STARS];
@@ -60,17 +60,17 @@ public:
 	int        m_collision_register;
 	int        m_total_stars;
 	int        m_stars_on;
-	UINT8      m_scroll_reg;
+	uint8_t      m_scroll_reg;
 	int        m_stars_scroll;
 
 	/* misc */
 	int m_s2650_flag;
 	emu_timer  *m_cvs_393hz_timer;
-	UINT8      m_cvs_393hz_clock;
+	uint8_t      m_cvs_393hz_clock;
 
-	UINT8      m_character_banking_mode;
-	UINT16     m_character_ram_page_start;
-	UINT16     m_speech_rom_bit_address;
+	uint8_t      m_character_banking_mode;
+	uint16_t     m_character_ram_page_start;
+	uint16_t     m_speech_rom_bit_address;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -87,9 +87,9 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
-	UINT8      m_color_ram[0x400];
-	UINT8      m_palette_ram[0x10];
-	UINT8      m_character_ram[3 * 0x800];  /* only half is used, but
+	uint8_t      m_color_ram[0x400];
+	uint8_t      m_palette_ram[0x10];
+	uint8_t      m_character_ram[3 * 0x800];  /* only half is used, but
 	                                           by allocating twice the amount,
 	                                           we can use the same gfx_layout */
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
@@ -128,7 +128,7 @@ public:
 	DECLARE_MACHINE_RESET(cvs);
 	DECLARE_VIDEO_START(cvs);
 	DECLARE_PALETTE_INIT(cvs);
-	UINT32 screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
 	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
 	void set_pens(  );

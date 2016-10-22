@@ -105,7 +105,7 @@ TIMER_CALLBACK_MEMBER( n8080_state::stop_mono_flop_callback )
 
 void n8080_state::spacefev_sound_pins_changed()
 {
-	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
+	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	if (changes & (1 << 0x3))
 	{
@@ -136,7 +136,7 @@ void n8080_state::spacefev_sound_pins_changed()
 
 void n8080_state::sheriff_sound_pins_changed()
 {
-	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
+	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	if (changes & (1 << 0x6))
 	{
@@ -159,7 +159,7 @@ void n8080_state::sheriff_sound_pins_changed()
 
 void n8080_state::helifire_sound_pins_changed()
 {
-	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
+	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	/* ((m_curr_sound_pins >> 0xa) & 1) not emulated */
 	/* ((m_curr_sound_pins >> 0xb) & 1) not emulated */
@@ -269,7 +269,7 @@ WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
 
 READ8_MEMBER(n8080_state::n8080_8035_p1_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if ((m_curr_sound_pins >> 0xb) & 1) val |= 0x01;
 	if ((m_curr_sound_pins >> 0xa) & 1) val |= 0x02;
@@ -306,7 +306,7 @@ READ8_MEMBER(n8080_state::helifire_8035_t1_r)
 
 READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if ((m_curr_sound_pins >> 0x7) & 1) val |= 0x01;
 	if ((m_curr_sound_pins >> 0x8) & 1) val |= 0x02;

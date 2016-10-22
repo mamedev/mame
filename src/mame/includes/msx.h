@@ -161,7 +161,7 @@ public:
 	}
 
 	// static configuration helpers
-	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
+	static void install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device);
 
 	virtual void driver_start() override;
 	virtual void machine_start() override;
@@ -185,7 +185,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
 	void msx_memory_map_all();
-	void msx_memory_map_page(UINT8 page);
+	void msx_memory_map_page(uint8_t page);
 	void msx_memory_reset();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -228,7 +228,7 @@ private:
 	/* PSG */
 	int m_psg_b;
 	/* mouse */
-	UINT16 m_mouse[2];
+	uint16_t m_mouse[2];
 	int m_mouse_stat[2];
 	/* rtc */
 	int m_rtc_latch;
@@ -239,11 +239,11 @@ private:
 	msx_internal_slot_interface *m_all_slots[4][4][4];
 	msx_internal_slot_interface *m_current_page[4];
 	bool m_slot_expanded[4];
-	UINT8 m_primary_slot;
-	UINT8 m_secondary_slot[4];
+	uint8_t m_primary_slot;
+	uint8_t m_secondary_slot[4];
 	int m_port_c_old;
 	int m_keylatch;
-	UINT8 m_current_switched_device;
+	uint8_t m_current_switched_device;
 
 	int m_irq_state[4];
 

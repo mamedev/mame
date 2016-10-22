@@ -66,7 +66,7 @@ public:
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	int    m_tile_bank;
@@ -74,8 +74,8 @@ public:
 	/* misc */
 	int   m_ay_select;
 	int   m_ack_data;
-	UINT8 m_n7751_command;
-//  UINT32 m_n7751_rom_address;
+	uint8_t m_n7751_command;
+//  uint32_t m_n7751_rom_address;
 	int m_sound_addr;
 	int m_n7751_busy;
 
@@ -116,10 +116,10 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int cx, x;
-	UINT32 data_address;
-	UINT32 tmp;
+	uint32_t data_address;
+	uint32_t tmp;
 
-	const UINT8 *gfx = memregion("gfx")->base();
+	const uint8_t *gfx = memregion("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{

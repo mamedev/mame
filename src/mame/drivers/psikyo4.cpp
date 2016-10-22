@@ -294,8 +294,8 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 	// YMF banking
 	if (ACCESSING_BITS_16_31)
 	{
-		UINT32 bankdata = data >> 16;
-		UINT32 bankmask = mem_mask >> 16;
+		uint32_t bankdata = data >> 16;
+		uint32_t bankmask = mem_mask >> 16;
 		for (auto & elem : m_ymf_bank)
 		{
 			if (bankmask & 0x0f)

@@ -26,17 +26,17 @@ class nes_4score_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_4score_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_4score_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_bit0() override;
+	virtual uint8_t read_bit0() override;
 
 protected:
-	UINT32 m_latch;
+	uint32_t m_latch;
 };
 
 // ======================> nes_4score_p1p3_device
@@ -45,12 +45,12 @@ class nes_4score_p1p3_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void write(UINT8 data) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_ioport m_joypad1;
@@ -63,12 +63,12 @@ class nes_4score_p2p4_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void write(UINT8 data) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_ioport m_joypad2;

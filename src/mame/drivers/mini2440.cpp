@@ -37,7 +37,7 @@ public:
 	required_ioport m_penx;
 	required_ioport m_peny;
 
-	UINT32 m_port[9];
+	uint32_t m_port[9];
 	DECLARE_DRIVER_INIT(mini2440);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -76,7 +76,7 @@ inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
 
 READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
 {
-	UINT32 data = m_port[offset];
+	uint32_t data = m_port[offset];
 	switch (offset)
 	{
 		case S3C2440_GPIO_PORT_G :
@@ -168,7 +168,7 @@ WRITE16_MEMBER(mini2440_state::s3c2440_i2s_data_w )
 
 READ32_MEMBER(mini2440_state::s3c2440_adc_data_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch (offset)
 	{
 		case 2 + 0 : data = m_penx->read(); break;

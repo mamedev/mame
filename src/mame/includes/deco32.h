@@ -64,19 +64,19 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<uint32_t> m_ram;
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr<UINT32> m_pf1_rowscroll32;
-	required_shared_ptr<UINT32> m_pf2_rowscroll32;
-	required_shared_ptr<UINT32> m_pf3_rowscroll32;
-	required_shared_ptr<UINT32> m_pf4_rowscroll32;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	optional_shared_ptr<UINT32> m_ace_ram;
+	required_shared_ptr<uint32_t> m_pf1_rowscroll32;
+	required_shared_ptr<uint32_t> m_pf2_rowscroll32;
+	required_shared_ptr<uint32_t> m_pf3_rowscroll32;
+	required_shared_ptr<uint32_t> m_pf4_rowscroll32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_shared_ptr<uint32_t> m_ace_ram;
 
 	int m_raster_enable; // captaven, dragongun and lockload
 	timer_device *m_raster_irq_timer; // captaven, dragongun and lockload
-	UINT8 m_nslasher_sound_irq; // nslasher and lockload
-	UINT8 m_irq_source; // captaven, dragongun and lockload
+	uint8_t m_nslasher_sound_irq; // nslasher and lockload
+	uint8_t m_irq_source; // captaven, dragongun and lockload
 	int m_tattass_eprom_bit; // tattass
 	int m_lastClock; // tattass
 	char m_buffer[32]; // tattass
@@ -86,17 +86,17 @@ public:
 	int m_byteAddr; // tattass
 	int m_ace_ram_dirty; // nslasher and tattass
 	int m_has_ace_ram; // all - config
-	std::unique_ptr<UINT8[]> m_dirty_palette; // all but captaven
+	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
 	int m_pri; // captaven, fghthist, nslasher and tattass
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap; // nslasher
-	UINT16 m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
-	UINT16 m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
-	UINT16 m_spriteram16_2[0x1000]; //nslasher and tattass
-	UINT16 m_spriteram16_2_buffered[0x1000]; //nslasher and tattass
-	UINT16    m_pf1_rowscroll[0x1000]; // common
-	UINT16    m_pf2_rowscroll[0x1000]; // common
-	UINT16    m_pf3_rowscroll[0x1000]; // common
-	UINT16    m_pf4_rowscroll[0x1000]; // common
+	uint16_t m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
+	uint16_t m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
+	uint16_t m_spriteram16_2[0x1000]; //nslasher and tattass
+	uint16_t m_spriteram16_2_buffered[0x1000]; //nslasher and tattass
+	uint16_t    m_pf1_rowscroll[0x1000]; // common
+	uint16_t    m_pf2_rowscroll[0x1000]; // common
+	uint16_t    m_pf3_rowscroll[0x1000]; // common
+	uint16_t    m_pf4_rowscroll[0x1000]; // common
 
 	// common
 	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
@@ -167,21 +167,21 @@ public:
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 
-	UINT32 screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void updateAceRam();
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
-	UINT16 port_a_fghthist(int unused);
-	UINT16 port_b_fghthist(int unused);
-	UINT16 port_c_fghthist(int unused);
-	void deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+	uint16_t port_a_fghthist(int unused);
+	uint16_t port_b_fghthist(int unused);
+	uint16_t port_c_fghthist(int unused);
+	void deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
-	UINT16 port_b_nslasher(int unused);
-	void nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
-	UINT16 port_b_tattass(int unused);
-	void tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+	uint16_t port_b_nslasher(int unused);
+	void nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
+	uint16_t port_b_tattass(int unused);
+	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
@@ -200,12 +200,12 @@ public:
 		m_sprite_lookup_1_ram(*this, "look1")
 	{ }
 
-	required_shared_ptr<UINT32> m_sprite_layout_0_ram;
-	required_shared_ptr<UINT32> m_sprite_layout_1_ram;
-	required_shared_ptr<UINT32> m_sprite_lookup_0_ram;
-	required_shared_ptr<UINT32> m_sprite_lookup_1_ram;
+	required_shared_ptr<uint32_t> m_sprite_layout_0_ram;
+	required_shared_ptr<uint32_t> m_sprite_layout_1_ram;
+	required_shared_ptr<uint32_t> m_sprite_lookup_0_ram;
+	required_shared_ptr<uint32_t> m_sprite_lookup_1_ram;
 
-	UINT32 m_sprite_ctrl;
+	uint32_t m_sprite_ctrl;
 	int m_lightgun_port;
 	bitmap_rgb32 m_temp_render_bitmap;
 
@@ -229,7 +229,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
 
-	UINT32 screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);

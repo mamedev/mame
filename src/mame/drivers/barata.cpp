@@ -116,9 +116,9 @@ static INPUT_PORTS_START( barata )
 INPUT_PORTS_END
 
 /* BCD to Seven Segment Decoder */
-static UINT8 dec_7seg(int data)
+static uint8_t dec_7seg(int data)
 {
-	UINT8 segment;
+	uint8_t segment;
 	switch (data)
 	{
 		case 0: segment = 0x3f; break;

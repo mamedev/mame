@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 	{
 		if (m_adpcm_data == 0xffffffff)
 		{
-			UINT8 *RAM = memregion("adpcm")->base();
+			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
 			m_msm->data_w(m_adpcm_data >> 4);

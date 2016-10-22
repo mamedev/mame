@@ -123,7 +123,7 @@ INPUT_PORTS_END
 /*
 WRITE8_MEMBER( s11c_state::bgbank_w )
 {
-    UINT8 bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
+    uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
     membank("bgbank")->set_entry(bank);
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
@@ -138,7 +138,7 @@ MACHINE_RESET_MEMBER( s11c_state, s11c )
 DRIVER_INIT_MEMBER(s11c_state,s11c)
 {
 	emu_timer* timer = timer_alloc(TIMER_IRQ);
-//  UINT8 *BGROM = memregion("bgcpu")->base();
+//  uint8_t *BGROM = memregion("bgcpu")->base();
 //  membank("bgbank")->configure_entries(0, 8, &BGROM[0x10000], 0x8000);
 //  membank("bgbank")->set_entry(0);
 	set_invert(true);

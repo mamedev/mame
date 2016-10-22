@@ -46,12 +46,12 @@ class cdislave_device : public device_t
 {
 public:
 	// construction/destruction
-	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external callbacks
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
 
-	UINT8* get_lcd_state() { return m_lcd_state; }
+	uint8_t* get_lcd_state() { return m_lcd_state; }
 
 	DECLARE_READ16_MEMBER( slave_r );
 	DECLARE_WRITE16_MEMBER( slave_w );
@@ -73,35 +73,35 @@ private:
 	public:
 		channel_state() { }
 
-		UINT8 m_out_buf[4];
-		UINT8 m_out_index;
-		UINT8 m_out_count;
-		UINT8 m_out_cmd;
+		uint8_t m_out_buf[4];
+		uint8_t m_out_index;
+		uint8_t m_out_count;
+		uint8_t m_out_cmd;
 	};
 
 	channel_state m_channel[4];
 	emu_timer *m_interrupt_timer;
 
-	UINT8 m_in_buf[17];
-	UINT8 m_in_index;
-	UINT8 m_in_count;
+	uint8_t m_in_buf[17];
+	uint8_t m_in_index;
+	uint8_t m_in_count;
 
-	UINT8 m_polling_active;
+	uint8_t m_polling_active;
 
-	UINT8 m_xbus_interrupt_enable;
+	uint8_t m_xbus_interrupt_enable;
 
-	UINT8 m_lcd_state[16];
+	uint8_t m_lcd_state[16];
 
-	UINT16 m_real_mouse_x;
-	UINT16 m_real_mouse_y;
+	uint16_t m_real_mouse_x;
+	uint16_t m_real_mouse_y;
 
-	UINT16 m_fake_mouse_x;
-	UINT16 m_fake_mouse_y;
+	uint16_t m_fake_mouse_x;
+	uint16_t m_fake_mouse_y;
 
 	// static internal members
 
 	// non-static internal members
-	void prepare_readback(const attotime &delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd);
+	void prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd);
 	void perform_mouse_update();
 	void set_mouse_position();
 };

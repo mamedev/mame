@@ -103,7 +103,7 @@ static const unsigned short vdt911_palette[] =
 */
 PALETTE_INIT_MEMBER(vdt911_device, vdt911)
 {
-	UINT8 i, r, g, b;
+	uint8_t i, r, g, b;
 
 	for ( i = 0; i < 3; i++ )
 	{
@@ -118,7 +118,7 @@ PALETTE_INIT_MEMBER(vdt911_device, vdt911)
 /*
     Copy a character bitmap array to another location in memory
 */
-static void copy_character_matrix_array(const UINT8 char_array[128][10], UINT8 *dest)
+static void copy_character_matrix_array(const uint8_t char_array[128][10], uint8_t *dest)
 {
 	int i, j;
 
@@ -130,7 +130,7 @@ static void copy_character_matrix_array(const UINT8 char_array[128][10], UINT8 *
 /*
     Patch a character bitmap array according to an array of char_override_t
 */
-static void apply_char_overrides(int nb_char_overrides, const char_override_t char_overrides[], UINT8 *dest)
+static void apply_char_overrides(int nb_char_overrides, const char_override_t char_overrides[], uint8_t *dest)
 {
 	int i, j;
 
@@ -143,7 +143,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 
 const device_type VDT911 = &device_creator<vdt911_device>;
 
-vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(vdt911), "palette"),
 		m_beeper(*this, "beeper"),
@@ -183,8 +183,8 @@ void vdt911_device::device_start()
 
 	m_blink_timer->adjust(attotime::from_msec(0), 0, attotime::from_msec(250));
 
-	UINT8 *base;
-	UINT8 *chr = machine().root_device().memregion(vdt911_chr_region)->base();
+	uint8_t *base;
+	uint8_t *chr = machine().root_device().memregion(vdt911_chr_region)->base();
 
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;
@@ -541,7 +541,7 @@ void vdt911_device::check_keyboard()
 	static unsigned char repeat_timer;
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
 
-	UINT16 key_buf[6];
+	uint16_t key_buf[6];
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
@@ -666,7 +666,7 @@ int vdt911_device::get_refresh_rate()
 	return ((m_model == vdt911_model_US) || (m_model == vdt911_model_Japanese))? 60 : 50;
 }
 
-UINT32 vdt911_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vdt911_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	refresh(bitmap, cliprect, 0, 0);
 	return 0;

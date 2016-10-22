@@ -1153,7 +1153,7 @@ static const M68HC11_OPCODE opcode_table_page4[256] =
 /*****************************************************************************/
 
 static char *output;
-static const UINT8 *rombase;
+static const uint8_t *rombase;
 
 static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
@@ -1164,26 +1164,26 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-static UINT8 fetch(void)
+static uint8_t fetch(void)
 {
 	return *rombase++;
 }
 
-static UINT16 fetch16(void)
+static uint16_t fetch16(void)
 {
-	UINT16 w;
+	uint16_t w;
 	w = (rombase[0] << 8) | rombase[1];
 	rombase+=2;
 	return w;
 }
 
-static UINT32 decode_opcode(UINT32 pc, const M68HC11_OPCODE *op_table)
+static uint32_t decode_opcode(uint32_t pc, const M68HC11_OPCODE *op_table)
 {
-	UINT8 imm8, mask;
-	INT8 rel8;
-	UINT16 imm16;
-	UINT8 op2;
-	UINT32 flags = 0;
+	uint8_t imm8, mask;
+	int8_t rel8;
+	uint16_t imm16;
+	uint8_t op2;
+	uint32_t flags = 0;
 
 	if (!strcmp(op_table->mnemonic, "jsr") || !strcmp(op_table->mnemonic, "bsr"))
 		flags = DASMFLAG_STEP_OVER;
@@ -1286,8 +1286,8 @@ static UINT32 decode_opcode(UINT32 pc, const M68HC11_OPCODE *op_table)
 
 CPU_DISASSEMBLE( hc11 )
 {
-	UINT32 flags;
-	UINT8 opcode;
+	uint32_t flags;
+	uint8_t opcode;
 
 	output = buffer;
 	rombase = oprom;

@@ -271,8 +271,8 @@ READ16_MEMBER(alpha68k_state::control_4_r)
 
 READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 {
-	UINT8 inp1 = ioport("IN3")->read();
-	UINT8 inp2 = ioport("IN4")->read();
+	uint8_t inp1 = ioport("IN3")->read();
+	uint8_t inp2 = ioport("IN4")->read();
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
 	return ioport("IN0")->read() | inp1 | inp2 << 4;
@@ -328,8 +328,8 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 	     - Kyros          : 0x22
 	     - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
 	*/
-	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
-	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
+	static const uint8_t coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
+	static const uint8_t coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -409,8 +409,8 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 	     - Sky Soldiers  : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
 	     - Gold Medalist : 0x21,0x23,0x24,0x5b
 	*/
-	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
-	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
+	static const uint8_t coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
+	static const uint8_t coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -503,8 +503,8 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 	     - Gang Wars               : 0x21,0x23,0x24,0x54
 	     - Super Champion Baseball : 0x21,0x23,0x24
 	*/
-	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
-	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
+	static const uint8_t coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
+	static const uint8_t coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -1851,7 +1851,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,common)
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
@@ -1882,7 +1882,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
@@ -3449,7 +3449,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,gangwars)
 
 DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
 	   calculate the ball speed when a strike is scored, notice that current emulation

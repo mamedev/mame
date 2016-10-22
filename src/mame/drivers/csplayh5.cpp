@@ -60,7 +60,7 @@ public:
 	required_memory_region m_region_audiocpu;
 	required_memory_bank m_bank1;
 
-	UINT16 m_mux_data;
+	uint16_t m_mux_data;
 
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
@@ -486,8 +486,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 void csplayh5_state::general_init(int patchaddress, int patchvalue)
 {
-	UINT16 *MAINROM = (UINT16 *)m_region_maincpu->base();
-	UINT8 *SNDROM = m_region_audiocpu->base();
+	uint16_t *MAINROM = (uint16_t *)m_region_maincpu->base();
+	uint8_t *SNDROM = m_region_audiocpu->base();
 
 	// initialize sound rom bank
 	soundbank_w(0);

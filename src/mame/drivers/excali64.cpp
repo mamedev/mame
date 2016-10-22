@@ -90,11 +90,11 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	const UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_hiresram;
-	UINT8 m_sys_status;
-	UINT8 m_kbdrow;
+	const uint8_t *m_p_chargen;
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_hiresram;
+	uint8_t m_sys_status;
+	uint8_t m_kbdrow;
 	bool m_crtc_vs;
 	bool m_crtc_hs;
 	bool m_motor;
@@ -244,7 +244,7 @@ WRITE8_MEMBER( excali64_state::motor_w )
 
 READ8_MEMBER( excali64_state::porte8_r )
 {
-	return 0xfc | (UINT8)m_motor;
+	return 0xfc | (uint8_t)m_motor;
 }
 
 WRITE8_MEMBER( excali64_state::porte4_w )
@@ -311,8 +311,8 @@ WRITE8_MEMBER( excali64_state::ppib_w )
 
 READ8_MEMBER( excali64_state::ppic_r )
 {
-	UINT8 data = 0xf4; // READY line must be low to print
-	data |= (UINT8)m_centronics_busy;
+	uint8_t data = 0xf4; // READY line must be low to print
+	data |= (uint8_t)m_centronics_busy;
 	data |= (m_cass->input() > 0.1) << 3;
 	return data;
 }
@@ -325,7 +325,7 @@ WRITE8_MEMBER( excali64_state::ppic_w )
 
 READ8_MEMBER( excali64_state::port00_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -346,9 +346,9 @@ d5 : rombank
 */
 READ8_MEMBER( excali64_state::port50_r )
 {
-	UINT8 data = m_sys_status & 0x2f;
+	uint8_t data = m_sys_status & 0x2f;
 	bool csync = m_crtc_hs | m_crtc_vs;
-	data |= (UINT8)csync << 4;
+	data |= (uint8_t)csync << 4;
 	return data;
 }
 
@@ -449,8 +449,8 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	m_p_videoram = memregion("videoram")->base();
 	m_p_chargen = memregion("chargen")->base();
 	m_p_hiresram = m_p_videoram + 0x2000;
-	UINT8 *main = memregion("roms")->base();
-	UINT8 *ram = memregion("rambank")->base();
+	uint8_t *main = memregion("roms")->base();
+	uint8_t *ram = memregion("rambank")->base();
 
 	// main ram (cp/m mode)
 	membank("bankr1")->configure_entry(0, &ram[0x0000]);
@@ -477,7 +477,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
 	// Set up foreground colours
-	UINT8 r,g,b,i,code;
+	uint8_t r,g,b,i,code;
 	for (i = 0; i < 32; i++)
 	{
 		code = m_p_chargen[0x1000+i];
@@ -501,10 +501,10 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 MC6845_UPDATE_ROW( excali64_state::update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,col,bg,fg;
-	UINT16 mem,x;
-	UINT8 col_base = BIT(m_sys_status, 3) ? 16 : 0;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,col,bg,fg;
+	uint16_t mem,x;
+	uint8_t col_base = BIT(m_sys_status, 3) ? 16 : 0;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -516,7 +516,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 
 		if (BIT(col, 0))
 		{
-			UINT8 h = m_p_videoram[mem+0x1000] - 4;
+			uint8_t h = m_p_videoram[mem+0x1000] - 4;
 			if (h > 5)
 				h = 0; // keep us in bounds
 			// hires definition - pixels are opposite order to characters

@@ -41,7 +41,7 @@
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TI990_10, "TI990/10 CPU", tag, owner, clock, "ti990_10_cpu",  __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 16, 21),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 12),
@@ -112,35 +112,35 @@ void ti990_10_device::execute_set_input(int irqline, int state)
 
 // ==========================================================================
 
-UINT32 ti990_10_device::execute_min_cycles() const
+uint32_t ti990_10_device::execute_min_cycles() const
 {
 	return 2;
 }
 
 // TODO: Compute this value, just a wild guess for the average
-UINT32 ti990_10_device::execute_max_cycles() const
+uint32_t ti990_10_device::execute_max_cycles() const
 {
 	return 10;
 }
 
-UINT32 ti990_10_device::execute_input_lines() const
+uint32_t ti990_10_device::execute_input_lines() const
 {
 	return 2;
 }
 
 // device_disasm_interface overrides
-UINT32 ti990_10_device::disasm_min_opcode_bytes() const
+uint32_t ti990_10_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
 
-UINT32 ti990_10_device::disasm_max_opcode_bytes() const
+uint32_t ti990_10_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
 
 // TODO: check 9900dasm
-offs_t ti990_10_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ti990_10_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9900 );
 	return CPU_DISASSEMBLE_NAME(tms9900)(this, buffer, pc, oprom, opram, options);

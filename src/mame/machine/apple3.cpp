@@ -62,7 +62,7 @@
 
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
-	UINT8 result = 0xFF;
+	uint8_t result = 0xFF;
 	device_a2bus_card_interface *slotdevice;
 
 	switch(offset)
@@ -77,7 +77,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
 		case 0x0C: case 0x0D: case 0x0E: case 0x0F:
 			{
-				UINT8 tmp = m_kbspecial->read();
+				uint8_t tmp = m_kbspecial->read();
 
 				result = 0x7c | (m_transchar & 0x80);
 
@@ -476,9 +476,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 	m_via_1->write_cb2(machine().first_screen()->vblank());
 }
 
-UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
+uint8_t *apple3_state::apple3_bankaddr(uint16_t bank, offs_t offset)
 {
-	if (bank != (UINT16) ~0)
+	if (bank != (uint16_t) ~0)
 	{
 		bank %= m_ram->size() / 0x8000;
 		if ((bank + 1) == (m_ram->size() / 0x8000))
@@ -489,7 +489,7 @@ UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
 	return &m_ram->pointer()[offset];
 }
 
-UINT8 *apple3_state::apple3_get_zpa_addr(offs_t offset)
+uint8_t *apple3_state::apple3_get_zpa_addr(offs_t offset)
 {
 	m_zpa = (((offs_t) m_via_0_b) * 0x100) + offset;
 
@@ -503,8 +503,8 @@ UINT8 *apple3_state::apple3_get_zpa_addr(offs_t offset)
 
 void apple3_state::apple3_update_memory()
 {
-	UINT16 bank;
-	UINT8 page;
+	uint16_t bank;
+	uint8_t page;
 
 	if (LOG_MEMORY)
 	{
@@ -589,7 +589,7 @@ void apple3_state::apple3_update_memory()
 
 
 
-void apple3_state::apple3_via_out(UINT8 *var, UINT8 data)
+void apple3_state::apple3_via_out(uint8_t *var, uint8_t data)
 {
 	if (*var != data)
 	{
@@ -680,9 +680,9 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 
 
 
-UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
+uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 {
-	UINT8 *result = nullptr;
+	uint8_t *result = nullptr;
 
 	// m_indir_bank is guaranteed to be between 0x80 and 0x8f
 	if (m_indir_bank == 0x8f)
@@ -784,14 +784,14 @@ void apple3_state::apple3_postload()
 
 READ8_MEMBER(apple3_state::apple3_memory_r)
 {
-	UINT8 rv = 0xff;
+	uint8_t rv = 0xff;
 
 	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
 		if ((m_indir_bank & 0x80) && (offset >= 0x100))
 		{
-			UINT8 *test;
+			uint8_t *test;
 			test = apple3_get_indexed_addr(offset);
 
 			if (test)
@@ -922,7 +922,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 {
 	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{
-		UINT8 *test;
+		uint8_t *test;
 		test = apple3_get_indexed_addr(offset);
 
 		if (test)
@@ -1133,7 +1133,7 @@ READ_LINE_MEMBER(apple3_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-static const UINT8 key_remap[0x50][4] =
+static const uint8_t key_remap[0x50][4] =
 {
 /*    norm shft ctrl both */
 	{ 0x9b,0x9b,0x9b,0x9b },    /* Escape  00     */
@@ -1224,7 +1224,7 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 
 	if (state == ASSERT_LINE)
 	{
-		UINT16 trans;
+		uint16_t trans;
 		int mod = 0;
 		m_lastchar = m_ay3600->b_r();
 
@@ -1246,7 +1246,7 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 
 void apple3_state::pdl_handler(int offset)
 {
-	UINT8 pdlread;
+	uint8_t pdlread;
 
 	switch (offset)
 	{
@@ -1341,7 +1341,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 
 WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 {
-	UINT8 irq_mask = m_a2bus->get_a2bus_irq_mask();
+	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
 	m_via_1->write_ca1(state);
 	m_via_1->write_pa7(state);

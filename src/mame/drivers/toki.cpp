@@ -856,8 +856,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(toki_state,toki)
 {
-	UINT8 *ROM = memregion("oki")->base();
-	std::vector<UINT8> buffer(0x20000);
+	uint8_t *ROM = memregion("oki")->base();
+	std::vector<uint8_t> buffer(0x20000);
 	int i;
 
 	memcpy(&buffer[0],ROM,0x20000);
@@ -870,16 +870,16 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 
 DRIVER_INIT_MEMBER(toki_state,tokib)
 {
-	std::vector<UINT8> temp(65536 * 2);
+	std::vector<uint8_t> temp(65536 * 2);
 	int i, offs, len;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	/* merge background tile graphics together */
 	len = memregion("gfx3")->bytes();
 	rom = memregion("gfx3")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
-		UINT8 *base = &rom[offs];
+		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
 		for (i = 0; i < 16; i++)
 		{
@@ -893,7 +893,7 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	rom = memregion("gfx4")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
-		UINT8 *base = &rom[offs];
+		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
 		for (i = 0; i < 16; i++)
 		{
@@ -914,7 +914,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)memregion("maincpu")->base();
+		uint16_t *prgrom = (uint16_t*)memregion("maincpu")->base();
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -927,21 +927,21 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	/* Decrypt data for z80 program */
 	{
-		UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
-		UINT8 *rom = memregion("audiocpu")->base();
+		uint8_t *decrypt = m_seibu_sound->get_custom_decrypt();
+		uint8_t *rom = memregion("audiocpu")->base();
 
 		memcpy(decrypt,rom,0x20000);
 
 		for (int i = 0;i < 0x2000;i++)
 		{
-			UINT8 src = decrypt[i];
+			uint8_t src = decrypt[i];
 			rom[i] = src^0x55;
 		}
 	}
 
 	{
-		UINT8 *ROM = memregion("oki")->base();
-		std::vector<UINT8> buffer(0x20000);
+		uint8_t *ROM = memregion("oki")->base();
+		std::vector<uint8_t> buffer(0x20000);
 		int i;
 
 		memcpy(&buffer[0],ROM,0x20000);

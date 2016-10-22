@@ -56,7 +56,7 @@ device_vic20_expansion_card_interface::~device_vic20_expansion_card_interface()
 //  vic20_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, VIC20_EXPANSION_SLOT, "VIC-20 expansion port", tag, owner, clock, "vic20_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -122,9 +122,9 @@ image_init_result vic20_expansion_slot_device::call_load()
 			else if (is_filetype("crt"))
 			{
 				// read the header
-				UINT8 header[2];
+				uint8_t header[2];
 				fread(&header, 2);
-				UINT16 address = (header[1] << 8) | header[0];
+				uint16_t address = (header[1] << 8) | header[0];
 
 				switch (address)
 				{
@@ -165,7 +165,7 @@ std::string vic20_expansion_slot_device::get_default_card_software()
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{
@@ -180,7 +180,7 @@ UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{

@@ -20,7 +20,7 @@
 #include "machine/rp5h01.h"
 
 // this is the contents of an unprogrammed PROM
-UINT8 const rp5h01_device::s_initial_data[0x10] =
+uint8_t const rp5h01_device::s_initial_data[0x10] =
 {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
@@ -32,7 +32,7 @@ UINT8 const rp5h01_device::s_initial_data[0x10] =
 
 const device_type RP5H01 = &device_creator<rp5h01_device>;
 
-rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5H01, "RP5H01 6/7-bit Counter", tag, owner, clock, "rp5h01", __FILE__)
 	, m_data(nullptr)
 	, m_rom(*this, DEVICE_SELF, 0x10)

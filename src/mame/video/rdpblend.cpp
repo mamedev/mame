@@ -41,18 +41,18 @@ n64_blender_t::n64_blender_t()
 	{
 		for (int dither = 0; dither < 8; dither++)
 		{
-			m_color_dither[(value << 3) | dither] = (UINT8)dither_color(value, dither);
-			m_alpha_dither[(value << 3) | dither] = (UINT8)dither_alpha(value, dither);
+			m_color_dither[(value << 3) | dither] = (uint8_t)dither_color(value, dither);
+			m_alpha_dither[(value << 3) | dither] = (uint8_t)dither_alpha(value, dither);
 		}
 	}
 }
 
-INT32 n64_blender_t::dither_alpha(INT32 alpha, INT32 dither)
+int32_t n64_blender_t::dither_alpha(int32_t alpha, int32_t dither)
 {
 	return min(alpha + dither, 0xff);
 }
 
-INT32 n64_blender_t::dither_color(INT32 color, INT32 dither)
+int32_t n64_blender_t::dither_color(int32_t color, int32_t dither)
 {
 	if ((color & 7) > dither)
 	{
@@ -99,8 +99,8 @@ bool n64_blender_t::alpha_reject(rdp_span_aux* userdata, const rdp_poly_state& o
 
 bool n64_blender_t::cycle1_noblend_noacvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 	if (test_for_reject(userdata, object))
 	{
 		return false;
@@ -112,8 +112,8 @@ bool n64_blender_t::cycle1_noblend_noacvg_nodither(color_t& blended_pixel, int d
 
 bool n64_blender_t::cycle1_noblend_noacvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 	if (test_for_reject(userdata, object))
 	{
 		return false;
@@ -130,7 +130,7 @@ bool n64_blender_t::cycle1_noblend_noacvg_dither(color_t& blended_pixel, int dit
 
 bool n64_blender_t::cycle1_noblend_acvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -143,7 +143,7 @@ bool n64_blender_t::cycle1_noblend_acvg_nodither(color_t& blended_pixel, int dit
 
 bool n64_blender_t::cycle1_noblend_acvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -161,8 +161,8 @@ bool n64_blender_t::cycle1_noblend_acvg_dither(color_t& blended_pixel, int dith,
 
 bool n64_blender_t::cycle1_blend_noacvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -176,8 +176,8 @@ bool n64_blender_t::cycle1_blend_noacvg_nodither(color_t& blended_pixel, int dit
 
 bool n64_blender_t::cycle1_blend_noacvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -197,7 +197,7 @@ bool n64_blender_t::cycle1_blend_noacvg_dither(color_t& blended_pixel, int dith,
 
 bool n64_blender_t::cycle1_blend_acvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -211,7 +211,7 @@ bool n64_blender_t::cycle1_blend_acvg_nodither(color_t& blended_pixel, int dith,
 
 bool n64_blender_t::cycle1_blend_acvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -231,8 +231,8 @@ bool n64_blender_t::cycle1_blend_acvg_dither(color_t& blended_pixel, int dith, i
 
 bool n64_blender_t::cycle2_noblend_noacvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -250,15 +250,15 @@ bool n64_blender_t::cycle2_noblend_noacvg_nodither(color_t& blended_pixel, int d
 
 bool n64_blender_t::cycle2_noblend_noacvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
 		return false;
 	}
 
-	userdata->m_inv_pixel_color.set_a(0xff - (UINT8)userdata->m_color_inputs.blender1b_a[0]->get_a());
+	userdata->m_inv_pixel_color.set_a(0xff - (uint8_t)userdata->m_color_inputs.blender1b_a[0]->get_a());
 	blend_pipe(0, sel0, userdata->m_blended_pixel_color, userdata, object);
 	userdata->m_blended_pixel_color.set_a(userdata->m_pixel_color.get_a());
 
@@ -273,7 +273,7 @@ bool n64_blender_t::cycle2_noblend_noacvg_dither(color_t& blended_pixel, int dit
 
 bool n64_blender_t::cycle2_noblend_acvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -291,7 +291,7 @@ bool n64_blender_t::cycle2_noblend_acvg_nodither(color_t& blended_pixel, int dit
 
 bool n64_blender_t::cycle2_noblend_acvg_dither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -313,8 +313,8 @@ bool n64_blender_t::cycle2_noblend_acvg_dither(color_t& blended_pixel, int dith,
 
 bool n64_blender_t::cycle2_blend_noacvg_nodither(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	userdata->m_pixel_color.set_a(m_alpha_dither[((UINT8)userdata->m_pixel_color.get_a() << 3) | adseed]);
-	userdata->m_shade_color.set_a(m_alpha_dither[((UINT8)userdata->m_shade_color.get_a() << 3) | adseed]);
+	userdata->m_pixel_color.set_a(m_alpha_dither[((uint8_t)userdata->m_pixel_color.get_a() << 3) | adseed]);
+	userdata->m_shade_color.set_a(m_alpha_dither[((uint8_t)userdata->m_shade_color.get_a() << 3) | adseed]);
 
 	if (test_for_reject(userdata, object))
 	{
@@ -397,7 +397,7 @@ bool n64_blender_t::cycle2_blend_acvg_dither(color_t& blended_pixel, int dith, i
 	return true;
 }
 
-void n64_blender_t::blend_with_partial_reject(color_t& out, INT32 cycle, INT32 partialreject, INT32 select, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_blender_t::blend_with_partial_reject(color_t& out, int32_t cycle, int32_t partialreject, int32_t select, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	if (partialreject && userdata->m_pixel_color.get_a() >= 0xff)
 	{
@@ -412,12 +412,12 @@ void n64_blender_t::blend_with_partial_reject(color_t& out, INT32 cycle, INT32 p
 
 void n64_blender_t::blend_pipe(const int cycle, const int special, color_t& out, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	const INT32 mask = 0xff &~ (0x73 * special);
-	const INT32 shift_a = 3 + userdata->m_shift_a * special;
-	const INT32 shift_b = 3 + userdata->m_shift_b * special;
-	const INT32 blend1a = (userdata->m_color_inputs.blender1b_a[cycle]->get_a() >> shift_a) & mask;
-	const INT32 blend2a = (userdata->m_color_inputs.blender2b_a[cycle]->get_a() >> shift_b) & mask;
-	const INT32 special_shift = special << 1;
+	const int32_t mask = 0xff &~ (0x73 * special);
+	const int32_t shift_a = 3 + userdata->m_shift_a * special;
+	const int32_t shift_b = 3 + userdata->m_shift_b * special;
+	const int32_t blend1a = (userdata->m_color_inputs.blender1b_a[cycle]->get_a() >> shift_a) & mask;
+	const int32_t blend2a = (userdata->m_color_inputs.blender2b_a[cycle]->get_a() >> shift_b) & mask;
+	const int32_t special_shift = special << 1;
 
 	rgbaint_t temp(*userdata->m_color_inputs.blender1a_rgb[cycle]);
 	temp.mul_imm(blend1a);
@@ -431,7 +431,7 @@ void n64_blender_t::blend_pipe(const int cycle, const int special, color_t& out,
 	temp.add(secondary);
 	temp.shr_imm(object.m_other_modes.blend_shift);
 
-	INT32 factor_sum = 0;
+	int32_t factor_sum = 0;
 	if (!object.m_other_modes.force_blend)
 	{
 		factor_sum = ((blend1a >> 2) + (blend2a >> 2) + 1) & 0xf;
@@ -451,7 +451,7 @@ void n64_blender_t::blend_pipe(const int cycle, const int special, color_t& out,
 	out.set(temp);
 }
 
-inline INT32 n64_blender_t::min(const INT32 x, const INT32 min)
+inline int32_t n64_blender_t::min(const int32_t x, const int32_t min)
 {
 	if (x < min)
 	{

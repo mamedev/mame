@@ -29,7 +29,7 @@ class zsg2_device : public device_t,
 					public device_sound_interface
 {
 public:
-	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~zsg2_device() { }
 
 	// static configuration helpers
@@ -50,40 +50,40 @@ private:
 	// 16 registers per channel, 48 channels
 	struct zchan
 	{
-		UINT16 v[16];
+		uint16_t v[16];
 		bool is_playing;
-		INT16 *samples;
-		UINT32 cur_pos;
-		UINT32 step_ptr;
-		UINT32 step;
-		UINT32 start_pos;
-		UINT32 end_pos;
-		UINT32 loop_pos;
-		UINT32 page;
-		UINT16 vol;
-		UINT16 flags;
-		UINT8 panl;
-		UINT8 panr;
+		int16_t *samples;
+		uint32_t cur_pos;
+		uint32_t step_ptr;
+		uint32_t step;
+		uint32_t start_pos;
+		uint32_t end_pos;
+		uint32_t loop_pos;
+		uint32_t page;
+		uint16_t vol;
+		uint16_t flags;
+		uint8_t panl;
+		uint8_t panr;
 	};
 
 	zchan m_chan[48];
 
-	required_region_ptr<UINT32> m_mem_base;
-	UINT32 m_read_address;
-	std::unique_ptr<UINT32[]> m_mem_copy;
-	UINT32 m_mem_blocks;
-	std::unique_ptr<INT16[]> m_full_samples;
+	required_region_ptr<uint32_t> m_mem_base;
+	uint32_t m_read_address;
+	std::unique_ptr<uint32_t[]> m_mem_copy;
+	uint32_t m_mem_blocks;
+	std::unique_ptr<int16_t[]> m_full_samples;
 
 	sound_stream *m_stream;
 
 	devcb_read32 m_ext_read_handler;
 
-	UINT32 read_memory(UINT32 offset);
-	void chan_w(int ch, int reg, UINT16 data);
-	UINT16 chan_r(int ch, int reg);
-	void control_w(int reg, UINT16 data);
-	UINT16 control_r(int reg);
-	INT16 *prepare_samples(UINT32 offset);
+	uint32_t read_memory(uint32_t offset);
+	void chan_w(int ch, int reg, uint16_t data);
+	uint16_t chan_r(int ch, int reg);
+	void control_w(int reg, uint16_t data);
+	uint16_t control_r(int reg);
+	int16_t *prepare_samples(uint32_t offset);
 };
 
 extern const device_type ZSG2;

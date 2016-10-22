@@ -37,7 +37,7 @@ extern const device_type GOTTLIEB_SOUND_REV2 = &device_creator<gottlieb_sound_r2
 
 #if USE_FAKE_VOTRAX
 
-void gottlieb_sound_r1_device::trigger_sample(UINT8 data)
+void gottlieb_sound_r1_device::trigger_sample(uint8_t data)
 {
 	/* Reactor samples */
 	if (strcmp(machine().system().name, "reactor") == 0)
@@ -93,7 +93,7 @@ void gottlieb_sound_r1_device::device_timer(emu_timer &timer, device_timer_id id
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-void gottlieb_sound_r1_device::fake_votrax_data_w(UINT8 data)
+void gottlieb_sound_r1_device::fake_votrax_data_w(uint8_t data)
 {
 	static const char *const PhonemeTable[0x40] =
 	{
@@ -257,7 +257,7 @@ MACHINE_CONFIG_END
 //  gottlieb_sound_r0_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 0", tag, owner, clock, "gotsndr0", __FILE__)
 	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
@@ -284,8 +284,8 @@ READ8_MEMBER( gottlieb_sound_r0_device::r6530b_r )
 WRITE8_MEMBER( gottlieb_sound_r0_device::write )
 {
 	// write the command data to the low 4 bits
-	UINT8 pb0_3 = data ^ 15;
-	UINT8 pb4_7 = ioport("SB0")->read() & 0x90;
+	uint8_t pb0_3 = data ^ 15;
+	uint8_t pb4_7 = ioport("SB0")->read() & 0x90;
 	m_sndcmd = pb0_3 | pb4_7;
 	m_r6530->write(space, offset, m_sndcmd);
 }
@@ -382,7 +382,7 @@ void gottlieb_sound_r0_device::device_start()
 //  gottlieb_sound_r1_device - constructors
 //-------------------------------------------------
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -399,7 +399,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 {
 }
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool populate_votrax)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -424,8 +424,8 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 WRITE8_MEMBER( gottlieb_sound_r1_device::write )
 {
 	// write the command data to the low 6 bits, and the trigger to the upper bit
-	UINT8 pa7 = (data & 0x0f) != 0xf;
-	UINT8 pa0_5 = ~data & 0x3f;
+	uint8_t pa7 = (data & 0x0f) != 0xf;
+	uint8_t pa0_5 = ~data & 0x3f;
 	m_riot->porta_in_set(pa0_5 | (pa7 << 7), 0xbf);
 
 #if USE_FAKE_VOTRAX
@@ -626,7 +626,7 @@ void gottlieb_sound_r1_device::device_start()
 //  constructor
 //-------------------------------------------------
 
-gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gottlieb_sound_r1_device(mconfig, tag, owner, clock, true)
 {
 }
@@ -663,7 +663,7 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 //  gottlieb_sound_r2_device - constructor
 //-------------------------------------------------
 
-gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV2, "Gottlieb Sound rev. 2", tag, owner, clock, "gotsndr2", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -809,7 +809,7 @@ CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 {
-	UINT8 previous = m_speech_control;
+	uint8_t previous = m_speech_control;
 	m_speech_control = data;
 
 	// bit 0 enables/disables the NMI line

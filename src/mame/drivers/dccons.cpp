@@ -313,7 +313,7 @@ DRIVER_INIT_MEMBER(dc_cons_state,dcjp)
 
 READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
-	UINT64 out = PCTRA<<32;
+	uint64_t out = PCTRA<<32;
 
 	out |= PDTRA & ~0x0303;
 
@@ -349,12 +349,12 @@ WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 
 READ64_MEMBER(dc_cons_state::dc_arm_r )
 {
-	return *((UINT64 *)dc_sound_ram.target()+offset);
+	return *((uint64_t *)dc_sound_ram.target()+offset);
 }
 
 WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 {
-	COMBINE_DATA((UINT64 *)dc_sound_ram.target() + offset);
+	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
 }
 
 #if 0

@@ -24,53 +24,53 @@
 
 struct hd63701y0_t
 {
-	UINT8 data[8];
-	UINT8 P1DDR;
-	UINT8 P2DDR;
-	UINT8 PORT1;
-	UINT8 PORT2;
-	UINT8 P3DDR;
-	UINT8 P4DDR;
-	UINT8 PORT3;
-	UINT8 PORT4;
-	UINT8 TCSR1;
-	UINT8 FRCH;
-	UINT8 FRCL;
-	UINT8 OCR1H;
-	UINT8 OCR1L;
-	UINT8 ICRH;
-	UINT8 ICRL;
-	UINT8 TCSR2;
-	UINT8 RMCR;
-	UINT8 TRCSR1;
-	UINT8 RDR;
-	UINT8 TDR;
-	UINT8 RP5CR;
-	UINT8 PORT5;
-	UINT8 P6DDR;
-	UINT8 PORT6;
-	UINT8 PORT7;
-	UINT8 OCR2H;
-	UINT8 OCR2L;
-	UINT8 TCSR3;
-	UINT8 TCONR;
-	UINT8 T2CNT;
-	UINT8 TRCSR2;
-	UINT8 TSTREG;
-	UINT8 P5DDR;
-	UINT8 P6CSR;
+	uint8_t data[8];
+	uint8_t P1DDR;
+	uint8_t P2DDR;
+	uint8_t PORT1;
+	uint8_t PORT2;
+	uint8_t P3DDR;
+	uint8_t P4DDR;
+	uint8_t PORT3;
+	uint8_t PORT4;
+	uint8_t TCSR1;
+	uint8_t FRCH;
+	uint8_t FRCL;
+	uint8_t OCR1H;
+	uint8_t OCR1L;
+	uint8_t ICRH;
+	uint8_t ICRL;
+	uint8_t TCSR2;
+	uint8_t RMCR;
+	uint8_t TRCSR1;
+	uint8_t RDR;
+	uint8_t TDR;
+	uint8_t RP5CR;
+	uint8_t PORT5;
+	uint8_t P6DDR;
+	uint8_t PORT6;
+	uint8_t PORT7;
+	uint8_t OCR2H;
+	uint8_t OCR2L;
+	uint8_t TCSR3;
+	uint8_t TCONR;
+	uint8_t T2CNT;
+	uint8_t TRCSR2;
+	uint8_t TSTREG;
+	uint8_t P5DDR;
+	uint8_t P6CSR;
 };
 
 struct rvoicepc_t
 {
-	UINT8 data[8];
-	UINT8 port1;
-	UINT8 port2;
-	UINT8 port3;
-	UINT8 port4;
-	UINT8 port5;
-	UINT8 port6;
-	UINT8 port7;
+	uint8_t data[8];
+	uint8_t port1;
+	uint8_t port2;
+	uint8_t port3;
+	uint8_t port4;
+	uint8_t port5;
+	uint8_t port6;
+	uint8_t port7;
 };
 
 class rvoice_state : public driver_device
@@ -138,7 +138,7 @@ void rvoice_state::machine_reset()
 
 READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", space.device().safe_pc(), offset);
 	switch(offset)
 	{

@@ -77,24 +77,24 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	std::unique_ptr<UINT8[]> m_nt_ram;
-	UINT8* m_nt_page[4];
+	std::unique_ptr<uint8_t[]> m_nt_ram;
+	uint8_t* m_nt_page[4];
 
-	UINT32 m_in_0;
-	UINT32 m_in_1;
-	UINT32 m_in_0_shift;
-	UINT32 m_in_1_shift;
+	uint32_t m_in_0;
+	uint32_t m_in_1;
+	uint32_t m_in_0_shift;
+	uint32_t m_in_1_shift;
 
-	UINT8       m_exception_mask;
-	UINT8       m_exception_cause;
+	uint8_t       m_exception_mask;
+	uint8_t       m_exception_cause;
 
 	emu_timer*  m_attract_timer;
-	UINT8       m_attract_timer_period;
+	uint8_t       m_attract_timer_period;
 
-	UINT32      m_coins;
+	uint32_t      m_coins;
 
 	emu_timer*  m_gameplay_timer;
-	UINT8       m_money_reg;
+	uint8_t       m_money_reg;
 
 	DECLARE_WRITE8_MEMBER(famibox_nt_w);
 	DECLARE_READ8_MEMBER(famibox_nt_r);
@@ -111,10 +111,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(famibox);
-	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
-	void famicombox_bankswitch(UINT8 bank);
+	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
 };
@@ -222,11 +222,11 @@ READ8_MEMBER(famibox_state::famibox_IN1_r)
    System
 
 *******************************************************/
-void famibox_state::famicombox_bankswitch(UINT8 bank)
+void famibox_state::famicombox_bankswitch(uint8_t bank)
 {
 	struct
 	{
-		UINT8 bank;
+		uint8_t bank;
 		const char* memory_region;
 		offs_t bank1_offset;
 		offs_t bank2_offset;
@@ -303,7 +303,7 @@ READ8_MEMBER(famibox_state::famibox_system_r)
 	{
 		case 0: /* device which caused exception */
 			{
-				UINT8 ret = m_exception_cause;
+				uint8_t ret = m_exception_cause;
 				m_exception_cause = 0xff;
 				return ret;
 			}
@@ -337,7 +337,7 @@ WRITE8_MEMBER(famibox_state::famibox_system_w)
 			{
 				if (m_attract_timer->start() != attotime::never)
 				{
-					m_attract_timer->adjust(attotime::from_seconds((INT32)((double)1.0/6.8274*m_attract_timer_period)), 0, attotime::never);
+					m_attract_timer->adjust(attotime::from_seconds((int32_t)((double)1.0/6.8274*m_attract_timer_period)), 0, attotime::never);
 				}
 			}
 			break;
@@ -503,7 +503,7 @@ void famibox_state::video_start()
 {
 }
 
-UINT32 famibox_state::screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t famibox_state::screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
 	m_ppu->render(bitmap, 0, 0, 0, 0);
@@ -521,7 +521,7 @@ void famibox_state::machine_reset()
 
 void famibox_state::machine_start()
 {
-	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
 	m_nt_page[2] = m_nt_ram.get() + 0x800;

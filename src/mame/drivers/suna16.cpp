@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(suna16_state::uballoon_prot_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (offset)
 	{

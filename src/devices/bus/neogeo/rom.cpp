@@ -20,12 +20,12 @@
 const device_type NEOGEO_ROM = &device_creator<neogeo_rom_device>;
 
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source) :
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_neogeo_cart_interface(mconfig, *this)
 {}
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 		device_t(mconfig, NEOGEO_ROM, "Neo Geo Standard Carts", tag, owner, clock, "neocart_rom", __FILE__),
 		device_neogeo_cart_interface(mconfig, *this)
 {}
@@ -52,7 +52,7 @@ READ16_MEMBER(neogeo_rom_device::rom_r)
 {
 	// to speed up access to ROM, the access to ROM are actually replaced in the driver
 	// by accesses to the maincpu rom region, where we have anyway copied the rom content
-	UINT16* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
+	uint16_t* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
 	return rom[offset];
 }
 
@@ -71,7 +71,7 @@ WRITE16_MEMBER(neogeo_rom_device::banksel_w)
 
 const device_type NEOGEO_VLINER_CART = &device_creator<neogeo_vliner_cart>;
 
-neogeo_vliner_cart::neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_vliner_cart::neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, "Neo Geo V-Liner Cart", tag, owner, clock, "neocart_vliner", __FILE__)
 {}
 

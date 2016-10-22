@@ -54,10 +54,10 @@ public:
 	required_device<address_map_bank_device> m_sub_ram_bankdev;
 	required_device<address_map_bank_device> m_sub_pal_bankdev;
 
-	required_shared_ptr<UINT8> m_ram0;
-	required_shared_ptr<UINT8> m_pal_r;
-	required_shared_ptr<UINT8> m_pal_g;
-	required_shared_ptr<UINT8> m_pal_b;
+	required_shared_ptr<uint8_t> m_ram0;
+	required_shared_ptr<uint8_t> m_pal_r;
+	required_shared_ptr<uint8_t> m_pal_g;
+	required_shared_ptr<uint8_t> m_pal_b;
 
 	required_device<z80pio_device> m_ic48_pio;
 	required_device<z80pio_device> m_ic49_pio;
@@ -89,17 +89,17 @@ public:
 
 	// other ports
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	UINT8 portff_data;
+	uint8_t portff_data;
 
 	DECLARE_READ8_MEMBER(other_cpu_r);
 	DECLARE_WRITE8_MEMBER(other_cpu_w);
 
-	UINT8 m_paladdr;
+	uint8_t m_paladdr;
 	int m_palbank;
 
-	UINT8 m_ic48_pio_pa_val;
-	UINT8 m_ic48_pio_pb_val;
-	UINT8 m_ic49_pio_pb_val;
+	uint8_t m_ic48_pio_pa_val;
+	uint8_t m_ic48_pio_pb_val;
+	uint8_t m_ic49_pio_pb_val;
 
 	void set_palette(int offset);
 	DECLARE_WRITE8_MEMBER(palette_r_w);
@@ -113,7 +113,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cedar_magnet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cedar_magnet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 

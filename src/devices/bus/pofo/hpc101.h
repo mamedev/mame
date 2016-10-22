@@ -29,7 +29,7 @@ class hpc101_t :  public device_t,
 {
 public:
 	// construction/destruction
-	hpc101_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hpc101_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -42,8 +42,8 @@ protected:
 	// device_portfolio_expansion_slot_interface overrides
 	bool pdet() override { return 1; }
 
-	virtual UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) override;
+	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
 
 private:
 	required_device<i8255_device> m_ppi;

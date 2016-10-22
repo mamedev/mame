@@ -30,13 +30,13 @@ The LCG is the same that was used to generate the FD1094 keys.
 Note that the algorithm skips the special value that would instruct the CPU to
 not decrypt at that address.
 
-void generate_key(UINT8 *key, int seed, int upper_bound)
+void generate_key(uint8_t *key, int seed, int upper_bound)
 {
     int i;
 
     for (i = 0; i < upper_bound; ++i)
     {
-        UINT8 byteval;
+        uint8_t byteval;
 
         do
         {
@@ -367,7 +367,7 @@ static int decrypt(int val, int key, int opcode)
 }
 
 
-static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
+static uint8_t mc8123_decrypt(offs_t addr,uint8_t val,const uint8_t *key,int opcode)
 {
 	int tbl_num;
 
@@ -377,12 +377,12 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 	return decrypt(val,key[tbl_num + (opcode ? 0 : 0x1000)],opcode);
 }
 
-void mc8123_decode(UINT8 *rom, UINT8 *opcodes, const UINT8 *key, int length)
+void mc8123_decode(uint8_t *rom, uint8_t *opcodes, const uint8_t *key, int length)
 {
 	for (int A = 0x0000;A < length;A++)
 	{
 		int adr = A >= 0xc000 ? (A & 0x3fff) | 0x8000 : A;
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 
 		/* decode the opcodes */
 		opcodes[A] = mc8123_decrypt(adr,src,key,1);

@@ -31,14 +31,14 @@
 class sega_32x_device : public device_t
 {
 public:
-	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 
-	required_shared_ptr<UINT32> m_sh2_shared;
+	required_shared_ptr<uint32_t> m_sh2_shared;
 
 	void pause_cpu();
 
@@ -119,7 +119,7 @@ public:
 	SH2_DMA_FIFO_DATA_AVAILABLE_CB(_32x_fifo_available_callback);
 
 	void _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
-	void _32x_render_videobuffer_to_screenbuffer(int x, UINT32 priority, UINT16 &lineptr);
+	void _32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint16_t &lineptr);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 	void _32x_check_framebuffer_swap(bool enabled);
@@ -131,19 +131,19 @@ public:
 	int m_32x_vblank_flag;
 	int m_sh2_are_running;
 	int m_32x_240mode;
-	UINT16 m_32x_a1518a_reg;
+	uint16_t m_32x_a1518a_reg;
 
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
-	UINT16 m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
-	UINT16 m_cur_lch[0x10],m_cur_rch[0x10];
-	UINT16 m_pwm_cycle_reg; //used for latching
-	UINT8 m_pwm_timer_tick;
-	UINT8 m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
-	UINT16 m_lch_fifo_state, m_rch_fifo_state;
+	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
+	uint16_t m_cur_lch[0x10],m_cur_rch[0x10];
+	uint16_t m_pwm_cycle_reg; //used for latching
+	uint8_t m_pwm_timer_tick;
+	uint8_t m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
+	uint16_t m_lch_fifo_state, m_rch_fifo_state;
 
 
-	UINT16 get_hposition(void);
+	uint16_t get_hposition(void);
 
 	emu_timer *m_32x_pwm_timer;
 
@@ -159,14 +159,14 @@ private:
 
 	int m_32x_displaymode;
 	int m_32x_videopriority;
-	UINT32 m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
+	uint32_t m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
 //  virtual void device_config_complete();
 	int m_32x_adapter_enabled;
 	int m_32x_access_auth;
 	int m_32x_screenshift;
 
-	UINT16 m_32x_68k_a15104_reg;
+	uint16_t m_32x_68k_a15104_reg;
 	int m_sh2_master_vint_enable, m_sh2_slave_vint_enable;
 	int m_sh2_master_hint_enable, m_sh2_slave_hint_enable;
 	int m_sh2_master_cmdint_enable, m_sh2_slave_cmdint_enable;
@@ -176,14 +176,14 @@ private:
 	int m_32x_fb_swap;
 	int m_32x_hcount_reg;
 
-	UINT16 m_32x_autofill_length;
-	UINT16 m_32x_autofill_address;
-	UINT16 m_32x_autofill_data;
-	UINT16 m_a15106_reg;
-	UINT16 m_dreq_src_addr[2],m_dreq_dst_addr[2],m_dreq_size;
-	UINT8 m_sega_tv;
-	UINT16 m_hint_vector[2];
-	UINT16 m_a15100_reg;
+	uint16_t m_32x_autofill_length;
+	uint16_t m_32x_autofill_address;
+	uint16_t m_32x_autofill_data;
+	uint16_t m_a15106_reg;
+	uint16_t m_dreq_src_addr[2],m_dreq_dst_addr[2],m_dreq_size;
+	uint8_t m_sega_tv;
+	uint16_t m_hint_vector[2];
+	uint16_t m_a15100_reg;
 	int m_32x_68k_a15102_reg;
 
 	int m_32x_pal;
@@ -191,18 +191,18 @@ private:
 	int m_base_total_scanlines;
 	int m_total_scanlines;
 
-	UINT16 m_commsram[8];
+	uint16_t m_commsram[8];
 
-	std::unique_ptr<UINT16[]> m_32x_dram0;
-	std::unique_ptr<UINT16[]> m_32x_dram1;
-	UINT16 *m_32x_display_dram, *m_32x_access_dram;
-	std::unique_ptr<UINT16[]> m_32x_palette;
-	std::unique_ptr<UINT16[]> m_32x_palette_lookup;
+	std::unique_ptr<uint16_t[]> m_32x_dram0;
+	std::unique_ptr<uint16_t[]> m_32x_dram1;
+	uint16_t *m_32x_display_dram, *m_32x_access_dram;
+	std::unique_ptr<uint16_t[]> m_32x_palette;
+	std::unique_ptr<uint16_t[]> m_32x_palette_lookup;
 
-	UINT16 m_fifo_block_a[4];
-	UINT16 m_fifo_block_b[4];
-	UINT16* m_current_fifo_block;
-	UINT16* m_current_fifo_readblock;
+	uint16_t m_fifo_block_a[4];
+	uint16_t m_fifo_block_b[4];
+	uint16_t* m_current_fifo_block;
+	uint16_t* m_current_fifo_readblock;
 	int m_current_fifo_write_pos;
 	int m_current_fifo_read_pos;
 	int m_fifo_block_a_full;
@@ -215,14 +215,14 @@ private:
 class sega_32x_ntsc_device : public sega_32x_device
 {
 	public:
-		sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 };
 
 class sega_32x_pal_device : public sega_32x_device
 {
 	public:
-		sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	protected:
 		virtual machine_config_constructor device_mconfig_additions() const override;
 };

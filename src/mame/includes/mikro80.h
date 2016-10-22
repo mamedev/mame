@@ -42,8 +42,8 @@ public:
 		m_dac(*this, "dac"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT8> m_cursor_ram;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_cursor_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 	int m_keyboard_mask;
 	int m_key_mask;
 	DECLARE_WRITE8_MEMBER(radio99_sound_w);
@@ -59,7 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(mikro80);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

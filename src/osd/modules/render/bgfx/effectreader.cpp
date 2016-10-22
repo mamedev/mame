@@ -41,7 +41,7 @@ bgfx_effect* effect_reader::read_from_value(const Value& value, std::string pref
 
 	std::vector<bgfx_uniform*> uniforms;
 	const Value& uniform_array = value["uniforms"];
-	for (UINT32 i = 0; i < uniform_array.Size(); i++)
+	for (uint32_t i = 0; i < uniform_array.Size(); i++)
 	{
 		bgfx_uniform* uniform = uniform_reader::read_from_value(uniform_array[i], prefix + "uniforms[" + std::to_string(i) + "]: ");
 		if (uniform == nullptr)

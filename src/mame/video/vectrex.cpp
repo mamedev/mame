@@ -121,7 +121,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
 }
 
 
-UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -223,7 +223,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
 	m_vector_start_time = machine().time();
 
 	if (ptr)
-		* (UINT8 *) ptr = param;
+		* (uint8_t *) ptr = param;
 }
 
 

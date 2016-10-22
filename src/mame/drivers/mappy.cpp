@@ -577,7 +577,7 @@ TODO:
 
 /***************************************************************************/
 
-void mappy_state::common_latch_w(UINT32 offset)
+void mappy_state::common_latch_w(uint32_t offset)
 {
 	int bit = offset & 1;
 

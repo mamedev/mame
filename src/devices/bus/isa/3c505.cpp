@@ -27,22 +27,22 @@ static int verbose = VERBOSE;
 #define LOG2(d,x) { if (verbose > 1) LOG(d,x)}
 
 #ifdef LSB_FIRST
-static UINT16 uint16_to_le(UINT16 value)
+static uint16_t uint16_to_le(uint16_t value)
 {
 	return value;
 }
 
-static UINT16 uint16_from_le(UINT16 value)
+static uint16_t uint16_from_le(uint16_t value)
 {
 	return value;
 }
 #else
-static UINT16 uint16_to_le(UINT16 value)
+static uint16_t uint16_to_le(uint16_t value)
 {
 	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
 }
 
-static UINT16 uint16_from_le(UINT16 value)
+static uint16_t uint16_from_le(uint16_t value)
 {
 	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
 }
@@ -301,7 +301,7 @@ const device_type ISA16_3C505 = &device_creator<threecom3c505_device> ;
 // threecom3c505_device - constructor
 //-------------------------------------------------
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA16_3C505, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -311,7 +311,7 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const 
 {
 }
 
-threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
@@ -459,7 +459,7 @@ threecom3c505_device::data_buffer::data_buffer() :
 {
 }
 
-void threecom3c505_device::data_buffer::start(threecom3c505_device *device, INT32 size)
+void threecom3c505_device::data_buffer::start(threecom3c505_device *device, int32_t size)
 {
 	m_device = device;
 	LOG2(device,("start threecom3c505_device::data_buffer with size %0x", size));
@@ -479,7 +479,7 @@ void threecom3c505_device::data_buffer::copy(data_buffer *db) const
 	memcpy(&db->m_data[0], &m_data[0], m_data.size());
 }
 
-int threecom3c505_device::data_buffer::append(UINT8 data)
+int threecom3c505_device::data_buffer::append(uint8_t data)
 {
 	if (m_length >= m_data.size())
 	{
@@ -522,7 +522,7 @@ threecom3c505_device::data_buffer_fifo::data_buffer_fifo() :
 }
 
 void threecom3c505_device::data_buffer_fifo::start(
-		threecom3c505_device *device, INT32 size, INT32 db_size)
+		threecom3c505_device *device, int32_t size, int32_t db_size)
 {
 	m_device = device;
 	LOG2(m_device,("start threecom3c505_device::data_buffer_fifo"));
@@ -552,9 +552,9 @@ threecom3c505_device::data_buffer_fifo::~data_buffer_fifo()
 	}
 }
 
-int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int length)
+int threecom3c505_device::data_buffer_fifo::put(const uint8_t data[], const int length)
 {
-	UINT16 next_index = (m_put_index + 1) % m_size;
+	uint16_t next_index = (m_put_index + 1) % m_size;
 
 	LOG2(m_device,("threecom3c505_device::data_buffer_fifo::put %d", m_count));
 
@@ -832,7 +832,7 @@ void threecom3c505_device::do_receive_command()
 			m_response.data.rcv_resp.timetag = 0; // TODO: time tag
 
 			// compute and check no of bytes to be DMA'ed (must be even)
-			UINT16 buf_len = uint16_from_le(m_response.data.rcv_resp.buf_len) & ~1;
+			uint16_t buf_len = uint16_from_le(m_response.data.rcv_resp.buf_len) & ~1;
 			if (m_rx_data_buffer.get_length() > buf_len)
 			{
 				LOG1(this,("do_receive_command !!! buffer size too small (%d < %d)", buf_len, m_rx_data_buffer.get_length()));
@@ -1027,7 +1027,7 @@ void threecom3c505_device::do_command()
 		break;
 
 	case CMD_DOWNLOAD_PROGRAM: // 0x0d
-		UINT16 mc_version = m_program_buffer.get_word(1);
+		uint16_t mc_version = m_program_buffer.get_word(1);
 		switch (mc_version)
 		{
 		case APOLLO_MC_VERSION_SR10_2:
@@ -1060,13 +1060,13 @@ void threecom3c505_device::do_command()
  ethernet_packet_is_for_me - check if ethernet address is for me
  ***************************************************************************/
 
-int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
+int threecom3c505_device::ethernet_packet_is_for_me(const uint8_t mac_address[])
 {
 	// tcpdump -i eth0 -q ether host 08:00:1e:01:ae:a5 or ether broadcast or ether dst 09:00:1e:00:00:00 or ether dst 09:00:1e:00:00:01
 	// wireshark filter: eth.addr eq 08:00:1e:01:ae:a5 or eth.dst eq ff:ff:ff:ff:ff:ff or eth.dst eq 09:00:1e:00:00:00 or eth.dst eq 09:00:1e:00:00:01
 
 	int i;
-	static const UINT8 broadcast_address[ETHERNET_ADDR_SIZE] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+	static const uint8_t broadcast_address[ETHERNET_ADDR_SIZE] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 	// accept all packets if RECV_PROMISC is set
 	if (m_i82586_config & RECV_PROMISC)
@@ -1108,7 +1108,7 @@ int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
  recv_cb - receive callback - receive and process an ethernet packet
  ***************************************************************************/
 
-void threecom3c505_device::recv_cb(UINT8 *data, int length)
+void threecom3c505_device::recv_cb(uint8_t *data, int length)
 {
 	if (length < ETHERNET_ADDR_SIZE || !ethernet_packet_is_for_me(data))
 	{
@@ -1135,7 +1135,7 @@ void threecom3c505_device::recv_cb(UINT8 *data, int length)
  write_command_port
 ***************************************************************************/
 
-void threecom3c505_device::write_command_port(UINT8 data)
+void threecom3c505_device::write_command_port(uint8_t data)
 {
 	LOG2(this,("writing 3C505 command port %02x - m_status=%02x m_control=%02x m_command_index=%02x",
 			data, m_status, m_control, m_command_index));
@@ -1217,9 +1217,9 @@ void threecom3c505_device::write_command_port(UINT8 data)
  read_command_port
  ***************************************************************************/
 
-UINT8 threecom3c505_device::read_command_port()
+uint8_t threecom3c505_device::read_command_port()
 {
-	UINT8 data;
+	uint8_t data;
 
 	// the interrupt request is cleared when the Command Register is read
 	set_interrupt(CLEAR_LINE);
@@ -1292,15 +1292,15 @@ UINT8 threecom3c505_device::read_command_port()
 				// see also http://www.edaboard.com/thread120700.html
 				{
 					// compute the Ethernet Frame Check Sequence
-					static const UINT32 crc_table[] =
+					static const uint32_t crc_table[] =
 					{ 0x4DBDF21C, 0x500AE278, 0x76D3D2D4, 0x6B64C2B0,
 							0x3B61B38C, 0x26D6A3E8, 0x000F9344, 0x1DB88320,
 							0xA005713C, 0xBDB26158, 0x9B6B51F4, 0x86DC4190,
 							0xD6D930AC, 0xCB6E20C8, 0xEDB71064, 0xF0000000 };
-					UINT32 n, crc = 0;
+					uint32_t n, crc = 0;
 					for (n = 0; n < m_tx_data_buffer.get_length(); n++)
 					{
-						UINT8 data = m_tx_data_buffer.get(n);
+						uint8_t data = m_tx_data_buffer.get(n);
 						crc = (crc >> 4) ^ crc_table[(crc ^ (data >> 0)) & 0x0f]; /* lower nibble */
 						crc = (crc >> 4) ^ crc_table[(crc ^ (data >> 4)) & 0x0f]; /* upper nibble */
 					}
@@ -1350,7 +1350,7 @@ UINT8 threecom3c505_device::read_command_port()
  write_data_port
  ***************************************************************************/
 
-void threecom3c505_device::write_data_port(UINT8 data)
+void threecom3c505_device::write_data_port(uint8_t data)
 {
 	if (m_control & FLSH)
 	{
@@ -1460,12 +1460,12 @@ void threecom3c505_device::write_data_port(UINT8 data)
  read_data_port
  ***************************************************************************/
 
-UINT8 threecom3c505_device::read_data_port()
+uint8_t threecom3c505_device::read_data_port()
 {
-	UINT8 data;
-	UINT16 data_length = m_rx_data_buffer.get_length();
+	uint8_t data;
+	uint16_t data_length = m_rx_data_buffer.get_length();
 	// DomainOS will read  words (i.e. even number of bytes); must handle packets with odd byte length
-	UINT16 even_data_length = (data_length + 1) & ~1;
+	uint16_t even_data_length = (data_length + 1) & ~1;
 
 	if (m_rx_data_index < even_data_length)
 	{
@@ -1497,7 +1497,7 @@ UINT8 threecom3c505_device::read_data_port()
  write_control_port
  ***************************************************************************/
 
-void threecom3c505_device::write_control_port(UINT8 data)
+void threecom3c505_device::write_control_port(uint8_t data)
 {
 	switch (data & (ATTN | FLSH))
 	{
@@ -1587,9 +1587,9 @@ void threecom3c505_device::write_control_port(UINT8 data)
  read_status_port
  ***************************************************************************/
 
-UINT8 threecom3c505_device::read_status_port()
+uint8_t threecom3c505_device::read_status_port()
 {
-	UINT8 data = m_status;
+	uint8_t data = m_status;
 	m_status &= ~ASF_PCB_MASK;
 
 	switch (data & ASF_PCB_MASK)
@@ -1640,13 +1640,13 @@ WRITE16_MEMBER(threecom3c505_device::write)
 READ16_MEMBER(threecom3c505_device::read)
 {
 	// data to omit excessive logging
-	static UINT16 last_data = 0xff;
-	static UINT32 last_pc = 0;
+	static uint16_t last_data = 0xff;
+	static uint32_t last_pc = 0;
 
 	// make byte offset
 	offset *= 2;
 
-	UINT16 data = m_reg[offset & 0x0f];
+	uint16_t data = m_reg[offset & 0x0f];
 	switch (offset)
 	{
 	case PORT_COMMAND: /* 0x00 read/write, 8-bit */
@@ -1658,7 +1658,7 @@ READ16_MEMBER(threecom3c505_device::read)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			UINT32 pc = space.device().safe_pcbase();
+			uint32_t pc = space.device().safe_pcbase();
 			if (pc == last_pc)
 			{
 				return data;
@@ -1688,7 +1688,7 @@ void threecom3c505_device::set_verbose(int on_off)
 	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
 }
 
-int threecom3c505_device::tx_data(device_t *device, const UINT8 data[], int length)
+int threecom3c505_device::tx_data(device_t *device, const uint8_t data[], int length)
 {
 	LOG1(this,("threecom3c505_device::tx_data length=%d", length));
 	return 1;

@@ -53,8 +53,8 @@ class luxor_55_21046_device :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -86,14 +86,14 @@ protected:
 	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data) override;
+	virtual void abcbus_cs(uint8_t data) override;
 	virtual int abcbus_csb() override;
-	virtual UINT8 abcbus_inp() override;
-	virtual void abcbus_out(UINT8 data) override;
-	virtual UINT8 abcbus_stat() override;
-	virtual void abcbus_c1(UINT8 data) override;
-	virtual void abcbus_c3(UINT8 data) override;
-	virtual void abcbus_c4(UINT8 data) override;
+	virtual uint8_t abcbus_inp() override;
+	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_stat() override;
+	virtual void abcbus_c1(uint8_t data) override;
+	virtual void abcbus_c3(uint8_t data) override;
+	virtual void abcbus_c4(uint8_t data) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,9 +107,9 @@ private:
 	required_ioport m_sw3;
 
 	bool m_cs;                  // card selected
-	UINT8 m_status;             // ABC BUS status
-	UINT8 m_out;                // ABC BUS data in
-	UINT8 m_inp;                // ABC BUS data out
+	uint8_t m_status;             // ABC BUS status
+	uint8_t m_out;                // ABC BUS data in
+	uint8_t m_inp;                // ABC BUS data out
 	bool m_fdc_irq;             // FDC interrupt
 	int m_dma_irq;              // DMA interrupt
 	int m_busy;                 // busy bit
@@ -123,7 +123,7 @@ class abc830_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -137,7 +137,7 @@ class abc832_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -151,7 +151,7 @@ class abc834_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -165,7 +165,7 @@ class abc838_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -179,7 +179,7 @@ class abc850_floppy_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

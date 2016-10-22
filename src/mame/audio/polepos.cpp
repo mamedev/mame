@@ -224,7 +224,7 @@ const device_type POLEPOS = &device_creator<polepos_sound_device>;
 //  polepos_sound_device - constructor
 //-------------------------------------------------
 
-polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, POLEPOS, "Pole Position Audio Custom", tag, owner, clock, "polepos_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_current_position(0),
@@ -275,8 +275,8 @@ void polepos_sound_device::device_reset()
 
 void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 step, clock, slot;
-	UINT8 *base;
+	uint32_t step, clock, slot;
+	uint8_t *base;
 	double volume, i_total;
 	stream_sample_t *buffer = outputs[0];
 	int loop;

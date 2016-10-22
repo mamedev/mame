@@ -12,8 +12,8 @@ class nes_jy_typea_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,24 +36,24 @@ protected:
 	void update_chr();
 	void update_mirror_typea();
 	virtual void update_mirror() { update_mirror_typea(); }
-	inline UINT8 unscramble(UINT8 bank);
+	inline uint8_t unscramble(uint8_t bank);
 
-	UINT8 m_mul[2];
-	UINT8 m_latch;
-	UINT8 m_reg[4];
-	UINT8 m_chr_latch[2];   // type C uses a more complex CHR 4K mode, and these vars are only changed for those games
-	UINT8 m_mmc_prg_bank[4];
-	UINT16 m_mmc_nt_bank[4];
-	UINT16 m_mmc_vrom_bank[8];
-	UINT16 m_extra_chr_bank;
-	UINT16 m_extra_chr_mask;
+	uint8_t m_mul[2];
+	uint8_t m_latch;
+	uint8_t m_reg[4];
+	uint8_t m_chr_latch[2];   // type C uses a more complex CHR 4K mode, and these vars are only changed for those games
+	uint8_t m_mmc_prg_bank[4];
+	uint16_t m_mmc_nt_bank[4];
+	uint16_t m_mmc_vrom_bank[8];
+	uint16_t m_extra_chr_bank;
+	uint16_t m_extra_chr_mask;
 	int m_bank_6000;
 
-	UINT8 m_irq_mode;
-	UINT8 m_irq_count;
-	UINT8 m_irq_prescale;
-	UINT8 m_irq_prescale_mask;
-	UINT8 m_irq_flip;
+	uint8_t m_irq_mode;
+	uint8_t m_irq_count;
+	uint8_t m_irq_prescale;
+	uint8_t m_irq_prescale_mask;
+	uint8_t m_irq_flip;
 	int m_irq_enable;
 	int m_irq_up, m_irq_down;
 
@@ -69,8 +69,8 @@ class nes_jy_typeb_device : public nes_jy_typea_device
 {
 public:
 	// construction/destruction
-	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	void update_mirror_typeb();
@@ -83,7 +83,7 @@ class nes_jy_typec_device : public nes_jy_typeb_device
 {
 public:
 	// construction/destruction
-	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(chr_r) override;
 

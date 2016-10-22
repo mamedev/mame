@@ -61,7 +61,7 @@ WRITE8_MEMBER( sb16_lle_device::dac_data_w )
 
 READ8_MEMBER( sb16_lle_device::p1_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_data_out << 0;
 	ret |= m_data_in << 1;
 	return ret;
@@ -141,7 +141,7 @@ READ8_MEMBER( sb16_lle_device::dma_stat_r )
 	 * bit6 -
 	 * bit7 -
 	*/
-	UINT8 ret = (m_dma16_done << 1) | m_dma8_done;
+	uint8_t ret = (m_dma16_done << 1) | m_dma8_done;
 	return ret;
 }
 
@@ -440,9 +440,9 @@ WRITE8_MEMBER( sb16_lle_device::host_cmd_w )
 	m_in_byte = data;
 }
 
-UINT8 sb16_lle_device::dack_r(int line)
+uint8_t sb16_lle_device::dack_r(int line)
 {
-	UINT8 ret = m_adc_fifo[m_adc_fifo_tail].b[m_adc_h + (m_adc_r * 2)];
+	uint8_t ret = m_adc_fifo[m_adc_fifo_tail].b[m_adc_h + (m_adc_r * 2)];
 
 	if(m_ctrl8 & 2)
 		return 0;
@@ -483,7 +483,7 @@ UINT8 sb16_lle_device::dack_r(int line)
 	return ret;
 }
 
-void sb16_lle_device::dack_w(int line, UINT8 data)
+void sb16_lle_device::dack_w(int line, uint8_t data)
 {
 	if(m_ctrl8 & 2)
 		return;
@@ -525,9 +525,9 @@ void sb16_lle_device::dack_w(int line, UINT8 data)
 		m_isa->drq1_w(0);
 }
 
-UINT16 sb16_lle_device::dack16_r(int line)
+uint16_t sb16_lle_device::dack16_r(int line)
 {
-	UINT16 ret = m_adc_fifo[m_adc_fifo_tail].h[m_adc_r];
+	uint16_t ret = m_adc_fifo[m_adc_fifo_tail].h[m_adc_r];
 
 	if(m_ctrl16 & 2)
 		return 0;
@@ -560,7 +560,7 @@ UINT16 sb16_lle_device::dack16_r(int line)
 	return ret;
 }
 
-void sb16_lle_device::dack16_w(int line, UINT16 data)
+void sb16_lle_device::dack16_w(int line, uint16_t data)
 {
 	if(m_ctrl16 & 2)
 		return;
@@ -637,7 +637,7 @@ READ8_MEMBER( sb16_lle_device::invalid_r )
 // just using the old dummy mpu401 for now
 READ8_MEMBER( sb16_lle_device::mpu401_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	m_irq_midi = false;
 	m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
@@ -676,7 +676,7 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 
 }
 
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
@@ -691,8 +691,8 @@ sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag,
 void sb16_lle_device::device_start()
 {
 	//address_space &space = m_cpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("sb16_cpu")->base();
-	UINT8 *xor_table = memregion("xor_table")->base();
+	uint8_t *rom = memregion("sb16_cpu")->base();
+	uint8_t *xor_table = memregion("xor_table")->base();
 
 	for(int i = 0; i < 0x2000; i++)
 		rom[i] = rom[i] ^ xor_table[i & 0x3f];
@@ -739,7 +739,7 @@ void sb16_lle_device::device_reset()
 
 void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	UINT16 dacl = 0, dacr = 0, adcl = 0, adcr = 0;
+	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
 	if(m_mode & 2)
 	{
 		// it might be possible to run the adc though dma simultaneously but the rom doesn't appear to permit it

@@ -60,7 +60,7 @@ WRITE8_MEMBER(niyanpai_state::soundlatch_clear_w)
 
 DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 {
-	UINT8 *SNDROM = memregion("audiocpu")->base();
+	uint8_t *SNDROM = memregion("audiocpu")->base();
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;          // DI -> NOP
@@ -76,8 +76,8 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 
 READ16_MEMBER(niyanpai_state::dipsw_r)
 {
-	UINT8 dipsw_a = ioport("DSWA")->read();
-	UINT8 dipsw_b = ioport("DSWB")->read();
+	uint8_t dipsw_a = ioport("DSWA")->read();
+	uint8_t dipsw_b = ioport("DSWB")->read();
 
 	dipsw_a = BITSWAP8(dipsw_a,0,1,2,3,4,5,6,7);
 	dipsw_b = BITSWAP8(dipsw_b,0,1,2,3,4,5,6,7);

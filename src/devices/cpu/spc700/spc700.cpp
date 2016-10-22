@@ -219,7 +219,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 const device_type SPC700 = &device_creator<spc700_device>;
 
 
-spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)
@@ -242,38 +242,38 @@ spc700_device::spc700_device(const machine_config &mconfig, const char *tag, dev
 #define CLK_ALL() CLOCKS = 0
 
 
-UINT32 spc700_device::read_8_normal(UINT32 address)
+uint32_t spc700_device::read_8_normal(uint32_t address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_8(address);
 }
 
-UINT32 spc700_device::read_8_immediate(UINT32 address)
+uint32_t spc700_device::read_8_immediate(uint32_t address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_8_immediate(address);
 }
 
-UINT32 spc700_device::read_8_instruction(UINT32 address)
+uint32_t spc700_device::read_8_instruction(uint32_t address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_instruction(address);
 }
 
-UINT32 spc700_device::read_8_direct(UINT32 address)
+uint32_t spc700_device::read_8_direct(uint32_t address)
 {
 	address = MAKE_UINT_8(address) | FLAG_P;
 	return spc700_read_8_direct(address);
 }
 
-void spc700_device::write_8_normal(UINT32 address, UINT32 value)
+void spc700_device::write_8_normal(uint32_t address, uint32_t value)
 {
 	address = MAKE_UINT_16(address);
 	value = MAKE_UINT_8(value);
 	spc700_write_8(address, value);
 }
 
-void spc700_device::write_8_direct(UINT32 address, UINT32 value)
+void spc700_device::write_8_direct(uint32_t address, uint32_t value)
 {
 	address = MAKE_UINT_8(address) | FLAG_P;
 	value = MAKE_UINT_8(value);
@@ -281,22 +281,22 @@ void spc700_device::write_8_direct(UINT32 address, UINT32 value)
 }
 
 
-UINT32 spc700_device::read_16_normal(UINT32 address)
+uint32_t spc700_device::read_16_normal(uint32_t address)
 {
 	return read_8_normal(address) | (read_8_normal(address+1)<<8);
 }
 
-UINT32 spc700_device::read_16_immediate(UINT32 address)
+uint32_t spc700_device::read_16_immediate(uint32_t address)
 {
 	return read_8_immediate(address) | (read_8_immediate(address+1)<<8);
 }
 
-UINT32 spc700_device::read_16_direct(UINT32 address)
+uint32_t spc700_device::read_16_direct(uint32_t address)
 {
 	return read_8_direct(address) | (read_8_direct(address+1)<<8);
 }
 
-void spc700_device::write_16_direct(UINT32 address, UINT32 value)
+void spc700_device::write_16_direct(uint32_t address, uint32_t value)
 {
 	write_8_direct(address, value);
 	write_8_direct(address+1, value>>8);
@@ -399,31 +399,31 @@ void spc700_device::write_16_direct(UINT32 address, UINT32 value)
 #define OPER_16_YI()    read_16_YI(EA_YI())
 
 /* Effective Address Calculations */
-UINT32 spc700_device::EA_IMM()   {return REG_PC++;}
-UINT32 spc700_device::EA_IMM16() {REG_PC += 2; return REG_PC-2;}
-UINT32 spc700_device::EA_ABS()   {return OPER_16_IMM();}
-UINT32 spc700_device::EA_ABX()   {return EA_ABS() + REG_X;}
-UINT32 spc700_device::EA_ABY()   {return EA_ABS() + REG_Y;}
-UINT32 spc700_device::EA_AXI()   {return OPER_16_ABX();}
-UINT32 spc700_device::EA_DP()   {return OPER_8_IMM();}
-UINT32 spc700_device::EA_DPX()   {return (EA_DP() + REG_X)&0xff;}
-UINT32 spc700_device::EA_DPY()   {return (EA_DP() + REG_Y)&0xff;}
-UINT32 spc700_device::EA_DXI()   {return OPER_16_DPX();}
-UINT32 spc700_device::EA_DIY()   {UINT32 addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
-UINT32 spc700_device::EA_XI()    {return REG_X;}
-UINT32 spc700_device::EA_XII()   {UINT32 val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
-UINT32 spc700_device::EA_YI()    {return REG_Y;}
+uint32_t spc700_device::EA_IMM()   {return REG_PC++;}
+uint32_t spc700_device::EA_IMM16() {REG_PC += 2; return REG_PC-2;}
+uint32_t spc700_device::EA_ABS()   {return OPER_16_IMM();}
+uint32_t spc700_device::EA_ABX()   {return EA_ABS() + REG_X;}
+uint32_t spc700_device::EA_ABY()   {return EA_ABS() + REG_Y;}
+uint32_t spc700_device::EA_AXI()   {return OPER_16_ABX();}
+uint32_t spc700_device::EA_DP()   {return OPER_8_IMM();}
+uint32_t spc700_device::EA_DPX()   {return (EA_DP() + REG_X)&0xff;}
+uint32_t spc700_device::EA_DPY()   {return (EA_DP() + REG_Y)&0xff;}
+uint32_t spc700_device::EA_DXI()   {return OPER_16_DPX();}
+uint32_t spc700_device::EA_DIY()   {uint32_t addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
+uint32_t spc700_device::EA_XI()    {return REG_X;}
+uint32_t spc700_device::EA_XII()   {uint32_t val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
+uint32_t spc700_device::EA_YI()    {return REG_Y;}
 
 
 
 /* Change the Program Counter */
-void spc700_device::JUMP(UINT32 address)
+void spc700_device::JUMP(uint32_t address)
 {
 	REG_PC = address;
 	spc700_jumping(REG_PC);
 }
 
-void spc700_device::BRANCH(UINT32 offset)
+void spc700_device::BRANCH(uint32_t offset)
 {
 	REG_PC = MAKE_UINT_16(REG_PC + MAKE_INT_8(offset));
 	spc700_branching(REG_PC);
@@ -432,7 +432,7 @@ void spc700_device::BRANCH(UINT32 offset)
 
 #define GET_REG_YA() (REG_A | (REG_Y<<8))
 
-void spc700_device::SET_REG_YA(UINT32 value)
+void spc700_device::SET_REG_YA(uint32_t value)
 {
 	REG_A = MAKE_UINT_8(value);
 	REG_Y = MAKE_UINT_8(value>>8);
@@ -450,7 +450,7 @@ void spc700_device::SET_REG_YA(UINT32 value)
 	CFLAG_AS_1())
 
 /* Set the Process Status Register */
-void spc700_device::SET_REG_P(UINT32 value)
+void spc700_device::SET_REG_P(uint32_t value)
 {
 	FLAG_N = (value & 0x80);
 	FLAG_Z = !(value & 2);
@@ -463,27 +463,27 @@ void spc700_device::SET_REG_P(UINT32 value)
 }
 
 /* Push/Pull data to/from the stack */
-void spc700_device::PUSH_8(UINT32 value)
+void spc700_device::PUSH_8(uint32_t value)
 {
 	write_8_STK(REG_S+STACK_PAGE, value);
 	REG_S = MAKE_UINT_8(REG_S - 1);
 }
 
-UINT32 spc700_device::PULL_8()
+uint32_t spc700_device::PULL_8()
 {
 	REG_S = MAKE_UINT_8(REG_S + 1);
 	return read_8_STK(REG_S+STACK_PAGE);
 }
 
-void spc700_device::PUSH_16(UINT32 value)
+void spc700_device::PUSH_16(uint32_t value)
 {
 	PUSH_8(value>>8);
 	PUSH_8(value);
 }
 
-UINT32 spc700_device::PULL_16()
+uint32_t spc700_device::PULL_16()
 {
-	UINT32 value = PULL_8();
+	uint32_t value = PULL_8();
 	return value | (PULL_8()<<8);
 }
 
@@ -499,7 +499,7 @@ void spc700_device::SERVICE_IRQ()
 }
 
 
-void spc700_device::SET_FLAG_I(UINT32 value)
+void spc700_device::SET_FLAG_I(uint32_t value)
 {
 	FLAG_I = value & IFLAG_SET;
 #if !SPC700_OPTIMIZE_SNES
@@ -517,7 +517,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 	FLAG_C  = (m_spc_int16 > 0xff) ? CFLAG_SET : 0;     \
 	FLAG_V =  (~((A) ^ (B))) & (((A) ^ m_spc_int16) & 0x80); \
 	FLAG_H = (((m_spc_int16 & 0x0f) - TMP1) & 0x10) >> 1;   \
-	FLAG_NZ = (UINT8)m_spc_int16
+	FLAG_NZ = (uint8_t)m_spc_int16
 
 
 /* Add With Carry */
@@ -525,7 +525,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			CLK(BCLK);              \
 			SRC     = OPER_8_##MODE();      \
 			SUBOP_ADC(SRC, REG_A);          \
-			REG_A = (UINT8)m_spc_int16;
+			REG_A = (uint8_t)m_spc_int16;
 
 
 /* Add With Carry to memory */
@@ -534,7 +534,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			SRC     = OPER_8_##SMODE();     \
 			DST     = EA_##DMODE();         \
 			SUBOP_ADC(SRC, read_8_##DMODE(DST));    \
-			write_8_##DMODE(DST, (UINT8)m_spc_int16)
+			write_8_##DMODE(DST, (uint8_t)m_spc_int16)
 
 /* Add word */
 #define OP_ADDW(BCLK)                       \
@@ -548,7 +548,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			FLAG_C = (TMP3 > 0xff) ? CFLAG_SET : 0; \
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) + \
 				(((SRC) >> 8) & 0x0F) + TMP2)) > 0x0F ? HFLAG_SET : 0; \
-			FLAG_V = (~((DST) ^ (SRC)) & ((SRC) ^ (UINT16) m_spc_int16) & 0x8000) ? VFLAG_SET : 0; \
+			FLAG_V = (~((DST) ^ (SRC)) & ((SRC) ^ (uint16_t) m_spc_int16) & 0x8000) ? VFLAG_SET : 0; \
 			FLAG_Z = (m_spc_int16 != 0);        \
 			FLAG_N = (m_spc_int16>>8);      \
 			SET_REG_YA(m_spc_int16);
@@ -1101,7 +1101,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			TMP2 = REG_A - SRC - (CFLAG_AS_1() ^ 1); \
 			SUBOP_ADC(REG_A, ~SRC);         \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
-			REG_A = (UINT8)m_spc_int16;
+			REG_A = (uint8_t)m_spc_int16;
 
 /* Subtract With Carry to memory */
 #define OP_SBCM(BCLK, SMODE, DMODE)             \
@@ -1112,7 +1112,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			TMP2 = TMP3 - SRC - (CFLAG_AS_1() ^ 1); \
 			SUBOP_ADC(~SRC, TMP3);          \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
-			write_8_##DMODE(DST, (UINT8)m_spc_int16)
+			write_8_##DMODE(DST, (uint8_t)m_spc_int16)
 
 /* Set Carry flag */
 #define OP_SETC(BCLK)                                                       \
@@ -1155,7 +1155,7 @@ void spc700_device::SET_FLAG_I(UINT32 value)
 			FLAG_C = (TMP3 <= 0xff) ? CFLAG_SET : 0;    \
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) - \
 				(((SRC) >> 8) & 0x0F) - TMP2)) > 0x0F ?  0: HFLAG_SET; \
-			FLAG_V = (((DST) ^ (SRC)) & ((DST) ^ (UINT16) m_spc_int16) & 0x8000) ? VFLAG_SET : 0; \
+			FLAG_V = (((DST) ^ (SRC)) & ((DST) ^ (uint16_t) m_spc_int16) & 0x8000) ? VFLAG_SET : 0; \
 			FLAG_Z = (m_spc_int16 != 0);        \
 			FLAG_N = (m_spc_int16>>8);      \
 			SET_REG_YA(m_spc_int16);
@@ -1344,7 +1344,7 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-offs_t spc700_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t spc700_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return CPU_DISASSEMBLE_NAME(spc700)(this, buffer, pc, oprom, opram, options);
 }

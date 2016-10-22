@@ -96,8 +96,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 	if (!m_pending_interrupt)
 		return;
 
-	UINT32 cpsr = m_r[eCPSR];   /* save current CPSR */
-	UINT32 pc = m_r[eR15] + 4;      /* save old pc (already incremented in pipeline) */;
+	uint32_t cpsr = m_r[eCPSR];   /* save current CPSR */
+	uint32_t pc = m_r[eR15] + 4;      /* save old pc (already incremented in pipeline) */;
 
 	/* Exception priorities:
 
@@ -154,7 +154,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 		}
 		else
 		{
-			UINT32 temp;
+			uint32_t temp;
 			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
 			set_cpsr(temp);            /* Mask IRQ */
@@ -225,7 +225,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 		}
 		else
 		{
-			UINT32 temp;
+			uint32_t temp;
 			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
 			set_cpsr(temp);            /* Mask IRQ */

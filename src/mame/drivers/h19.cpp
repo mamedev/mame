@@ -75,10 +75,10 @@ public:
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	DECLARE_WRITE8_MEMBER(h19_kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<palette_device> m_palette;
-	UINT8 *m_p_chargen;
-	UINT8 m_term_data;
+	uint8_t *m_p_chargen;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -102,7 +102,7 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 READ8_MEMBER( h19_state::h19_80_r )
 {
 // keyboard data
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -121,7 +121,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
     offset 00-1F = keyclick
     offset 20-3F = terminal bell */
 
-	UINT8 length = (offset & 0x20) ? 200 : 4;
+	uint8_t length = (offset & 0x20) ? 200 : 4;
 	m_beep->set_state(1);
 	timer_set(attotime::from_msec(length), TIMER_BEEP_OFF);
 }
@@ -324,13 +324,13 @@ void h19_state::video_start()
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		UINT8 inv=0;
+		uint8_t inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];

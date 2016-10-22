@@ -19,7 +19,7 @@ class k007232_device : public device_t,
 									public device_sound_interface
 {
 public:
-	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k007232_device() {}
 
 	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(object); }
@@ -50,21 +50,21 @@ protected:
 
 private:
 	// internal state
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 
-	UINT8           m_vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
-	UINT32          m_addr[KDAC_A_PCM_MAX];
-	UINT32          m_start[KDAC_A_PCM_MAX];
-	UINT32          m_step[KDAC_A_PCM_MAX];
-	UINT32          m_bank[KDAC_A_PCM_MAX];
+	uint8_t           m_vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
+	uint32_t          m_addr[KDAC_A_PCM_MAX];
+	uint32_t          m_start[KDAC_A_PCM_MAX];
+	uint32_t          m_step[KDAC_A_PCM_MAX];
+	uint32_t          m_bank[KDAC_A_PCM_MAX];
 	int             m_play[KDAC_A_PCM_MAX];
 
-	UINT8           m_wreg[0x10]; /* write data */
+	uint8_t           m_wreg[0x10]; /* write data */
 
-	UINT32          m_pcmlimit;
+	uint32_t          m_pcmlimit;
 
 	sound_stream *  m_stream;
-	UINT32          m_fncode[0x200];
+	uint32_t          m_fncode[0x200];
 	devcb_write8 m_port_write_handler;
 };
 

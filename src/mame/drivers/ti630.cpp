@@ -92,7 +92,7 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 	{
 		case 0x01:
 		{
-			UINT8 value = 0;
+			uint8_t value = 0;
 #if LOG_IO_PORTS
 			printf("P1 read value:%02X\n", value);
 #endif
@@ -108,7 +108,7 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 
 WRITE8_MEMBER(ti630_state::ti630_io_w)
 {
-	static UINT8 p0=0, p1=0, p2=0, p3=0;
+	static uint8_t p0=0, p1=0, p2=0, p3=0;
 	switch (offset)
 	{
 		case 0x00:

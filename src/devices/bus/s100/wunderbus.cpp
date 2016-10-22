@@ -236,7 +236,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //  s100_wunderbus_device - constructor
 //-------------------------------------------------
 
-s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),
@@ -302,12 +302,12 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
-	UINT8 address = (m_7c->read() & 0x3e) << 2;
+	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ((offset & 0x07) < 7)
 	{
@@ -411,9 +411,9 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
+void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
 {
-	UINT8 address = (m_7c->read() & 0x3e) << 2;
+	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
 
 	if ((offset & 0x07) == 7)

@@ -27,7 +27,7 @@ class sv805_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;

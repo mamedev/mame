@@ -25,7 +25,7 @@ class tvc_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_sndint_wr_callback(device_t &device, _Object object) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(object); }
 
@@ -48,7 +48,7 @@ private:
 	int             m_volume;
 	int             m_incr;
 	int             m_signal;
-	UINT8           m_ports[3];
+	uint8_t           m_ports[3];
 	emu_timer *     m_sndint_timer;
 	devcb_write_line   m_write_sndint;
 };

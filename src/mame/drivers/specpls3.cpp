@@ -201,7 +201,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
 void spectrum_state::spectrum_plus3_update_memory()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	if (m_port_7ffd_data & 8)
 	{
@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
 	MACHINE_RESET_CALL_MEMBER(spectrum);

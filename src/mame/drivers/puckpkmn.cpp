@@ -377,7 +377,7 @@ ROM sockets U63 & U64 empty
 
 DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 	int i;
 

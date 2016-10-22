@@ -43,7 +43,7 @@ const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
 //  microdrive_image_device - constructor
 //-------------------------------------------------
 
-microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock, "microdrive_image", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_write_comms_out(*this)
@@ -77,8 +77,8 @@ void microdrive_image_device::device_start()
 	m_write_comms_out.resolve_safe();
 
 	// allocate track buffers
-	m_left = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
-	m_right = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
+	m_left = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
+	m_right = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
 	m_bit_timer = timer_alloc();

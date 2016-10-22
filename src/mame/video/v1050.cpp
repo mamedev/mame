@@ -58,9 +58,9 @@ MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
-		UINT8 data = m_video_ram[address & V1050_VIDEORAM_MASK];
-		UINT8 attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
+		uint16_t address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
+		uint8_t data = m_video_ram[address & V1050_VIDEORAM_MASK];
+		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
 
 		for (bit = 0; bit < 8; bit++)
 		{

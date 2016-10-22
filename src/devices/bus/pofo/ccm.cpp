@@ -44,7 +44,7 @@ device_portfolio_memory_card_slot_interface::device_portfolio_memory_card_slot_i
 //  portfolio_memory_card_slot_t - constructor
 //-------------------------------------------------
 
-portfolio_memory_card_slot_t::portfolio_memory_card_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+portfolio_memory_card_slot_t::portfolio_memory_card_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PORTFOLIO_MEMORY_CARD_SLOT, "Atari Portfolio memory card port", tag, owner, clock, "portfolio_ccm_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),

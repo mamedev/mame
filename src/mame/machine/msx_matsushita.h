@@ -21,7 +21,7 @@ extern const device_type MSX_MATSUSHITA;
 class msx_matsushita_device : public msx_switched_device
 {
 public:
-	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_turbo_callback(device_t &device, _Object object) { return downcast<msx_matsushita_device &>(device).m_turbo_out_cb.set_callback(object); }
 
@@ -29,7 +29,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual UINT8 get_id() override;
+	virtual uint8_t get_id() override;
 
 	virtual DECLARE_READ8_MEMBER(io_read) override;
 	virtual DECLARE_WRITE8_MEMBER(io_write) override;
@@ -38,11 +38,11 @@ private:
 	required_ioport m_io_config;
 	required_device<nvram_device> m_nvram;
 	devcb_write_line m_turbo_out_cb;
-	UINT16 m_address;
-	std::vector<UINT8> m_sram;
-	UINT8 m_nibble1;
-	UINT8 m_nibble2;
-	UINT8 m_pattern;
+	uint16_t m_address;
+	std::vector<uint8_t> m_sram;
+	uint8_t m_nibble1;
+	uint8_t m_nibble2;
+	uint8_t m_pattern;
 };
 
 #endif

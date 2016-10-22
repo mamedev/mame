@@ -18,13 +18,13 @@ class cedar_magnet_board_device :  public device_t
 {
 public:
 	// construction/destruction
-	cedar_magnet_board_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cedar_magnet_board_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	UINT8* m_ram;
+	uint8_t* m_ram;
 	z80_device* m_cpu;
 	
-	virtual UINT8 read_cpu_bus(int offset);
-	virtual void write_cpu_bus(int offset, UINT8 data);
+	virtual uint8_t read_cpu_bus(int offset);
+	virtual void write_cpu_bus(int offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(halt_assert_callback);
 	TIMER_CALLBACK_MEMBER(halt_clear_callback);

@@ -66,7 +66,7 @@ READ8_MEMBER(aladdin_cart_interface::read)
 
 const device_type NES_ALADDIN_SLOT = &device_creator<nes_aladdin_slot_device>;
 
-nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_ALADDIN_SLOT, "NES Aladdin Deck Enhancer Cartridge Slot", tag, owner, clock, "nes_ade_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr)
@@ -96,8 +96,8 @@ image_init_result nes_aladdin_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM = m_cart->get_cart_base();
-		UINT32 size;
+		uint8_t *ROM = m_cart->get_cart_base();
+		uint32_t size;
 
 		if (!ROM)
 			return image_init_result::FAIL;
@@ -107,14 +107,14 @@ image_init_result nes_aladdin_slot_device::call_load()
 			if (length() != 0x20010 && length() != 0x40010)
 				return image_init_result::FAIL;
 
-			UINT8 temp[0x40010];
+			uint8_t temp[0x40010];
 			size = length() - 0x10;
 			fread(&temp, length());
 			memcpy(ROM, temp + 0x10, size);
 
 			// double check that iNES files are really mapper 71 or 232
 			{
-				UINT8 mapper = (temp[6] & 0xf0) >> 4;
+				uint8_t mapper = (temp[6] & 0xf0) >> 4;
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 71 && mapper != 232)
 					return image_init_result::FAIL;
@@ -141,9 +141,9 @@ std::string nes_aladdin_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "algn";
-		UINT32 len = m_file->size();
-		std::vector<UINT8> rom(len);
-		UINT8 mapper;
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
+		uint8_t mapper;
 
 		m_file->read(&rom[0], len);
 
@@ -177,26 +177,26 @@ ROM_END
 const device_type NES_ALGN_ROM = &device_creator<nes_algn_rom_device>;
 const device_type NES_ALGQ_ROM = &device_creator<nes_algq_rom_device>;
 
-nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 						: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 							aladdin_cart_interface( mconfig, *this )
 {
 }
 
-nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 						: device_t(mconfig, NES_ALGN_ROM, "NES Aladdin Deck Enhancer ALGN ROM", tag, owner, clock, "nes_algn_rom", __FILE__),
 							aladdin_cart_interface( mconfig, *this )
 {
 }
 
-nes_algq_rom_device::nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_algq_rom_device::nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 						: nes_algn_rom_device(mconfig, NES_ALGQ_ROM, "NES Aladdin Deck Enhancer ALGQ ROM", tag, owner, clock, "nes_algq_rom", __FILE__), m_bank_base(0)
 					{
 }
 
 void nes_algn_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("aderom")->base();
+	m_rom = (uint8_t*)memregion("aderom")->base();
 	save_item(NAME(m_lobank));
 }
 
@@ -208,7 +208,7 @@ void nes_algn_rom_device::device_reset()
 
 void nes_algq_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("aderom")->base();
+	m_rom = (uint8_t*)memregion("aderom")->base();
 	save_item(NAME(m_lobank));
 	save_item(NAME(m_hibank));
 	save_item(NAME(m_bank_base));
@@ -226,19 +226,19 @@ const tiny_rom_entry *nes_algn_rom_device::device_rom_region() const
 	return ROM_NAME( ade_rom );
 }
 
-UINT8 *nes_algn_rom_device::get_cart_base()
+uint8_t *nes_algn_rom_device::get_cart_base()
 {
 	return m_rom;
 }
 
-void nes_algn_rom_device::write_prg(UINT32 offset, UINT8 data)
+void nes_algn_rom_device::write_prg(uint32_t offset, uint8_t data)
 {
 	// m_hibank is fixed to the last available bank!
 	if (offset >= 0x4000)
 		m_lobank = data & m_rom_mask;
 }
 
-void nes_algq_rom_device::write_prg(UINT32 offset, UINT8 data)
+void nes_algq_rom_device::write_prg(uint32_t offset, uint8_t data)
 {
 	// here hibank & lobank variables are used differently
 	// m_bank_base = 64K block
@@ -264,7 +264,7 @@ void nes_algq_rom_device::write_prg(UINT32 offset, UINT8 data)
 
 const device_type NES_ALADDIN = &device_creator<nes_aladdin_device>;
 
-nes_aladdin_device::nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_aladdin_device::nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_ALADDIN, "NES Cart Camerica Aladdin PCB", tag, owner, clock, "nes_aladdin", __FILE__),
 					m_subslot(*this, "ade_slot")
 {

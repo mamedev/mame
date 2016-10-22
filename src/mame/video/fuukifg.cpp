@@ -8,7 +8,7 @@
 
 const device_type FUUKI_VIDEO = &device_creator<fuukivid_device>;
 
-fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
@@ -23,14 +23,14 @@ void fuukivid_device::static_set_gfxdecode_tag(device_t &device, const char *tag
 
 void fuukivid_device::device_start()
 {
-	m_sprram = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_sprram = make_unique_clear<uint16_t[]>(0x2000 / 2);
 
 	// fuukifg3 clearly has buffered ram, it is unclear if fuukifg2 has
 	// it is likely these render to a framebuffer as the tile bank (which is probably external hw) also needs to be banked
 	// suggesting that the sprites are rendered earlier, then displayed from a buffer
 
-	m_sprram_old = make_unique_clear<UINT16[]>(0x2000 / 2);
-	m_sprram_old2 = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_sprram_old = make_unique_clear<uint16_t[]>(0x2000 / 2);
+	m_sprram_old2 = make_unique_clear<uint16_t[]>(0x2000 / 2);
 
 	save_pointer(NAME(m_sprram.get()), 0x2000 / 2);
 	save_pointer(NAME(m_sprram_old.get()), 0x2000 / 2);
@@ -74,7 +74,7 @@ void fuukivid_device::device_reset()
 
 ***************************************************************************/
 
-void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen , UINT32* tilebank)
+void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen , uint32_t* tilebank)
 {
 	// as we're likely framebuffered (sprites are delayed by 2-3 frames, at least on FG3, and doing rasters on sprites causes glitches) we
 	// only draw the sprites when MAME wants to draw the final screen line.  Ideally we should framebuffer them instead.
@@ -88,7 +88,7 @@ void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const rectangle &visarea = screen.visible_area();
 
-	UINT16 *spriteram16 = m_sprram.get();
+	uint16_t *spriteram16 = m_sprram.get();
 
 	if (tilebank) spriteram16 = m_sprram_old2.get(); // so that FG3 uses the buffered RAM
 

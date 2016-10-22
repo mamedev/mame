@@ -938,7 +938,7 @@ WRITE8_MEMBER(seibuspi_state::z80_enable_w)
 
 READ8_MEMBER(seibuspi_state::sb_coin_r)
 {
-	UINT8 ret = m_sb_coin_latch;
+	uint8_t ret = m_sb_coin_latch;
 
 	m_sb_coin_latch = 0;
 	return ret;
@@ -947,7 +947,7 @@ READ8_MEMBER(seibuspi_state::sb_coin_r)
 READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
 	// coins/eeprom data
-	UINT32 ret = m_special->read();
+	uint32_t ret = m_special->read();
 
 	// multiplexed inputs
 	for (int i = 0; i < 5; i++)
@@ -1197,7 +1197,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	RON   - 110 port C
 	Start - 111 port A
 	*/
-	static const UINT8 encoding[] = { 6, 5, 4, 3, 2, 7 };
+	static const uint8_t encoding[] = { 6, 5, 4, 3, 2, 7 };
 	ioport_value state = ~m_key[(uintptr_t)param]->read();
 
 	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
@@ -2000,8 +2000,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)memregion("gfx3")->base();
-	UINT16 tmp[0x40 / 2], offset;
+	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
+	uint16_t tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
 	for (i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
@@ -2231,7 +2231,7 @@ READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 	/* rfjetus */
 	if (space.device().safe_pc()==0x0205b39)
 	{
-		UINT32 r;
+		uint32_t r;
 		space.device().execute().spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_mainram[0x002894c/4] & (~0x400);

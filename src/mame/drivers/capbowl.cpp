@@ -462,7 +462,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(capbowl_state,capbowl)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);

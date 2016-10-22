@@ -1221,7 +1221,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 	return osd_file::error::NONE;
 }
 
-osd_file::error core_file::load(std::string const &filename, std::vector<UINT8> &data)
+osd_file::error core_file::load(std::string const &filename, std::vector<uint8_t> &data)
 {
 	ptr file;
 
@@ -1320,7 +1320,7 @@ bool core_filename_ends_with(const std::string &filename, const std::string &ext
 	// work backwards checking for a match
 	while (matches && extlen > 0 && namelen > 0)
 	{
-		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
+		if (tolower((uint8_t)filename[--namelen]) != tolower((uint8_t)extension[--extlen]))
 			matches = false;
 	}
 

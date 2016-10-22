@@ -27,7 +27,7 @@ class bbc_opus3_device:
 {
 public:
 	// construction/destruction
-	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -55,7 +55,7 @@ private:
 
 	int m_fdc_ie;
 	int m_fdc_drq;
-	UINT16 m_ramdisk_page;
+	uint16_t m_ramdisk_page;
 };
 
 

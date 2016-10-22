@@ -12,7 +12,7 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
-extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);
+extern unsigned DasmSH2(char *buffer, unsigned pc, uint16_t opcode);
 
 using namespace uml;
 
@@ -62,7 +62,7 @@ using namespace uml;
     descriptor
 -------------------------------------------------*/
 
-UINT32 sh2_device::epc(const opcode_desc *desc)
+uint32_t sh2_device::epc(const opcode_desc *desc)
 {
 	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 1) : desc->pc;
 }
@@ -127,36 +127,36 @@ static void cfunc_printf_probe(void *param)
 
 void sh2_device::func_printf_probe()
 {
-	UINT32 pc = m_sh2_state->pc;
+	uint32_t pc = m_sh2_state->pc;
 
 	printf(" PC=%08X          r0=%08X  r1=%08X  r2=%08X\n",
 		pc,
-		(UINT32)m_sh2_state->r[0],
-		(UINT32)m_sh2_state->r[1],
-		(UINT32)m_sh2_state->r[2]);
+		(uint32_t)m_sh2_state->r[0],
+		(uint32_t)m_sh2_state->r[1],
+		(uint32_t)m_sh2_state->r[2]);
 	printf(" r3=%08X  r4=%08X  r5=%08X  r6=%08X\n",
-		(UINT32)m_sh2_state->r[3],
-		(UINT32)m_sh2_state->r[4],
-		(UINT32)m_sh2_state->r[5],
-		(UINT32)m_sh2_state->r[6]);
+		(uint32_t)m_sh2_state->r[3],
+		(uint32_t)m_sh2_state->r[4],
+		(uint32_t)m_sh2_state->r[5],
+		(uint32_t)m_sh2_state->r[6]);
 	printf(" r7=%08X  r8=%08X  r9=%08X  r10=%08X\n",
-		(UINT32)m_sh2_state->r[7],
-		(UINT32)m_sh2_state->r[8],
-		(UINT32)m_sh2_state->r[9],
-		(UINT32)m_sh2_state->r[10]);
+		(uint32_t)m_sh2_state->r[7],
+		(uint32_t)m_sh2_state->r[8],
+		(uint32_t)m_sh2_state->r[9],
+		(uint32_t)m_sh2_state->r[10]);
 	printf(" r11=%08X  r12=%08X  r13=%08X  r14=%08X\n",
-		(UINT32)m_sh2_state->r[11],
-		(UINT32)m_sh2_state->r[12],
-		(UINT32)m_sh2_state->r[13],
-		(UINT32)m_sh2_state->r[14]);
+		(uint32_t)m_sh2_state->r[11],
+		(uint32_t)m_sh2_state->r[12],
+		(uint32_t)m_sh2_state->r[13],
+		(uint32_t)m_sh2_state->r[14]);
 	printf(" r15=%08X  macl=%08X  mach=%08X  gbr=%08X\n",
-		(UINT32)m_sh2_state->r[15],
-		(UINT32)m_sh2_state->macl,
-		(UINT32)m_sh2_state->mach,
-		(UINT32)m_sh2_state->gbr);
+		(uint32_t)m_sh2_state->r[15],
+		(uint32_t)m_sh2_state->macl,
+		(uint32_t)m_sh2_state->mach,
+		(uint32_t)m_sh2_state->gbr);
 	printf(" evec %x irqsr %x pc=%08x\n",
-		(UINT32)m_sh2_state->evec,
-		(UINT32)m_sh2_state->irqsr, (UINT32)m_sh2_state->pc);
+		(uint32_t)m_sh2_state->evec,
+		(uint32_t)m_sh2_state->irqsr, (uint32_t)m_sh2_state->pc);
 }
 
 /*-------------------------------------------------
@@ -202,9 +202,9 @@ static void cfunc_MAC_W(void *param)
 
 void sh2_device::func_MAC_W()
 {
-	INT32 tempm, tempn, dest, src, ans;
-	UINT32 templ;
-	UINT16 opcode;
+	int32_t tempm, tempn, dest, src, ans;
+	uint32_t templ;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -214,17 +214,17 @@ void sh2_device::func_MAC_W()
 	n = Rn;
 	m = Rm;
 
-	tempn = (INT32) RW( m_sh2_state->r[n] );
+	tempn = (int32_t) RW( m_sh2_state->r[n] );
 	m_sh2_state->r[n] += 2;
-	tempm = (INT32) RW( m_sh2_state->r[m] );
+	tempm = (int32_t) RW( m_sh2_state->r[m] );
 	m_sh2_state->r[m] += 2;
 	templ = m_sh2_state->macl;
-	tempm = ((INT32) (short) tempn * (INT32) (short) tempm);
-	if ((INT32) m_sh2_state->macl >= 0)
+	tempm = ((int32_t) (short) tempn * (int32_t) (short) tempm);
+	if ((int32_t) m_sh2_state->macl >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) tempm >= 0)
+	if ((int32_t) tempm >= 0)
 	{
 		src = 0;
 		tempn = 0;
@@ -236,7 +236,7 @@ void sh2_device::func_MAC_W()
 	}
 	src += dest;
 	m_sh2_state->macl += tempm;
-	if ((INT32) m_sh2_state->macl >= 0)
+	if ((int32_t) m_sh2_state->macl >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -289,10 +289,10 @@ static void cfunc_MAC_L(void *param)
 
 void sh2_device::func_MAC_L()
 {
-	UINT32 RnL, RnH, RmL, RmH, Res0, Res1, Res2;
-	UINT32 temp0, temp1, temp2, temp3;
-	INT32 tempm, tempn, fnLmL;
-	UINT16 opcode;
+	uint32_t RnL, RnH, RmL, RmH, Res0, Res1, Res2;
+	uint32_t temp0, temp1, temp2, temp3;
+	int32_t tempm, tempn, fnLmL;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -302,11 +302,11 @@ void sh2_device::func_MAC_L()
 	n = Rn;
 	m = Rm;
 
-	tempn = (INT32) RL( m_sh2_state->r[n] );
+	tempn = (int32_t) RL( m_sh2_state->r[n] );
 	m_sh2_state->r[n] += 4;
-	tempm = (INT32) RL( m_sh2_state->r[m] );
+	tempm = (int32_t) RL( m_sh2_state->r[m] );
 	m_sh2_state->r[m] += 4;
-	if ((INT32) (tempn ^ tempm) < 0)
+	if ((int32_t) (tempn ^ tempm) < 0)
 		fnLmL = -1;
 	else
 		fnLmL = 0;
@@ -314,8 +314,8 @@ void sh2_device::func_MAC_L()
 		tempn = 0 - tempn;
 	if (tempm < 0)
 		tempm = 0 - tempm;
-	temp1 = (UINT32) tempn;
-	temp2 = (UINT32) tempm;
+	temp1 = (uint32_t) tempn;
+	temp2 = (uint32_t) tempm;
 	RnL = temp1 & 0x0000ffff;
 	RnH = (temp1 >> 16) & 0x0000ffff;
 	RmL = temp2 & 0x0000ffff;
@@ -347,12 +347,12 @@ void sh2_device::func_MAC_L()
 		if (m_sh2_state->macl > Res0)
 			Res2++;
 		Res2 += (m_sh2_state->mach & 0x0000ffff);
-		if (((INT32) Res2 < 0) && (Res2 < 0xffff8000))
+		if (((int32_t) Res2 < 0) && (Res2 < 0xffff8000))
 		{
 			Res2 = 0x00008000;
 			Res0 = 0x00000000;
 		}
-		else if (((INT32) Res2 > 0) && (Res2 > 0x00007fff))
+		else if (((int32_t) Res2 > 0) && (Res2 > 0x00007fff))
 		{
 			Res2 = 0x00007fff;
 			Res0 = 0xffffffff;
@@ -381,9 +381,9 @@ static void cfunc_DIV1(void *param)
 
 void sh2_device::func_DIV1()
 {
-	UINT32 tmp0;
-	UINT32 old_q;
-	UINT16 opcode;
+	uint32_t tmp0;
+	uint32_t old_q;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -490,8 +490,8 @@ static void cfunc_ADDV(void *param)
 
 void sh2_device::func_ADDV()
 {
-	INT32 dest, src, ans;
-	UINT16 opcode;
+	int32_t dest, src, ans;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -501,17 +501,17 @@ void sh2_device::func_ADDV()
 	n = Rn;
 	m = Rm;
 
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) m_sh2_state->r[m] >= 0)
+	if ((int32_t) m_sh2_state->r[m] >= 0)
 		src = 0;
 	else
 		src = 1;
 	src += dest;
 	m_sh2_state->r[n] += m_sh2_state->r[m];
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -537,8 +537,8 @@ static void cfunc_SUBV(void *param)
 
 void sh2_device::func_SUBV()
 {
-	INT32 dest, src, ans;
-	UINT16 opcode;
+	int32_t dest, src, ans;
+	uint16_t opcode;
 	int n, m;
 
 	// recover the opcode
@@ -548,17 +548,17 @@ void sh2_device::func_SUBV()
 	n = Rn;
 	m = Rm;
 
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		dest = 0;
 	else
 		dest = 1;
-	if ((INT32) m_sh2_state->r[m] >= 0)
+	if ((int32_t) m_sh2_state->r[m] >= 0)
 		src = 0;
 	else
 		src = 1;
 	src += dest;
 	m_sh2_state->r[n] -= m_sh2_state->r[m];
-	if ((INT32) m_sh2_state->r[n] >= 0)
+	if ((int32_t) m_sh2_state->r[n] >= 0)
 		ans = 0;
 	else
 		ans = 1;
@@ -662,7 +662,7 @@ void sh2_device::execute_run_drc()
     given mode at the specified pc
 -------------------------------------------------*/
 
-void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
+void sh2_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
@@ -690,7 +690,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
-				UINT32 nextpc;
+				uint32_t nextpc;
 
 				/* add a code log entry */
 				if (drcuml->logging())
@@ -938,8 +938,8 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	{
 		if (elem.base != nullptr && (!iswrite || !elem.readonly))
 		{
-			void *fastbase = (UINT8 *)elem.base - elem.start;
-			UINT32 skip = label++;
+			void *fastbase = (uint8_t *)elem.base - elem.start;
+			uint32_t skip = label++;
 			if (elem.end != 0xffffffff)
 			{
 				UML_CMP(block, I0, elem.end);   // cmp     i0,end
@@ -1038,7 +1038,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
     flags
 -------------------------------------------------*/
 
-const char *sh2_device::log_desc_flags_to_string(UINT32 flags)
+const char *sh2_device::log_desc_flags_to_string(uint32_t flags)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
@@ -1092,7 +1092,7 @@ const char *sh2_device::log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
+void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
 {
 	int count = 0;
 	int regnum;
@@ -1205,7 +1205,7 @@ void sh2_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
     including disassembly of an SH2 instruction
 -------------------------------------------------*/
 
-void sh2_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
+void sh2_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
 	if (m_drcuml->logging())
 	{
@@ -1329,7 +1329,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 				UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));   // exne    nocode,seqhead->pc
 			}
 #else
-		UINT32 sum = 0;
+		uint32_t sum = 0;
 		void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];
@@ -1353,7 +1353,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	offs_t expc;
 
@@ -1438,7 +1438,7 @@ void sh2_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
     generate_delay_slot
 ------------------------------------------------------------------*/
 
-void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
 	compiler_state compiler_temp = *compiler;
 
@@ -1455,12 +1455,12 @@ void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compil
     opcode
 -------------------------------------------------*/
 
-int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 ovrpc)
+int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
-	UINT32 scratch, scratch2;
-	INT32 disp;
-	UINT16 opcode = desc->opptr.w[0];
-	UINT8 opswitch = opcode >> 12;
+	uint32_t scratch, scratch2;
+	int32_t disp;
+	uint16_t opcode = desc->opptr.w[0];
+	uint8_t opswitch = opcode >> 12;
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 
 	switch (opswitch)
@@ -1502,7 +1502,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 
 		case  7:    // ADDI
 			scratch = opcode & 0xff;
-			scratch2 = (UINT32)(INT32)(INT16)(INT8)scratch;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
 			UML_ADD(block, R32(Rn), R32(Rn), scratch2); // add Rn, Rn, scratch2
 			return TRUE;
 
@@ -1528,7 +1528,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			}
 			else
 			{
-				scratch2 = (UINT32)(INT32)(INT16) RW(scratch);
+				scratch2 = (uint32_t)(int32_t)(int16_t) RW(scratch);
 				UML_MOV(block, R32(Rn), scratch2);          // mov Rn, scratch2
 			}
 
@@ -1537,7 +1537,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			return TRUE;
 
 		case 10:    // BRA
-			disp = ((INT32)opcode << 20) >> 20;
+			disp = ((int32_t)opcode << 20) >> 20;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
@@ -1551,7 +1551,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 			// do this before running the delay slot
 			UML_ADD(block, mem(&m_sh2_state->pr), desc->pc, 4); // add m_pr, desc->pc, #4 (skip the current insn & delay slot)
 
-			disp = ((INT32)opcode << 20) >> 20;
+			disp = ((int32_t)opcode << 20) >> 20;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;            // m_sh2_state->ea = pc+4 + disp*2 + 2
 
 			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
@@ -1591,7 +1591,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 
 		case 14:    // MOVI
 			scratch = opcode & 0xff;
-			scratch2 = (UINT32)(INT32)(INT16)(INT8)scratch;
+			scratch2 = (uint32_t)(int32_t)(int16_t)(int8_t)scratch;
 			UML_MOV(block, R32(Rn), scratch2);
 			return TRUE;
 
@@ -1602,7 +1602,7 @@ int sh2_device::generate_opcode(drcuml_block *block, compiler_state *compiler, c
 	return FALSE;
 }
 
-int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -1849,7 +1849,7 @@ int sh2_device::generate_group_0(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -2018,7 +2018,7 @@ int sh2_device::generate_group_2(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, UINT32 ovrpc)
+int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -2130,7 +2130,7 @@ int sh2_device::generate_group_3(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 0x3F)
 	{
@@ -2495,7 +2495,7 @@ int sh2_device::generate_group_4(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	switch (opcode & 15)
 	{
@@ -2625,10 +2625,10 @@ int sh2_device::generate_group_6(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	INT32 disp;
-	UINT32 udisp;
+	int32_t disp;
+	uint32_t udisp;
 	code_label templabel;
 
 	switch ( opcode  & (15<<8) )
@@ -2701,7 +2701,7 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;    // m_sh2_state->ea = destination
 
 		generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
@@ -2714,7 +2714,7 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 		UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 		UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 		generate_update_cycles(block, compiler, m_sh2_state->ea, TRUE);    // <subtract cycles>
@@ -2729,7 +2729,7 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_Z, compiler->labelnum);    // jz compiler->labelnum
 
-			disp = ((INT32)opcode << 24) >> 24;
+			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler->labelnum;         // save our label
@@ -2750,7 +2750,7 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 			UML_TEST(block, mem(&m_sh2_state->sr), T);      // test m_sh2_state->sr, T
 			UML_JMPc(block, COND_NZ, compiler->labelnum);   // jnz compiler->labelnum
 
-			disp = ((INT32)opcode << 24) >> 24;
+			disp = ((int32_t)opcode << 24) >> 24;
 			m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;        // m_sh2_state->ea = destination
 
 			templabel = compiler->labelnum;         // save our label
@@ -2769,9 +2769,9 @@ int sh2_device::generate_group_8(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
-int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot, UINT32 ovrpc)
+int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UINT32 scratch;
+	uint32_t scratch;
 
 	switch (opcode & (15<<8))
 	{
@@ -2943,7 +2943,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
     sh2drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void sh2_device::sh2drc_set_options(UINT32 options)
+void sh2_device::sh2drc_set_options(uint32_t options)
 {
 	if (!allow_drc()) return;
 	m_drcoptions = options;
@@ -2969,7 +2969,7 @@ void sh2_device::sh2drc_add_pcflush(offs_t address)
     region
 -------------------------------------------------*/
 
-void sh2_device::sh2drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+void sh2_device::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
 	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
 	{

@@ -43,10 +43,10 @@ public:
 	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
 	DECLARE_READ8_MEMBER(kim1_u2_read_b);
 	DECLARE_WRITE8_MEMBER(kim1_u2_write_b);
-	UINT8 m_u2_port_b;
-	UINT8 m_311_output;
-	UINT32 m_cassette_high_count;
-	UINT8 m_led_time[6];
+	uint8_t m_u2_port_b;
+	uint8_t m_311_output;
+	uint32_t m_cassette_high_count;
+	uint8_t m_led_time[6];
 
 	// device overrides
 	virtual void machine_start() override;

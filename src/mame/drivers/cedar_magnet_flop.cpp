@@ -10,7 +10,7 @@
 
 extern const device_type CEDAR_MAGNET_FLOP = &device_creator<cedar_magnet_flop_device>;
 
-cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CEDAR_MAGNET_FLOP, "Cedar Floppy Simulation", tag, owner, clock, "cedmag_flop", __FILE__)
 {
 }
@@ -41,25 +41,25 @@ void cedar_magnet_flop_device::device_reset()
 
 READ8_MEMBER(cedar_magnet_flop_device::port60_r)
 {
-	UINT8 ret = m_flopstat;
+	uint8_t ret = m_flopstat;
 	return ret;
 }
 
 READ8_MEMBER(cedar_magnet_flop_device::port61_r)
 {
-	UINT8 ret = m_curtrack;
+	uint8_t ret = m_curtrack;
 	return ret;
 }
 
 READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 {
-	UINT8 ret = rand();
+	uint8_t ret = rand();
 
 	// printf("%s: port63_r (DATA) (%02x)\n", device().machine().describe_context(), ret);
 
 	if ((m_flopcmd&0xf0) == 0x90) // reading data
 	{
-		UINT8 *flop      =   memregion("disk")->base();
+		uint8_t *flop      =   memregion("disk")->base();
 		int side = (m_flopcmd & 0x02)>>1;
 		int read_offset_base = (m_flopsec * 0x400) + (m_curtrack * 0x3000) + (side * 0x1800);
 
@@ -172,7 +172,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
 
 	if ((m_flopcmd & 0xf0) == 0xb0) // writing data
 	{
-		UINT8 *flop      =   memregion("disk")->base();
+		uint8_t *flop      =   memregion("disk")->base();
 		int side = (m_flopcmd & 0x02)>>1;
 		int read_offset_base = (m_flopsec * 0x400) + (m_curtrack * 0x3000) + (side * 0x1800);
 

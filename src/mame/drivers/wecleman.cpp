@@ -969,7 +969,7 @@ static const gfx_layout wecleman_bg_layout =
 	8*8
 };
 
-static const UINT32 wecleman_road_layout_xoffset[64] =
+static const uint32_t wecleman_road_layout_xoffset[64] =
 {
 		0,7,6,5,4,3,2,1,
 		8,15,14,13,12,11,10,9,
@@ -1007,7 +1007,7 @@ GFXDECODE_END
                             Hot Chase Graphics Layout
 ***************************************************************************/
 
-static const UINT32 hotchase_road_layout_xoffset[64] =
+static const uint32_t hotchase_road_layout_xoffset[64] =
 {
 		0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
 		8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
@@ -1361,22 +1361,22 @@ void wecleman_state::wecleman_unpack_sprites()
 {
 	const char *region       = "gfx1";  // sprites
 
-	const UINT32 len = memregion(region)->bytes();
-	UINT8 *src     = memregion(region)->base() + len / 2 - 1;
-	UINT8 *dst     = memregion(region)->base() + len - 1;
+	const uint32_t len = memregion(region)->bytes();
+	uint8_t *src     = memregion(region)->base() + len / 2 - 1;
+	uint8_t *dst     = memregion(region)->base() + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data = *src--;
+		uint8_t data = *src--;
 		if( (data&0xf0) == 0xf0 ) data &= 0x0f;
 		if( (data&0x0f) == 0x0f ) data &= 0xf0;
 		*dst-- = data & 0xF;    *dst-- = data >> 4;
 	}
 }
 
-void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
+void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	int i;
 
 	memcpy(&buffer[0],src,len);
@@ -1391,8 +1391,8 @@ void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _
 DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 {
 	int i, len;
-	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) memregion("maincpu")->base();   /* Main CPU patches */
+	uint8_t *RAM;
+//  uint16_t *RAM1 = (uint16_t *) memregion("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1651,20 +1651,20 @@ ROM_END
 
 void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
-	UINT8 *base;
+	uint8_t *base;
 	int i;
 
 	base = memregion("gfx1")->base(); // sprites
-	std::vector<UINT8> temp( bank_size );
+	std::vector<uint8_t> temp( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
-		UINT8 *finish   = base + 2*bank_size*i;
-		UINT8 *dest     = finish - 2*bank_size;
+		uint8_t *finish   = base + 2*bank_size*i;
+		uint8_t *dest     = finish - 2*bank_size;
 
-		UINT8 *p1 = &temp[0];
-		UINT8 *p2 = &temp[bank_size/2];
+		uint8_t *p1 = &temp[0];
+		uint8_t *p2 = &temp[bank_size/2];
 
-		UINT8 data;
+		uint8_t data;
 
 		memcpy (&temp[0], base+bank_size*(i-1), bank_size);
 
@@ -1698,7 +1698,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 /* Unpack sprites data and do some patching */
 DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 {
-//  UINT16 *RAM1 = (UINT16) memregion("maincpu")->base(); /* Main CPU patches */
+//  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */

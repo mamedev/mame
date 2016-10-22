@@ -14,19 +14,19 @@ DEVICE_ADDRESS_MAP_START(extmap, 32, lpc_rtc_device)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(exttarget_r, exttarget_w, 0xff000000)
 ADDRESS_MAP_END
 
-lpc_rtc_device::lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lpc_rtc_device::lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: lpc_device(mconfig, LPC_RTC, "LPC RTC", tag, owner, clock, "lpc_rtc", __FILE__), cur_index(0), cur_extindex(0)
 {
 }
 
-void lpc_rtc_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void lpc_rtc_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(io_offset, io_window_end, *this, &lpc_rtc_device::map);
 }
 
-void lpc_rtc_device::map_extdevice(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void lpc_rtc_device::map_extdevice(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(io_offset, io_window_end, *this, &lpc_rtc_device::extmap);
 }

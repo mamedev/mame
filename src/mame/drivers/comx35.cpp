@@ -38,9 +38,9 @@ enum
     image_fread_memory - read image to memory
 -------------------------------------------------*/
 
-void comx35_state::image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
+void comx35_state::image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count)
 {
-	UINT8 *ram = m_ram->pointer() + (addr - 0x4000);
+	uint8_t *ram = m_ram->pointer() + (addr - 0x4000);
 
 	image.fread(ram, count);
 }
@@ -53,7 +53,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT8 header[16] = {0};
+	uint8_t header[16] = {0};
 	int size = image.length();
 
 	if (size > m_ram->size())
@@ -85,7 +85,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 
 		*/
 		{
-			UINT16 start_address, end_address, run_address;
+			uint16_t start_address, end_address, run_address;
 
 			image.fread(header, 6);
 
@@ -171,7 +171,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 
 		*/
 		{
-			UINT16 start_array, end_array, start_string, array_length;
+			uint16_t start_array, end_array, start_string, array_length;
 
 			image.fread(header, 2);
 
@@ -207,7 +207,7 @@ READ8_MEMBER( comx35_state::mem_r )
 {
 	int extrom = 1;
 
-	UINT8 data = m_exp->mrd_r(space, offset, &extrom);
+	uint8_t data = m_exp->mrd_r(space, offset, &extrom);
 
 	if (offset < 0x4000)
 	{
@@ -255,7 +255,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 
 READ8_MEMBER( comx35_state::io_r )
 {
-	UINT8 data = m_exp->io_r(space, offset);
+	uint8_t data = m_exp->io_r(space, offset);
 
 	if (offset == 3)
 	{
@@ -552,7 +552,7 @@ void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 void comx35_state::machine_start()
 {
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	memset(ram, 0, m_ram->size());
 
 	// register for state saving

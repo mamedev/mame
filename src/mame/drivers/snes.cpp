@@ -91,10 +91,10 @@ public:
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);
 	SNESCTRL_GUNLATCH_CB(gun_latch_cb);
 	virtual DECLARE_WRITE8_MEMBER(io_read) override;
-	virtual UINT8 oldjoy1_read(int latched) override;
-	virtual UINT8 oldjoy2_read(int latched) override;
-	virtual void write_joy_latch(UINT8 data) override;
-	virtual void wrio_write(UINT8 data) override;
+	virtual uint8_t oldjoy1_read(int latched) override;
+	virtual uint8_t oldjoy2_read(int latched) override;
+	virtual void write_joy_latch(uint8_t data) override;
+	virtual void wrio_write(uint8_t data) override;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -138,7 +138,7 @@ WRITE8_MEMBER(snes_console_state::spc_ram_100_w )
 
 READ8_MEMBER( snes_console_state::snes20_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	// take care of add-on IO
 	if ((m_cartslot->get_type() == SNES_ST010 || m_cartslot->get_type() == SNES_ST011)
@@ -195,7 +195,7 @@ READ8_MEMBER( snes_console_state::snes20_hi_r )
 
 WRITE8_MEMBER( snes_console_state::snes20_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	// take care of add-on IO
 	if ((m_cartslot->get_type() == SNES_ST010 || m_cartslot->get_type() == SNES_ST011)
@@ -233,7 +233,7 @@ WRITE8_MEMBER( snes_console_state::snes20_hi_w )
 
 READ8_MEMBER( snes_console_state::snes20_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	// take care of add-on IO
 	if ((m_cartslot->get_type() == SNES_ST010 /*|| m_cartslot->get_type() == SNES_ST011*/) // why does this break moritash?
@@ -305,7 +305,7 @@ WRITE8_MEMBER( snes_console_state::snes20_lo_w )
 
 READ8_MEMBER( snes_console_state::snes21_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000 && address < 0x8000)
 	{
@@ -339,7 +339,7 @@ READ8_MEMBER( snes_console_state::snes21_lo_r )
 
 WRITE8_MEMBER( snes_console_state::snes21_lo_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
@@ -367,7 +367,7 @@ WRITE8_MEMBER( snes_console_state::snes21_lo_w )
 
 READ8_MEMBER( snes_console_state::snes21_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000 && address < 0x8000)
 	{
@@ -401,7 +401,7 @@ READ8_MEMBER( snes_console_state::snes21_hi_r )
 
 WRITE8_MEMBER( snes_console_state::snes21_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
@@ -433,7 +433,7 @@ WRITE8_MEMBER( snes_console_state::snes21_hi_w )
 
 READ8_MEMBER( snes_console_state::snessfx_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -459,7 +459,7 @@ READ8_MEMBER( snes_console_state::snessfx_hi_r )
 
 READ8_MEMBER( snes_console_state::snessfx_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -485,7 +485,7 @@ READ8_MEMBER( snes_console_state::snessfx_lo_r )
 
 WRITE8_MEMBER( snes_console_state::snessfx_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -515,7 +515,7 @@ WRITE8_MEMBER( snes_console_state::snessfx_lo_w )
 
 READ8_MEMBER( snes_console_state::snessa1_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -541,7 +541,7 @@ READ8_MEMBER( snes_console_state::snessa1_hi_r )
 
 READ8_MEMBER( snes_console_state::snessa1_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -569,7 +569,7 @@ READ8_MEMBER( snes_console_state::snessa1_lo_r )
 
 WRITE8_MEMBER( snes_console_state::snessa1_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -602,7 +602,7 @@ WRITE8_MEMBER( snes_console_state::snessa1_lo_w )
 
 READ8_MEMBER( snes_console_state::snes7110_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -610,7 +610,7 @@ READ8_MEMBER( snes_console_state::snes7110_hi_r )
 			return space.read_byte(0x7e0000 + address);
 		else if (address < 0x6000)
 		{
-			UINT16 limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
+			uint16_t limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
 				return m_cartslot->chip_read(space, address);
 
@@ -631,7 +631,7 @@ READ8_MEMBER( snes_console_state::snes7110_hi_r )
 
 READ8_MEMBER( snes_console_state::snes7110_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -639,7 +639,7 @@ READ8_MEMBER( snes_console_state::snes7110_lo_r )
 			return space.read_byte(0x7e0000 + address);
 		else if (address < 0x6000)
 		{
-			UINT16 limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
+			uint16_t limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
 				return m_cartslot->chip_read(space, address);
 
@@ -668,14 +668,14 @@ WRITE8_MEMBER( snes_console_state::snes7110_hi_w )
 
 WRITE8_MEMBER( snes_console_state::snes7110_lo_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
 		else if (address < 0x6000)
 		{
-			UINT16 limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
+			uint16_t limit = (m_cartslot->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
 			{
 				m_cartslot->chip_write(space, address, data);
@@ -700,7 +700,7 @@ WRITE8_MEMBER( snes_console_state::snes7110_lo_w )
 
 READ8_MEMBER( snes_console_state::snessdd1_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -739,7 +739,7 @@ WRITE8_MEMBER( snes_console_state::snessdd1_lo_w )
 
 WRITE8_MEMBER( snes_console_state::snessdd1_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -770,7 +770,7 @@ WRITE8_MEMBER( snes_console_state::snessdd1_hi_w )
 
 READ8_MEMBER( snes_console_state::snesbsx_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -799,7 +799,7 @@ READ8_MEMBER( snes_console_state::snesbsx_hi_r )
 
 WRITE8_MEMBER( snes_console_state::snesbsx_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -831,7 +831,7 @@ WRITE8_MEMBER( snes_console_state::snesbsx_hi_w )
 
 READ8_MEMBER( snes_console_state::snesbsx_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -870,7 +870,7 @@ WRITE8_MEMBER( snes_console_state::snesbsx_lo_w )
 
 READ8_MEMBER( snes_console_state::snessgb_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -896,7 +896,7 @@ READ8_MEMBER( snes_console_state::snessgb_lo_r )
 
 WRITE8_MEMBER( snes_console_state::snessgb_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -919,7 +919,7 @@ WRITE8_MEMBER( snes_console_state::snessgb_lo_w )
 
 READ8_MEMBER( snes_console_state::pfest94_hi_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -946,7 +946,7 @@ READ8_MEMBER( snes_console_state::pfest94_hi_r )
 
 WRITE8_MEMBER( snes_console_state::pfest94_hi_w )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -967,7 +967,7 @@ WRITE8_MEMBER( snes_console_state::pfest94_hi_w )
 
 READ8_MEMBER( snes_console_state::pfest94_lo_r )
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -1095,7 +1095,7 @@ WRITE8_MEMBER(snes_console_state::io_read)
 	// is automatic reading on? if so, read 16bits from oldjoy1/2
 	if (SNES_CPU_REG(NMITIMEN) & 1)
 	{
-		UINT16 joy1 = 0, joy2 = 0, joy3 = 0, joy4 = 0;
+		uint16_t joy1 = 0, joy2 = 0, joy3 = 0, joy4 = 0;
 		m_ctrl1->port_poll();
 		m_ctrl2->port_poll();
 
@@ -1118,29 +1118,29 @@ WRITE8_MEMBER(snes_console_state::io_read)
 	}
 }
 
-UINT8 snes_console_state::oldjoy1_read(int latched)
+uint8_t snes_console_state::oldjoy1_read(int latched)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_ctrl1->read_pin4();
 	ret |= (m_ctrl1->read_pin5() << 1);
 	return ret;
 }
 
-UINT8 snes_console_state::oldjoy2_read(int latched)
+uint8_t snes_console_state::oldjoy2_read(int latched)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_ctrl2->read_pin4();
 	ret |= (m_ctrl2->read_pin5() << 1);
 	return ret;
 }
 
-void snes_console_state::write_joy_latch(UINT8 data)
+void snes_console_state::write_joy_latch(uint8_t data)
 {
 	m_ctrl1->write_strobe(data);
 	m_ctrl2->write_strobe(data);
 }
 
-void snes_console_state::wrio_write(UINT8 data)
+void snes_console_state::wrio_write(uint8_t data)
 {
 	if (!(SNES_CPU_REG(WRIO) & 0x80) && (data & 0x80))
 	{

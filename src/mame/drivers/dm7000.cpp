@@ -58,7 +58,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 READ8_MEMBER( dm7000_state::dm7000_iic0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC0) %08X -> %08X\n", 0x40030000 + offset, data);
 	return data;
 }
@@ -70,7 +70,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_iic0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_iic1_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(IIC1) %08X -> %08X\n", 0x400b0000 + offset, data);
 	return data;
 }
@@ -82,7 +82,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_iic1_w )
 
 READ8_MEMBER( dm7000_state::dm7000_scc0_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch(offset) {
 		case UART_THR:
 			data = m_term_data;
@@ -119,7 +119,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scc0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_gpio0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	verboselog(*this, 9, "(GPIO0) %08X -> %08X\n", 0x40060000 + offset, data);
 	return data;
 }
@@ -131,7 +131,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_gpio0_w )
 
 READ8_MEMBER( dm7000_state::dm7000_scp0_r )
 {
-	UINT8 data = 0; // dummy
+	uint8_t data = 0; // dummy
 	switch(offset) {
 		case SCP_STATUS:
 			data = SCP_STATUS_RXRDY;
@@ -153,7 +153,7 @@ WRITE8_MEMBER( dm7000_state::dm7000_scp0_w )
 
 READ16_MEMBER( dm7000_state::dm7000_enet_r )
 {
-	UINT16 data;
+	uint16_t data;
 	switch (offset) {
 		case 0x01:
 			data = 0x1801;
@@ -267,7 +267,7 @@ void dm7000_state::video_start()
 {
 }
 
-UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

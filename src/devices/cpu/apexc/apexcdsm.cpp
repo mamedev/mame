@@ -85,7 +85,7 @@ static const instr_desc instructions[16] =
 
 CPU_DISASSEMBLE( apexc )
 {
-	UINT32 instruction;         /* 32-bit machine instruction */
+	uint32_t instruction;         /* 32-bit machine instruction */
 	int x, y, function, c6, vector; /* instruction fields */
 	int n;                      /* 'friendly', instruction-dependant interpretation of C6 */
 	const instr_desc *the_desc; /* pointer to the relevant entry in the instructions array */

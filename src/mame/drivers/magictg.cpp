@@ -160,22 +160,22 @@ public:
 	/* ASIC */
 	struct
 	{
-		UINT32 src_addr;
-		UINT32 dst_addr;
-		UINT32 ctrl;
-		UINT32 count;
+		uint32_t src_addr;
+		uint32_t dst_addr;
+		uint32_t ctrl;
+		uint32_t count;
 	} m_dma_ch[3];
 
 
 	/* ADSP-2181 */
-	required_shared_ptr<UINT32> m_adsp_pram;
+	required_shared_ptr<uint32_t> m_adsp_pram;
 
 	struct
 	{
-		UINT16 bdma_internal_addr;
-		UINT16 bdma_external_addr;
-		UINT16 bdma_control;
-		UINT16 bdma_word_count;
+		uint16_t bdma_internal_addr;
+		uint16_t bdma_external_addr;
+		uint16_t bdma_control;
+		uint16_t bdma_word_count;
 	} m_adsp_regs;
 
 
@@ -185,21 +185,21 @@ public:
 	struct
 	{
 		/* PCI */
-		UINT32 command;
-		UINT32 base_addr;
+		uint32_t command;
+		uint32_t base_addr;
 
-		UINT32 init_enable;
+		uint32_t init_enable;
 	} m_voodoo_pci_regs[2];
 
 
 	struct
 	{
 		/* PCI */
-		UINT32 command;
-		UINT32 base_addr;
+		uint32_t command;
+		uint32_t base_addr;
 
 		/* Memory-mapped */
-		UINT32 as_regs[19];
+		uint32_t as_regs[19];
 	} m_zr36120;
 
 
@@ -229,7 +229,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 public:
-	UINT32 screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -248,14 +248,14 @@ void magictg_state::machine_start()
 
 void magictg_state::machine_reset()
 {
-	UINT8 *adsp_boot = (UINT8*)memregion("adsp")->base();
+	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
 	zr36120_reset();
 
 	/* Load 32 program words (96 bytes) via BDMA */
 	for (int i = 0; i < 32; i ++)
 	{
-		UINT32 word;
+		uint32_t word;
 
 		word = adsp_boot[i*3 + 0] << 16;
 		word |= adsp_boot[i*3 + 1] << 8;
@@ -276,7 +276,7 @@ void magictg_state::video_start()
 {
 }
 
-UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo[0]->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -288,21 +288,21 @@ UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 
  *
  *************************************/
 
-static UINT32 pci_dev0_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t pci_dev0_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	osd_printf_debug("PCI[0] READ: %x\n", reg);
 	return 0x00000000; // TODO
 }
 
-static void pci_dev0_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void pci_dev0_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 }
 
 
-static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	magictg_state* state = device->machine().driver_data<magictg_state>();
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	switch (reg)
 	{
@@ -321,7 +321,7 @@ static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	magictg_state* state = device->machine().driver_data<magictg_state>();
 
@@ -347,10 +347,10 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 }
 
 #if defined(USE_TWO_3DFX)
-static UINT32 voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo_1_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	magictg_state* state = space.machine().driver_data<magictg_state>();
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	switch (reg)
 	{
@@ -369,7 +369,7 @@ static UINT32 voodoo_1_pci_r(device_t *busdevice, device_t *device, int function
 	return val;
 }
 
-static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo_1_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	magictg_state* state = space.machine().driver_data<magictg_state>();
 
@@ -429,10 +429,10 @@ void magictg_state::zr36120_reset()
 	m_zr36120.as_regs[0x48/4] = 1 << 23;
 }
 
-static UINT32 zr36120_pci_r(device_t* busdevice, device_t* device, int function, int reg, UINT32 mem_mask)
+static uint32_t zr36120_pci_r(device_t* busdevice, device_t* device, int function, int reg, uint32_t mem_mask)
 {
 	magictg_state* state = busdevice->machine().driver_data<magictg_state>();
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	switch (reg)
 	{
@@ -454,7 +454,7 @@ static UINT32 zr36120_pci_r(device_t* busdevice, device_t* device, int function,
 	return val;
 }
 
-static void zr36120_pci_w(device_t* busdevice, device_t* device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void zr36120_pci_w(device_t* busdevice, device_t* device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	magictg_state* state = busdevice->machine().driver_data<magictg_state>();
 
@@ -473,7 +473,7 @@ static void zr36120_pci_w(device_t* busdevice, device_t* device, int function, i
 
 READ32_MEMBER( magictg_state::zr36120_r )
 {
-	UINT32 res = 0;
+	uint32_t res = 0;
 
 	offset <<= 2;
 
@@ -515,9 +515,9 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 	}
 	else
 	{
-		UINT32 guest = (data >> 20) & 3;
-		UINT32 g_data = data & 0xff;
-		UINT32 g_reg = (data >> 16) & 7;
+		uint32_t guest = (data >> 20) & 3;
+		uint32_t g_data = data & 0xff;
+		uint32_t g_reg = (data >> 16) & 7;
 
 		/* Direction - 0 for read, 1 for write */
 		//  zr36120_guest_write(guest, g_data, g_reg);
@@ -597,8 +597,8 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 			if (data & 0x1000)
 			{
-				UINT32 src_addr = m_dma_ch[ch].src_addr;
-				UINT32 dst_addr = m_dma_ch[ch].dst_addr;
+				uint32_t src_addr = m_dma_ch[ch].src_addr;
+				uint32_t dst_addr = m_dma_ch[ch].dst_addr;
 				//device_t *voodoo = dst_addr > 0xa000000 voodoo0 : voodoo1;
 
 				assert((src_addr & 3) == 0);
@@ -606,7 +606,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 				while (m_dma_ch[ch].count > 3)
 				{
-					UINT32 src_dword = flipendian_int32(space.read_dword(src_addr));
+					uint32_t src_dword = flipendian_int32(space.read_dword(src_addr));
 					space.write_dword(dst_addr, src_dword);
 					src_addr += 4;
 					dst_addr += 4;
@@ -616,9 +616,9 @@ WRITE32_MEMBER( magictg_state::f0_w )
 				// FIXME!
 				if (m_dma_ch[ch].count & 3)
 				{
-					UINT32 src_dword = flipendian_int32(space.read_dword(src_addr));
-					UINT32 dst_dword = space.read_dword(dst_addr);
-					UINT32 mask = 0xffffffff >> ((m_dma_ch[ch].count & 3) << 3);
+					uint32_t src_dword = flipendian_int32(space.read_dword(src_addr));
+					uint32_t dst_dword = space.read_dword(dst_addr);
+					uint32_t mask = 0xffffffff >> ((m_dma_ch[ch].count & 3) << 3);
 
 					dst_dword = (dst_dword & ~mask) | (src_dword & mask);
 					space.write_dword(dst_addr, dst_dword);
@@ -646,7 +646,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 READ32_MEMBER( magictg_state::f0_r )
 {
 	int ch;
-	UINT32 val = 0;
+	uint32_t val = 0;
 	offset *= 4;
 
 	ch = ((offset >> 2) & 3) - 1;
@@ -731,7 +731,7 @@ READ32_MEMBER( magictg_state::adsp_status_r )
 
 READ16_MEMBER( magictg_state::adsp_control_r )
 {
-	UINT16 res = 0;
+	uint16_t res = 0;
 
 	switch (offset)
 	{
@@ -766,13 +766,13 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 
 			if (data > 0)
 			{
-				UINT8* adsp_rom = (UINT8*)memregion("adsp")->base();
+				uint8_t* adsp_rom = (uint8_t*)memregion("adsp")->base();
 
-				UINT32 page = (m_adsp_regs.bdma_control >> 8) & 0xff;
-				UINT32 dir = (m_adsp_regs.bdma_control >> 2) & 1;
-				UINT32 type = m_adsp_regs.bdma_control & 3;
+				uint32_t page = (m_adsp_regs.bdma_control >> 8) & 0xff;
+				uint32_t dir = (m_adsp_regs.bdma_control >> 2) & 1;
+				uint32_t type = m_adsp_regs.bdma_control & 3;
 
-				UINT32 src_addr = (page << 14) | m_adsp_regs.bdma_external_addr;
+				uint32_t src_addr = (page << 14) | m_adsp_regs.bdma_external_addr;
 
 				address_space &addr_space = m_adsp->space((type == 0) ? AS_PROGRAM : AS_DATA);
 
@@ -782,7 +782,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 					{
 						if (type == 0)
 						{
-							UINT32 src_word =(adsp_rom[src_addr + 0] << 16) |
+							uint32_t src_word =(adsp_rom[src_addr + 0] << 16) |
 												(adsp_rom[src_addr + 1] << 8) |
 												(adsp_rom[src_addr + 2]);
 
@@ -793,7 +793,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 						}
 						else if (type == 1)
 						{
-							UINT32 src_word =(adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
+							uint32_t src_word =(adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
 
 							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 2, src_word);
 

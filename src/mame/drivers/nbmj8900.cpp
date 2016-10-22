@@ -36,7 +36,7 @@ TODO:
 DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 {
 #if 0
-	UINT8 *prot = memregion("protdata")->base();
+	uint8_t *prot = memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -65,7 +65,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 {
 #if 0
-	UINT8 *prot = memregion("protdata")->base();
+	uint8_t *prot = memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the

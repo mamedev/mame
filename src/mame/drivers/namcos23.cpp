@@ -1303,9 +1303,9 @@ struct namcos23_render_entry
 	{
 		struct
 		{
-			UINT16 model;
-			INT16 m[9];
-			INT32 v[3];
+			uint16_t model;
+			int16_t m[9];
+			int32_t v[3];
 			float scaling;
 		} model;
 	};
@@ -1316,7 +1316,7 @@ struct namcos23_render_data
 	running_machine *machine;
 	const pen_t *pens;
 	bitmap_rgb32 *bitmap;
-	UINT32 (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
+	uint32_t (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
 };
 
 class namcos23_state;
@@ -1326,7 +1326,7 @@ class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, PO
 public:
 	namcos23_renderer(namcos23_state &state);
 	void render_flush(bitmap_rgb32& bitmap);
-	void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+	void render_scanline(int32_t scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
 	float* zBuffer() { return m_zBuffer; }
 
 private:
@@ -1348,32 +1348,32 @@ struct namcos23_poly_entry
 
 struct c417_t
 {
-	UINT16 ram[0x10000];
-	UINT16 adr;
-	UINT32 pointrom_adr;
+	uint16_t ram[0x10000];
+	uint16_t adr;
+	uint32_t pointrom_adr;
 };
 
 struct c412_t
 {
-	UINT16 sdram_a[0x100000]; // Framebuffers, probably
-	UINT16 sdram_b[0x100000];
-	UINT16 sram[0x20000];     // Ram-based tiles for rendering
-	UINT16 pczram[0x200];     // Ram-based tilemap for rendering, or something else
-	UINT32 adr;
-	UINT16 status_c;
+	uint16_t sdram_a[0x100000]; // Framebuffers, probably
+	uint16_t sdram_b[0x100000];
+	uint16_t sram[0x20000];     // Ram-based tiles for rendering
+	uint16_t pczram[0x200];     // Ram-based tilemap for rendering, or something else
+	uint32_t adr;
+	uint16_t status_c;
 };
 
 struct c421_t
 {
-	UINT16 dram_a[0x40000];
-	UINT16 dram_b[0x40000];
-	UINT16 sram[0x8000];
-	UINT32 adr;
+	uint16_t dram_a[0x40000];
+	uint16_t dram_b[0x40000];
+	uint16_t sram[0x8000];
+	uint32_t adr;
 };
 
 struct c422_t
 {
-	INT16 regs[0x10];
+	int16_t regs[0x10];
 };
 
 struct c361_t
@@ -1385,8 +1385,8 @@ struct c361_t
 struct c404_t
 {
 	rgb_t bgcolor;
-	UINT16 palbase;
-	UINT8 layer;
+	uint16_t palbase;
+	uint8_t layer;
 };
 
 struct render_t
@@ -1436,14 +1436,14 @@ public:
 	optional_device<h83334_device> m_iocpu;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_shared_ram;
-	required_shared_ptr<UINT32> m_gammaram;
-	required_shared_ptr<UINT32> m_charram;
-	required_shared_ptr<UINT32> m_textram;
-	optional_shared_ptr<UINT32> m_czattr;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_shared_ram;
+	required_shared_ptr<uint32_t> m_gammaram;
+	required_shared_ptr<uint32_t> m_charram;
+	required_shared_ptr<uint32_t> m_textram;
+	optional_shared_ptr<uint32_t> m_czattr;
 	optional_device<cpu_device> m_gmen_sh2;
-	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
+	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
 	optional_ioport m_lighty;
@@ -1451,7 +1451,7 @@ public:
 	required_ioport m_p2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_ioport_array<4> m_adc_ports;
 
 	c404_t m_c404;
@@ -1463,22 +1463,22 @@ public:
 	render_t m_render;
 
 	tilemap_t *m_bgtilemap;
-	UINT8 m_jvssense;
-	INT32 m_has_jvsio;
-	UINT32 m_main_irqcause;
+	uint8_t m_jvssense;
+	int32_t m_has_jvsio;
+	uint32_t m_main_irqcause;
 	bool m_ctl_vbl_active;
-	UINT8 m_ctl_led;
-	UINT16 m_ctl_inp_buffer[2];
+	uint8_t m_ctl_led;
+	uint16_t m_ctl_inp_buffer[2];
 	bool m_subcpu_running;
-	UINT32 m_c435_address;
-	UINT32 m_c435_size;
-	const UINT32 *m_ptrom;
-	const UINT16 *m_tmlrom;
-	const UINT8 *m_tmhrom;
-	const UINT8 *m_texrom;
-	UINT32 m_tileid_mask;
-	UINT32 m_tile_mask;
-	UINT32 m_ptrom_limit;
+	uint32_t m_c435_address;
+	uint32_t m_c435_size;
+	const uint32_t *m_ptrom;
+	const uint16_t *m_tmlrom;
+	const uint8_t *m_tmhrom;
+	const uint8_t *m_texrom;
+	uint32_t m_tileid_mask;
+	uint32_t m_tile_mask;
+	uint32_t m_ptrom_limit;
 
 	int m_vblank_count;
 
@@ -1490,21 +1490,21 @@ public:
 // Matrices are stored in signed 2.14 fixed point
 // Vectors are stored in signed 10.14 fixed point
 
-	INT16 m_matrices[256][9];
-	INT32 m_vectors[256][3];
-	INT32 m_light_vector[3];
-	UINT16 m_scaling;
-	INT32 m_spv[3];
-	INT16 m_spm[3];
+	int16_t m_matrices[256][9];
+	int32_t m_vectors[256][3];
+	int32_t m_light_vector[3];
+	uint16_t m_scaling;
+	int32_t m_spv[3];
+	int16_t m_spm[3];
 
-	UINT16 m_c435_buffer[256];
+	uint16_t m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
-	UINT8 m_sub_porta;
-	UINT8 m_sub_portb;
-	UINT8 m_tssio_port_4;
+	uint8_t m_sub_porta;
+	uint8_t m_sub_portb;
+	uint8_t m_tssio_port_4;
 
-	void update_main_interrupts(UINT32 cause);
+	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
 	DECLARE_WRITE32_MEMBER(textram_w);
@@ -1559,23 +1559,23 @@ public:
 	DECLARE_MACHINE_RESET(gmen);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
 	void sub_irq(screen_device &screen, bool vblank_state);
-	UINT8 nthbyte(const UINT32 *pSource, int offs);
-	UINT16 nthword(const UINT32 *pSource, int offs);
-	inline INT32 u32_to_s24(UINT32 v);
-	inline INT32 u32_to_s10(UINT32 v);
-	float f24_to_f32(UINT32 v);
+	uint8_t nthbyte(const uint32_t *pSource, int offs);
+	uint16_t nthword(const uint32_t *pSource, int offs);
+	inline int32_t u32_to_s24(uint32_t v);
+	inline int32_t u32_to_s10(uint32_t v);
+	float f24_to_f32(uint32_t v);
 
-	INT32 *c435_getv(UINT16 id);
-	INT16 *c435_getm(UINT16 id);
+	int32_t *c435_getv(uint16_t id);
+	int16_t *c435_getm(uint16_t id);
 
-	void c435_state_set_interrupt(const UINT16 *param);
-	void c435_state_set_projection_matrix_line(const UINT16 *param);
-	void c435_state_set(UINT16 type, const UINT16 *param);
-	int c435_get_state_entry_size(UINT16 type);
+	void c435_state_set_interrupt(const uint16_t *param);
+	void c435_state_set_projection_matrix_line(const uint16_t *param);
+	void c435_state_set(uint16_t type, const uint16_t *param);
+	int c435_get_state_entry_size(uint16_t type);
 
 	void c435_matrix_matrix_mul();
 	void c435_matrix_set();
@@ -1586,24 +1586,24 @@ public:
 	void c435_render();
 	void c435_flush();
 
-	void c435_pio_w(UINT16 data);
-	void c435_dma(address_space &space, UINT32 adr, UINT32 size);
+	void c435_pio_w(uint16_t data);
+	void c435_dma(address_space &space, uint32_t adr, uint32_t size);
 
-	void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv);
-	void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z);
+	void render_apply_transform(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, poly_vertex &pv);
+	void render_apply_matrot(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, int32_t &x, int32_t &y, int32_t &z);
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
 };
 
 
-UINT8 namcos23_state::nthbyte(const UINT32 *pSource, int offs)
+uint8_t namcos23_state::nthbyte(const uint32_t *pSource, int offs)
 {
 	pSource += offs/4;
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
+uint16_t namcos23_state::nthword(const uint32_t *pSource, int offs)
 {
 	pSource += offs/2;
 	return (pSource[0]<<((offs&1)*16))>>16;
@@ -1627,17 +1627,17 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state)
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
-inline INT32 namcos23_state::u32_to_s24(UINT32 v)
+inline int32_t namcos23_state::u32_to_s24(uint32_t v)
 {
 	return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
 }
 
-inline INT32 namcos23_state::u32_to_s10(UINT32 v)
+inline int32_t namcos23_state::u32_to_s10(uint32_t v)
 {
 	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
 }
 
-float namcos23_state::f24_to_f32(UINT32 v)
+float namcos23_state::f24_to_f32(uint32_t v)
 {
 	// 8 bits exponent, 16 mantissa
 	// mantissa is 16-bits signed, 2-complement
@@ -1648,9 +1648,9 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	if(!v)
 		return 0;
 
-	UINT32 r = v & 0x8000 ? 0x80000000 : 0;
-	UINT16 m = r ? -v : v;
-	UINT8 e = (v >> 16) + 0x60;
+	uint32_t r = v & 0x8000 ? 0x80000000 : 0;
+	uint16_t m = r ? -v : v;
+	uint8_t e = (v >> 16) + 0x60;
 	while(!(m & 0x8000)) {
 		m <<= 1;
 		e--;
@@ -1660,16 +1660,16 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	return *(float *)&r;
 }
 
-static inline UINT8 light(UINT8 c, float l)
+static inline uint8_t light(uint8_t c, float l)
 {
 	if(l < 1)
 		l = l*c;
 	else
 		l = 255 - (255-c)/l;
-	return UINT8(l);
+	return uint8_t(l);
 }
 
-INT32 *namcos23_state::c435_getv(UINT16 id)
+int32_t *namcos23_state::c435_getv(uint16_t id)
 {
 	if(id == 0x8000)
 		return m_light_vector;
@@ -1680,7 +1680,7 @@ INT32 *namcos23_state::c435_getv(UINT16 id)
 	return m_vectors[id];
 }
 
-INT16 *namcos23_state::c435_getm(UINT16 id)
+int16_t *namcos23_state::c435_getm(uint16_t id)
 {
 	if(id >= 0x100) {
 		memset(m_spm, 0, sizeof(m_spm));
@@ -1689,7 +1689,7 @@ INT16 *namcos23_state::c435_getm(UINT16 id)
 	return m_matrices[id];
 }
 
-void namcos23_state::c435_state_set_interrupt(const UINT16 *param)
+void namcos23_state::c435_state_set_interrupt(const uint16_t *param)
 {
 	if(param[0] & 1)
 		update_main_interrupts(m_main_irqcause | MAIN_C435_IRQ);
@@ -1697,7 +1697,7 @@ void namcos23_state::c435_state_set_interrupt(const UINT16 *param)
 		update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
 }
 
-void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
+void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param)
 {
 	// timecrs2:
 	//   sx = 640/2, sy = 480/2, t = tan(fov/2) (fov=45 degrees)
@@ -1714,7 +1714,7 @@ void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
 	logerror(buf);
 }
 
-void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
+void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 {
 	switch(type) {
 	case 0x0001: c435_state_set_interrupt(param); break;
@@ -1747,7 +1747,7 @@ WRITE16_MEMBER(namcos23_state::c435_state_pio_w)
 	m_c435_buffer_pos = 0;
 }
 
-int namcos23_state::c435_get_state_entry_size(UINT16 type)
+int namcos23_state::c435_get_state_entry_size(uint16_t type)
 {
 	switch(type) {
 	case 0x0001: return 1;
@@ -1774,19 +1774,19 @@ void namcos23_state::c435_matrix_matrix_mul() // 0.0
 	if(m_c435_buffer[3] != 0xffff)
 		logerror("WARNING: c435_matrix_matrix_mul with +2=%04x\n", m_c435_buffer[3]);
 
-	INT16 *t        = c435_getm(m_c435_buffer[1]);
-	const INT16 *m2 = c435_getm(m_c435_buffer[2]);
-	const INT16 *m1 = c435_getm(m_c435_buffer[4]);
+	int16_t *t        = c435_getm(m_c435_buffer[1]);
+	const int16_t *m2 = c435_getm(m_c435_buffer[2]);
+	const int16_t *m1 = c435_getm(m_c435_buffer[4]);
 
-	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[1] + m1[2]*m2[2]) >> 14);
-	t[1] = INT16((m1[0]*m2[3] + m1[1]*m2[4] + m1[2]*m2[5]) >> 14);
-	t[2] = INT16((m1[0]*m2[6] + m1[1]*m2[7] + m1[2]*m2[8]) >> 14);
-	t[3] = INT16((m1[3]*m2[0] + m1[4]*m2[1] + m1[5]*m2[2]) >> 14);
-	t[4] = INT16((m1[3]*m2[3] + m1[4]*m2[4] + m1[5]*m2[5]) >> 14);
-	t[5] = INT16((m1[3]*m2[6] + m1[4]*m2[7] + m1[5]*m2[8]) >> 14);
-	t[6] = INT16((m1[6]*m2[0] + m1[7]*m2[1] + m1[8]*m2[2]) >> 14);
-	t[7] = INT16((m1[6]*m2[3] + m1[7]*m2[4] + m1[8]*m2[5]) >> 14);
-	t[8] = INT16((m1[6]*m2[6] + m1[7]*m2[7] + m1[8]*m2[8]) >> 14);
+	t[0] = int16_t((m1[0]*m2[0] + m1[1]*m2[1] + m1[2]*m2[2]) >> 14);
+	t[1] = int16_t((m1[0]*m2[3] + m1[1]*m2[4] + m1[2]*m2[5]) >> 14);
+	t[2] = int16_t((m1[0]*m2[6] + m1[1]*m2[7] + m1[2]*m2[8]) >> 14);
+	t[3] = int16_t((m1[3]*m2[0] + m1[4]*m2[1] + m1[5]*m2[2]) >> 14);
+	t[4] = int16_t((m1[3]*m2[3] + m1[4]*m2[4] + m1[5]*m2[5]) >> 14);
+	t[5] = int16_t((m1[3]*m2[6] + m1[4]*m2[7] + m1[5]*m2[8]) >> 14);
+	t[6] = int16_t((m1[6]*m2[0] + m1[7]*m2[1] + m1[8]*m2[2]) >> 14);
+	t[7] = int16_t((m1[6]*m2[3] + m1[7]*m2[4] + m1[8]*m2[5]) >> 14);
+	t[8] = int16_t((m1[6]*m2[6] + m1[7]*m2[7] + m1[8]*m2[8]) >> 14);
 }
 
 void namcos23_state::c435_matrix_vector_mul() // 0.1
@@ -1801,23 +1801,23 @@ void namcos23_state::c435_matrix_vector_mul() // 0.1
 
 
 	if(m_c435_buffer[3] != 0xffff) {
-		INT32 *t        = c435_getv(m_c435_buffer[1]);
-		const INT16 *m  = c435_getm(m_c435_buffer[2]);
-		const INT32 *vt = c435_getv(m_c435_buffer[3]);
-		const INT32 *v  = c435_getv(m_c435_buffer[4]);
+		int32_t *t        = c435_getv(m_c435_buffer[1]);
+		const int16_t *m  = c435_getm(m_c435_buffer[2]);
+		const int32_t *vt = c435_getv(m_c435_buffer[3]);
+		const int32_t *v  = c435_getv(m_c435_buffer[4]);
 
-		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14) + vt[0];
-		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14) + vt[1];
-		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14) + vt[2];
+		t[0] = int32_t((m[0]*int64_t(v[0]) + m[1]*int64_t(v[1]) + m[2]*int64_t(v[2])) >> 14) + vt[0];
+		t[1] = int32_t((m[3]*int64_t(v[0]) + m[4]*int64_t(v[1]) + m[5]*int64_t(v[2])) >> 14) + vt[1];
+		t[2] = int32_t((m[6]*int64_t(v[0]) + m[7]*int64_t(v[1]) + m[8]*int64_t(v[2])) >> 14) + vt[2];
 
 	} else {
-		INT32 *t       = c435_getv(m_c435_buffer[1]);
-		const INT16 *m = c435_getm(m_c435_buffer[2]);
-		const INT32 *v = c435_getv(m_c435_buffer[4]);
+		int32_t *t       = c435_getv(m_c435_buffer[1]);
+		const int16_t *m = c435_getm(m_c435_buffer[2]);
+		const int32_t *v = c435_getv(m_c435_buffer[4]);
 
-		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
-		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
-		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+		t[0] = int32_t((m[0]*int64_t(v[0]) + m[1]*int64_t(v[1]) + m[2]*int64_t(v[2])) >> 14);
+		t[1] = int32_t((m[3]*int64_t(v[0]) + m[4]*int64_t(v[1]) + m[5]*int64_t(v[2])) >> 14);
+		t[2] = int32_t((m[6]*int64_t(v[0]) + m[7]*int64_t(v[1]) + m[8]*int64_t(v[2])) >> 14);
 	}
 }
 
@@ -1831,7 +1831,7 @@ void namcos23_state::c435_matrix_set() // 0.4
 	if(m_c435_buffer[0] != 0x004a)
 		logerror("WARNING: c435_matrix_set header %04x\n", m_c435_buffer[0]);
 
-	INT16 *t = c435_getm(m_c435_buffer[1]);
+	int16_t *t = c435_getm(m_c435_buffer[1]);
 	for(int i=0; i<9; i++)
 		t[i] = m_c435_buffer[i+2];
 }
@@ -1845,7 +1845,7 @@ void namcos23_state::c435_vector_set() // 0.5
 	if(m_c435_buffer[0] != 0x057)
 		logerror("WARNING: c435_vector_set header %04x\n", m_c435_buffer[0]);
 
-	INT32 *t = c435_getv(m_c435_buffer[1]);
+	int32_t *t = c435_getv(m_c435_buffer[1]);
 	for(int i=0; i<3; i++)
 		t[i] = u32_to_s24((m_c435_buffer[2*i+2] << 16) | m_c435_buffer[2*i+3]);
 }
@@ -1893,8 +1893,8 @@ void namcos23_state::c435_render() // 8
 	}
 
 	// Vector and matrix may be inverted
-	const INT16 *m = c435_getm(m_c435_buffer[2]);
-	const INT32 *v = c435_getv(m_c435_buffer[3]);
+	const int16_t *m = c435_getm(m_c435_buffer[2]);
+	const int32_t *v = c435_getv(m_c435_buffer[3]);
 
 	namcos23_render_entry *re = render.entries[render.cur] + render.count[render.cur];
 	re->type = MODEL;
@@ -1930,10 +1930,10 @@ void namcos23_state::c435_flush() // c
 }
 
 
-void namcos23_state::c435_pio_w(UINT16 data)
+void namcos23_state::c435_pio_w(uint16_t data)
 {
 	m_c435_buffer[m_c435_buffer_pos++] = data;
-	UINT16 h = m_c435_buffer[0];
+	uint16_t h = m_c435_buffer[0];
 	int psize;
 	if((h & 0x4000) == 0x4000)
 		psize = h & 0xff;
@@ -1979,7 +1979,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 	m_c435_buffer_pos = 0;
 }
 
-void namcos23_state::c435_dma(address_space &space, UINT32 adr, UINT32 size)
+void namcos23_state::c435_dma(address_space &space, uint32_t adr, uint32_t size)
 {
 	adr &= 0x1fffffff;
 
@@ -2020,7 +2020,7 @@ WRITE32_MEMBER(namcos23_state::c435_w)
 
 
 
-void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid)
+void namcos23_renderer::render_scanline(int32_t scanline, const extent_t& extent, const namcos23_render_data& object, int threadid)
 {
 	const namcos23_render_data& rd = object;
 
@@ -2033,11 +2033,11 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	float dv = extent.param[2].dpdx;
 	float dl = extent.param[3].dpdx;
 
-	UINT32 *img = &object.bitmap->pix32(scanline, extent.startx);
+	uint32_t *img = &object.bitmap->pix32(scanline, extent.startx);
 
 	for(int x = extent.startx; x < extent.stopx; x++) {
 		float z = w ? 1/w : 0;
-		UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+		uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -2049,14 +2049,14 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	}
 }
 
-void namcos23_state::render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
+void namcos23_state::render_apply_transform(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[1]*INT64(yi) + re->model.m[2]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0f;
-	pv.y =    (INT32((re->model.m[3]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[5]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0f;
-	pv.p[0] = (INT32((re->model.m[6]*INT64(xi) + re->model.m[7]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0f;
+	pv.x =    (int32_t((re->model.m[0]*int64_t(xi) + re->model.m[1]*int64_t(yi) + re->model.m[2]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0f;
+	pv.y =    (int32_t((re->model.m[3]*int64_t(xi) + re->model.m[4]*int64_t(yi) + re->model.m[5]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0f;
+	pv.p[0] = (int32_t((re->model.m[6]*int64_t(xi) + re->model.m[7]*int64_t(yi) + re->model.m[8]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0f;
 }
 
-void namcos23_state::render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
+void namcos23_state::render_apply_matrot(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, int32_t &x, int32_t &y, int32_t &z)
 {
 	x = (re->model.m[0]*xi + re->model.m[3]*yi + re->model.m[6]*zi) >> 14;
 	y = (re->model.m[1]*xi + re->model.m[4]*yi + re->model.m[7]*zi) >> 14;
@@ -2081,22 +2081,22 @@ void namcos23_state::render_project(poly_vertex &pv)
 	pv.p[0] = 1.0f / pv.p[0];
 }
 
-static UINT32 render_texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
+static uint32_t render_texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	UINT32 xx = UINT32(x);
-	UINT32 yy = UINT32(y);
-	UINT32 tileid = ((xx >> 4) & 0xff) | ((yy << 4) & state->m_tileid_mask);
-	UINT8 attr = state->m_tmhrom[tileid >> 1];
+	uint32_t xx = uint32_t(x);
+	uint32_t yy = uint32_t(y);
+	uint32_t tileid = ((xx >> 4) & 0xff) | ((yy << 4) & state->m_tileid_mask);
+	uint8_t attr = state->m_tmhrom[tileid >> 1];
 	if(tileid & 1)
 		attr &= 15;
 	else
 		attr >>= 4;
-	UINT32 tile = (state->m_tmlrom[tileid] | (attr << 16)) & state->m_tile_mask;
+	uint32_t tile = (state->m_tmlrom[tileid] | (attr << 16)) & state->m_tile_mask;
 
 	// Probably swapx/swapy to add on bits 2-3 of attr
 	// Bits used by motoxgo at least
-	UINT8 color = state->m_texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
+	uint8_t color = state->m_texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
 	return pens[color];
 }
 
@@ -2111,7 +2111,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 	if(re->model.model == 3486)
 		return;
 
-	UINT32 adr = m_ptrom[re->model.model];
+	uint32_t adr = m_ptrom[re->model.model];
 	if(adr >= m_ptrom_limit) {
 		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
 		return;
@@ -2120,11 +2120,11 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 	while(adr < m_ptrom_limit) {
 		poly_vertex pv[15];
 
-		UINT32 type = m_ptrom[adr++];
-		UINT32 h    = m_ptrom[adr++];
+		uint32_t type = m_ptrom[adr++];
+		uint32_t h    = m_ptrom[adr++];
 
 		float tbase = (type >> 24) << 12;
-		UINT8 color = (h >> 24) & 0x7f;
+		uint8_t color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;
 		int ne = (type >> 8) & 15;
 
@@ -2132,8 +2132,8 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		if(type & 0x00001000)
 			adr++;
 
-		UINT32 light = 0;
-		UINT32 extptr = 0;
+		uint32_t light = 0;
+		uint32_t extptr = 0;
 
 		if(lmode == 3) {
 			extptr = adr;
@@ -2146,9 +2146,9 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		float maxz = FLT_MIN;
 
 		for(int i=0; i<ne; i++) {
-			UINT32 v1 = m_ptrom[adr++];
-			UINT32 v2 = m_ptrom[adr++];
-			UINT32 v3 = m_ptrom[adr++];
+			uint32_t v1 = m_ptrom[adr++];
+			uint32_t v2 = m_ptrom[adr++];
+			uint32_t v3 = m_ptrom[adr++];
 
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
@@ -2170,11 +2170,11 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 				pv[i].p[3] = 1.0;
 				break;
 			case 3: {
-				UINT32 norm = m_ptrom[extptr++];
-				INT32 nx = u32_to_s10(norm >> 20);
-				INT32 ny = u32_to_s10(norm >> 10);
-				INT32 nz = u32_to_s10(norm);
-				INT32 nrx, nry, nrz;
+				uint32_t norm = m_ptrom[extptr++];
+				int32_t nx = u32_to_s10(norm >> 20);
+				int32_t ny = u32_to_s10(norm >> 10);
+				int32_t nz = u32_to_s10(norm);
+				int32_t nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
 				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0f;
 				if(lsi < 0)
@@ -2353,7 +2353,7 @@ WRITE32_MEMBER(namcos23_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 {
-	UINT16 data = nthword( m_textram,tile_index );
+	uint16_t data = nthword( m_textram,tile_index );
 	/**
 	* xxxx.----.----.---- palette select
 	* ----.xx--.----.---- flip
@@ -2381,7 +2381,7 @@ WRITE32_MEMBER(namcos23_state::textchar_w)
 
 VIDEO_START_MEMBER(namcos23_state,s23)
 {
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
@@ -2389,7 +2389,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 }
 
 
-UINT32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_mixer();
 	bitmap.fill(m_c404.bgcolor, cliprect);
@@ -2418,9 +2418,9 @@ UINT32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 // Interrupts
 
-void namcos23_state::update_main_interrupts(UINT32 cause)
+void namcos23_state::update_main_interrupts(uint32_t cause)
 {
-	UINT32 changed = cause ^ m_main_irqcause;
+	uint32_t changed = cause ^ m_main_irqcause;
 	m_main_irqcause = cause;
 
 	// level 2: vblank
@@ -2806,7 +2806,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 	case 1:
 		return 0x0000 | ioport("DSW")->read() | ((m_main_irqcause & MAIN_C361_IRQ) ? 0x400 : 0);
 	case 2: case 3: {
-		UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+		uint16_t res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		m_ctl_inp_buffer[offset-2] = (m_ctl_inp_buffer[offset-2] << 1) | 1;
 		return res;
 	}
@@ -2974,7 +2974,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 {
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
+	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
 	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
 	if(!m_has_jvsio) {
@@ -2988,7 +2988,7 @@ WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 
 READ16_MEMBER(namcos23_state::sharedram_sub_r)
 {
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
+	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
 	return shared16[BYTE_XOR_BE(offset)];
 }
@@ -3120,7 +3120,7 @@ WRITE16_MEMBER(namcos23_state::iob_p4_w)
 READ16_MEMBER(namcos23_state::iob_p6_r)
 {
 	// d4 is service button
-	UINT8 sb = (ioport("SERVICE")->read() & 1) << 4;
+	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
 	// other bits: unknown
 
 	return sb | 0;
@@ -3163,8 +3163,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos23_state::iob_gun_r)
 {
-	UINT16 xpos = m_lightx->read();
-	UINT16 ypos = m_lighty->read();
+	uint16_t xpos = m_lightx->read();
+	uint16_t ypos = m_lighty->read();
 	// ypos is not completely understood yet, there should be a difference between case 1/4 and 2/5
 
 	switch(offset) {
@@ -3442,7 +3442,7 @@ void namcos23_state::machine_start()
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
-	m_maincpu->add_fastram(0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(memshare("mainram")->ptr()));
+	m_maincpu->add_fastram(0, m_mainram.bytes()-1, FALSE, reinterpret_cast<uint32_t *>(memshare("mainram")->ptr()));
 }
 
 
@@ -3465,8 +3465,8 @@ MACHINE_RESET_MEMBER(namcos23_state,gmen)
 
 DRIVER_INIT_MEMBER(namcos23_state,s23)
 {
-	m_ptrom  = (const UINT32 *)memregion("pointrom")->base();
-	m_tmlrom = (const UINT16 *)memregion("textilemapl")->base();
+	m_ptrom  = (const uint32_t *)memregion("pointrom")->base();
+	m_tmlrom = (const uint16_t *)memregion("textilemapl")->base();
 	m_tmhrom = memregion("textilemaph")->base();
 	m_texrom = memregion("textile")->base();
 

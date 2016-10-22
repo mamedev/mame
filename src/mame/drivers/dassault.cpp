@@ -1048,9 +1048,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dassault_state,dassault)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	std::vector<UINT8> tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
@@ -1063,9 +1063,9 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 
 DRIVER_INIT_MEMBER(dassault_state,thndzone)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	std::vector<UINT8> tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx

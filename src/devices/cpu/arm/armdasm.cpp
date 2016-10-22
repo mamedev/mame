@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "arm.h"
 
-static char *WriteImmediateOperand( char *pBuf, UINT32 opcode )
+static char *WriteImmediateOperand( char *pBuf, uint32_t opcode )
 {
 	/* rrrrbbbbbbbb */
-	UINT32 imm;
+	uint32_t imm;
 	int r;
 
 	imm = opcode&0xff;
@@ -22,7 +22,7 @@ static char *WriteImmediateOperand( char *pBuf, UINT32 opcode )
 	return pBuf;
 }
 
-static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0, int printOp1, int printOp2 )
+static char *WriteDataProcessingOperand( char *pBuf, uint32_t opcode, int printOp0, int printOp1, int printOp2 )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -55,7 +55,7 @@ static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0
 	return pBuf;
 }
 
-static char *WriteRegisterOperand1( char *pBuf, UINT32 opcode )
+static char *WriteRegisterOperand1( char *pBuf, uint32_t opcode )
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -80,7 +80,7 @@ static char *WriteRegisterOperand1( char *pBuf, UINT32 opcode )
 } /* WriteRegisterOperand */
 
 
-static char *WriteBranchAddress( char *pBuf, UINT32 pc, UINT32 opcode )
+static char *WriteBranchAddress( char *pBuf, uint32_t pc, uint32_t opcode )
 {
 	opcode &= 0x00ffffff;
 	if( opcode&0x00800000 )
@@ -102,7 +102,7 @@ static char *WritePadding( char *pBuf, const char *pBuf0 )
 	return pBuf;
 }
 
-static UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
+static uint32_t arm_disasm( char *pBuf, uint32_t pc, uint32_t opcode )
 {
 	const char *pBuf0;
 
@@ -121,7 +121,7 @@ static UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		"ORR","MOV","BIC","MVN"
 	};
 	const char *pConditionCode;
-	UINT32 dasmflags = 0;
+	uint32_t dasmflags = 0;
 
 	pConditionCode= pConditionCodeTable[opcode>>28];
 	pBuf0 = pBuf;
@@ -397,12 +397,12 @@ static UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 
 CPU_DISASSEMBLE( arm )
 {
-	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	uint32_t opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	return 4 | arm_disasm(buffer, pc, opcode);
 }
 
 CPU_DISASSEMBLE( arm_be )
 {
-	UINT32 opcode = oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24);
+	uint32_t opcode = oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24);
 	return 4 | arm_disasm(buffer, pc, opcode);
 }

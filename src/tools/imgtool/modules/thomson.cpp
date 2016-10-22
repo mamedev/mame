@@ -122,11 +122,11 @@
 struct thom_floppy {
 	imgtool::stream *stream;
 
-	UINT16 sector_size;   /* 128 or 256 */
-	UINT16 sectuse_size;  /* bytes used in sector: 128 or 255 */
-	UINT8  tracks;        /* 25, 40, or 80 */
-	UINT8  heads;         /* 1 or 2 */
-	UINT8  data[MAXSIZE]; /* image data */
+	uint16_t sector_size;   /* 128 or 256 */
+	uint16_t sectuse_size;  /* bytes used in sector: 128 or 255 */
+	uint8_t  tracks;        /* 25, 40, or 80 */
+	uint8_t  heads;         /* 1 or 2 */
+	uint8_t  data[MAXSIZE]; /* image data */
 
 	int    modified;      /* data need to be copied back to image file */
 
@@ -149,21 +149,21 @@ struct thom_dirent {
 	char   name[9];
 	char   ext[4];
 	char   comment[9];
-	UINT8  ftype;
-	UINT8  format;
-	UINT8  firstblock;
-	UINT16 lastsectsize;
-	UINT8  day;
-	UINT8  month;
-	UINT8  year;
+	uint8_t  ftype;
+	uint8_t  format;
+	uint8_t  firstblock;
+	uint16_t lastsectsize;
+	uint8_t  day;
+	uint8_t  month;
+	uint8_t  year;
 
 };
 
 
-static void thom_basic_get_info(const imgtool_class *clas, UINT32 param,
+static void thom_basic_get_info(const imgtool_class *clas, uint32_t param,
 				union imgtoolinfo *info);
 
-static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
+static uint8_t* thom_get_sector(thom_floppy* f, unsigned head,
 					unsigned track, unsigned sector);
 
 
@@ -298,15 +298,15 @@ static const char sap_header[]=
 	"\001SYSTEME D'ARCHIVAGE PUKALL S.A.P. "
 	"(c) Alexandre PUKALL Avril 1998";
 
-static const UINT16 sap_crc[] = {
+static const uint16_t sap_crc[] = {
 	0x0000, 0x1081, 0x2102, 0x3183,   0x4204, 0x5285, 0x6306, 0x7387,
 	0x8408, 0x9489, 0xa50a, 0xb58b,   0xc60c, 0xd68d, 0xe70e, 0xf78f,
 };
 
-static UINT16 thom_sap_crc( UINT8* data, int size )
+static uint16_t thom_sap_crc( uint8_t* data, int size )
 {
 	int i;
-	UINT16 crc = 0xffff, crc2;
+	uint16_t crc = 0xffff, crc2;
 	for ( i = 0; i < size; i++ ) {
 	crc2 = ( crc >> 4 ) ^ sap_crc[ ( crc ^ data[i] ) & 15 ];
 	crc = ( crc2 >> 4 ) ^ sap_crc[ ( crc2 ^ (data[i] >> 4) ) & 15 ];
@@ -317,7 +317,7 @@ static UINT16 thom_sap_crc( UINT8* data, int size )
 static imgtoolerr_t thom_open_sap(imgtool::image &img, imgtool::stream::ptr &&stream)
 {
 	thom_floppy* f = get_thom_floppy(img);
-	UINT8 buf[262];
+	uint8_t buf[262];
 
 	f->stream = stream.get();
 	f->modified = 0;
@@ -353,7 +353,7 @@ static imgtoolerr_t thom_open_sap(imgtool::image &img, imgtool::stream::ptr &&st
 	f->stream->seek(66, SEEK_SET);
 	while ( 1) {
 	int i, sector, track;
-	UINT16 crc;
+	uint16_t crc;
 
 	/* load sector */
 	if (f->stream->read(buf, 6 + f->sector_size ) < 6 + f->sector_size )
@@ -386,8 +386,8 @@ static void thom_close_sap(imgtool::image &img)
 
 	if ( f->modified ) {
 	int i, sector, track;
-	UINT8 buf[262];
-	UINT16 crc;
+	uint8_t buf[262];
+	uint16_t crc;
 
 	/* rewind */
 	f->stream->seek(0, SEEK_SET);
@@ -431,7 +431,7 @@ static void thom_close_sap(imgtool::image &img)
 
 /*********************** low-level functions *********************/
 
-static UINT8* thom_get_sector(thom_floppy* f, unsigned head,
+static uint8_t* thom_get_sector(thom_floppy* f, unsigned head,
 					unsigned track, unsigned sector)
 {
 	assert( head < f->heads);
@@ -459,7 +459,7 @@ static void thom_stringify(char* str)
 	char* s = str + strlen(str) - 1;
 	while ( s >= str && *s == ' ' ) { *s = 0; s--; }
 	for ( s = str; *s; s++ )
-	if ( (UINT8)*s == 0xff ) *s = 0;
+	if ( (uint8_t)*s == 0xff ) *s = 0;
 	else if ( *s < ' ' || *s >= 127 ) *s = '?';
 }
 
@@ -528,7 +528,7 @@ static void thom_make_time_now(thom_dirent* d)
 static void thom_get_dirent(thom_floppy* f, unsigned head,
 				unsigned n, thom_dirent* d)
 {
-	UINT8* base = thom_get_sector( f, head, 20, 3 ) + n * 32;
+	uint8_t* base = thom_get_sector( f, head, 20, 3 ) + n * 32;
 	memset( d, 0, sizeof(*d) );
 	d->index = n;
 	if ( n >= thom_max_dirent( f ) )
@@ -563,7 +563,7 @@ static void thom_get_dirent(thom_floppy* f, unsigned head,
 static void thom_set_dirent(thom_floppy* f, unsigned head,
 				unsigned n, thom_dirent* d)
 {
-	UINT8* base = thom_get_sector( f, head, 20, 3 ) + n * 32;
+	uint8_t* base = thom_get_sector( f, head, 20, 3 ) + n * 32;
 	if ( n >= thom_max_dirent( f ) ) return;
 	memset( base, 0, 32 );
 	if ( d->type == THOM_DIRENT_END ) base[ 0 ] = 0xff;
@@ -623,7 +623,7 @@ static int thom_find_free_dirent(thom_floppy* f, unsigned head, thom_dirent* d)
 /* returns the file size in bytes, or -1 if error */
 static int thom_get_file_size(thom_floppy* f, unsigned head, thom_dirent* d)
 {
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	int size = 0;
@@ -652,7 +652,7 @@ static int thom_get_file_size(thom_floppy* f, unsigned head, thom_dirent* d)
 /* number of blocks used by file */
 static int thom_get_file_blocks(thom_floppy* f, unsigned head, thom_dirent* d)
 {
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	int nb = 0;
@@ -677,7 +677,7 @@ static int thom_get_file_blocks(thom_floppy* f, unsigned head, thom_dirent* d)
 /* number of free blocks */
 static int thom_get_free_blocks(thom_floppy* f, unsigned head)
 {
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int i, nb = 0;
 	for ( i = 1; i <= nbblocks; i++ )
@@ -689,7 +689,7 @@ static int thom_get_free_blocks(thom_floppy* f, unsigned head)
 static void thom_get_file(thom_floppy* f, unsigned head,
 				thom_dirent* d, imgtool::stream &dst)
 {
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	if ( block >= nbblocks ) return;
@@ -704,7 +704,7 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 			int i;
 			for ( i = 0; i < 8; i++ )
 			{
-				UINT8* data = thom_get_sector( f, head, track, firstsect + i );
+				uint8_t* data = thom_get_sector( f, head, track, firstsect + i );
 				dst.write(data, f->sectuse_size);
 			}
 			block = fat[ block + 1 ];
@@ -713,7 +713,7 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 		{
 			/* last block in file */
 			int i;
-			UINT8* data;
+			uint8_t* data;
 			for ( i = 0; i < nextblock - 0xc1; i++ )
 			{
 				data = thom_get_sector( f, head, track, firstsect + i );
@@ -726,7 +726,7 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 		else
 		{
 			/* invalid, assume last block */
-			UINT8* data = thom_get_sector( f, head, track, firstsect );
+			uint8_t* data = thom_get_sector( f, head, track, firstsect );
 			dst.write(data, d->lastsectsize);
 			return;
 		}
@@ -736,7 +736,7 @@ static void thom_get_file(thom_floppy* f, unsigned head,
 
 static void thom_del_file(thom_floppy* f, unsigned head, thom_dirent* d)
 {
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block = d->firstblock;
 	if ( d->type != THOM_DIRENT_FILE ) return;
@@ -757,7 +757,7 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 				thom_dirent* d, imgtool::stream &src)
 {
 	int size = src.size();
-	UINT8* fat = thom_get_sector( f, head, 20, 2 );
+	uint8_t* fat = thom_get_sector( f, head, 20, 2 );
 	int nbblocks = thom_nb_blocks(f);
 	int block;
 
@@ -774,14 +774,14 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 	/* store data, full sectors */
 	for ( i = 0; i < 8 && size > f->sectuse_size; i++ ) {
-		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
+		uint8_t* dst = thom_get_sector( f, head, track, firstsect + i );
 		src.read(dst, f->sectuse_size);
 		size -= f->sectuse_size;
 	}
 
 	/* store data, last sector */
 	if ( i < 8 ) {
-		UINT8* dst = thom_get_sector( f, head, track, firstsect + i );
+		uint8_t* dst = thom_get_sector( f, head, track, firstsect + i );
 		src.read(dst, size);
 		fat[ block + 1 ] = 0xc1 + i;
 		d->lastsectsize = size;
@@ -808,8 +808,8 @@ static void thom_put_file(thom_floppy* f, unsigned head,
 
 /********************** module functions ***********************/
 
-static imgtoolerr_t thom_get_geometry(imgtool::image &img, UINT32* tracks,
-						UINT32* heads, UINT32* sectors)
+static imgtoolerr_t thom_get_geometry(imgtool::image &img, uint32_t* tracks,
+						uint32_t* heads, uint32_t* sectors)
 {
 	thom_floppy* f = get_thom_floppy(img);
 	if ( tracks ) *tracks = f->tracks;
@@ -818,8 +818,8 @@ static imgtoolerr_t thom_get_geometry(imgtool::image &img, UINT32* tracks,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_read_sector(imgtool::image &img, UINT32 track,
-						UINT32 head, UINT32 sector, std::vector<UINT8> &buffer)
+static imgtoolerr_t thom_read_sector(imgtool::image &img, uint32_t track,
+						uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer)
 {
 	thom_floppy* f = get_thom_floppy(img);
 	if ( head >= f->heads || sector < 1 || sector > 16 || track >= f->tracks )
@@ -833,8 +833,8 @@ static imgtoolerr_t thom_read_sector(imgtool::image &img, UINT32 track,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_write_sector(imgtool::image &img, UINT32 track,
-						UINT32 head, UINT32 sector,
+static imgtoolerr_t thom_write_sector(imgtool::image &img, uint32_t track,
+						uint32_t head, uint32_t sector,
 						const void *buf, size_t len, int ddam)
 {
 	thom_floppy* f = get_thom_floppy(img);
@@ -853,7 +853,7 @@ static imgtoolerr_t thom_write_sector(imgtool::image &img, UINT32 track,
 static void thom_info(imgtool::image &img, std::ostream &stream)
 {
 	thom_floppy* f = get_thom_floppy(img);
-	UINT8* base = thom_get_sector( f, 0, 20, 1 );
+	uint8_t* base = thom_get_sector( f, 0, 20, 1 );
 	char buf[9];
 	memcpy( buf, base, 8 );
 	buf[8] = 0;
@@ -875,7 +875,7 @@ static imgtoolerr_t thom_list_partitions(imgtool::image &img, std::vector<imgtoo
 }
 
 static imgtoolerr_t thom_open_partition(imgtool::partition &part,
-					UINT64 first_block, UINT64 block_count)
+					uint64_t first_block, uint64_t block_count)
 {
 	imgtool::image &img(part.image());
 	thom_floppy* f = get_thom_floppy(img);
@@ -931,7 +931,7 @@ static imgtoolerr_t thom_next_enum(imgtool::directory &enumeration, imgtool_dire
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_free_space(imgtool::partition &part, UINT64 *size)
+static imgtoolerr_t thom_free_space(imgtool::partition &part, uint64_t *size)
 {
 	int head = *( (int*) part.extra_bytes() );
 	imgtool::image &img(part.image());
@@ -1119,7 +1119,7 @@ static imgtoolerr_t thom_create(imgtool::image &img,
 {
 	thom_floppy* f = get_thom_floppy(img);
 	int i;
-	UINT8* buf;
+	uint8_t* buf;
 	const char* name;
 
 	f->stream = stream.get();
@@ -1273,11 +1273,11 @@ static const char *const thombas128[2][128] = {
 };
 
 /* tables for simple XOR encryption sieve */
-static const UINT8 crypt1[11] = {
+static const uint8_t crypt1[11] = {
 	0x80, 0x19, 0x56, 0xAA, 0x80, 0x76, 0x22, 0xF1,  0x82, 0x38, 0xAA
 };
 
-static const UINT8 crypt2[13] = {
+static const uint8_t crypt2[13] = {
 	0x86, 0x1E, 0xD7, 0xBA, 0x87, 0x99, 0x26, 0x64, 0x87, 0x23, 0x34, 0x58, 0x86
 };
 
@@ -1287,9 +1287,9 @@ static void thom_decrypt(imgtool::stream &out, imgtool::stream &in)
 	int i1 = 11, i2 = 13;
 	while ( 1 )
 	{
-		UINT8 b;
+		uint8_t b;
 		if ( in.read(&b, 1) < 1 ) break;
-		b = ( (UINT8)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
+		b = ( (uint8_t)(b - i2) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i1;
 		out.putc(b );
 		i1--; i2--;
 		if ( !i1 ) i1 = 11;
@@ -1303,9 +1303,9 @@ static void thom_encrypt(imgtool::stream &out, imgtool::stream &in)
 	int i1 = 11, i2 = 13;
 	while ( 1 )
 	{
-		UINT8 b;
+		uint8_t b;
 		if ( in.read(&b, 1) < 1 ) break;
-		b = ( (UINT8)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
+		b = ( (uint8_t)(b - i1) ^ crypt2[i2-1] ^ crypt1[i1-1] ) + i2;
 		out.putc(b );
 		i1--; i2--;
 		if ( !i1 ) i1 = 11;
@@ -1317,7 +1317,7 @@ static imgtoolerr_t thomcrypt_read_file(imgtool::partition &part,
 					const char *name,
 					const char *fork, imgtool::stream &dst)
 {
-	UINT8 buf[3];
+	uint8_t buf[3];
 	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
 	imgtoolerr_t err;
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
@@ -1353,7 +1353,7 @@ static imgtoolerr_t thomcrypt_write_file(imgtool::partition &part,
 						const char *fork, imgtool::stream &src,
 						util::option_resolution *opts)
 {
-	UINT8 buf[3];
+	uint8_t buf[3];
 
 	if ( src.read(buf, 3 ) < 3 || buf[0] == 0xfe )
 	{
@@ -1377,7 +1377,7 @@ static imgtoolerr_t thomcrypt_write_file(imgtool::partition &part,
 	}
 }
 
-void filter_thomcrypt_getinfo(UINT32 state, union filterinfo *info)
+void filter_thomcrypt_getinfo(uint32_t state, union filterinfo *info)
 {
 	switch(state) {
 	case FILTINFO_STR_NAME:
@@ -1404,7 +1404,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 {
 	imgtool::stream *org = imgtool::stream::open_mem( NULL, 0 );
 	imgtoolerr_t err;
-	UINT8 buf[4];
+	uint8_t buf[4];
 	int i;
 
 	if ( !org ) return IMGTOOLERR_OUTOFMEMORY;
@@ -1434,7 +1434,7 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 		/* process line */
 		for ( i = 0; i < linelength; i++ )
 		{
-			UINT8 c;
+			uint8_t c;
 			if ( org->read(&c, 1 ) < 1 ) break;
 			if ( c == 0 )
 			{
@@ -1500,7 +1500,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &part,
 	{                                   \
 	return thom_basic_write_file( part, name, fork, src, opts, short ); \
 	}                                   \
-	void filter_##short##_getinfo(UINT32 state, union filterinfo *info) \
+	void filter_##short##_getinfo(uint32_t state, union filterinfo *info) \
 	{                                   \
 	switch(state)                           \
 		{                                   \
@@ -1556,7 +1556,7 @@ OPTION_GUIDE_START( thom_writefile_optguide )
 OPTION_GUIDE_END
 
 static void thom_basic_get_info(const imgtool_class *clas,
-				UINT32 param,
+				uint32_t param,
 				union imgtoolinfo *info)
 {
 	switch ( param ) {
@@ -1616,7 +1616,7 @@ static void thom_basic_get_info(const imgtool_class *clas,
 }
 
 void thom_fd_basic_get_info(const imgtool_class *clas,
-				UINT32 param,
+				uint32_t param,
 				union imgtoolinfo *info)
 {
 	switch ( param ) {
@@ -1640,7 +1640,7 @@ void thom_fd_basic_get_info(const imgtool_class *clas,
 }
 
 void thom_qd_basic_get_info(const imgtool_class *clas,
-				UINT32 param,
+				uint32_t param,
 				union imgtoolinfo *info)
 {
 	switch ( param ) {
@@ -1664,7 +1664,7 @@ void thom_qd_basic_get_info(const imgtool_class *clas,
 }
 
 void thom_sap_basic_get_info(const imgtool_class *clas,
-					UINT32 param,
+					uint32_t param,
 					union imgtoolinfo *info)
 {
 	switch ( param ) {

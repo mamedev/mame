@@ -74,15 +74,15 @@ class newbrain_expansion_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	newbrain_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	newbrain_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~newbrain_expansion_slot_t() { }
 
 	// computer interface
-	UINT8 mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh);
-	void mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh);
+	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
+	void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
 
-	UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov);
-	void iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov);
+	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov);
+	void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov);
 
 protected:
 	// device-level overrides
@@ -104,12 +104,12 @@ public:
 	virtual ~device_newbrain_expansion_slot_interface() { }
 
 	// memory access
-	virtual UINT8 mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) { return data; };
-	virtual void mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) { };
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { return data; };
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) { };
 
 	// I/O access
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov) { return data; };
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov) { };
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov) { return data; };
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov) { };
 
 protected:
 	newbrain_expansion_slot_t *m_slot;

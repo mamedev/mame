@@ -33,28 +33,28 @@ public:
 			m_bgpalette(*this, "bgpalette")
 			{ }
 
-	required_shared_ptr<UINT8> m_bgvram;
+	required_shared_ptr<uint8_t> m_bgvram;
 	required_device<palette_device> m_bgpalette;
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
-	UINT32 screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 };
 
 
 /* Video Hardware */
 
-UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
-	const UINT8 *prom;
-	const UINT8 *prom_line;
-	UINT16 bg_offs;
+	const uint8_t *prom;
+	const uint8_t *prom_line;
+	uint16_t bg_offs;
 
 	/* Bubble Bobble doesn't have a real video RAM. All graphics (characters */
 	/* and sprites) are stored in the same memory region, and information on */
@@ -83,9 +83,9 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 &b
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
-		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
+		/* this is dword aligned so the uint32_t * cast shouldn't give problems */
 		/* on any architecture */
-		if (*(UINT32 *)(&m_objectram[offs]) == 0)
+		if (*(uint32_t *)(&m_objectram[offs]) == 0)
 			continue;
 
 		gfx_num = m_objectram[offs + 1];
@@ -286,7 +286,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const UINT32 bglayout_xoffset[256] =
+static const uint32_t bglayout_xoffset[256] =
 {
 		0*8,      1*8, 2048*8, 2049*8,    8*8,    9*8, 2056*8, 2057*8,
 		4*8,      5*8, 2052*8, 2053*8,   12*8,   13*8, 2060*8, 2061*8,
@@ -335,7 +335,7 @@ static const gfx_layout bglayout =
 	nullptr
 };
 
-static const UINT32 bglayout_xoffset_alt[256] =
+static const uint32_t bglayout_xoffset_alt[256] =
 {
 		(256*0+0)*8 , (256*0+1)*8 , (256*0+2)*8 , (256*0+3)*8 , (256*0+4)*8 , (256*0+5)*8 , (256*0+6)*8 , (256*0+7)*8,
 		(256*0+8)*8 , (256*0+9)*8 , (256*0+10)*8, (256*0+11)*8, (256*0+12)*8, (256*0+13)*8, (256*0+14)*8, (256*0+15)*8,
@@ -559,8 +559,8 @@ ROM_END
 
 void missb2_state::configure_banks()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *SLAVE = memregion("slave")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *SLAVE = memregion("slave")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 

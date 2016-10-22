@@ -31,7 +31,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sharp_unk128mbit_device> m_flash;
-	required_region_ptr<UINT16> m_rom_base;
+	required_region_ptr<uint16_t> m_rom_base;
 	required_ioport m_io_bit0;
 	required_ioport m_io_bit1;
 	required_ioport m_io_bit2;
@@ -45,42 +45,42 @@ public:
 	enum { HW1=1, HW2, HW3, HW4 };
 
 	// HW specifications
-	UINT8 m_hw_version;
+	uint8_t m_hw_version;
 	bool m_flash_mem;
-	UINT32 m_initial_pc;
+	uint32_t m_initial_pc;
 
 	// keyboard
-	UINT16 m_kb_mask;
-	UINT8 m_on_key;
+	uint16_t m_kb_mask;
+	uint8_t m_on_key;
 
 	// LCD
-	UINT8 m_lcd_on;
-	UINT32 m_lcd_base;
-	UINT16 m_lcd_width;
-	UINT16 m_lcd_height;
-	UINT16 m_lcd_contrast;
+	uint8_t m_lcd_on;
+	uint32_t m_lcd_base;
+	uint16_t m_lcd_width;
+	uint16_t m_lcd_height;
+	uint16_t m_lcd_contrast;
 
 	// I/O
-	UINT16 m_io_hw1[0x10];
-	UINT16 m_io_hw2[0x80];
+	uint16_t m_io_hw1[0x10];
+	uint16_t m_io_hw2[0x80];
 
 	// Timer
-	UINT8 m_timer_on;
-	UINT8 m_timer_val;
-	UINT16 m_timer_mask;
+	uint8_t m_timer_on;
+	uint8_t m_timer_val;
+	uint16_t m_timer_mask;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 keypad_r();
+	uint8_t keypad_r();
 	DECLARE_WRITE16_MEMBER ( ti68k_io_w );
 	DECLARE_READ16_MEMBER ( ti68k_io_r );
 	DECLARE_WRITE16_MEMBER ( ti68k_io2_w );
 	DECLARE_READ16_MEMBER ( ti68k_io2_r );
 	DECLARE_WRITE16_MEMBER ( flash_w );
 	DECLARE_READ16_MEMBER ( flash_r );
-	UINT64 m_timer;
+	uint64_t m_timer;
 	DECLARE_PALETTE_INIT(ti68k);
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);

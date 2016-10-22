@@ -27,8 +27,8 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 	m_palette_ram[offset & 0x1ff] = data;
 
 	{
-		UINT8 r,g,b,i;
-		UINT16 pal;
+		uint8_t r,g,b,i;
+		uint16_t pal;
 
 		pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
 
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
 ADDRESS_MAP_END
 
-tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8))
@@ -225,7 +225,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 {
 	int attr = m_tvram[2 * tile_index + 1];
-	UINT16 code = m_tvram[2 * tile_index]
+	uint16_t code = m_tvram[2 * tile_index]
 			| ((attr & 0x07) << 8);
 
 	SET_TILE_INFO_MEMBER(m_gfx_index,
@@ -286,7 +286,7 @@ void tc0091lvc_device::device_start()
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
 	palette_device &palette = m_gfxdecode->palette();
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (UINT8 *)m_pcg_ram, 0, palette.entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
 void tc0091lvc_device::device_reset()
@@ -299,7 +299,7 @@ const address_space_config *tc0091lvc_device::memory_space_config(address_spacen
 }
 
 
-void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip )
+void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int count;
@@ -329,11 +329,11 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
-UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 count;
+	uint32_t count;
 	int x,y;
-	UINT8 global_flip;
+	uint8_t global_flip;
 
 	bitmap.fill(m_gfxdecode->palette().black_pen(), cliprect);
 

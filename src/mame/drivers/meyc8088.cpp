@@ -47,13 +47,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<timer_device> m_heartbeat;
 
 	optional_ioport_array<4> m_switches;
 
-	UINT8 m_status;
-	UINT8 m_common;
+	uint8_t m_status;
+	uint8_t m_common;
 
 	DECLARE_WRITE8_MEMBER(drive_w);
 	DECLARE_WRITE8_MEMBER(video5_flip_w);
@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
 	DECLARE_PALETTE_INIT(meyc8088);
-	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 };
@@ -121,16 +121,16 @@ static const res_net_info meyc8088_net_info =
 
 PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
 	palette.set_pen_colors(0, rgb);
 }
 
-UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 v[5];
+	uint8_t v[5];
 	v[4] = m_status << 2 & 0x10; // video5: color prom d4
 
 	if (~m_status & 2)
@@ -142,8 +142,8 @@ UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind1
 
 	for (offs_t offs = 0x800; offs < 0x4000; offs+=2)
 	{
-		UINT8 y = (offs-0x800) >> 6;
-		UINT8 x = (offs-0x800) << 2;
+		uint8_t y = (offs-0x800) >> 6;
+		uint8_t x = (offs-0x800) << 2;
 
 		v[0] = m_vram[offs|0x0000]; // video1: color prom d0
 		v[1] = m_vram[offs|0x0001]; // video2: color prom d1
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	// multiplexed switch inputs
 	if (~m_common & 1) ret &= m_switches[0].read_safe(0); // bit switches

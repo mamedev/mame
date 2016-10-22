@@ -50,14 +50,14 @@ osd_netdev::~osd_netdev()
 //  m_timer->reset();
 }
 
-int osd_netdev::send(UINT8 *buf, int len)
+int osd_netdev::send(uint8_t *buf, int len)
 {
 	return 0;
 }
 
 void osd_netdev::recv(void *ptr, int param)
 {
-	UINT8 *buf;
+	uint8_t *buf;
 	int len;
 	//const char atalkmac[] = { 0x09, 0x00, 0x07, 0xff, 0xff, 0xff };
 	while((!m_stop) && (len = recv_dev(&buf)))
@@ -78,7 +78,7 @@ void osd_netdev::recv(void *ptr, int param)
 	}
 }
 
-int osd_netdev::recv_dev(UINT8 **buf)
+int osd_netdev::recv_dev(uint8_t **buf)
 {
 	return 0;
 }

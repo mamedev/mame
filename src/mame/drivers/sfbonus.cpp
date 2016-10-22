@@ -302,13 +302,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_nvram;
-	required_shared_ptr<UINT8> m_1800_regs;
-	required_shared_ptr<UINT8> m_vregs;
-	required_shared_ptr<UINT8> m_2801_regs;
-	required_shared_ptr<UINT8> m_2c01_regs;
-	required_shared_ptr<UINT8> m_3000_regs;
-	required_shared_ptr<UINT8> m_3800_regs;
+	required_shared_ptr<uint8_t> m_nvram;
+	required_shared_ptr<uint8_t> m_1800_regs;
+	required_shared_ptr<uint8_t> m_vregs;
+	required_shared_ptr<uint8_t> m_2801_regs;
+	required_shared_ptr<uint8_t> m_2c01_regs;
+	required_shared_ptr<uint8_t> m_3000_regs;
+	required_shared_ptr<uint8_t> m_3800_regs;
 
 	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
@@ -316,12 +316,12 @@ public:
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	std::unique_ptr<UINT8[]> m_tilemap_ram;
-	std::unique_ptr<UINT8[]> m_reel_ram;
-	std::unique_ptr<UINT8[]> m_reel2_ram;
-	std::unique_ptr<UINT8[]> m_reel3_ram;
-	std::unique_ptr<UINT8[]> m_reel4_ram;
-	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_tilemap_ram;
+	std::unique_ptr<uint8_t[]> m_reel_ram;
+	std::unique_ptr<uint8_t[]> m_reel2_ram;
+	std::unique_ptr<uint8_t[]> m_reel3_ram;
+	std::unique_ptr<uint8_t[]> m_reel4_ram;
+	std::unique_ptr<uint8_t[]> m_videoram;
 
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
@@ -451,14 +451,14 @@ public:
 	DECLARE_DRIVER_INIT(tighookv);
 	DECLARE_DRIVER_INIT(robadv);
 	DECLARE_DRIVER_INIT(pirpok2d);
-	void sfbonus_bitswap(UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
-						UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
-						UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
-						UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
-						UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
-						UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
-						UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
-						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 );
+	void sfbonus_bitswap(uint8_t xor0, uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03, uint8_t b04, uint8_t b05, uint8_t b06,uint8_t b07,
+						uint8_t xor1, uint8_t b10, uint8_t b11, uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15, uint8_t b16,uint8_t b17,
+						uint8_t xor2, uint8_t b20, uint8_t b21, uint8_t b22, uint8_t b23, uint8_t b24, uint8_t b25, uint8_t b26,uint8_t b27,
+						uint8_t xor3, uint8_t b30, uint8_t b31, uint8_t b32, uint8_t b33, uint8_t b34, uint8_t b35, uint8_t b36,uint8_t b37,
+						uint8_t xor4, uint8_t b40, uint8_t b41, uint8_t b42, uint8_t b43, uint8_t b44, uint8_t b45, uint8_t b46,uint8_t b47,
+						uint8_t xor5, uint8_t b50, uint8_t b51, uint8_t b52, uint8_t b53, uint8_t b54, uint8_t b55, uint8_t b56,uint8_t b57,
+						uint8_t xor6, uint8_t b60, uint8_t b61, uint8_t b62, uint8_t b63, uint8_t b64, uint8_t b65, uint8_t b66,uint8_t b67,
+						uint8_t xor7, uint8_t b70, uint8_t b71, uint8_t b72, uint8_t b73, uint8_t b74, uint8_t b75, uint8_t b76,uint8_t b77 );
 	TILE_GET_INFO_MEMBER(get_sfbonus_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
@@ -467,7 +467,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
-	UINT32 screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -939,9 +939,9 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 	int i;
 	int startclipmin;
 	const rectangle &visarea = screen.visible_area();
-	UINT8* selectbase = &m_videoram[0x600];
-	UINT8* bg_scroll = &m_videoram[0x000];
-	UINT8* reels_rowscroll = &m_videoram[0x400];
+	uint8_t* selectbase = &m_videoram[0x600];
+	uint8_t* bg_scroll = &m_videoram[0x000];
+	uint8_t* reels_rowscroll = &m_videoram[0x400];
 	int globalyscrollreels = (m_vregs[6] | m_vregs[7]<<8);
 	int globalxscrollreels = (m_vregs[4] | m_vregs[5]<<8);
 	globalyscrollreels += 8;
@@ -1068,11 +1068,11 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 
 }
 
-UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int globalyscroll = (m_vregs[2] | m_vregs[3]<<8);
 	int globalxscroll = (m_vregs[0] | m_vregs[1]<<8);
-	UINT8* front_rowscroll = &m_videoram[0x200];
+	uint8_t* front_rowscroll = &m_videoram[0x200];
 	ioport_constructor ipt;
 	int i;
 
@@ -1093,8 +1093,8 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = &m_temp_reel_bitmap->pix16(y, x);
-				UINT16* dst = &bitmap.pix16(y, x);
+				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
+				uint16_t* dst = &bitmap.pix16(y, x);
 
 				if ((src[0]&0x100)==0x000)
 					dst[0] = src[0];
@@ -1119,8 +1119,8 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = &m_temp_reel_bitmap->pix16(y, x);
-				UINT16* dst = &bitmap.pix16(y, x);
+				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
+				uint16_t* dst = &bitmap.pix16(y, x);
 
 				if ((src[0]&0x100)==0x100)
 					dst[0] = src[0]-0x100;
@@ -1212,8 +1212,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 bank;
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t bank;
 
 	bank = data & 7;
 
@@ -1346,7 +1346,7 @@ GFXDECODE_END
 
 void sfbonus_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0]);
 }
@@ -5847,27 +5847,27 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 {
-	m_tilemap_ram = std::make_unique<UINT8[]>(0x4000);
+	m_tilemap_ram = std::make_unique<uint8_t[]>(0x4000);
 	memset(m_tilemap_ram.get(), 0xff, 0x4000);
 	save_pointer(NAME(m_tilemap_ram.get()), 0x4000);
 
-	m_reel_ram = std::make_unique<UINT8[]>(0x0800);
+	m_reel_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel_ram.get(), 0xff ,0x0800);
 	save_pointer(NAME(m_reel_ram.get()), 0x0800);
 
-	m_reel2_ram = std::make_unique<UINT8[]>(0x0800);
+	m_reel2_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel2_ram.get(), 0xff, 0x0800);
 	save_pointer(NAME(m_reel2_ram.get()), 0x0800);
 
-	m_reel3_ram = std::make_unique<UINT8[]>(0x0800);
+	m_reel3_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel3_ram.get(), 0xff, 0x0800);
 	save_pointer(NAME(m_reel3_ram.get()), 0x0800);
 
-	m_reel4_ram = std::make_unique<UINT8[]>(0x0800);
+	m_reel4_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel4_ram.get(), 0xff, 0x0800);
 	save_pointer(NAME(m_reel4_ram.get()), 0x0800);
 
-	m_videoram = std::make_unique<UINT8[]>(0x10000);
+	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	memset(m_videoram.get(), 0xff, 0x10000);
 
@@ -5875,21 +5875,21 @@ DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 }
 
 void sfbonus_state::sfbonus_bitswap(
-						UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
-						UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
-						UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
-						UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
-						UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
-						UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
-						UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
-						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
+						uint8_t xor0, uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03, uint8_t b04, uint8_t b05, uint8_t b06,uint8_t b07,
+						uint8_t xor1, uint8_t b10, uint8_t b11, uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15, uint8_t b16,uint8_t b17,
+						uint8_t xor2, uint8_t b20, uint8_t b21, uint8_t b22, uint8_t b23, uint8_t b24, uint8_t b25, uint8_t b26,uint8_t b27,
+						uint8_t xor3, uint8_t b30, uint8_t b31, uint8_t b32, uint8_t b33, uint8_t b34, uint8_t b35, uint8_t b36,uint8_t b37,
+						uint8_t xor4, uint8_t b40, uint8_t b41, uint8_t b42, uint8_t b43, uint8_t b44, uint8_t b45, uint8_t b46,uint8_t b47,
+						uint8_t xor5, uint8_t b50, uint8_t b51, uint8_t b52, uint8_t b53, uint8_t b54, uint8_t b55, uint8_t b56,uint8_t b57,
+						uint8_t xor6, uint8_t b60, uint8_t b61, uint8_t b62, uint8_t b63, uint8_t b64, uint8_t b65, uint8_t b66,uint8_t b67,
+						uint8_t xor7, uint8_t b70, uint8_t b71, uint8_t b72, uint8_t b73, uint8_t b74, uint8_t b75, uint8_t b76,uint8_t b77 )
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for(i = 0; i < memregion("maincpu")->bytes(); i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 7)
 		{

@@ -33,10 +33,10 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_teletype_data;
-	UINT8 m_teletype_status;
+	uint8_t m_teletype_data;
+	uint8_t m_teletype_status;
 
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -57,7 +57,7 @@ void harriet_state::video_start()
 {
 }
 
-UINT32 harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -97,7 +97,7 @@ READ8_MEMBER(harriet_state::unk3_r)
 /* 0x314c bit 7: keyboard status */
 READ8_MEMBER(harriet_state::keyboard_status_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = m_teletype_status | m_teletype_data;
 	m_teletype_status &= ~0x80;

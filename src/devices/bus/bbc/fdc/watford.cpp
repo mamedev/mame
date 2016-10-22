@@ -113,13 +113,13 @@ const tiny_rom_entry *bbc_weddb3_device::device_rom_region() const
 //  bbc_watfordfdc_device - constructor
 //-------------------------------------------------
 
-bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_bbc_fdc_interface(mconfig, *this)
 {
 }
 
-bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, "Watford Electronics DDB2 1772 FDC", tag, owner, clock, "bbc_weddb2", __FILE__),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "wd1772"),
@@ -128,7 +128,7 @@ bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *
 {
 }
 
-bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, "Watford Electronics DDB3 1770 FDC", tag, owner, clock, "bbc_weddb3", __FILE__),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "wd1770"),

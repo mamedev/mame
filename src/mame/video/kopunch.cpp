@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(kopunch_state, kopunch)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	color_prom += 24; // first 24 colors are black
 
@@ -102,7 +102,7 @@ void kopunch_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

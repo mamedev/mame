@@ -257,7 +257,7 @@ inline int i8255_device::port_c_upper_mode()
 //  i8255_device - constructor
 //-------------------------------------------------
 
-i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8255, "8255 PPI", tag, owner, clock, "i8255", __FILE__),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
@@ -311,9 +311,9 @@ void i8255_device::device_reset()
 //  read_mode0 -
 //-------------------------------------------------
 
-UINT8 i8255_device::read_mode0(int port)
+uint8_t i8255_device::read_mode0(int port)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -334,9 +334,9 @@ UINT8 i8255_device::read_mode0(int port)
 //  read_mode1 -
 //-------------------------------------------------
 
-UINT8 i8255_device::read_mode1(int port)
+uint8_t i8255_device::read_mode1(int port)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -366,9 +366,9 @@ UINT8 i8255_device::read_mode1(int port)
 //  read_mode2 -
 //-------------------------------------------------
 
-UINT8 i8255_device::read_mode2()
+uint8_t i8255_device::read_mode2()
 {
-	UINT8 data;
+	uint8_t data;
 
 	// read data from input latch
 	data = m_input[PORT_A];
@@ -390,11 +390,11 @@ UINT8 i8255_device::read_mode2()
 //  read_pc -
 //-------------------------------------------------
 
-UINT8 i8255_device::read_pc()
+uint8_t i8255_device::read_pc()
 {
-	UINT8 data = 0;
-	UINT8 mask = 0;
-	UINT8 b_mask = 0x0f;
+	uint8_t data = 0;
+	uint8_t mask = 0;
+	uint8_t b_mask = 0x0f;
 
 	// PC upper
 	switch (group_mode(GROUP_A))
@@ -483,7 +483,7 @@ UINT8 i8255_device::read_pc()
 //  write_mode0 -
 //-------------------------------------------------
 
-void i8255_device::write_mode0(int port, UINT8 data)
+void i8255_device::write_mode0(int port, uint8_t data)
 {
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -505,7 +505,7 @@ void i8255_device::write_mode0(int port, UINT8 data)
 //  write_mode1 -
 //-------------------------------------------------
 
-void i8255_device::write_mode1(int port, UINT8 data)
+void i8255_device::write_mode1(int port, uint8_t data)
 {
 	if (port_mode(port) == MODE_OUTPUT)
 	{
@@ -533,7 +533,7 @@ void i8255_device::write_mode1(int port, UINT8 data)
 //  write_mode2 -
 //-------------------------------------------------
 
-void i8255_device::write_mode2(UINT8 data)
+void i8255_device::write_mode2(uint8_t data)
 {
 	// latch output data
 	m_output[PORT_A] = data;
@@ -555,9 +555,9 @@ void i8255_device::write_mode2(UINT8 data)
 
 void i8255_device::output_pc()
 {
-	UINT8 data = 0;
-	UINT8 mask = 0;
-	UINT8 b_mask = 0x0f;
+	uint8_t data = 0;
+	uint8_t mask = 0;
+	uint8_t b_mask = 0x0f;
 
 	// PC upper
 	switch (group_mode(GROUP_A))
@@ -635,7 +635,7 @@ void i8255_device::output_pc()
 //  set_mode -
 //-------------------------------------------------
 
-void i8255_device::set_mode(UINT8 data)
+void i8255_device::set_mode(uint8_t data)
 {
 	m_control = data;
 
@@ -766,7 +766,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 
 READ8_MEMBER( i8255_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{
@@ -875,9 +875,9 @@ READ8_MEMBER( i8255_device::pa_r )
 //  pb_r - port A read
 //-------------------------------------------------
 
-UINT8 i8255_device::pa_r()
+uint8_t i8255_device::pa_r()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (port_mode(PORT_A) == MODE_OUTPUT)
 	{
@@ -902,9 +902,9 @@ READ8_MEMBER( i8255_device::pb_r )
 //  pb_r - port B read
 //-------------------------------------------------
 
-UINT8 i8255_device::pb_r()
+uint8_t i8255_device::pb_r()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (port_mode(PORT_B) == MODE_OUTPUT)
 	{

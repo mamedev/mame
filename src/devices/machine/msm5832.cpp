@@ -87,7 +87,7 @@ inline void msm5832_device::write_counter(int counter, int value)
 //  msm5832_device - constructor
 //-------------------------------------------------
 
-msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock, "msm5832", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_hold(0),
@@ -163,7 +163,7 @@ void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_
 
 READ8_MEMBER( msm5832_device::data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cs && m_read)
 	{
@@ -217,7 +217,7 @@ WRITE8_MEMBER( msm5832_device::data_w )
 //  address_w -
 //-------------------------------------------------
 
-void msm5832_device::address_w(UINT8 data)
+void msm5832_device::address_w(uint8_t data)
 {
 	if (LOG) logerror("MSM5832 Address: %01x\n", data & 0x0f);
 

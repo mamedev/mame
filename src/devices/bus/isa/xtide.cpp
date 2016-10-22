@@ -58,11 +58,11 @@ Device Control (out)        14              7
 
 READ8_MEMBER( xtide_device::read )
 {
-	UINT8 result;
+	uint8_t result;
 
 	if (offset == 0)
 	{
-		UINT16 data16 = m_ata->read_cs0(space, offset & 7, 0xffff);
+		uint16_t data16 = m_ata->read_cs0(space, offset & 7, 0xffff);
 		result = data16 & 0xff;
 		m_d8_d15_latch = data16 >> 8;
 	}
@@ -91,7 +91,7 @@ WRITE8_MEMBER( xtide_device::write )
 	if (offset == 0)
 	{
 		// Data register transfer low byte and latched high
-		UINT16 data16 = (m_d8_d15_latch << 8) | data;
+		uint16_t data16 = (m_d8_d15_latch << 8) | data;
 		m_ata->write_cs0(space, offset & 7, data16, 0xffff);
 	}
 	else if (offset < 8)
@@ -299,7 +299,7 @@ const tiny_rom_entry *xtide_device::device_rom_region() const
 //  xtide_device - constructor
 //-------------------------------------------------
 
-xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),

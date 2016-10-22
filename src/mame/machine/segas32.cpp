@@ -14,7 +14,7 @@
 
 #define xxxx 0x00
 
-const UINT8 ga2_v25_opcode_table[256] = {
+const uint8_t ga2_v25_opcode_table[256] = {
 		xxxx,xxxx,0xEA,xxxx,xxxx,0x8B,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,
 		xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xFA,
 		xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x49,xxxx,xxxx,xxxx,
@@ -38,8 +38,8 @@ const UINT8 ga2_v25_opcode_table[256] = {
 void segas32_state::decrypt_ga2_protrom()
 {
 	int i;
-	UINT8 *rom = memregion("mcu")->base();
-	std::vector<UINT8> temp(0x100000);
+	uint8_t *rom = memregion("mcu")->base();
+	std::vector<uint8_t> temp(0x100000);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(&temp[0], rom, 0x10000);
@@ -63,7 +63,7 @@ READ16_MEMBER(segas32_state::ga2_dpram_r)
 #if 0 // simulation
 READ16_MEMBER(segas32_state::ga2_sprite_protection_r)
 {
-	static const UINT16 prot[16] =
+	static const uint16_t prot[16] =
 	{
 		0x0a, 0,
 		0xc5, 0,
@@ -102,7 +102,7 @@ READ16_MEMBER(segas32_state::ga2_wakeup_protection_r)
 
 WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 {
-	UINT16 level;
+	uint16_t level;
 //Perform write
 	COMBINE_DATA(&m_system32_workram[CLEARED_LEVELS / 2]);
 
@@ -113,7 +113,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = memregion("maincpu")->base();
+			const uint8_t *ROM = memregion("maincpu")->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -163,7 +163,7 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	switch (offset)
 	{
@@ -248,7 +248,7 @@ void segas32_state::f1lap_fd1149_vblank()
 	space.write_byte(0x20F7C6, 0);
 
 	// needed to start a game
-	UINT8 val = space.read_byte(0x20EE81);
+	uint8_t val = space.read_byte(0x20EE81);
 	if (val == 0xff)  space.write_byte(0x20EE81,0);
 
 }

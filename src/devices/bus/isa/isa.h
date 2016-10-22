@@ -162,8 +162,8 @@ class isa8_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -186,8 +186,8 @@ class isa8_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	static void static_set_custom_spaces(device_t &device);
@@ -216,11 +216,11 @@ public:
 	}
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff))
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, uint64_t unitmask = U64(0xffffffffffffffff))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
 	}
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
 	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
@@ -245,14 +245,14 @@ public:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	UINT8 dack_r(int line);
-	void dack_w(int line,UINT8 data);
+	uint8_t dack_r(int line);
+	void dack_w(int line,uint8_t data);
 	void eop_w(int channels, int state);
 
 	void nmi();
 	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }
 
-	virtual void set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop);
+	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
 
 	const address_space_config m_program_config, m_io_config, m_program16_config, m_io16_config;
 
@@ -310,8 +310,8 @@ public:
 
 	void set_isa_device();
 	// configuration access
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line,UINT8 data);
+	virtual uint8_t dack_r(int line);
+	virtual void dack_w(int line,uint8_t data);
 	virtual void eop_w(int state);
 
 	// inline configuration
@@ -328,7 +328,7 @@ class isa16_slot_device : public isa8_slot_device
 {
 public:
 	// construction/destruction
-	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 		// device-level overrides
 	virtual void device_start() override;
 
@@ -345,7 +345,7 @@ class isa16_device : public isa8_device
 {
 public:
 	// construction/destruction
-	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_irq10_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_irq10_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq11_callback(device_t &device, _Object object) { return downcast<isa16_device &>(device).m_out_irq11_cb.set_callback(object); }
@@ -383,8 +383,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq6_w );
 	DECLARE_WRITE_LINE_MEMBER( drq7_w );
 
-	UINT16 dack16_r(int line);
-	void dack16_w(int line,UINT16 data);
+	uint16_t dack16_r(int line);
+	void dack16_w(int line,uint16_t data);
 
 	// 16 bit accessors for ISA-defined address spaces
 	DECLARE_READ16_MEMBER(prog16_r);
@@ -429,8 +429,8 @@ public:
 	// construction/destruction
 	device_isa16_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_isa16_card_interface();
-	virtual UINT16 dack16_r(int line);
-	virtual void dack16_w(int line,UINT16 data);
+	virtual uint16_t dack16_r(int line);
+	virtual void dack16_w(int line,uint16_t data);
 
 	void set_isa_device();
 	isa16_device  *m_isa;

@@ -23,8 +23,8 @@ public:
 	virtual void SetDevice( void *device ) override;
 	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;
-	virtual void WriteData( UINT8 *data, int dataLength ) override;
-	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
 protected:
 	virtual void t10_start(device_t &device) override;
@@ -32,8 +32,8 @@ protected:
 
 	harddisk_image_device *m_image;
 
-	UINT32 m_lba;
-	UINT32 m_blocks;
+	uint32_t m_lba;
+	uint32_t m_blocks;
 
 	hard_disk_file *m_disk;
 	device_t *m_device;

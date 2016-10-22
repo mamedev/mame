@@ -21,7 +21,7 @@ const device_type SNKWAVE = &device_creator<snkwave_device>;
 //  snkwave_device - constructor
 //-------------------------------------------------
 
-snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock, "snkwave", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -85,7 +85,7 @@ void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	while (samples-- > 0)
 	{
 		int loops;
-		INT16 out = 0;
+		int16_t out = 0;
 
 		loops = 1 << CLOCK_SHIFT;
 		while (loops > 0)
@@ -142,7 +142,7 @@ WRITE8_MEMBER( snkwave_device::snkwave_w )
    So the sequence 01234567 will play as
    89ABCDEF76543210
 */
-void snkwave_device::update_waveform(unsigned int offset, UINT8 data)
+void snkwave_device::update_waveform(unsigned int offset, uint8_t data)
 {
 	assert(offset < SNKWAVE_WAVEFORM_LENGTH/4);
 

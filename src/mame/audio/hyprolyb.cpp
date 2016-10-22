@@ -6,7 +6,7 @@
 
 const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
 
-hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock, "hyprolyb_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_soundlatch2(*this, ":soundlatch2"),
@@ -60,7 +60,7 @@ WRITE8_MEMBER( hyprolyb_adpcm_device::msm_data_w )
 
 READ8_MEMBER( hyprolyb_adpcm_device::msm_vck_r )
 {
-	UINT8 old = m_vck_ready;
+	uint8_t old = m_vck_ready;
 	m_vck_ready = 0x00;
 	return old;
 }

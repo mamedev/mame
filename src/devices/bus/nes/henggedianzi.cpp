@@ -43,17 +43,17 @@ const device_type NES_HENGG_XHZS = &device_creator<nes_hengg_xhzs_device>;
 const device_type NES_HENGG_SHJY3 = &device_creator<nes_hengg_shjy3_device>;
 
 
-nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_HENGG_SRICH, "NES Cart Henggedianzi Super Rich PCB", tag, owner, clock, "nes_hengg_srich", __FILE__)
 {
 }
 
-nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_HENGG_XHZS, "NES Cart Henggedianzi Xing He Zhan Shi PCB", tag, owner, clock, "nes_hengg_xhzs", __FILE__)
 {
 }
 
-nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_HENGG_SHJY3, "NES Cart Henggedianzi Shen Hua Jian Yun III PCB", tag, owner, clock, "nes_hengg_shjy3", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_chr_mode(0)
 				{
 }
@@ -209,7 +209,7 @@ void nes_hengg_shjy3_device::update_banks()
 
 	for (int i = 0; i < 8; i++)
 	{
-		UINT8 chr_bank = m_mmc_vrom_bank[i] | (m_mmc_extra_bank[i] << 4);
+		uint8_t chr_bank = m_mmc_vrom_bank[i] | (m_mmc_extra_bank[i] << 4);
 		if (m_mmc_vrom_bank[i] == 0xc8)
 		{
 			m_chr_mode = 0;
@@ -233,8 +233,8 @@ WRITE8_MEMBER(nes_hengg_shjy3_device::write_h)
 
 	if (offset >= 0x3000 && offset <= 0x600c)
 	{
-		UINT8 shift = offset & 4;
-		UINT8 mmc_helper = ((offset & 8) | (offset >> 8)) >> 3;
+		uint8_t shift = offset & 4;
+		uint8_t mmc_helper = ((offset & 8) | (offset >> 8)) >> 3;
 		mmc_helper += 2;
 		mmc_helper &= 7;
 

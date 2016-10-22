@@ -46,7 +46,7 @@ class tandy2k_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<tandy2k_keyboard_device &>(device).m_write_clock.set_callback(object); }
 	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<tandy2k_keyboard_device &>(device).m_write_data.set_callback(object); }
@@ -84,7 +84,7 @@ private:
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;
 
-	UINT16 m_keylatch;
+	uint16_t m_keylatch;
 
 	int m_clock;
 	int m_data;

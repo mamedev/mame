@@ -1546,14 +1546,14 @@ DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
 {
 	/* Program ROMs have data pins connected different from normal */
 	offs_t offs, len;
-	UINT8 *rom;
+	uint8_t *rom;
 	len = memregion("maincpu")->bytes();
 	rom = memregion("maincpu")->base();
 	for (offs = 0; offs < len; offs++)
 	{
-		UINT8 scrambled = rom[offs];
+		uint8_t scrambled = rom[offs];
 
-		UINT8 normal = (scrambled >> 3 & 0x11)
+		uint8_t normal = (scrambled >> 3 & 0x11)
 						| (scrambled >> 1 & 0x22)
 						| (scrambled << 1 & 0x44)
 						| (scrambled << 3 & 0x88);

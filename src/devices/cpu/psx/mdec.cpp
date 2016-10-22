@@ -30,7 +30,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_MDEC = &device_creator<psxmdec_device>;
 
-psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSX_MDEC, "Sony PSX MDEC", tag, owner, clock, "psxmdec", __FILE__), n_decoded(0), n_offset(0), n_0_command(0), n_0_address(0), n_0_size(0), n_1_command(0), n_1_status(0)
 {
 }
@@ -83,18 +83,18 @@ void psxmdec_device::device_start()
 }
 
 #ifdef UNUSED_FUNCTION
-static inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data )
+static inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data )
 {
-	*( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
+	*( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
 #endif
 
-static inline UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
+static inline uint16_t psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
 {
-	return *( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
+	return *( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
 
-static const UINT32 m_p_n_mdec_zigzag[ DCTSIZE2 ] =
+static const uint32_t m_p_n_mdec_zigzag[ DCTSIZE2 ] =
 {
 		0,  1,  8, 16,  9,  2,  3, 10,
 	17, 24, 32, 25, 18, 11,  4,  5,
@@ -108,11 +108,11 @@ static const UINT32 m_p_n_mdec_zigzag[ DCTSIZE2 ] =
 
 void psxmdec_device::mdec_cos_precalc()
 {
-	UINT32 n_x;
-	UINT32 n_y;
-	UINT32 n_u;
-	UINT32 n_v;
-	INT32 *p_n_precalc = p_n_cos_precalc;
+	uint32_t n_x;
+	uint32_t n_y;
+	uint32_t n_u;
+	uint32_t n_v;
+	int32_t *p_n_precalc = p_n_cos_precalc;
 
 	for( n_y = 0; n_y < 8; n_y++ )
 	{
@@ -131,18 +131,18 @@ void psxmdec_device::mdec_cos_precalc()
 	}
 }
 
-void psxmdec_device::mdec_idct( INT32 *p_n_src, INT32 *p_n_dst )
+void psxmdec_device::mdec_idct( int32_t *p_n_src, int32_t *p_n_dst )
 {
-	INT32 *p_n_precalc = p_n_cos_precalc;
+	int32_t *p_n_precalc = p_n_cos_precalc;
 
-	for( UINT32 n_yx = 0; n_yx < DCTSIZE2; n_yx++ )
+	for( uint32_t n_yx = 0; n_yx < DCTSIZE2; n_yx++ )
 	{
-		INT32 p_n_z[ 8 ];
-		INT32 *p_n_data = p_n_src;
+		int32_t p_n_z[ 8 ];
+		int32_t *p_n_data = p_n_src;
 
 		memset( p_n_z, 0, sizeof( p_n_z ) );
 
-		for( UINT32 n_vu = 0; n_vu < DCTSIZE2 / 8; n_vu++ )
+		for( uint32_t n_vu = 0; n_vu < DCTSIZE2 / 8; n_vu++ )
 		{
 			p_n_z[ 0 ] += p_n_data[ 0 ] * p_n_precalc[ 0 ];
 			p_n_z[ 1 ] += p_n_data[ 1 ] * p_n_precalc[ 1 ];
@@ -161,29 +161,29 @@ void psxmdec_device::mdec_idct( INT32 *p_n_src, INT32 *p_n_dst )
 	}
 }
 
-static inline UINT16 mdec_unpack_run( UINT16 n_packed )
+static inline uint16_t mdec_unpack_run( uint16_t n_packed )
 {
 	return n_packed >> 10;
 }
 
-static inline INT32 mdec_unpack_val( UINT16 n_packed )
+static inline int32_t mdec_unpack_val( uint16_t n_packed )
 {
-	return ( ( (INT32)n_packed ) << 22 ) >> 22;
+	return ( ( (int32_t)n_packed ) << 22 ) >> 22;
 }
 
-UINT32 psxmdec_device::mdec_unpack( UINT32 *p_n_psxram, UINT32 n_address )
+uint32_t psxmdec_device::mdec_unpack( uint32_t *p_n_psxram, uint32_t n_address )
 {
-	UINT8 n_z;
-	INT32 n_qscale;
-	UINT16 n_packed;
-	INT32 *p_n_block;
-	INT32 p_n_unpacked[ 64 ];
-	INT32 *p_n_q;
+	uint8_t n_z;
+	int32_t n_qscale;
+	uint16_t n_packed;
+	int32_t *p_n_block;
+	int32_t p_n_unpacked[ 64 ];
+	int32_t *p_n_q;
 
 	p_n_q = p_n_quantize_uv;
 	p_n_block = m_p_n_unpacked;
 
-	for( UINT32 n_block = 0; n_block < 6; n_block++ )
+	for( uint32_t n_block = 0; n_block < 6; n_block++ )
 	{
 		memset( p_n_unpacked, 0, sizeof( p_n_unpacked ) );
 
@@ -224,42 +224,42 @@ UINT32 psxmdec_device::mdec_unpack( UINT32 *p_n_psxram, UINT32 n_address )
 	return n_address;
 }
 
-static inline INT32 mdec_cr_to_r( INT32 n_cr )
+static inline int32_t mdec_cr_to_r( int32_t n_cr )
 {
 	return ( 1435 * n_cr ) >> 10;
 }
 
-static inline INT32 mdec_cr_to_g( INT32 n_cr )
+static inline int32_t mdec_cr_to_g( int32_t n_cr )
 {
 	return ( -731 * n_cr ) >> 10;
 }
 
-static inline INT32 mdec_cb_to_g( INT32 n_cb )
+static inline int32_t mdec_cb_to_g( int32_t n_cb )
 {
 	return ( -351 * n_cb ) >> 10;
 }
 
-static inline INT32 mdec_cb_to_b( INT32 n_cb )
+static inline int32_t mdec_cb_to_b( int32_t n_cb )
 {
 	return ( 1814 * n_cb ) >> 10;
 }
 
-UINT16 psxmdec_device::mdec_clamp_r5( INT32 n_r ) const
+uint16_t psxmdec_device::mdec_clamp_r5( int32_t n_r ) const
 {
 	return p_n_r5[ n_r + 128 + 256 ];
 }
 
-UINT16 psxmdec_device::mdec_clamp_g5( INT32 n_g ) const
+uint16_t psxmdec_device::mdec_clamp_g5( int32_t n_g ) const
 {
 	return p_n_g5[ n_g + 128 + 256 ];
 }
 
-UINT16 psxmdec_device::mdec_clamp_b5( INT32 n_b ) const
+uint16_t psxmdec_device::mdec_clamp_b5( int32_t n_b ) const
 {
 	return p_n_b5[ n_b + 128 + 256 ];
 }
 
-void psxmdec_device::mdec_makergb15( UINT32 n_address, INT32 n_r, INT32 n_g, INT32 n_b, INT32 *p_n_y, UINT16 n_stp )
+void psxmdec_device::mdec_makergb15( uint32_t n_address, int32_t n_r, int32_t n_g, int32_t n_b, int32_t *p_n_y, uint16_t n_stp )
 {
 	p_n_output[ WORD_XOR_LE( n_address + 0 ) / 2 ] = n_stp |
 		mdec_clamp_r5( p_n_y[ 0 ] + n_r ) |
@@ -274,18 +274,18 @@ void psxmdec_device::mdec_makergb15( UINT32 n_address, INT32 n_r, INT32 n_g, INT
 
 void psxmdec_device::mdec_yuv2_to_rgb15( void )
 {
-	INT32 n_r;
-	INT32 n_g;
-	INT32 n_b;
-	INT32 n_cb;
-	INT32 n_cr;
-	INT32 *p_n_cb;
-	INT32 *p_n_cr;
-	INT32 *p_n_y;
-	UINT32 n_x;
-	UINT32 n_y;
-	UINT32 n_z;
-	UINT16 n_stp;
+	int32_t n_r;
+	int32_t n_g;
+	int32_t n_b;
+	int32_t n_cb;
+	int32_t n_cr;
+	int32_t *p_n_cb;
+	int32_t *p_n_cr;
+	int32_t *p_n_y;
+	uint32_t n_x;
+	uint32_t n_y;
+	uint32_t n_z;
+	uint16_t n_stp;
 	int n_address = 0;
 
 	if( ( n_0_command & ( 1L << 25 ) ) != 0 )
@@ -340,12 +340,12 @@ void psxmdec_device::mdec_yuv2_to_rgb15( void )
 	n_decoded = ( 16 * 16 ) / 2;
 }
 
-UINT16 psxmdec_device::mdec_clamp8( INT32 n_r ) const
+uint16_t psxmdec_device::mdec_clamp8( int32_t n_r ) const
 {
 	return p_n_clamp8[ n_r + 128 + 256 ];
 }
 
-void psxmdec_device::mdec_makergb24( UINT32 n_address, INT32 n_r, INT32 n_g, INT32 n_b, INT32 *p_n_y, UINT32 n_stp )
+void psxmdec_device::mdec_makergb24( uint32_t n_address, int32_t n_r, int32_t n_g, int32_t n_b, int32_t *p_n_y, uint32_t n_stp )
 {
 	p_n_output[ WORD_XOR_LE( n_address + 0 ) / 2 ] = ( mdec_clamp8( p_n_y[ 0 ] + n_g ) << 8 ) | mdec_clamp8( p_n_y[ 0 ] + n_r );
 	p_n_output[ WORD_XOR_LE( n_address + 2 ) / 2 ] = ( mdec_clamp8( p_n_y[ 1 ] + n_r ) << 8 ) | mdec_clamp8( p_n_y[ 0 ] + n_b );
@@ -354,18 +354,18 @@ void psxmdec_device::mdec_makergb24( UINT32 n_address, INT32 n_r, INT32 n_g, INT
 
 void psxmdec_device::mdec_yuv2_to_rgb24( void )
 {
-	INT32 n_r;
-	INT32 n_g;
-	INT32 n_b;
-	INT32 n_cb;
-	INT32 n_cr;
-	INT32 *p_n_cb;
-	INT32 *p_n_cr;
-	INT32 *p_n_y;
-	UINT32 n_x;
-	UINT32 n_y;
-	UINT32 n_z;
-	UINT32 n_stp;
+	int32_t n_r;
+	int32_t n_g;
+	int32_t n_b;
+	int32_t n_cb;
+	int32_t n_cr;
+	int32_t *p_n_cb;
+	int32_t *p_n_cr;
+	int32_t *p_n_y;
+	uint32_t n_x;
+	uint32_t n_y;
+	uint32_t n_z;
+	uint32_t n_stp;
 	int n_address = 0;
 
 	if( ( n_0_command & ( 1L << 25 ) ) != 0 )
@@ -420,7 +420,7 @@ void psxmdec_device::mdec_yuv2_to_rgb24( void )
 	n_decoded = ( 24 * 16 ) / 2;
 }
 
-void psxmdec_device::dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psxmdec_device::dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int n_index;
 
@@ -463,8 +463,8 @@ void psxmdec_device::dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_si
 		n_index = 0;
 		while( n_size > 0 )
 		{
-			p_n_cos[ n_index + 0 ] = (INT16)( ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xffff );
-			p_n_cos[ n_index + 1 ] = (INT16)( ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xffff );
+			p_n_cos[ n_index + 0 ] = (int16_t)( ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xffff );
+			p_n_cos[ n_index + 1 ] = (int16_t)( ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xffff );
 			n_index += 2;
 			n_address += 4;
 			n_size--;
@@ -477,10 +477,10 @@ void psxmdec_device::dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_si
 	}
 }
 
-void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psxmdec_device::dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT32 n_this;
-	UINT32 n_nextaddress;
+	uint32_t n_this;
+	uint32_t n_nextaddress;
 
 	verboselog( *this, 2, "mdec1_read( %08x, %08x )\n", n_address, n_size );
 	if( ( n_0_command & ( 1L << 29 ) ) != 0 && n_0_size != 0 )
@@ -523,7 +523,7 @@ void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 			}
 			n_decoded -= n_this;
 
-			memcpy( (UINT8 *)p_n_psxram + n_address, (UINT8 *)p_n_output + n_offset, n_this * 4 );
+			memcpy( (uint8_t *)p_n_psxram + n_address, (uint8_t *)p_n_output + n_offset, n_this * 4 );
 			n_offset += n_this * 4;
 			n_address += n_this * 4;
 			n_size -= n_this;

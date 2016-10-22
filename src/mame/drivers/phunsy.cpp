@@ -60,17 +60,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
 	DECLARE_PALETTE_INIT(phunsy);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	const UINT8 *m_p_chargen;
-	UINT8       m_data_out;
-	UINT8       m_keyboard_input;
+	const uint8_t *m_p_chargen;
+	uint8_t       m_data_out;
+	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 
 READ8_MEMBER( phunsy_state::phunsy_data_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//if (LOG)
 		//logerror("%s: phunsy_data_r\n", machine().describe_context());
@@ -212,16 +212,16 @@ void phunsy_state::video_start()
 }
 
 
-UINT32 phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,col;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,col;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma+64; x++)
 			{
@@ -280,9 +280,9 @@ GFXDECODE_END
 QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT16 i;
-	UINT16 quick_addr = 0x1800;
-	std::vector<UINT8> quick_data;
+	uint16_t i;
+	uint16_t quick_addr = 0x1800;
+	std::vector<uint8_t> quick_data;
 	image_init_result result = image_init_result::FAIL;
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
@@ -295,7 +295,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 		quick_data.resize(quick_length);
 		membank("bankru")->set_entry(0); // point at ram
 
-		UINT16 exec_addr = quick_addr + 2;
+		uint16_t exec_addr = quick_addr + 2;
 
 		for (i = 0; i < quick_length; i++)
 			space.write_byte(i+quick_addr, quick_data[i]);
@@ -318,9 +318,9 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 
 DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 {
-	UINT8 *main = memregion("maincpu")->base();
-	UINT8 *roms = memregion("roms")->base();
-	UINT8 *ram = memregion("ram_4000")->base();
+	uint8_t *main = memregion("maincpu")->base();
+	uint8_t *roms = memregion("roms")->base();
+	uint8_t *ram = memregion("ram_4000")->base();
 
 	membank("bankru")->configure_entry(0, &main[0x1800]);
 	membank("bankwu")->configure_entry(0, &main[0x1800]);

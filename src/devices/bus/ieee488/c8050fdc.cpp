@@ -71,7 +71,7 @@ const tiny_rom_entry *c8050_fdc_t::device_rom_region() const
 //  c8050_fdc_t - constructor
 //-------------------------------------------------
 
-c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C8050_FDC, "Commodore 8050 FDC", tag, owner, clock, "c8050fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
@@ -498,7 +498,7 @@ void c8050_fdc_t::live_run(const attotime &limit)
 
 READ8_MEMBER( c8050_fdc_t::read )
 {
-	UINT8 e = checkpoint_live.e;
+	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
 
 	return GCR_DECODE(e, i);

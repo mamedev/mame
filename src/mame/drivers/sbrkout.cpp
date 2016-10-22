@@ -53,13 +53,13 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	emu_timer *m_scanline_timer;
 	emu_timer *m_pot_timer;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_sync2_value;
-	UINT8 m_pot_mask[2];
-	UINT8 m_pot_trigger[2];
+	uint8_t m_sync2_value;
+	uint8_t m_pot_mask[2];
+	uint8_t m_pot_trigger[2];
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(sbrkoutct_switches_r);
@@ -77,7 +77,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
@@ -121,7 +121,7 @@ public:
 
 void sbrkout_state::machine_start()
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	membank("bank1")->set_base(&videoram[0x380]);
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::scanline_callback),this));
 	m_pot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::pot_trigger_callback),this));
@@ -147,7 +147,7 @@ void sbrkout_state::machine_reset()
 
 TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int scanline = param;
 
 	/* force a partial update before anything happens */
@@ -163,7 +163,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == m_screen->visible_area().max_y + 1)
 	{
-		UINT8 potvalue = ioport("PADDLE")->read();
+		uint8_t potvalue = ioport("PADDLE")->read();
 		m_pot_timer->adjust(m_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
 	}
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(sbrkout_state::irq_ack_w)
 
 READ8_MEMBER(sbrkout_state::switches_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
@@ -219,7 +219,7 @@ READ8_MEMBER(sbrkout_state::switches_r)
 
 READ8_MEMBER(sbrkout_state::sbrkoutct_switches_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	switch( offset )
 	{
@@ -338,7 +338,7 @@ READ8_MEMBER(sbrkout_state::sync2_r)
 
 TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -352,7 +352,7 @@ void sbrkout_state::video_start()
 
 WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -365,9 +365,9 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
  *
  *************************************/
 
-UINT32 sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int ball;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -106,10 +106,10 @@ public:
 		m_vid_1(*this, "vid_1"),
 		m_dac(*this, "dac") { }
 
-	std::unique_ptr<UINT16[]> m_m68k_framebuffer[2];
-	std::unique_ptr<UINT16[]> m_i860_framebuffer[2][2];
+	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
+	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
 	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<UINT16> m_framebuffer_ctrl;
+	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	int m_crtc_select;
 	DECLARE_WRITE16_MEMBER(main_video_write);
 	DECLARE_READ16_MEMBER(control_1_r);
@@ -128,8 +128,8 @@ public:
 	DECLARE_DRIVER_INIT(vcombat);
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
-	UINT32 screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<i860_cpu_device> m_vid_0;
@@ -137,14 +137,14 @@ public:
 	required_device<dac_word_interface> m_dac;
 };
 
-static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
+static uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	vcombat_state *state = screen.machine().driver_data<vcombat_state>();
 	int y;
 	const rgb_t *const pens = state->m_tlc34076->get_pens();
 
-	UINT16 *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
-	UINT16 *i860_buf = state->m_i860_framebuffer[index][0].get();
+	uint16_t *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
+	uint16_t *i860_buf = state->m_i860_framebuffer[index][0].get();
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */
@@ -155,15 +155,15 @@ static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const r
 	{
 		int x;
 		int src_addr = 256/2 * y;
-		const UINT16 *m68k_src = &m68k_buf[src_addr];
-		const UINT16 *i860_src = &i860_buf[src_addr];
-		UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
+		const uint16_t *m68k_src = &m68k_buf[src_addr];
+		const uint16_t *i860_src = &i860_buf[src_addr];
+		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			int i;
-			UINT16 m68k_pix = *m68k_src++;
-			UINT16 i860_pix = *i860_src++;
+			uint16_t m68k_pix = *m68k_src++;
+			uint16_t i860_pix = *i860_src++;
 
 			/* Draw two pixels */
 			for (i = 0; i < 2; ++i)
@@ -186,14 +186,14 @@ static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const r
 	return 0;
 }
 
-UINT32 vcombat_state::screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 0); }
-UINT32 vcombat_state::screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 1); }
+uint32_t vcombat_state::screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 0); }
+uint32_t vcombat_state::screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 1); }
 
 
 WRITE16_MEMBER(vcombat_state::main_video_write)
 {
 	int fb = (*m_framebuffer_ctrl & 0x20) ? 0 : 1;
-	UINT16 old_data = m_m68k_framebuffer[fb][offset];
+	uint16_t old_data = m_m68k_framebuffer[fb][offset];
 
 	/* Transparency mode? */
 	if (*m_framebuffer_ctrl & 0x40)
@@ -229,7 +229,7 @@ READ16_MEMBER(vcombat_state::control_3_r)
 	return (ioport("IN2")->read() << 8);
 }
 
-static void wiggle_i860_common(i860_cpu_device *device, UINT16 data)
+static void wiggle_i860_common(i860_cpu_device *device, uint16_t data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
@@ -433,19 +433,19 @@ MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 
 DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* Allocate the 68000 framebuffers */
-	m_m68k_framebuffer[0] = std::make_unique<UINT16[]>(0x8000);
-	m_m68k_framebuffer[1] = std::make_unique<UINT16[]>(0x8000);
+	m_m68k_framebuffer[0] = std::make_unique<uint16_t[]>(0x8000);
+	m_m68k_framebuffer[1] = std::make_unique<uint16_t[]>(0x8000);
 
 	/* First i860 */
-	m_i860_framebuffer[0][0] = std::make_unique<UINT16[]>(0x8000);
-	m_i860_framebuffer[0][1] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[0][0] = std::make_unique<uint16_t[]>(0x8000);
+	m_i860_framebuffer[0][1] = std::make_unique<uint16_t[]>(0x8000);
 
 	/* Second i860 */
-	m_i860_framebuffer[1][0] = std::make_unique<UINT16[]>(0x8000);
-	m_i860_framebuffer[1][1] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[1][0] = std::make_unique<uint16_t[]>(0x8000);
+	m_i860_framebuffer[1][1] = std::make_unique<uint16_t[]>(0x8000);
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
 	   I think what is happening here is that M0 snags the first time
@@ -466,12 +466,12 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 {
 	/* Allocate th 68000 frame buffers */
-	m_m68k_framebuffer[0] = std::make_unique<UINT16[]>(0x8000);
-	m_m68k_framebuffer[1] = std::make_unique<UINT16[]>(0x8000);
+	m_m68k_framebuffer[0] = std::make_unique<uint16_t[]>(0x8000);
+	m_m68k_framebuffer[1] = std::make_unique<uint16_t[]>(0x8000);
 
 	/* Only one i860 */
-	m_i860_framebuffer[0][0] = std::make_unique<UINT16[]>(0x8000);
-	m_i860_framebuffer[0][1] = std::make_unique<UINT16[]>(0x8000);
+	m_i860_framebuffer[0][0] = std::make_unique<uint16_t[]>(0x8000);
+	m_i860_framebuffer[0][1] = std::make_unique<uint16_t[]>(0x8000);
 	m_i860_framebuffer[1][0] = nullptr;
 	m_i860_framebuffer[1][1] = nullptr;
 }

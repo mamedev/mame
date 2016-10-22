@@ -13,7 +13,7 @@ const device_type H8_TIMER16_CHANNEL  = &device_creator<h8_timer16_channel_devic
 const device_type H8H_TIMER16_CHANNEL = &device_creator<h8h_timer16_channel_device>;
 const device_type H8S_TIMER16_CHANNEL = &device_creator<h8s_timer16_channel_device>;
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER16_CHANNEL, "H8 16-bits timer channel", tag, owner, clock, "h8_16bits_timer_channel", __FILE__),
 	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
@@ -21,7 +21,7 @@ h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconf
 	chain_tag = nullptr;
 }
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
@@ -77,7 +77,7 @@ WRITE8_MEMBER(h8_timer16_channel_device::tior_w)
 	if(V>=1) logerror("tior_w %d, %02x\n", offset, data);
 }
 
-void h8_timer16_channel_device::set_ier(UINT8 value)
+void h8_timer16_channel_device::set_ier(uint8_t value)
 {
 	update_counter();
 	ier = value;
@@ -204,7 +204,7 @@ void h8_timer16_channel_device::device_reset()
 	counter_incrementing = true;
 }
 
-UINT64 h8_timer16_channel_device::internal_update(UINT64 current_time)
+uint64_t h8_timer16_channel_device::internal_update(uint64_t current_time)
 {
 	if(event_time && current_time >= event_time) {
 		update_counter(current_time);
@@ -214,7 +214,7 @@ UINT64 h8_timer16_channel_device::internal_update(UINT64 current_time)
 	return event_time;
 }
 
-void h8_timer16_channel_device::update_counter(UINT64 cur_time)
+void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 {
 	if(clock_type != DIV_1)
 		return;
@@ -227,8 +227,8 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 		return;
 	}
 
-	UINT64 base_time = last_clock_update;
-	UINT64 new_time = cur_time;
+	uint64_t base_time = last_clock_update;
+	uint64_t new_time = cur_time;
 	if(clock_divider) {
 		base_time = (base_time + phase) >> clock_divider;
 		new_time = (new_time + phase) >> clock_divider;
@@ -251,7 +251,7 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 	last_clock_update = cur_time;
 }
 
-void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
+void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 {
 	if(!channel_active) {
 		event_time = 0;
@@ -259,7 +259,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 	}
 
 	bool update_cpu = cur_time == 0;
-	UINT64 old_event_time = event_time;
+	uint64_t old_event_time = event_time;
 
 	if(clock_type != DIV_1) {
 		event_time = 0;
@@ -273,7 +273,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		cur_time = cpu->total_cycles();
 
 	if(counter_incrementing) {
-		UINT32 event_delay = 0xffffffff;
+		uint32_t event_delay = 0xffffffff;
 		if(tgr_clearing >= 0 && tgr[tgr_clearing])
 			counter_cycle = tgr[tgr_clearing];
 		else {
@@ -286,7 +286,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		}
 		for(int i=0; i<tgr_count; i++)
 			if(ier & (1 << i)) {
-				UINT32 new_delay = 0xffffffff;
+				uint32_t new_delay = 0xffffffff;
 				if(tgr[i] > tcnt) {
 					if(tcnt >= counter_cycle || tgr[i] <= counter_cycle)
 						new_delay = tgr[i] - tcnt;
@@ -315,13 +315,13 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 		cpu->internal_update();
 }
 
-h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER16, "H8 16-bits timer", tag, owner, clock, "h8_timer16", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
 }
 
-void h8_timer16_device::set_info(int count, UINT8 tstr)
+void h8_timer16_device::set_info(int count, uint8_t tstr)
 {
 	timer_count = count;
 	default_tstr = tstr;
@@ -412,7 +412,7 @@ WRITE8_MEMBER(h8_timer16_device::tocr_w)
 
 READ8_MEMBER(h8_timer16_device::tisr_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 	for(int i=0; i<timer_count; i++)
 		r |= timer_channel[i]->tisr_r(offset) << i;
 	for(int i=timer_count; i<4; i++)
@@ -451,11 +451,11 @@ void h8_timer16_channel_device::tier_update()
 {
 }
 
-void h8_timer16_channel_device::isr_update(UINT8 val)
+void h8_timer16_channel_device::isr_update(uint8_t val)
 {
 }
 
-UINT8 h8_timer16_channel_device::isr_to_sr() const
+uint8_t h8_timer16_channel_device::isr_to_sr() const
 {
 	return 0x00;
 }
@@ -464,7 +464,7 @@ void h8_timer16_channel_device::tcr_update()
 {
 }
 
-void h8_timer16_channel_device::tisr_w(int offset, UINT8 value)
+void h8_timer16_channel_device::tisr_w(int offset, uint8_t value)
 {
 	update_counter();
 	if(!(value & 0x01)) {
@@ -508,7 +508,7 @@ void h8_timer16_channel_device::tisr_w(int offset, UINT8 value)
 	recalc_event();
 }
 
-UINT8 h8_timer16_channel_device::tisr_r(int offset) const
+uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 {
 	switch(offset) {
 	case 0:
@@ -521,7 +521,7 @@ UINT8 h8_timer16_channel_device::tisr_r(int offset) const
 	return 0x00;
 }
 
-h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, "H8H 16-bits timer channel", tag, owner, clock, "h8h_16bits_timer_channel", __FILE__)
 {
 }
@@ -553,7 +553,7 @@ void h8h_timer16_channel_device::tier_update()
 		(tier & 0x04 ? IRQ_V : 0);
 }
 
-void h8h_timer16_channel_device::isr_update(UINT8 val)
+void h8h_timer16_channel_device::isr_update(uint8_t val)
 {
 	if(!(val & 1))
 		isr &= ~IRQ_A;
@@ -563,7 +563,7 @@ void h8h_timer16_channel_device::isr_update(UINT8 val)
 		isr &= ~IRQ_V;
 }
 
-UINT8 h8h_timer16_channel_device::isr_to_sr() const
+uint8_t h8h_timer16_channel_device::isr_to_sr() const
 {
 	return 0xf8 | (isr & IRQ_V ? 4 : 0) | (isr & IRQ_B ? 2 : 0) | (isr & IRQ_A ? 1 : 0);
 }
@@ -619,7 +619,7 @@ void h8h_timer16_channel_device::tcr_update()
 	}
 }
 
-h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, "H8S 16-bits timer channel", tag, owner, clock, "h8s_16bits_timer_channel", __FILE__)
 {
 }
@@ -633,7 +633,7 @@ void h8s_timer16_channel_device::set_chain(const char *_chain_tag)
 	chain_tag = _chain_tag;
 }
 
-void h8s_timer16_channel_device::set_info(int _tgr_count, UINT8 _tier_mask, const char *intc, int irq_base,
+void h8s_timer16_channel_device::set_info(int _tgr_count, uint8_t _tier_mask, const char *intc, int irq_base,
 											int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
 {
 	tgr_count = _tgr_count;
@@ -671,12 +671,12 @@ void h8s_timer16_channel_device::tier_update()
 		(tier & 0x80 ? IRQ_TRIG : 0);
 }
 
-void h8s_timer16_channel_device::isr_update(UINT8 val)
+void h8s_timer16_channel_device::isr_update(uint8_t val)
 {
 	isr &= (val | tier_mask | 0xc0);
 }
 
-UINT8 h8s_timer16_channel_device::isr_to_sr() const
+uint8_t h8s_timer16_channel_device::isr_to_sr() const
 {
 	return 0xc0 | isr;
 }

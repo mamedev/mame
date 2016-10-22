@@ -26,7 +26,7 @@ protected:
 	struct string_to_enum
 	{
 		std::string m_string;
-		const UINT64 m_enum;
+		const uint64_t m_enum;
 	};
 
 	static void validate_array_parameter(const Value& value, std::string type_name, std::string name, const int count);

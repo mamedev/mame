@@ -137,7 +137,7 @@ GFXDECODE_END
 
 const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 
-bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette"),
 		m_cpu(*this, "adder2")
@@ -203,7 +203,7 @@ void bfm_adder2_device::device_reset()
 	m_adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = machine().root_device().memregion("adder2")->base();
+		uint8_t *rom = machine().root_device().memregion("adder2")->base();
 
 		membank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
 
@@ -253,7 +253,7 @@ void bfm_adder2_device::device_start()
 }
 
 // video update ///////////////////////////////////////////////////////////
-UINT32 bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
@@ -290,7 +290,7 @@ WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
 	if ( offset > 102 && offset < 102+1+16 )
 	{ // format xxxrrggb ////////////////////////////////////////////////////
 		int pal;
-		UINT8 r,g,b;
+		uint8_t r,g,b;
 
 		pal = offset-102-1;
 
@@ -449,7 +449,7 @@ WRITE8_MEMBER(bfm_adder2_device::vid_uart_ctrl_w)
 
 READ8_MEMBER(bfm_adder2_device::vid_uart_rx_r)
 {
-	UINT8 data = m_adder2_data;
+	uint8_t data = m_adder2_data;
 	m_adder2_data_to_sc2 = 0;   // clr flag, data from adder available
 
 	//LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
@@ -478,11 +478,11 @@ READ8_MEMBER(bfm_adder2_device::vid_uart_ctrl_r)
 
 void bfm_adder2_device::adder2_decode_char_roms()
 {
-	UINT8 *p = machine().root_device().memregion("gfx1")->base();
+	uint8_t *p = machine().root_device().memregion("gfx1")->base();
 
 	if ( p )
 	{
-		std::vector<UINT8> s( 0x40000 );
+		std::vector<uint8_t> s( 0x40000 );
 		{
 			int x, y;
 
@@ -495,7 +495,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 				x = 0;
 				while ( x < 64 )
 				{
-					UINT8 *src = &s[(y*256*8)+(x*4)];
+					uint8_t *src = &s[(y*256*8)+(x*4)];
 
 					*p++ = src[0*256+0];*p++ = src[0*256+1];*p++ = src[0*256+2];*p++ = src[0*256+3];
 					*p++ = src[1*256+0];*p++ = src[1*256+1];*p++ = src[1*256+2];*p++ = src[1*256+3];

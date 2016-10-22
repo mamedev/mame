@@ -7,7 +7,7 @@
 extern const device_type CTHD_PROT = &device_creator<cthd_prot_device>;
 
 
-cthd_prot_device::cthd_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cthd_prot_device::cthd_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CTHD_PROT, "Neo Geo CTHD Protection (Bootleg)", tag, owner, clock, "cthd_prot", __FILE__)
 {}
 
@@ -31,12 +31,12 @@ void cthd_prot_device::device_reset()
 **************************/
 
 // descrambling information from razoola
-void cthd_prot_device::fix_do(UINT8* sprrom, UINT32 sprrom_size, int start, int end, int bit3shift, int bit2shift, int bit1shift, int bit0shift)
+void cthd_prot_device::fix_do(uint8_t* sprrom, uint32_t sprrom_size, int start, int end, int bit3shift, int bit2shift, int bit1shift, int bit0shift)
 {
 	int tilesize = 128;
 
-	std::vector<UINT8> rom(16 * tilesize); // 16 tiles buffer
-	UINT8* realrom = sprrom + start * tilesize;
+	std::vector<uint8_t> rom(16 * tilesize); // 16 tiles buffer
+	uint8_t* realrom = sprrom + start * tilesize;
 
 	for (int i = 0; i < (end-start)/16; i++)
 	{
@@ -53,7 +53,7 @@ void cthd_prot_device::fix_do(UINT8* sprrom, UINT32 sprrom_size, int start, int 
 	}
 }
 
-void cthd_prot_device::gfx_address_fix(UINT8* sprrom, UINT32 sprrom_size, int start, int end)
+void cthd_prot_device::gfx_address_fix(uint8_t* sprrom, uint32_t sprrom_size, int start, int end)
 {
 	fix_do(sprrom, sprrom_size, start + 512 * 0, end + 512 * 0, 0,3,2,1);
 	fix_do(sprrom, sprrom_size, start + 512 * 1, end + 512 * 1, 1,0,3,2);
@@ -64,7 +64,7 @@ void cthd_prot_device::gfx_address_fix(UINT8* sprrom, UINT32 sprrom_size, int st
 	fix_do(sprrom, sprrom_size, start + 512 * 7, end + 512 * 7, 0,2,3,1);
 }
 
-void cthd_prot_device::cthd2003_c(UINT8* sprrom, UINT32 sprrom_size, int pow)
+void cthd_prot_device::cthd2003_c(uint8_t* sprrom, uint32_t sprrom_size, int pow)
 {
 	for (int i = 0; i <= 192; i += 8)
 		gfx_address_fix(sprrom, sprrom_size, i * 512, i * 512 + 512);
@@ -91,10 +91,10 @@ void cthd_prot_device::cthd2003_c(UINT8* sprrom, UINT32 sprrom_size, int pow)
 
  **************************/
 
-void cthd_prot_device::decrypt_cthd2003(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size, UINT8* fixedrom, UINT32 fixedrom_size)
+void cthd_prot_device::decrypt_cthd2003(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size, uint8_t* fixedrom, uint32_t fixedrom_size)
 {
-	UINT8 *romdata = fixedrom;
-	std::vector<UINT8> tmp(8 * 128 * 128);
+	uint8_t *romdata = fixedrom;
+	std::vector<uint8_t> tmp(8 * 128 * 128);
 
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
@@ -132,17 +132,17 @@ WRITE16_MEMBER( ngbootleg_prot_device::cthd2003_bankswitch_w )
 }
 */
 
-UINT32 cthd_prot_device::get_bank_base(UINT16 sel)
+uint32_t cthd_prot_device::get_bank_base(uint16_t sel)
 {
 	static const int cthd2003_banks[8] = { 1, 0, 1, 0, 1, 0, 3, 2 };
 	return (cthd2003_banks[sel & 7] + 1) * 0x100000;
 }
 
 
-void cthd_prot_device::patch_cthd2003(UINT8* cpurom, UINT32 cpurom_size)
+void cthd_prot_device::patch_cthd2003(uint8_t* cpurom, uint32_t cpurom_size)
 {
 	// patches thanks to razoola
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	uint16_t *mem16 = (uint16_t *)cpurom;
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -178,11 +178,11 @@ void cthd_prot_device::patch_cthd2003(UINT8* cpurom, UINT32 cpurom_size)
 /* Crouching Tiger Hidden Dragon 2003 Super Plus (bootleg of King of Fighters 2001) */
 
 
-void cthd_prot_device::ct2k3sp_sx_decrypt( UINT8* fixedrom, UINT32 fixedrom_size )
+void cthd_prot_device::ct2k3sp_sx_decrypt( uint8_t* fixedrom, uint32_t fixedrom_size )
 {
 	int rom_size = fixedrom_size;
-	UINT8 *rom = fixedrom;
-	std::vector<UINT8> buf(rom_size);
+	uint8_t *rom = fixedrom;
+	std::vector<uint8_t> buf(rom_size);
 
 	memcpy(&buf[0], rom, rom_size);
 
@@ -203,10 +203,10 @@ void cthd_prot_device::ct2k3sp_sx_decrypt( UINT8* fixedrom, UINT32 fixedrom_size
 	memcpy(&rom[0x30000], &buf[0x28000], 0x8000);
 }
 
-void cthd_prot_device::decrypt_ct2k3sp(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size, UINT8* fixedrom, UINT32 fixedrom_size)
+void cthd_prot_device::decrypt_ct2k3sp(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size, uint8_t* fixedrom, uint32_t fixedrom_size)
 {
-	UINT8 *romdata = audiorom + 0x10000;
-	std::vector<UINT8> tmp(8 * 128 * 128);
+	uint8_t *romdata = audiorom + 0x10000;
+	std::vector<uint8_t> tmp(8 * 128 * 128);
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
@@ -222,10 +222,10 @@ void cthd_prot_device::decrypt_ct2k3sp(UINT8* sprrom, UINT32 sprrom_size, UINT8*
 /* Crouching Tiger Hidden Dragon 2003 Super Plus alternate (bootleg of King of Fighters 2001) */
 
 
-void cthd_prot_device::decrypt_ct2k3sa(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size )
+void cthd_prot_device::decrypt_ct2k3sa(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size )
 {
-	UINT8 *romdata = audiorom + 0x10000;
-	std::vector<UINT8> tmp(8 * 128 * 128);
+	uint8_t *romdata = audiorom + 0x10000;
+	std::vector<uint8_t> tmp(8 * 128 * 128);
 	memcpy(&tmp[8 *  0 * 128], romdata + 8 *  0 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 32 * 128], romdata + 8 * 64 * 128, 8 * 32 * 128);
 	memcpy(&tmp[8 * 64 * 128], romdata + 8 * 32 * 128, 8 * 32 * 128);
@@ -237,10 +237,10 @@ void cthd_prot_device::decrypt_ct2k3sa(UINT8* sprrom, UINT32 sprrom_size, UINT8*
 }
 
 
-void cthd_prot_device::patch_ct2k3sa(UINT8* cpurom, UINT32 cpurom_size)
+void cthd_prot_device::patch_ct2k3sa(uint8_t* cpurom, uint32_t cpurom_size)
 {
 	/* patches thanks to razoola - same as for cthd2003*/
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	uint16_t *mem16 = (uint16_t *)cpurom;
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -276,11 +276,11 @@ void cthd_prot_device::patch_ct2k3sa(UINT8* cpurom, UINT32 cpurom_size)
 /* Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg) */
 #define MATRIMBLZ80(i) (i ^ (BITSWAP8(i & 0x3,4,3,1,2,0,7,6,5) << 8))
 
-void cthd_prot_device::matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size)
+void cthd_prot_device::matrimbl_decrypt(uint8_t* sprrom, uint32_t sprrom_size, uint8_t* audiorom, uint32_t audiorom_size)
 {
 	// decrypt Z80
-	UINT8 *rom = audiorom + 0x10000;
-	std::vector<UINT8> buf(0x20000);
+	uint8_t *rom = audiorom + 0x10000;
+	std::vector<uint8_t> buf(0x20000);
 	memcpy(&buf[0], rom, 0x20000);
 
 	int j;

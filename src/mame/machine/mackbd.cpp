@@ -209,7 +209,7 @@ ioport_constructor mackbd_device::device_input_ports() const
 //  mackbd_device - constructor
 //-------------------------------------------------
 
-mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this),
@@ -241,7 +241,7 @@ void mackbd_device::device_reset()
 void mackbd_device::scan_kbd_col(int col)
 {
 	char tempcol[8];
-	UINT16 keydata;
+	uint16_t keydata;
 
 	// read the selected col
 	sprintf(tempcol, "COL%d", col);
@@ -256,7 +256,7 @@ void mackbd_device::scan_kbd_col(int col)
 
 READ8_MEMBER(mackbd_device::p0_r)
 {
-	UINT8 ret = p0;
+	uint8_t ret = p0;
 
 	// capslock
 	if (ioport("MODS")->read() & 0x1)

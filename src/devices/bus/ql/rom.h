@@ -62,13 +62,13 @@ public:
 	virtual ~device_ql_rom_cartridge_card_interface();
 
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
-	virtual void write(address_space &space, offs_t offset, UINT8 data) { }
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
+	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
 	ql_rom_cartridge_slot_t *m_slot;
 
-	optional_shared_ptr<UINT8> m_rom;
+	optional_shared_ptr<uint8_t> m_rom;
 
 	int m_romoeh;
 };
@@ -82,11 +82,11 @@ class ql_rom_cartridge_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	UINT8 read(address_space &space, offs_t offset, UINT8 data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, UINT8 data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
+	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 protected:

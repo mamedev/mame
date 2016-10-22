@@ -89,10 +89,10 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_rombank_w);
 	DECLARE_MACHINE_RESET(wmg);
 	DECLARE_DRIVER_INIT(wmg);
-	UINT8 m_wmg_bank;
-	UINT8 m_wmg_def_bank;
-	UINT8 m_wmg_port_select;
-	UINT8 m_wmg_vram_bank;
+	uint8_t m_wmg_bank;
+	uint8_t m_wmg_def_bank;
+	uint8_t m_wmg_port_select;
+	uint8_t m_wmg_vram_bank;
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
 	DECLARE_READ8_MEMBER(wmg_pia_0_r);
@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 	void wmg_def_install_io_space(address_space &space);
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 
@@ -133,7 +133,7 @@ WRITE8_MEMBER( wmg_state::wmg_nvram_w )
 WRITE8_MEMBER( wmg_state::wmg_rombank_w )
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	data &= 7;
 
@@ -265,7 +265,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
 
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	pia6821_device *pia_0 = space1.machine().device<pia6821_device>("pia_0");
-	UINT8 data = pia_0->read(space1, offset);
+	uint8_t data = pia_0->read(space1, offset);
 
 	if ((m_wmg_bank) && (!offset) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{
@@ -510,8 +510,8 @@ MACHINE_CONFIG_END
  *************************************/
 DRIVER_INIT_MEMBER( wmg_state, wmg )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 	membank("bank5")->configure_entries(0, 8, &RAM[0x2d000], 0x10000);  /* Code */
 	membank("bank6")->configure_entries(0, 8, &ROM[0x10000], 0x1000);   /* Sound */
 	membank("bank7")->configure_entries(1, 4, &RAM[0x78000], 0x1000);   /* Defender roms */

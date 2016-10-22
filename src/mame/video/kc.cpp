@@ -12,7 +12,7 @@
 #include "includes/kc.h"
 
 // 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue
-static const UINT8 kc85_palette[KC85_PALETTE_SIZE * 3] =
+static const uint8_t kc85_palette[KC85_PALETTE_SIZE * 3] =
 {
 	// foreground colours, "full" of each component
 	0x00, 0x00, 0x00,    // black
@@ -66,7 +66,7 @@ WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
 
 
 /* draw 8 pixels */
-void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 colour_byte, UINT8 gfx_byte)
+void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte)
 {
 	int pens[4];
 	int px;
@@ -165,19 +165,19 @@ void kc85_4_state::video_control_w(int data)
 }
 
 
-UINT32 kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *pixel_ram = m_display_video_ram;
-	UINT8 *colour_ram = pixel_ram + 0x04000;
+	uint8_t *pixel_ram = m_display_video_ram;
+	uint8_t *colour_ram = pixel_ram + 0x04000;
 
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{
 		for (int x=0; x<(KC85_SCREEN_WIDTH>>3); x++)
 		{
-			UINT16 offset = y | (x<<8);
+			uint16_t offset = y | (x<<8);
 
-			UINT8 colour_byte = colour_ram[offset];
-			UINT8 gfx_byte = pixel_ram[offset];
+			uint8_t colour_byte = colour_ram[offset];
+			uint8_t gfx_byte = pixel_ram[offset];
 
 			video_draw_8_pixels(bitmap, (x<<3), y, colour_byte, gfx_byte);
 		}
@@ -198,11 +198,11 @@ void kc_state::video_start()
 	m_kc85_blink_state = 0;
 }
 
-UINT32 kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* colour ram takes up 0x02800 bytes */
-	UINT8 *pixel_ram = m_video_ram;
-	UINT8 *colour_ram = m_video_ram + 0x02800;
+	uint8_t *pixel_ram = m_video_ram;
+	uint8_t *colour_ram = m_video_ram + 0x02800;
 
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{
@@ -229,8 +229,8 @@ UINT32 kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 					(((y>>2) & 0x03)<<5) | ((y>>6) & 0x03)<<7);
 			}
 
-			UINT8 colour_byte = colour_ram[colour_offset];
-			UINT8 gfx_byte = pixel_ram[pixel_offset];
+			uint8_t colour_byte = colour_ram[colour_offset];
+			uint8_t gfx_byte = pixel_ram[pixel_offset];
 
 			video_draw_8_pixels(bitmap,(x<<3),y, colour_byte, gfx_byte);
 		}

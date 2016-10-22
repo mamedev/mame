@@ -45,7 +45,7 @@ device_m5_cart_interface::~device_m5_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_m5_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_m5_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -59,7 +59,7 @@ void device_m5_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_m5_cart_interface::ram_alloc(UINT32 size)
+void device_m5_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 }
@@ -72,7 +72,7 @@ void device_m5_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  m5_cart_slot_device - constructor
 //-------------------------------------------------
-m5_cart_slot_device::m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m5_cart_slot_device::m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, M5_CART_SLOT, "M5 Cartridge Slot", tag, owner, clock, "m5_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -175,7 +175,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 		if (m_type == M5_STD || m_type>2) //carts with roms
 		{
-			UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+			uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
@@ -213,7 +213,7 @@ std::string m5_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "std";
-		//UINT32 size = core_fsize(m_file);
+		//uint32_t size = core_fsize(m_file);
 		int type = M5_STD;
 
 

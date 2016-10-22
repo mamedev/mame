@@ -135,7 +135,7 @@ WRITE8_MEMBER(champbas_state::mcu_start_w)
 /* champbja another protection */
 READ8_MEMBER(champbas_state::champbja_protection_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	/*
 	(68BA) & 0x99 == 0x00
 	(6867) & 0x99 == 0x99
@@ -1193,13 +1193,13 @@ ROM_END
 DRIVER_INIT_MEMBER(champbas_state,champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memregion("gfx1")->base();
-	UINT8 *rom2 = memregion("gfx2")->base();
+	uint8_t *rom1 = memregion("gfx1")->base();
+	uint8_t *rom2 = memregion("gfx2")->base();
 	int len = memregion("gfx1")->bytes();
 
 	for (int i = 0; i < len/2; i++)
 	{
-		UINT8 t = rom1[i + len/2];
+		uint8_t t = rom1[i + len/2];
 		rom1[i + len/2] = rom2[i];
 		rom2[i] = t;
 	}
@@ -1209,13 +1209,13 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memregion("gfx1")->base();
-	UINT8 *rom2 = memregion("gfx2")->base();
+	uint8_t *rom1 = memregion("gfx1")->base();
+	uint8_t *rom2 = memregion("gfx2")->base();
 
 	// planes 0,1
 	for (int i = 0; i < 0x1000; i++)
 	{
-		UINT8 t = rom1[i + 0x1000];
+		uint8_t t = rom1[i + 0x1000];
 		rom1[i + 0x1000] = rom2[i];
 		rom2[i] = t;
 	}

@@ -37,7 +37,7 @@ class pcd3311_t :  public device_t,
 {
 public:
 	// construction/destruction
-	pcd3311_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcd3311_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
 	DECLARE_WRITE_LINE_MEMBER( strobe_w ) { m_strobe = state; }
@@ -55,7 +55,7 @@ private:
 	int m_a0;
 	int m_mode;
 	int m_strobe;
-	UINT8 m_data;
+	uint8_t m_data;
 };
 
 

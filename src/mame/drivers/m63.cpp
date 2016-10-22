@@ -145,13 +145,13 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8    m_nmi_mask;
+	uint8_t    m_nmi_mask;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -161,11 +161,11 @@ public:
 	int      m_sy_offset;
 
 	/* sound-related */
-	UINT8    m_sound_irq;
+	uint8_t    m_sound_irq;
 	int      m_sound_status;
 	int      m_p1;
 	int      m_p2;
-	std::unique_ptr<INT16[]>    m_samplebuf;
+	std::unique_ptr<int16_t[]>    m_samplebuf;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -202,7 +202,7 @@ public:
 	DECLARE_MACHINE_RESET(m63);
 	DECLARE_VIDEO_START(m63);
 	DECLARE_PALETTE_INIT(m63);
-	UINT32 screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -211,7 +211,7 @@ public:
 
 PALETTE_INIT_MEMBER(m63_state,m63)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -372,7 +372,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	}
 }
 
-UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int col;
 
@@ -706,13 +706,13 @@ GFXDECODE_END
 SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 {
 	int i, len = memregion("samples")->bytes();
-	UINT8 *ROM = memregion("samples")->base();
+	uint8_t *ROM = memregion("samples")->base();
 
-	m_samplebuf = std::make_unique<INT16[]>(len);
+	m_samplebuf = std::make_unique<int16_t[]>(len);
 	save_pointer(NAME(m_samplebuf.get()), len);
 
 	for(i = 0; i < len; i++)
-		m_samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;
+		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;
 }
 
 INTERRUPT_GEN_MEMBER(m63_state::snd_irq)

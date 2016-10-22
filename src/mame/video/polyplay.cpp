@@ -47,9 +47,9 @@ void polyplay_state::video_start()
 }
 
 
-UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	offs_t offs;
 
 
@@ -57,7 +57,7 @@ UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind1
 	{
 		int sx = (offs & 0x3f) << 3;
 		int sy = offs >> 6 << 3;
-		UINT8 code = videoram[offs];
+		uint8_t code = videoram[offs];
 
 		m_gfxdecode->gfx((code >> 7) & 0x01)->opaque(bitmap,cliprect,
 				code, 0, 0, 0, sx, sy);

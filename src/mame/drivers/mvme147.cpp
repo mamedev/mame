@@ -212,14 +212,14 @@ private:
 	required_device<scc85C30_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	UINT32  *m_sysrom;
-	UINT32  m_sysram[2];
+	uint32_t  *m_sysrom;
+	uint32_t  m_sysram[2];
 
 	// PCC registers
-	UINT8   m_genpurp_stat;
+	uint8_t   m_genpurp_stat;
 
 	// VME chip registers
-	UINT8   m_vc_cntl_conf;
+	uint8_t   m_vc_cntl_conf;
 };
 
 static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
@@ -255,7 +255,7 @@ void mvme147_state::machine_start ()
 	LOG(("--->%s\n", FUNCNAME));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
+	m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 	m_genpurp_stat = 0x02; /* Indicate power up reset */
 	m_vc_cntl_conf = 0x01; /* We are the system controller */
 }
@@ -266,7 +266,7 @@ void mvme147_state::machine_reset ()
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
+		m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 	m_genpurp_stat &= 0xfe; /* Clear parity error bit - not used by MAME at this point so just for the record */
 }
 
@@ -312,7 +312,7 @@ WRITE32_MEMBER (mvme147_state::pcc32_w){
 #define P16_TIMER2_COUNT   (P16BASE + 6)
 
 READ16_MEMBER (mvme147_state::pcc16_r){
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 
 	LOG(("Call to %s[%04x]", FUNCNAME, offset));
 	switch(offset)
@@ -369,7 +369,7 @@ WRITE16_MEMBER (mvme147_state::pcc16_w){
 #define P8_PRINTER_STATUS   0xfffe2800
 
 READ8_MEMBER (mvme147_state::pcc8_r){
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
 	switch(offset + P8BASE)
@@ -492,7 +492,7 @@ WRITE8_MEMBER (mvme147_state::pcc8_w){
 
 
 READ8_MEMBER (mvme147_state::vmechip_r){
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
 	switch(offset * 2 + VCBASE)
@@ -609,7 +609,7 @@ WRITE8_MEMBER (mvme147_state::vmechip_w){
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (mvme147_state::vme_a24_r){
 	LOG (logerror ("vme_a24_r\n"));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme147_state::vme_a24_w){
@@ -618,7 +618,7 @@ WRITE16_MEMBER (mvme147_state::vme_a24_w){
 
 READ16_MEMBER (mvme147_state::vme_a16_r){
 	LOG (logerror ("vme_16_r\n"));
-	return (UINT16) 0;
+	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme147_state::vme_a16_w){

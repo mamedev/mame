@@ -16,7 +16,7 @@
 	else                                                    \
 		m_program->write_dword_unaligned(m_op##num, f2u(appf));
 
-void v60_device::F2DecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
+void v60_device::F2DecodeFirstOperand(am_func DecodeOp1, uint8_t dim1)
 {
 	m_moddim = dim1;
 	m_modm = m_instflags & 0x40;
@@ -26,7 +26,7 @@ void v60_device::F2DecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
 	m_flag1 = m_amflag;
 }
 
-void v60_device::F2DecodeSecondOperand(am_func DecodeOp2, UINT8 dim2)
+void v60_device::F2DecodeSecondOperand(am_func DecodeOp2, uint8_t dim2)
 {
 	m_moddim = dim2;
 	m_modm = m_instflags & 0x20;
@@ -36,7 +36,7 @@ void v60_device::F2DecodeSecondOperand(am_func DecodeOp2, UINT8 dim2)
 	m_flag2 = m_amflag;
 }
 
-void v60_device::F2WriteSecondOperand(UINT8 dim2)
+void v60_device::F2WriteSecondOperand(uint8_t dim2)
 {
 	m_moddim = dim2;
 	m_modm = m_instflags & 0x20;
@@ -44,14 +44,14 @@ void v60_device::F2WriteSecondOperand(UINT8 dim2)
 	m_amlength2 = WriteAM();
 }
 
-UINT32 v60_device::opCVTWS()
+uint32_t v60_device::opCVTWS()
 {
 	float val;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 
 	// Convert to float
-	val = (float)(INT32)m_op1;
+	val = (float)(int32_t)m_op1;
 	m_modwritevalw = f2u(val);
 
 	_OV = 0;
@@ -63,15 +63,15 @@ UINT32 v60_device::opCVTWS()
 	F2END();
 }
 
-UINT32 v60_device::opCVTSW()
+uint32_t v60_device::opCVTSW()
 {
 	float val;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 
-	// Convert to UINT32
+	// Convert to uint32_t
 	val = u2f(m_op1);
-	m_modwritevalw = (UINT32)val;
+	m_modwritevalw = (uint32_t)val;
 
 	_OV = 0;
 	_CY =(val < 0.0f);
@@ -82,7 +82,7 @@ UINT32 v60_device::opCVTSW()
 	F2END();
 }
 
-UINT32 v60_device::opMOVFS()
+uint32_t v60_device::opMOVFS()
 {
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 	m_modwritevalw = m_op1;
@@ -90,7 +90,7 @@ UINT32 v60_device::opMOVFS()
 	F2END();
 }
 
-UINT32 v60_device::opNEGFS()
+uint32_t v60_device::opNEGFS()
 {
 	float appf;
 
@@ -108,7 +108,7 @@ UINT32 v60_device::opNEGFS()
 	F2END()
 }
 
-UINT32 v60_device::opABSFS()
+uint32_t v60_device::opABSFS()
 {
 	float appf;
 
@@ -129,9 +129,9 @@ UINT32 v60_device::opABSFS()
 	F2END()
 }
 
-UINT32 v60_device::opADDFS()
+uint32_t v60_device::opADDFS()
 {
-	UINT32 appw;
+	uint32_t appw;
 	float appf;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
@@ -150,9 +150,9 @@ UINT32 v60_device::opADDFS()
 	F2END()
 }
 
-UINT32 v60_device::opSUBFS()
+uint32_t v60_device::opSUBFS()
 {
-	UINT32 appw;
+	uint32_t appw;
 	float appf;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
@@ -171,9 +171,9 @@ UINT32 v60_device::opSUBFS()
 	F2END()
 }
 
-UINT32 v60_device::opMULFS()
+uint32_t v60_device::opMULFS()
 {
-	UINT32 appw;
+	uint32_t appw;
 	float appf;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
@@ -192,9 +192,9 @@ UINT32 v60_device::opMULFS()
 	F2END()
 }
 
-UINT32 v60_device::opDIVFS()
+uint32_t v60_device::opDIVFS()
 {
-	UINT32 appw;
+	uint32_t appw;
 	float appf;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
@@ -213,9 +213,9 @@ UINT32 v60_device::opDIVFS()
 	F2END()
 }
 
-UINT32 v60_device::opSCLFS()
+uint32_t v60_device::opSCLFS()
 {
-	UINT32 appw;
+	uint32_t appw;
 	float appf;
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 1);
@@ -223,8 +223,8 @@ UINT32 v60_device::opSCLFS()
 
 	F2LOADOPFLOAT(2);
 
-	if ((INT16)m_op1 < 0)
-		appf /= 1 << -(INT16)m_op1;
+	if ((int16_t)m_op1 < 0)
+		appf /= 1 << -(int16_t)m_op1;
 	else
 		appf *= 1 << m_op1;
 
@@ -237,7 +237,7 @@ UINT32 v60_device::opSCLFS()
 	F2END()
 }
 
-UINT32 v60_device::opCMPF()
+uint32_t v60_device::opCMPF()
 {
 	float appf;
 
@@ -254,13 +254,13 @@ UINT32 v60_device::opCMPF()
 	F2END();
 }
 
-UINT32 v60_device::op5FUNHANDLED()
+uint32_t v60_device::op5FUNHANDLED()
 {
 	fatalerror("Unhandled 5F opcode at %08x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::op5CUNHANDLED()
+uint32_t v60_device::op5CUNHANDLED()
 {
 	fatalerror("Unhandled 5C opcode at %08x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
@@ -340,14 +340,14 @@ const v60_device::am_func v60_device::s_Op5CTable[32] =
 };
 
 
-UINT32 v60_device::op5F()
+uint32_t v60_device::op5F()
 {
 	m_instflags = OpRead8(PC + 1);
 	return (this->*s_Op5FTable[m_instflags & 0x1F])();
 }
 
 
-UINT32 v60_device::op5C()
+uint32_t v60_device::op5C()
 {
 	m_instflags = OpRead8(PC + 1);
 	return (this->*s_Op5CTable[m_instflags & 0x1F])();

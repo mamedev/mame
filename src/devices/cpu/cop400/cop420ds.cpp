@@ -12,29 +12,29 @@
 
 CPU_DISASSEMBLE( cop420 )
 {
-	UINT8 opcode = oprom[0];
-	UINT8 next_opcode = oprom[1];
-	UINT16 address;
-	UINT32 flags = 0;
+	uint8_t opcode = oprom[0];
+	uint8_t next_opcode = oprom[1];
+	uint16_t address;
+	uint32_t flags = 0;
 	int bytes = 1;
 
 	if ((opcode >= 0x80 && opcode <= 0xBE) || (opcode >= 0xC0 && opcode <= 0xFE))
 	{
 		if ((pc & 0x3E0) >= 0x80 && (pc & 0x3E0) < 0x100) //JP pages 2,3
 		{
-			address = (UINT16)((pc & 0x380) | (opcode & 0x7F));
+			address = (uint16_t)((pc & 0x380) | (opcode & 0x7F));
 			sprintf(buffer, "JP %x", address);
 		}
 		else
 		{
 			if ((opcode & 0xC0) == 0xC0) //JP other pages
 			{
-				address = (UINT16)((pc & 0x3C0) | (opcode & 0x3F));
+				address = (uint16_t)((pc & 0x3C0) | (opcode & 0x3F));
 				sprintf(buffer, "JP %x", address);
 			}
 			else                    //JSRP
 			{
-				address = (UINT16)(0x80 | (opcode & 0x3F));
+				address = (uint16_t)(0x80 | (opcode & 0x3F));
 				sprintf(buffer, "JSRP %x", address);
 				flags = DASMFLAG_STEP_OVER;
 			}
@@ -162,12 +162,12 @@ CPU_DISASSEMBLE( cop420 )
 
 			if (next_opcode <= 0x3f)
 			{
-				address = (UINT16)(next_opcode & 0x3F);
+				address = (uint16_t)(next_opcode & 0x3F);
 				sprintf(buffer, "LDD %x,%x", ((address & 0x30) >> 4),address & 0x0F);
 			}
 			else if (next_opcode >= 0x80 && next_opcode <= 0xbf)
 			{
-				address = (UINT16)(next_opcode & 0x3F);
+				address = (uint16_t)(next_opcode & 0x3F);
 				sprintf(buffer, "XAD %x,%x", ((address & 0x30) >> 4),address & 0x0F);
 			}
 			else

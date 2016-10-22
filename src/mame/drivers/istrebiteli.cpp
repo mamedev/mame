@@ -33,9 +33,9 @@ class istrebiteli_sound_device : public device_t,
 	public device_sound_interface
 {
 public:
-	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void sound_w(UINT8 data);
+	void sound_w(uint8_t data);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,13 +45,13 @@ protected:
 private:
 	// internal state
 	sound_stream *m_channel;
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	int m_rom_cnt;
 	int m_rom_incr;
 	int m_sample_num;
 	bool m_cnt_reset;
 	bool m_rom_out_en;
-	UINT8 m_prev_data;
+	uint8_t m_prev_data;
 };
 
 extern const device_type ISTREBITELI_SOUND;
@@ -60,7 +60,7 @@ extern const device_type ISTREBITELI_SOUND;
 
 const device_type ISTREBITELI_SOUND = &device_creator<istrebiteli_sound_device>;
 
-istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISTREBITELI_SOUND, "Istrebiteli Sound", tag, owner, clock, "istrebiteli_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -100,7 +100,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 	}
 }
 
-void istrebiteli_sound_device::sound_w(UINT8 data)
+void istrebiteli_sound_device::sound_w(uint8_t data)
 {
 	m_cnt_reset = (data & 2) ? true : false;
 	m_sample_num = (data >> 2) & 7;
@@ -159,13 +159,13 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	tilemap_t *m_tilemap;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 coin_count;
-	UINT8 m_spr_ctrl[2];
-	UINT8 m_spr_collision[2];
-	UINT8 m_spr_xy[8];
-	UINT8 m_tileram[16];
+	uint8_t coin_count;
+	uint8_t m_spr_ctrl[2];
+	uint8_t m_spr_collision[2];
+	uint8_t m_spr_xy[8];
+	uint8_t m_tileram[16];
 };
 
 void istrebiteli_state::machine_start()
@@ -205,8 +205,8 @@ TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 
 void istrebiteli_state::video_start()
 {
-	UINT8 *gfx = memregion("sprite")->base();
-	UINT8 temp[64];
+	uint8_t *gfx = memregion("sprite")->base();
+	uint8_t temp[64];
 
 	for (int offs = 0; offs < 0x200; offs += 0x40)
 	{
@@ -222,7 +222,7 @@ void istrebiteli_state::video_start()
 	m_tilemap->set_scrolldx(96, 96);
 }
 
-UINT32 istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(1);
 

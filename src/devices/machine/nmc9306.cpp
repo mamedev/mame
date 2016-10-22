@@ -62,7 +62,7 @@ const device_type NMC9306 = &device_creator<nmc9306_device>;
 //  nmc9306_device - constructor
 //-------------------------------------------------
 
-inline UINT16 nmc9306_device::read(offs_t offset)
+inline uint16_t nmc9306_device::read(offs_t offset)
 {
 	return m_register[offset];
 }
@@ -72,7 +72,7 @@ inline UINT16 nmc9306_device::read(offs_t offset)
 //  nmc9306_device - constructor
 //-------------------------------------------------
 
-inline void nmc9306_device::write(offs_t offset, UINT16 data)
+inline void nmc9306_device::write(offs_t offset, uint16_t data)
 {
 	if (m_ewen)
 	{
@@ -103,7 +103,7 @@ inline void nmc9306_device::erase(offs_t offset)
 //  nmc9306_device - constructor
 //-------------------------------------------------
 
-nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMC9306, "NMC9306", tag, owner, clock, "nmc9306", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_state(STATE_IDLE),

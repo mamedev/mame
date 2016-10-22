@@ -69,8 +69,8 @@ public:
 	/* misc */
 	ioport_port       *m_io_disksel;
 
-	UINT8      *m_vram;
-	std::unique_ptr<UINT8[]>    m_ciram; //PPU nametable RAM - external to PPU!
+	uint8_t      *m_vram;
+	std::unique_ptr<uint8_t[]>    m_ciram; //PPU nametable RAM - external to PPU!
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
@@ -95,7 +95,7 @@ public:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(nes);
-	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);
 
 	DECLARE_DRIVER_INIT(famicom);

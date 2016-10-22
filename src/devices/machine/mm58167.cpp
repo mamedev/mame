@@ -51,7 +51,7 @@ typedef enum
 //  mm58167_device - constructor
 //-------------------------------------------------
 
-mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MM58167, "National Semiconductor MM58167", tag, owner, clock, "mm58167", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_irq_w(*this)
@@ -186,7 +186,7 @@ READ8_MEMBER(mm58167_device::read)
 	if (offset == R_CTL_IRQSTATUS && !space.debugger_access())
 	{
 		// reading the IRQ status clears IRQ line and IRQ status
-		UINT8 data = m_regs[offset];
+		uint8_t data = m_regs[offset];
 		m_regs[R_CTL_IRQSTATUS] = 0;
 		m_irq_w(CLEAR_LINE);
 		return data;

@@ -280,10 +280,10 @@ public:
 private:
 	required_device<m68000_device> m_maincpu;
 
-	UINT32 m_mmu[4];
-	UINT16 m_internal_ram[0x40000];
+	uint32_t m_mmu[4];
+	uint16_t m_internal_ram[0x40000];
 
-	inline UINT32 get_ram_address(offs_t offset) { return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF; }
+	inline uint32_t get_ram_address(offs_t offset) { return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF; }
 };
 
 
@@ -307,7 +307,7 @@ WRITE16_MEMBER(hp_ipc_state::mmu_w)
 
 READ16_MEMBER(hp_ipc_state::ram_r)
 {
-	UINT32 ram_address = get_ram_address(offset);
+	uint32_t ram_address = get_ram_address(offset);
 
 	//logerror("RAM read, offset = %08x, ram address = %08X\n", offset, ram_address);
 
@@ -326,7 +326,7 @@ READ16_MEMBER(hp_ipc_state::ram_r)
 
 WRITE16_MEMBER(hp_ipc_state::ram_w)
 {
-	UINT32 ram_address = get_ram_address(offset);
+	uint32_t ram_address = get_ram_address(offset);
 
 	//logerror("RAM write, offset = %08x, ram address = %08X, data = %04x\n", offset, ram_address, data);
 

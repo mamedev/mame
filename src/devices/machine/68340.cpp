@@ -32,7 +32,7 @@ int m68340_calc_cs(m68340cpu_device *m68k, offs_t address)
 
 
 
-UINT16 m68340cpu_device::get_cs(offs_t address)
+uint16_t m68340cpu_device::get_cs(offs_t address)
 {
 	m68340_currentcs = m68340_calc_cs(this, address);
 
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 
 
-m68340cpu_device::m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m68340cpu_device::m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fscpu32_device(mconfig, "MC68340", tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map), "mc68340", __FILE__)
 {
 	m68340SIM = nullptr;

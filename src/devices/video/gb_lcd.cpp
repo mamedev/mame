@@ -228,7 +228,7 @@ enum {
  OAM fingerprints taken from Wilbert Pol's own unit.
  */
 
-static const UINT8 dmg_oam_fingerprint[0x100] = {
+static const uint8_t dmg_oam_fingerprint[0x100] = {
 	0xD8, 0xE6, 0xB3, 0x89, 0xEC, 0xDE, 0x11, 0x62, 0x0B, 0x7E, 0x48, 0x9E, 0xB9, 0x6E, 0x26, 0xC9,
 	0x36, 0xF4, 0x7D, 0xE4, 0xD9, 0xCE, 0xFA, 0x5E, 0xA3, 0x77, 0x60, 0xFC, 0x1C, 0x64, 0x8B, 0xAC,
 	0xB6, 0x74, 0x3F, 0x9A, 0x0E, 0xFE, 0xEA, 0xA9, 0x40, 0x3A, 0x7A, 0xB6, 0xF2, 0xED, 0xA8, 0x3E,
@@ -247,7 +247,7 @@ static const UINT8 dmg_oam_fingerprint[0x100] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static const UINT8 mgb_oam_fingerprint[0x100] = {
+static const uint8_t mgb_oam_fingerprint[0x100] = {
 	0xB9, 0xE9, 0x0D, 0x69, 0xBB, 0x7F, 0x00, 0x80, 0xE9, 0x7B, 0x79, 0xA2, 0xFD, 0xCF, 0xD8, 0x0A,
 	0x87, 0xEF, 0x44, 0x11, 0xFE, 0x37, 0x10, 0x21, 0xFA, 0xFF, 0x00, 0x17, 0xF6, 0x4F, 0x83, 0x03,
 	0x3A, 0xF4, 0x00, 0x24, 0xBB, 0xAE, 0x05, 0x01, 0xFF, 0xF7, 0x12, 0x48, 0xA7, 0x5E, 0xF6, 0x28,
@@ -266,7 +266,7 @@ static const UINT8 mgb_oam_fingerprint[0x100] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static const UINT8 cgb_oam_fingerprint[0x100] = {
+static const uint8_t cgb_oam_fingerprint[0x100] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -288,7 +288,7 @@ static const UINT8 cgb_oam_fingerprint[0x100] = {
 /*
  For an AGS in CGB mode this data is: */
 #if 0
-static const UINT8 ags_oam_fingerprint[0x100] = {
+static const uint8_t ags_oam_fingerprint[0x100] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -316,7 +316,7 @@ const device_type CGB_PPU = &device_creator<cgb_ppu_device>;
 
 
 
-dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT32 vram_size)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint32_t vram_size)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 				, device_video_interface(mconfig, *this)
 				, m_lr35902(*this, finder_base::DUMMY_TAG)
@@ -327,7 +327,7 @@ dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, DMG_PPU, "DMG PPU", tag, owner, clock, "dmg_ppu", __FILE__)
 				, device_video_interface(mconfig, *this)
 				, m_lr35902(*this, finder_base::DUMMY_TAG)
@@ -338,19 +338,19 @@ dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, d
 	m_enable_experimental_engine = true;
 }
 
-mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: dmg_ppu_device(mconfig, MGB_PPU, "MGB PPU", tag, owner, clock, "mgb_ppu", __FILE__, 0x2000)
 {
 	m_enable_experimental_engine = true;
 }
 
-sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: dmg_ppu_device(mconfig, SGB_PPU, "SGB PPU", tag, owner, clock, "sgb_ppu", __FILE__, 0x2000)
 {
 	m_enable_experimental_engine = false;
 }
 
-cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: dmg_ppu_device(mconfig, CGB_PPU, "CGB PPU", tag, owner, clock, "cgb_ppu", __FILE__, 0x4000)
 {
 	m_enable_experimental_engine = false;
@@ -365,8 +365,8 @@ void dmg_ppu_device::common_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 	save_item(NAME(m_bitmap));
-	m_oam = make_unique_clear<UINT8[]>(m_oam_size);
-	m_vram = make_unique_clear<UINT8[]>(m_vram_size);
+	m_oam = make_unique_clear<uint8_t[]>(m_oam_size);
+	m_vram = make_unique_clear<uint8_t[]>(m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dmg_ppu_device::videoptr_restore), this));
 	m_lcd_timer = timer_alloc();
@@ -518,7 +518,7 @@ void sgb_ppu_device::device_start()
 {
 	common_start();
 
-	m_sgb_tile_data = make_unique_clear<UINT8[]>(0x2000);
+	m_sgb_tile_data = make_unique_clear<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_sgb_tile_data.get()), 0x2000);
 
 	memset(m_sgb_tile_map, 0, sizeof(m_sgb_tile_map));
@@ -673,7 +673,7 @@ void cgb_ppu_device::device_reset()
 
 
 
-inline void dmg_ppu_device::plot_pixel(int x, int y, UINT16 color)
+inline void dmg_ppu_device::plot_pixel(int x, int y, uint16_t color)
 {
 	m_bitmap.pix16(y, x) = color;
 }
@@ -735,7 +735,7 @@ void dmg_ppu_device::select_sprites()
 	/* If video hardware is enabled and sprites are enabled */
 	if ((LCDCONT & ENABLED) && (LCDCONT & SPRITES_ENABLED))
 	{
-		UINT8 sprite_occurs[32];
+		uint8_t sprite_occurs[32];
 
 		memset(sprite_occurs, 0, sizeof(sprite_occurs));
 
@@ -802,7 +802,7 @@ void dmg_ppu_device::select_sprites()
 }
 
 
-void dmg_ppu_device::update_line_state(UINT64 cycles)
+void dmg_ppu_device::update_line_state(uint64_t cycles)
 {
 	// Can the bg tilemap select bit be changed while drawing the screen? => yes
 	// Can scroll-y be changed while drawing the screen? => yes
@@ -855,7 +855,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			}
 		}
 
-		UINT8 next_tile_cycle = m_line.tile_cycle + 1;
+		uint8_t next_tile_cycle = m_line.tile_cycle + 1;
 
 		switch (m_line.tile_cycle)
 		{
@@ -1056,7 +1056,7 @@ LOG(("enable window, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.win
 
 void dmg_ppu_device::update_sprites()
 {
-	UINT8 height, tilemask, line, *vram;
+	uint8_t height, tilemask, line, *vram;
 	int yindex;
 
 	if (LCDCONT & LARGE_SPRITES)
@@ -1077,7 +1077,7 @@ void dmg_ppu_device::update_sprites()
 	for (int i = m_sprCount - 1; i >= 0; i--)
 	{
 		int oam_address = m_sprite[i] * 4;
-		UINT16 *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
+		uint16_t *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
 		int xindex = m_oam[oam_address + 1] - 8;
 		int adr = (m_oam[oam_address + 2] & tilemask) * 16;
 
@@ -1094,7 +1094,7 @@ void dmg_ppu_device::update_sprites()
 		{
 			adr += (line - m_oam[oam_address]) * 2;
 		}
-		UINT16 data = (vram[adr + 1] << 8) | vram[adr];
+		uint16_t data = (vram[adr + 1] << 8) | vram[adr];
 
 		switch (m_oam[oam_address + 3] & 0xA0)
 		{
@@ -1139,7 +1139,7 @@ void dmg_ppu_device::update_sprites()
 }
 
 
-void dmg_ppu_device::update_scanline(UINT32 cycles_to_go)
+void dmg_ppu_device::update_scanline(uint32_t cycles_to_go)
 {
 	if (m_enable_experimental_engine)
 	{
@@ -1203,8 +1203,8 @@ void dmg_ppu_device::update_scanline(UINT32 cycles_to_go)
 			}
 			while (l < 2)
 			{
-				UINT8 xindex, *map, *tiles;
-				UINT16 data;
+				uint8_t xindex, *map, *tiles;
+				uint16_t data;
 				int i, tile_index;
 
 				if (!m_layer[l].enabled)
@@ -1288,8 +1288,8 @@ void dmg_ppu_device::update_scanline(UINT32 cycles_to_go)
 
 void sgb_ppu_device::update_sprites()
 {
-	UINT8 height, tilemask, line, *vram;
-	INT16 yindex;
+	uint8_t height, tilemask, line, *vram;
+	int16_t yindex;
 
 	if (LCDCONT & LARGE_SPRITES)
 	{
@@ -1312,8 +1312,8 @@ void sgb_ppu_device::update_sprites()
 	{
 		int oam_address = m_sprite[i] * 4;
 		int adr = (m_oam[oam_address + 2] & tilemask) * 16;
-		UINT16 *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
-		UINT16 xindex = m_oam[oam_address + 1] - 8;
+		uint16_t *spal = (m_oam[oam_address + 3] & 0x10) ? m_gb_spal1 : m_gb_spal0;
+		uint16_t xindex = m_oam[oam_address + 1] - 8;
 
 		if (m_oam[oam_address + 3] & 0x40)         /* flip y ? */
 		{
@@ -1323,11 +1323,11 @@ void sgb_ppu_device::update_sprites()
 		{
 			adr += (line - m_oam[oam_address]) * 2;
 		}
-		UINT16 data = (vram[adr + 1] << 8) | vram[adr];
+		uint16_t data = (vram[adr + 1] << 8) | vram[adr];
 
 		/* Find the palette to use */
 		// If sprite started before the start of the line we may need to pick a different pal_map entry?
-		UINT8 pal = m_sgb_pal_map[(xindex < 0) ? 0 : (xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
+		uint8_t pal = m_sgb_pal_map[(xindex < 0) ? 0 : (xindex >> 3)][((yindex - SGB_YOFFSET) >> 3)] << 2;
 
 		/* Offset to center of screen */
 		xindex += SGB_XOFFSET;
@@ -1377,15 +1377,15 @@ void sgb_ppu_device::update_sprites()
 
 void sgb_ppu_device::refresh_border()
 {
-	UINT16 data, data2;
-	UINT8 *tiles, *tiles2;
+	uint16_t data, data2;
+	uint8_t *tiles, *tiles2;
 
-	for (UINT16 yidx = 0; yidx < 224; yidx++)
+	for (uint16_t yidx = 0; yidx < 224; yidx++)
 	{
-		UINT8 *map = m_sgb_tile_map + ((yidx >> 3) * 64);
-		UINT16 xindex = 0;
+		uint8_t *map = m_sgb_tile_map + ((yidx >> 3) * 64);
+		uint16_t xindex = 0;
 
-		for (UINT16 xidx = 0; xidx < 64; xidx += 2)
+		for (uint16_t xidx = 0; xidx < 64; xidx += 2)
 		{
 			if (map[xidx + 1] & 0x80) /* Vertical flip */
 				tiles = m_sgb_tile_data.get() + ((7 - (yidx % 8)) << 1);
@@ -1393,14 +1393,14 @@ void sgb_ppu_device::refresh_border()
 				tiles = m_sgb_tile_data.get() + ((yidx % 8) << 1);
 			tiles2 = tiles + 16;
 
-			UINT8 pal = (map[xidx + 1] & 0x1C) >> 2;
+			uint8_t pal = (map[xidx + 1] & 0x1C) >> 2;
 			if (pal == 0)
 				pal = 1;
 			pal <<= 4;
 
 			if (m_sgb_border_hack)
 			{ /* A few games do weird stuff */
-				UINT8 tileno = map[xidx];
+				uint8_t tileno = map[xidx];
 				if (tileno >= 128) tileno = ((64 + tileno) % 128) + 128;
 				else tileno = (64 + tileno) % 128;
 				data = tiles[tileno * 32] | (tiles[(tileno * 32) + 1] << 8);
@@ -1414,7 +1414,7 @@ void sgb_ppu_device::refresh_border()
 
 			for (int i = 0; i < 8; i++)
 			{
-				UINT8 colour;
+				uint8_t colour;
 				if ((map[xidx + 1] & 0x40))  /* Horizontal flip */
 				{
 					colour = ((data  & 0x0001) ? 1 : 0) | ((data  & 0x0100) ? 2 : 0) |
@@ -1444,7 +1444,7 @@ void sgb_ppu_device::refresh_border()
 	}
 }
 
-void sgb_ppu_device::update_scanline(UINT32 cycles_to_go)
+void sgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 {
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -1534,8 +1534,8 @@ void sgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 			}
 			while (l < 2)
 			{
-				UINT8   xindex, sgb_palette, *map, *tiles;
-				UINT16  data;
+				uint8_t   xindex, sgb_palette, *map, *tiles;
+				uint16_t  data;
 				int i, tile_index;
 
 				if (!m_layer[l].enabled)
@@ -1623,7 +1623,7 @@ void sgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 
 void cgb_ppu_device::update_sprites()
 {
-	UINT8 height, tilemask, line;
+	uint8_t height, tilemask, line;
 	int yindex;
 
 	if (LCDCONT & LARGE_SPRITES)
@@ -1642,10 +1642,10 @@ void cgb_ppu_device::update_sprites()
 
 	for (int i = m_sprCount - 1; i >= 0; i--)
 	{
-		const UINT16 oam_address = m_sprite[i] * 4;
-		UINT8 pal;
+		const uint16_t oam_address = m_sprite[i] * 4;
+		uint8_t pal;
 		int xindex = m_oam[oam_address + 1] - 8;
-		UINT16 adr = ((m_oam[oam_address + 3] & 0x08) << 10) + (m_oam[oam_address + 2] & tilemask) * 16;
+		uint16_t adr = ((m_oam[oam_address + 3] & 0x08) << 10) + (m_oam[oam_address + 2] & tilemask) * 16;
 
 		if (xindex < -7 || xindex > 160)
 		{
@@ -1667,7 +1667,7 @@ void cgb_ppu_device::update_sprites()
 			adr += (line - m_oam[oam_address]) * 2;
 		}
 
-		UINT16 data = (m_vram[adr + 1] << 8) | m_vram[adr];
+		uint16_t data = (m_vram[adr + 1] << 8) | m_vram[adr];
 
 		switch (m_oam[oam_address + 3] & 0xA0)
 		{
@@ -1734,7 +1734,7 @@ void cgb_ppu_device::update_sprites()
 	}
 }
 
-void cgb_ppu_device::update_scanline(UINT32 cycles_to_go)
+void cgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 {
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -1795,8 +1795,8 @@ void cgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 			}
 			while (l < 2)
 			{
-				UINT8   xindex, *map, *tiles, *gbcmap;
-				UINT16  data;
+				uint8_t   xindex, *map, *tiles, *gbcmap;
+				uint16_t  data;
 				int i, tile_index;
 
 				if (!m_layer[l].enabled)
@@ -1917,7 +1917,7 @@ void cgb_ppu_device::update_scanline(UINT32 cycles_to_go)
 }
 
 
-UINT32 dmg_ppu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dmg_ppu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -1944,7 +1944,7 @@ void dmg_ppu_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-void dmg_ppu_device::update_oam_dma_state(UINT64 cycles)
+void dmg_ppu_device::update_oam_dma_state(uint64_t cycles)
 {
 	if (m_oam_dma_cycles_left > 0)
 	{
@@ -2041,7 +2041,7 @@ void dmg_ppu_device::update_state()
 
 	assert(now >= m_last_updated);
 
-	UINT64 cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
+	uint64_t cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
 
 	update_oam_dma_state(cycles);
 
@@ -2073,7 +2073,7 @@ void dmg_ppu_device::update_state()
 
 		while (m_cycles_left == 0)
 		{
-			UINT16 state_cycles = 0;
+			uint16_t state_cycles = 0;
 
 			m_state = m_next_state;
 
@@ -2417,7 +2417,7 @@ LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_lin
 
 // CGB specific code
 
-void cgb_ppu_device::update_hdma_state(UINT64 cycles)
+void cgb_ppu_device::update_hdma_state(uint64_t cycles)
 {
 	if (m_hdma_cycles_to_start > 0)
 	{
@@ -2434,7 +2434,7 @@ void cgb_ppu_device::update_hdma_state(UINT64 cycles)
 }
 
 
-void cgb_ppu_device::hdma_trans(UINT16 length)
+void cgb_ppu_device::hdma_trans(uint16_t length)
 {
 	LOG(("hdma_trans\n"));
 	m_hdma_length = length;
@@ -2446,8 +2446,8 @@ void cgb_ppu_device::hdma_trans(UINT16 length)
 void cgb_ppu_device::hdma_trans_execute()
 {
 	LOG(("hdma_trans_execute\n"));
-	UINT16 length = m_hdma_length;
-	UINT16 src, dst;
+	uint16_t length = m_hdma_length;
+	uint16_t src, dst;
 
 	src = (HDMA1 << 8) | (HDMA2 & 0xF0);
 	// 102 Dalmatians uses destination 0000 and expects data to be DMAed.
@@ -2458,8 +2458,8 @@ void cgb_ppu_device::hdma_trans_execute()
 	{
 		if (dst & 0x8000)
 		{
-			UINT16 src_high = src & 0xF000;
-			UINT8 source = 0xFF;
+			uint16_t src_high = src & 0xF000;
+			uint8_t source = 0xFF;
 			if (src_high < 0x8000 || (src_high >= 0xA000 && src_high < 0xE000))
 			{
 				source = m_program_space->read_byte(src);
@@ -2497,7 +2497,7 @@ void cgb_ppu_device::update_state()
 
 	attotime now = machine().time();
 
-	UINT64 cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
+	uint64_t cycles = m_lr35902->attotime_to_cycles(now - m_last_updated);
 
 	update_oam_dma_state(cycles);
 	update_hdma_state(cycles);
@@ -2521,7 +2521,7 @@ void cgb_ppu_device::update_state()
 
 		while (m_cycles_left == 0)
 		{
-			UINT16 state_cycles = 0;
+			uint16_t state_cycles = 0;
 
 			m_state = m_next_state;
 
@@ -2832,7 +2832,7 @@ void cgb_ppu_device::update_state()
 }
 
 
-void dmg_ppu_device::lcd_switch_on(UINT8 new_data)
+void dmg_ppu_device::lcd_switch_on(uint8_t new_data)
 {
 	m_current_line = 0;
 	m_previous_line = 153;
@@ -2940,7 +2940,7 @@ READ8_MEMBER(dmg_ppu_device::video_r)
 }
 
 
-bool dmg_ppu_device::stat_write(UINT8 new_data)
+bool dmg_ppu_device::stat_write(uint8_t new_data)
 {
 	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
 
@@ -3227,7 +3227,7 @@ READ8_MEMBER(cgb_ppu_device::video_r)
 }
 
 
-bool cgb_ppu_device::stat_write(UINT8 new_data)
+bool cgb_ppu_device::stat_write(uint8_t new_data)
 {
 	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
 
@@ -3511,7 +3511,7 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 
 // Super Game Boy
 
-void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
+void sgb_ppu_device::sgb_io_write_pal(int offs, uint8_t *data)
 {
 	switch (offs)
 	{
@@ -3557,7 +3557,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x04:  /* ATTR_BLK */
 		{
-			UINT8 I, J, K, o;
+			uint8_t I, J, K, o;
 			for( K = 0; K < data[1]; K++ )
 			{
 				o = K * 6;
@@ -3576,7 +3576,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x05:  /* ATTR_LIN */
 		{
-			UINT8 J, K;
+			uint8_t J, K;
 			if( data[1] > 15 )
 				data[1] = 15;
 			for( K = 0; K < data[1]; K++ )
@@ -3600,7 +3600,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x06:  /* ATTR_DIV */
 		{
-			UINT8 I, J;
+			uint8_t I, J;
 			if( data[1] & 0x40 ) /* Vertical */
 			{
 				for( I = 0; I < data[2]; I++ )
@@ -3647,8 +3647,8 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x07:  /* ATTR_CHR */
 		{
-			UINT16 I, sets;
-			UINT8 x, y;
+			uint16_t I, sets;
+			uint8_t x, y;
 			sets = (data[3] | (data[4] << 8) );
 			if( sets > 360 )
 				sets = 360;
@@ -3751,28 +3751,28 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x0A:  /* PAL_SET */
 		{
-			UINT16 index_;
+			uint16_t index_;
 
 			/* Palette 0 */
-			index_ = (UINT16)(data[1] | (data[2] << 8)) * 4;
+			index_ = (uint16_t)(data[1] | (data[2] << 8)) * 4;
 			m_sgb_pal[0] = m_sgb_pal_data[index_];
 			m_sgb_pal[1] = m_sgb_pal_data[index_ + 1];
 			m_sgb_pal[2] = m_sgb_pal_data[index_ + 2];
 			m_sgb_pal[3] = m_sgb_pal_data[index_ + 3];
 			/* Palette 1 */
-			index_ = (UINT16)(data[3] | (data[4] << 8)) * 4;
+			index_ = (uint16_t)(data[3] | (data[4] << 8)) * 4;
 			m_sgb_pal[4] = m_sgb_pal_data[index_];
 			m_sgb_pal[5] = m_sgb_pal_data[index_ + 1];
 			m_sgb_pal[6] = m_sgb_pal_data[index_ + 2];
 			m_sgb_pal[7] = m_sgb_pal_data[index_ + 3];
 			/* Palette 2 */
-			index_ = (UINT16)(data[5] | (data[6] << 8)) * 4;
+			index_ = (uint16_t)(data[5] | (data[6] << 8)) * 4;
 			m_sgb_pal[8] = m_sgb_pal_data[index_];
 			m_sgb_pal[9] = m_sgb_pal_data[index_ + 1];
 			m_sgb_pal[10] = m_sgb_pal_data[index_ + 2];
 			m_sgb_pal[11] = m_sgb_pal_data[index_ + 3];
 			/* Palette 3 */
-			index_ = (UINT16)(data[7] | (data[8] << 8)) * 4;
+			index_ = (uint16_t)(data[7] | (data[8] << 8)) * 4;
 			m_sgb_pal[12] = m_sgb_pal_data[index_];
 			m_sgb_pal[13] = m_sgb_pal_data[index_ + 1];
 			m_sgb_pal[14] = m_sgb_pal_data[index_ + 2];
@@ -3798,7 +3798,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x0B:  /* PAL_TRN */
 		{
-			UINT16 col;
+			uint16_t col;
 
 			for (int i = 0; i < 2048; i++ )
 			{
@@ -3833,7 +3833,7 @@ void sgb_ppu_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x14:  /* PCT_TRN */
 		{
-			UINT16 col;
+			uint16_t col;
 			if (m_sgb_border_hack)
 			{
 				memcpy(m_sgb_tile_map, m_vram.get() + 0x1000, 2048);

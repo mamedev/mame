@@ -22,7 +22,7 @@
 
 PALETTE_INIT_MEMBER(gridlee_state, gridlee)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(gridlee_state, gridlee)
 
 void gridlee_state::expand_pixels()
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int offset = 0;
 
 	for(offset = 0; offset < 0x77ff; offset++)
@@ -63,7 +63,7 @@ void gridlee_state::expand_pixels()
 void gridlee_state::video_start()
 {
 	/* allocate a local copy of video RAM */
-	m_local_videoram = make_unique_clear<UINT8[]>(256 * 256);
+	m_local_videoram = make_unique_clear<uint8_t[]>(256 * 256);
 
 	/* reset the palette */
 	m_palettebank_vis = 0;
@@ -97,7 +97,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_cocktail_flip_w)
 
 WRITE8_MEMBER(gridlee_state::gridlee_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 
 	/* expand the two pixel values into two bytes */
@@ -131,10 +131,10 @@ WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 /* all the GRIDLEE_VBEND adjustments are needed because the hardware has a separate counting chain
    to address the video memory instead of using the video chain directly */
 
-UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = &m_palette->pen(m_palettebank_vis * 32);
-	UINT8 *gfx;
+	uint8_t *gfx;
 	int x, y, i;
 
 	/* draw scanlines from the VRAM directly */
@@ -148,7 +148,7 @@ UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 
 		else
 		{
 			int srcy = GRIDLEE_VBSTART - 1 - y;
-			UINT8 temp[256];
+			uint8_t temp[256];
 			int xx;
 
 			for (xx = 0; xx < 256; xx++)
@@ -161,8 +161,8 @@ UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 
 	gfx = memregion("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 *sprite = m_spriteram + i * 4;
-		UINT8 *src;
+		uint8_t *sprite = m_spriteram + i * 4;
+		uint8_t *src;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;
 		int xpos = sprite[3];

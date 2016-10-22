@@ -26,7 +26,7 @@ class intv_handctrl_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_intv_control_port_interface overrides
-	virtual UINT8 read_ctrl() override;
+	virtual uint8_t read_ctrl() override;
 
 private:
 	required_ioport m_cfg;

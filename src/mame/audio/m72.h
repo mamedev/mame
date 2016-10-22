@@ -14,7 +14,7 @@ class m72_audio_device : public device_t,
 									public device_sound_interface
 {
 public:
-	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~m72_audio_device() {}
 
 	enum
@@ -50,10 +50,10 @@ protected:
 
 private:
 	// internal state
-	UINT8 m_irqvector;
-	UINT32 m_sample_addr;
-	optional_region_ptr<UINT8> m_samples;
-	UINT32 m_samples_size;
+	uint8_t m_irqvector;
+	uint32_t m_sample_addr;
+	optional_region_ptr<uint8_t> m_samples;
+	uint32_t m_samples_size;
 	address_space *m_space;
 	optional_device<dac_byte_interface> m_dac;
 	required_device<generic_latch_8_device> m_soundlatch;

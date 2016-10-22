@@ -26,7 +26,7 @@ const device_type COLECOVISION_STANDARD = &device_creator<colecovision_standard_
 //  colecovision_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COLECOVISION_STANDARD, "ColecoVision standard cartridge", tag, owner, clock, "colecovision_standard", __FILE__),
 	device_colecovision_cartridge_interface(mconfig, *this)
 {
@@ -46,7 +46,7 @@ void colecovision_standard_cartridge_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-UINT8 colecovision_standard_cartridge_device::bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_standard_cartridge_device::bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
 {
 	if (!_8000 || !_a000 || !_c000 || !_e000)
 	{

@@ -194,7 +194,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_bioship_x0016_w)
 WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 {
 #if 0
-	UINT16* dstram;
+	uint16_t* dstram;
 
 	dstram = m_mainram;
 
@@ -246,7 +246,7 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 	    all word accesses are to the input port */
 	if (ACCESSING_BITS_8_15 && !ACCESSING_BITS_0_7)
 	{
-		static const UINT8 to_main[] =
+		static const uint8_t to_main[] =
 		{
 			0x82,0xc7,0x00,0x2c,0x6c,0x00,0x9f,0xc7,0x00,0x29,0x69,0x00,0x8b,0xc7,0x00
 		};
@@ -736,11 +736,11 @@ WRITE16_MEMBER(nmk16_state::tdragon_mainram_w)
 }
 
 /*coin setting MCU simulation*/
-void nmk16_state::mcu_run(UINT8 dsw_setting)
+void nmk16_state::mcu_run(uint8_t dsw_setting)
 {
-	UINT16 coin_input;
-	UINT8 dsw[2];
-	UINT8 i;
+	uint16_t coin_input;
+	uint8_t dsw[2];
+	uint8_t i;
 
 	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
 	if(m_start_helper & 1 && m_mainram[0x9000/2] & 0x0200) /*start 1 */
@@ -4681,9 +4681,9 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 MACHINE_CONFIG_END
 
 
-UINT8 nmk16_state::decode_byte(UINT8 src, const UINT8 *bitp)
+uint8_t nmk16_state::decode_byte(uint8_t src, const uint8_t *bitp)
 {
-	UINT8 ret, i;
+	uint8_t ret, i;
 
 	ret = 0;
 	for (i=0; i<8; i++)
@@ -4692,15 +4692,15 @@ UINT8 nmk16_state::decode_byte(UINT8 src, const UINT8 *bitp)
 	return ret;
 }
 
-UINT32 nmk16_state::bjtwin_address_map_bg0(UINT32 addr)
+uint32_t nmk16_state::bjtwin_address_map_bg0(uint32_t addr)
 {
 	return ((addr&0x00004)>> 2) | ((addr&0x00800)>> 10) | ((addr&0x40000)>>16);
 }
 
 
-UINT16 nmk16_state::decode_word(UINT16 src, const UINT8 *bitp)
+uint16_t nmk16_state::decode_word(uint16_t src, const uint8_t *bitp)
 {
-	UINT16 ret, i;
+	uint16_t ret, i;
 
 	ret=0;
 	for (i=0; i<16; i++)
@@ -4710,7 +4710,7 @@ UINT16 nmk16_state::decode_word(UINT16 src, const UINT8 *bitp)
 }
 
 
-UINT32 nmk16_state::bjtwin_address_map_sprites(UINT32 addr)
+uint32_t nmk16_state::bjtwin_address_map_sprites(uint32_t addr)
 {
 	return ((addr&0x00010)>> 4) | ((addr&0x20000)>>16) | ((addr&0x100000)>>18);
 }
@@ -4719,10 +4719,10 @@ UINT32 nmk16_state::bjtwin_address_map_sprites(UINT32 addr)
 void nmk16_state::decode_gfx()
 {
 	/* GFX are scrambled.  We decode them here.  (BIG Thanks to Antiriad for descrambling info) */
-	UINT8 *rom;
+	uint8_t *rom;
 	int A, len;
 
-	static const UINT8 decode_data_bg[8][8] =
+	static const uint8_t decode_data_bg[8][8] =
 	{
 		{0x3,0x0,0x7,0x2,0x5,0x1,0x4,0x6},
 		{0x1,0x2,0x6,0x5,0x4,0x0,0x3,0x7},
@@ -4734,7 +4734,7 @@ void nmk16_state::decode_gfx()
 		{0x3,0x4,0x7,0x6,0x2,0x0,0x5,0x1},
 	};
 
-	static const UINT8 decode_data_sprite[8][16] =
+	static const uint8_t decode_data_sprite[8][16] =
 	{
 		{0x9,0x3,0x4,0x5,0x7,0x1,0xb,0x8,0x0,0xd,0x2,0xc,0xe,0x6,0xf,0xa},
 		{0x1,0x3,0xc,0x4,0x0,0xf,0xb,0xa,0x8,0x5,0xe,0x6,0xd,0x2,0x7,0x9},
@@ -4761,7 +4761,7 @@ void nmk16_state::decode_gfx()
 	len = memregion("sprites")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
-		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
+		uint16_t tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
 		rom[A+1] = tmp >> 8;
 		rom[A] = tmp & 0xff;
 	}
@@ -4772,17 +4772,17 @@ void nmk16_state::decode_tdragonb()
 	/* Descrambling Info Again Taken from Raine, Huge Thanks to Antiriad and the Raine Team for
 	   going Open Source, best of luck in future development. */
 
-	UINT8 *rom;
+	uint8_t *rom;
 	int A, len;
 
 	/* The Main 68k Program of the Bootleg is Bitswapped */
-	static const UINT8 decode_data_tdragonb[1][16] =
+	static const uint8_t decode_data_tdragonb[1][16] =
 	{
 		{0xe,0xc,0xa,0x8,0x7,0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x6,0x4,0x2,0x0},
 	};
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static const UINT8 decode_data_tdragonbgfx[1][8] =
+	static const uint8_t decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
@@ -4792,7 +4792,7 @@ void nmk16_state::decode_tdragonb()
 	for (A = 0;A < len;A += 2)
 	{
 		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
-		UINT16 tmp = decode_word( rom[h]*256 + rom[l], decode_data_tdragonb[0]);
+		uint16_t tmp = decode_word( rom[h]*256 + rom[l], decode_data_tdragonb[0]);
 		rom[h] = tmp >> 8;
 		rom[l] = tmp & 0xff;
 	}
@@ -4815,11 +4815,11 @@ void nmk16_state::decode_tdragonb()
 void nmk16_state::decode_ssmissin()
 {
 	/* Like Thunder Dragon Bootleg without the Program Rom Swapping */
-	UINT8 *rom;
+	uint8_t *rom;
 	int A, len;
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static const UINT8 decode_data_tdragonbgfx[1][8] =
+	static const uint8_t decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
@@ -4858,7 +4858,7 @@ DRIVER_INIT_MEMBER(nmk16_state,tharrier)
 
 DRIVER_INIT_MEMBER(nmk16_state,hachamf_prot)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4876,7 +4876,7 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4913,7 +4913,7 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif
@@ -5316,9 +5316,9 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 	int a11, int a10, int a9, int a8, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0 )
 {
 	int i;
-	UINT8 *RAM = machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *RAM = machine.root_device().memregion( "maincpu" )->base();
 	size_t  size = machine.root_device().memregion( "maincpu" )->bytes();
-	std::vector<UINT8> buffer( size );
+	std::vector<uint8_t> buffer( size );
 
 	memcpy( &buffer[0], RAM, size );
 	for( i = 0; i < size; i++ )

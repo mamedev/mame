@@ -96,7 +96,7 @@ void menu_plugin_opt::populate()
 	uintptr_t i = 1;
 	for(auto &item : menu_list)
 	{
-		UINT32 flags = 0;
+		uint32_t flags = 0;
 		if(item.flags == "off")
 			flags = FLAG_DISABLE;
 		else if(item.flags == "l")

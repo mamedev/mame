@@ -155,7 +155,7 @@ void menu_custom_filter::handle()
 void menu_custom_filter::populate()
 {
 	// add main filter
-	UINT32 arrow_flags = get_arrow_flags<UINT16>(FILTER_ALL, FILTER_UNAVAILABLE, custfltr::main);
+	uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_ALL, FILTER_UNAVAILABLE, custfltr::main);
 	item_append(_("Main filter"), main_filters::text[custfltr::main], arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
 
 	// add other filters
@@ -164,7 +164,7 @@ void menu_custom_filter::populate()
 		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
-		arrow_flags = get_arrow_flags<UINT16>(FILTER_UNAVAILABLE + 1, FILTER_LAST - 1, custfltr::other[x]);
+		arrow_flags = get_arrow_flags<uint16_t>(FILTER_UNAVAILABLE + 1, FILTER_LAST - 1, custfltr::other[x]);
 		item_append(_("Other filter"), main_filters::text[custfltr::other[x]], arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
 
 		if (m_added)
@@ -173,7 +173,7 @@ void menu_custom_filter::populate()
 		// add manufacturer subitem
 		if (custfltr::other[x] == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
 			std::string fbuff(_("^!Manufacturer"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_mnfct::ui[custfltr::mnfct[x]], arrow_flags, (void *)(uintptr_t)(MNFCT_FILTER + x));
@@ -182,7 +182,7 @@ void menu_custom_filter::populate()
 		// add year subitem
 		else if (custfltr::other[x] == FILTER_YEAR && c_year::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, c_year::ui.size() - 1, custfltr::year[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, c_year::ui.size() - 1, custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_year::ui[custfltr::year[x]], arrow_flags, (void *)(uintptr_t)(YEAR_FILTER + x));
@@ -442,7 +442,7 @@ void menu_swcustom_filter::handle()
 void menu_swcustom_filter::populate()
 {
 	// add main filter
-	UINT32 arrow_flags = get_arrow_flags<UINT16>(UI_SW_ALL, UI_SW_UNAVAILABLE, sw_custfltr::main);
+	uint32_t arrow_flags = get_arrow_flags<uint16_t>(UI_SW_ALL, UI_SW_UNAVAILABLE, sw_custfltr::main);
 	item_append(_("Main filter"), sw_filters::text[sw_custfltr::main], arrow_flags, (void *)(uintptr_t)MAIN_FILTER);
 
 	// add other filters
@@ -451,7 +451,7 @@ void menu_swcustom_filter::populate()
 		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
-		arrow_flags = get_arrow_flags<UINT16>(UI_SW_UNAVAILABLE + 1, UI_SW_LAST - 1, sw_custfltr::other[x]);
+		arrow_flags = get_arrow_flags<uint16_t>(UI_SW_UNAVAILABLE + 1, UI_SW_LAST - 1, sw_custfltr::other[x]);
 		item_append(_("Other filter"), sw_filters::text[sw_custfltr::other[x]], arrow_flags, (void *)(uintptr_t)(OTHER_FILTER + x));
 
 		if (m_added)
@@ -460,7 +460,7 @@ void menu_swcustom_filter::populate()
 		// add publisher subitem
 		if (sw_custfltr::other[x] == UI_SW_PUBLISHERS && m_filter.publisher.ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
 			std::string fbuff(_("^!Publisher"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, m_filter.publisher.ui[sw_custfltr::mnfct[x]], arrow_flags, (void *)(uintptr_t)(MNFCT_FILTER + x));
@@ -469,7 +469,7 @@ void menu_swcustom_filter::populate()
 		// add year subitem
 		else if (sw_custfltr::other[x] == UI_SW_YEARS && m_filter.year.ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, m_filter.year.ui[sw_custfltr::year[x]], arrow_flags, (void *)(uintptr_t)(YEAR_FILTER + x));
@@ -478,7 +478,7 @@ void menu_swcustom_filter::populate()
 		// add year subitem
 		else if (sw_custfltr::other[x] == UI_SW_LIST && m_filter.swlist.name.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
 			std::string fbuff(_("^!Software List"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, m_filter.swlist.description[sw_custfltr::list[x]], arrow_flags, (void *)(uintptr_t)(LIST_FILTER + x));
@@ -487,7 +487,7 @@ void menu_swcustom_filter::populate()
 		// add device type subitem
 		else if (sw_custfltr::other[x] == UI_SW_TYPE && m_filter.type.ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
 			std::string fbuff(_("^!Device type"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, m_filter.type.ui[sw_custfltr::type[x]], arrow_flags, (void *)(uintptr_t)(TYPE_FILTER + x));
@@ -496,7 +496,7 @@ void menu_swcustom_filter::populate()
 		// add region subitem
 		else if (sw_custfltr::other[x] == UI_SW_REGION && m_filter.region.ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags<UINT16>(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
+			arrow_flags = get_arrow_flags<uint16_t>(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
 			std::string fbuff(_("^!Region"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, m_filter.region.ui[sw_custfltr::region[x]], arrow_flags, (void *)(uintptr_t)(REGION_FILTER + x));

@@ -27,7 +27,7 @@ class bbc_watfordfdc_device :
 {
 public:
 	// construction/destruction
-	bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -38,7 +38,7 @@ public:
 class bbc_weddb2_device : public bbc_watfordfdc_device
 {
 public:
-	bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -63,7 +63,7 @@ private:
 class bbc_weddb3_device : public bbc_watfordfdc_device
 {
 public:
-	bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

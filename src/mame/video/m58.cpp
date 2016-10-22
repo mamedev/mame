@@ -21,13 +21,13 @@
 
 PALETTE_INIT_MEMBER(m58_state, m58)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	const UINT8 *char_lopal = color_prom + 0x000;
-	const UINT8 *char_hipal = color_prom + 0x100;
-	const UINT8 *sprite_pal = color_prom + 0x200;
-	const UINT8 *sprite_table = color_prom + 0x220;
-	const UINT8 *radar_lopal = color_prom + 0x320;
-	const UINT8 *radar_hipal = color_prom + 0x420;
+	const uint8_t *color_prom = memregion("proms")->base();
+	const uint8_t *char_lopal = color_prom + 0x000;
+	const uint8_t *char_hipal = color_prom + 0x100;
+	const uint8_t *sprite_pal = color_prom + 0x200;
+	const uint8_t *sprite_table = color_prom + 0x220;
+	const uint8_t *radar_lopal = color_prom + 0x320;
+	const uint8_t *radar_hipal = color_prom + 0x420;
 	static const int resistances_3[3] = { 1000, 470, 220 };
 	static const int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 	/* character palette */
 	for (i = 0; i < 256; i++)
 	{
-		UINT8 promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
+		uint8_t promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
 		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
@@ -53,7 +53,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 	/* radar palette */
 	for (i = 0; i < 256; i++)
 	{
-		UINT8 promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
+		uint8_t promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
 		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
@@ -70,7 +70,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 	/* sprite palette */
 	for (i = 0; i < 16; i++)
 	{
-		UINT8 promval = sprite_pal[i];
+		uint8_t promval = sprite_pal[i];
 		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 	/* sprite lookup table */
 	for (i = 0; i < 256; i++)
 	{
-		UINT8 promval = sprite_table[i] & 0x0f;
+		uint8_t promval = sprite_table[i] & 0x0f;
 		palette.set_pen_indirect(256+256+i, 256+256+promval);
 	}
 }
@@ -294,7 +294,7 @@ void m58_state::draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect )
  *
  *************************************/
 
-UINT32 m58_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m58_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, (*m_scroll_x_high * 0x100) + *m_scroll_x_low);
 	m_bg_tilemap->set_scrolly(0, *m_scroll_y_low);

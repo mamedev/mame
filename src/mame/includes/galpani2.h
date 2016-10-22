@@ -36,18 +36,18 @@ public:
 	required_device<palette_device> m_bg15palette;
 	required_device<palette_device> m_bg8palette;
 
-	required_shared_ptr_array<UINT16, 2> m_bg8;
-	optional_shared_ptr_array<UINT16, 2> m_palette_val;
-	required_shared_ptr_array<UINT16, 2> m_bg8_scrollx;
-	required_shared_ptr_array<UINT16, 2> m_bg8_scrolly;
-	required_shared_ptr<UINT16> m_bg15;
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_ram2;
-	optional_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr_array<uint16_t, 2> m_bg8;
+	optional_shared_ptr_array<uint16_t, 2> m_palette_val;
+	required_shared_ptr_array<uint16_t, 2> m_bg8_scrollx;
+	required_shared_ptr_array<uint16_t, 2> m_bg8_scrolly;
+	required_shared_ptr<uint16_t> m_bg15;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_ram2;
+	optional_shared_ptr<uint16_t> m_spriteram;
 
-	UINT16 m_eeprom_word;
-	UINT16 m_old_mcu_nmi1;
-	UINT16 m_old_mcu_nmi2;
+	uint16_t m_eeprom_word;
+	uint16_t m_old_mcu_nmi1;
+	uint16_t m_old_mcu_nmi2;
 
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_init_w);
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
@@ -62,7 +62,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galpani2);
-	UINT32 screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 	void copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

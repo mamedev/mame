@@ -39,7 +39,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #define VERBOSE_LEVEL ( 0 )
 
 
-#define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
+#define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
 
 class gizmondo_state : public driver_device
 {
@@ -51,7 +51,7 @@ public:
 		m_gf4500(*this, "gf4500")
 		{ }
 
-	UINT32 m_port[9];
+	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
 	DECLARE_DRIVER_INIT(gizmondo);
 	virtual void machine_start() override;
@@ -87,7 +87,7 @@ inline void gizmondo_state::verboselog( int n_level, const char *s_fmt, ...)
 
 READ32_MEMBER(gizmondo_state::s3c2440_gpio_port_r)
 {
-	UINT32 data = m_port[offset];
+	uint32_t data = m_port[offset];
 	switch (offset)
 	{
 		case S3C2440_GPIO_PORT_D :
@@ -98,7 +98,7 @@ READ32_MEMBER(gizmondo_state::s3c2440_gpio_port_r)
 		break;
 		case S3C2440_GPIO_PORT_F :
 		{
-			UINT32 port_c = m_port[S3C2440_GPIO_PORT_C];
+			uint32_t port_c = m_port[S3C2440_GPIO_PORT_C];
 			data = data & ~0x000000F2;
 			// keys
 			data |= 0x00F2;

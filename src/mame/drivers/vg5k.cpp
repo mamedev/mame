@@ -297,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
 {
-	m_ef9345->update_scanline((UINT16)param);
+	m_ef9345->update_scanline((uint16_t)param);
 }
 
 
@@ -331,8 +331,8 @@ GFXDECODE_END
 
 DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 {
-	UINT8 *FNT = memregion("ef9345")->base();
-	UINT16 a,b,c,d,dest=0x2000;
+	uint8_t *FNT = memregion("ef9345")->base();
+	uint16_t a,b,c,d,dest=0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
 	for (a = 0; a < 8192; a+=4096)
@@ -344,8 +344,8 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 
 	/* install expansion memory*/
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT16 ram_size = m_ram->size();
+	uint8_t *ram = m_ram->pointer();
+	uint16_t ram_size = m_ram->size();
 
 	if (ram_size > 0x4000)
 		program.install_ram(0x8000, 0x3fff + ram_size, ram);

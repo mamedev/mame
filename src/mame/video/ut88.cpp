@@ -27,7 +27,7 @@ VIDEO_START_MEMBER(ut88_state,ut88)
 {
 }
 
-UINT32 ut88_state::screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ut88_state::screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 

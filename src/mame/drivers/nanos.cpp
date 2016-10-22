@@ -54,10 +54,10 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<timer_device> m_key_t;
 	required_device<ram_device> m_ram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_key_command;
-	UINT8 m_last_code;
-	UINT8 m_key_pressed;
+	const uint8_t *m_p_chargen;
+	uint8_t m_key_command;
+	uint8_t m_last_code;
+	uint8_t m_key_pressed;
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
@@ -65,7 +65,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
 	DECLARE_READ8_MEMBER(nanos_port_a_r);
@@ -80,7 +80,7 @@ protected:
 	required_memory_bank m_bank3;
 	required_ioport_array<7> m_lines;
 	required_ioport m_linec;
-	UINT8 row_number(UINT8 code);
+	uint8_t row_number(uint8_t code);
 };
 
 
@@ -246,11 +246,11 @@ void nanos_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  static UINT8 framecnt=0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+//  static uint8_t framecnt=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 //  framecnt++;
 
@@ -258,7 +258,7 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -290,7 +290,7 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 READ8_MEMBER(nanos_state::nanos_port_a_r)
 {
-	UINT8 retVal;
+	uint8_t retVal;
 	if (m_key_command==0)  {
 		return m_key_pressed;
 	} else {
@@ -316,7 +316,7 @@ WRITE8_MEMBER(nanos_state::nanos_port_b_w)
 	}
 }
 
-UINT8 nanos_state::row_number(UINT8 code)
+uint8_t nanos_state::row_number(uint8_t code)
 {
 	if (BIT(code, 0)) return 0;
 	if (BIT(code, 1)) return 1;
@@ -332,10 +332,10 @@ UINT8 nanos_state::row_number(UINT8 code)
 TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
 	int i;
-	UINT8 code;
-	UINT8 key_code = 0;
-	UINT8 shift = m_linec->read() & 0x02 ? 1 : 0;
-	UINT8 ctrl =  m_linec->read() & 0x01 ? 1 : 0;
+	uint8_t code;
+	uint8_t key_code = 0;
+	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
+	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
 	m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{

@@ -44,19 +44,19 @@ public:
 	required_device<dac_bit_interface> m_dac2;
 	required_device<dac_bit_interface> m_dac3;
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	UINT8 m_marker_x;
-	UINT8 m_marker_y;
+	uint8_t m_marker_x;
+	uint8_t m_marker_y;
 
 	/* misc */
 	int m_timer_count;
-	UINT8 m_sense_state;
-	UINT8 m_attract;
+	uint8_t m_sense_state;
+	uint8_t m_attract;
 
 	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);
 	DECLARE_READ8_MEMBER(lazercmd_ctrl_port_r);
@@ -70,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(lazercmd);
-	UINT32 screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
 	int vert_scale(int data);

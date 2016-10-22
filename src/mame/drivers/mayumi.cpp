@@ -28,9 +28,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<i8255_device> m_i8255;
-//  UINT8 *    m_nvram;       // this currently uses generic nvram handlers
+//  uint8_t *    m_nvram;       // this currently uses generic nvram handlers
 
 	/* video-related */
 	tilemap_t *m_tilemap;
@@ -38,7 +38,7 @@ public:
 	/* misc */
 	int m_int_enable;
 	int m_input_sel;
-	UINT8 key_matrix_r(UINT8 offset);
+	uint8_t key_matrix_r(uint8_t offset);
 	DECLARE_WRITE8_MEMBER(mayumi_videoram_w);
 	DECLARE_WRITE8_MEMBER(bank_sel_w);
 	DECLARE_WRITE8_MEMBER(input_sel_w);
@@ -48,7 +48,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mayumi_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -80,7 +80,7 @@ WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-UINT32 mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -290,7 +290,7 @@ WRITE8_MEMBER(mayumi_state::input_sel_w)
 	m_input_sel = data;
 }
 
-UINT8 mayumi_state::key_matrix_r(UINT8 offset)
+uint8_t mayumi_state::key_matrix_r(uint8_t offset)
 {
 	int p, i, ret;
 	static const char *const keynames[2][5] =
@@ -351,7 +351,7 @@ GFXDECODE_END
 
 void mayumi_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x8000], 0x4000);
 	membank("bank1")->set_entry(0);

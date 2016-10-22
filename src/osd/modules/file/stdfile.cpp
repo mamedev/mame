@@ -167,7 +167,7 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
+int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
 	// there is no standard way of doing this, so we always return FALSE, indicating
 	// that a given path is not a physical drive
@@ -182,7 +182,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
 	// we assume a standard 1:1 mapping of characters to the first 256 unicode characters
-	*uchar = (UINT8)*osdchar;
+	*uchar = (uint8_t)*osdchar;
 	return 1;
 }
 

@@ -22,7 +22,7 @@
 class kaneko_grap2_device : public device_t
 {
 public:
-	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
 	int m_chipnum; // used to decide where we write the palette
@@ -34,19 +34,19 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);
 
 
-	void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata);
-	void set_color_555_gp3(pen_t color, int rshift, int gshift, int bshift, UINT16 data);
+	void gp3_do_rle(uint32_t address, uint16_t*framebuffer, uint8_t* rledata);
+	void set_color_555_gp3(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
 
-	UINT16 m_framebuffer_bgcol;
-	UINT16 m_framebuffer_scrolly;
-	UINT16 m_framebuffer_scrollx;
-	UINT16 m_framebuffer_enable;
+	uint16_t m_framebuffer_bgcol;
+	uint16_t m_framebuffer_scrolly;
+	uint16_t m_framebuffer_scrollx;
+	uint16_t m_framebuffer_enable;
 	int m_regs1_i;
 
-	UINT16 m_framebuffer_bright1;
-	UINT16 m_framebuffer_bright2;
+	uint16_t m_framebuffer_bright1;
+	uint16_t m_framebuffer_bright2;
 
-	UINT16 m_regs1_address_regs[0x2];
+	uint16_t m_regs1_address_regs[0x2];
 
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_enable_w) { m_framebuffer_enable = data; }
 
@@ -74,10 +74,10 @@ public:
 	DECLARE_READ16_MEMBER(  unk2_r ) { return m_framebuffer_unk2[offset]; }
 	DECLARE_WRITE16_MEMBER( unk2_w ) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
 
-	std::unique_ptr<UINT16[]> m_framebuffer;
-	std::unique_ptr<UINT16[]> m_framebuffer_palette;
-	std::unique_ptr<UINT16[]> m_framebuffer_unk1;
-	std::unique_ptr<UINT16[]> m_framebuffer_unk2;
+	std::unique_ptr<uint16_t[]> m_framebuffer;
+	std::unique_ptr<uint16_t[]> m_framebuffer_palette;
+	std::unique_ptr<uint16_t[]> m_framebuffer_unk1;
+	std::unique_ptr<uint16_t[]> m_framebuffer_unk2;
 
 
 

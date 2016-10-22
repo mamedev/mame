@@ -21,14 +21,14 @@ class nubus_lview_device :
 {
 public:
 		// construction/destruction
-		nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
-		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+		uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -41,10 +41,10 @@ protected:
 		DECLARE_WRITE32_MEMBER(vram_w);
 
 public:
-		std::vector<UINT8> m_vram;
-		UINT32 *m_vram32;
-		UINT32 m_vbl_disable, m_toggle;
-		UINT32 m_palette[256];
+		std::vector<uint8_t> m_vram;
+		uint32_t *m_vram32;
+		uint32_t m_vbl_disable, m_toggle;
+		uint32_t m_palette[256];
 		emu_timer *m_timer;
 		int m_protstate;
 		std::string m_assembled_tag;

@@ -28,7 +28,7 @@ class ec_1841_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -54,9 +54,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<16> m_kbd;
 
-	UINT8 m_bus;
-	UINT8 m_p1;
-	UINT8 m_p2;
+	uint8_t m_bus;
+	uint8_t m_p1;
+	uint8_t m_p2;
 	int m_q;
 };
 

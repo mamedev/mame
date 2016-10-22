@@ -45,25 +45,25 @@ public:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	required_shared_ptr<UINT16> m_videoram_1;
-	required_shared_ptr<UINT16> m_videoram_2;
-	required_shared_ptr<UINT16> m_scrollram_1;
-	required_shared_ptr<UINT16> m_scrollram_2;
-	required_shared_ptr<UINT16> m_scrollram_3;
-	required_shared_ptr<UINT16> m_pixram;
-	required_shared_ptr<UINT16> m_priority;
-	required_shared_ptr<UINT16> m_layerctrl;
+	required_shared_ptr<uint16_t> m_videoram_1;
+	required_shared_ptr<uint16_t> m_videoram_2;
+	required_shared_ptr<uint16_t> m_scrollram_1;
+	required_shared_ptr<uint16_t> m_scrollram_2;
+	required_shared_ptr<uint16_t> m_scrollram_3;
+	required_shared_ptr<uint16_t> m_pixram;
+	required_shared_ptr<uint16_t> m_priority;
+	required_shared_ptr<uint16_t> m_layerctrl;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	// Protection
-	UINT16 m_prot_val;
+	uint16_t m_prot_val;
 	DECLARE_READ16_MEMBER(prot_r);
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_READ16_MEMBER(unk_r);
 
 	// I/O
-	UINT16 m_mux;
+	uint16_t m_mux;
 	DECLARE_WRITE16_MEMBER(mux_w);
 	DECLARE_READ16_MEMBER(dsw_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
@@ -71,7 +71,7 @@ public:
 	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
 
 	// Interrrupts
-	UINT16 m_irq_enable;
+	uint16_t m_irq_enable;
 	DECLARE_WRITE16_MEMBER(irq_enable_w);
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -86,13 +86,13 @@ public:
 
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
-	UINT16 m_pixpal;
+	uint16_t m_pixpal;
 	DECLARE_WRITE16_MEMBER(pixram_w);
 	DECLARE_WRITE16_MEMBER(pixpal_w);
 
 	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void save_state()
 	{
@@ -124,13 +124,13 @@ WRITE16_MEMBER(bmcpokr_state::videoram_2_w)
 
 TILE_GET_INFO_MEMBER(bmcpokr_state::get_t1_tile_info)
 {
-	UINT16 data = m_videoram_1[tile_index];
+	uint16_t data = m_videoram_1[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(bmcpokr_state::get_t2_tile_info)
 {
-	UINT16 data = m_videoram_2[tile_index];
+	uint16_t data = m_videoram_2[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
@@ -162,9 +162,9 @@ WRITE16_MEMBER(bmcpokr_state::pixram_w)
 	int x = (offset & 0xff) << 2;
 	int y = (offset >> 8);
 
-	UINT16 pixpal = (m_pixpal & 0xf) * 0x10;
+	uint16_t pixpal = (m_pixpal & 0xf) * 0x10;
 
-	UINT16 pen;
+	uint16_t pen;
 	if (ACCESSING_BITS_8_15)
 	{
 		pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
@@ -179,14 +179,14 @@ WRITE16_MEMBER(bmcpokr_state::pixram_w)
 
 void bmcpokr_state::pixbitmap_redraw()
 {
-	UINT16 pixpal = (m_pixpal & 0xf) * 0x10;
+	uint16_t pixpal = (m_pixpal & 0xf) * 0x10;
 	int offset = 0;
 	for (int y = 0; y < 512; y++)
 	{
 		for (int x = 0; x < 1024; x += 4)
 		{
-			UINT16 data = m_pixram[offset++];
-			UINT16 pen;
+			uint16_t data = m_pixram[offset++];
+			uint16_t pen;
 			pen = (data >> 12) & 0xf; m_pixbitmap->pix16(y, x + 0) = pen ? pixpal + pen : 0;
 			pen = (data >>  8) & 0xf; m_pixbitmap->pix16(y, x + 1) = pen ? pixpal + pen : 0;
 			pen = (data >>  4) & 0xf; m_pixbitmap->pix16(y, x + 2) = pen ? pixpal + pen : 0;
@@ -197,7 +197,7 @@ void bmcpokr_state::pixbitmap_redraw()
 
 WRITE16_MEMBER(bmcpokr_state::pixpal_w)
 {
-	UINT16 old = m_pixpal;
+	uint16_t old = m_pixpal;
 	if (old != COMBINE_DATA(&m_pixpal))
 		pixbitmap_redraw();
 }
@@ -207,8 +207,8 @@ WRITE16_MEMBER(bmcpokr_state::pixpal_w)
 void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer)
 {
 	tilemap_t *tmap;
-	UINT16 *scroll;
-	UINT16 ctrl;
+	uint16_t *scroll;
+	uint16_t ctrl;
 
 	switch (layer)
 	{
@@ -255,7 +255,7 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -432,7 +432,7 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
 
 READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
 {
-	UINT16 key = 0x3f;
+	uint16_t key = 0x3f;
 	switch ((m_mux >> 4) & 7)
 	{
 		case 0: key = ioport("KEY1")->read(); break;

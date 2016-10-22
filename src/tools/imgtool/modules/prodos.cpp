@@ -137,44 +137,44 @@ struct prodos_diskinfo
 {
 	imgtoolerr_t (*load_block)(imgtool::image &image, int block, void *buffer);
 	imgtoolerr_t (*save_block)(imgtool::image &image, int block, const void *buffer);
-	UINT8 dirent_size;
-	UINT8 dirents_per_block;
-	UINT16 volume_bitmap_block;
-	UINT16 total_blocks;
+	uint8_t dirent_size;
+	uint8_t dirents_per_block;
+	uint16_t volume_bitmap_block;
+	uint16_t total_blocks;
 };
 
 struct prodos_direnum
 {
-	UINT32 block;
-	UINT32 index;
-	UINT8 block_data[BLOCK_SIZE];
+	uint32_t block;
+	uint32_t index;
+	uint8_t block_data[BLOCK_SIZE];
 };
 
 struct prodos_dirent
 {
 	char filename[16];
-	UINT8 storage_type;
-	UINT16 extkey_pointer;
-	UINT16 key_pointer[2];
-	UINT32 filesize[2];
+	uint8_t storage_type;
+	uint16_t extkey_pointer;
+	uint16_t key_pointer[2];
+	uint32_t filesize[2];
 	int depth[2];
-	UINT32 lastmodified_time;
-	UINT32 creation_time;
+	uint32_t lastmodified_time;
+	uint32_t creation_time;
 
 	/* FInfo */
-	UINT32 file_type;
-	UINT32 file_creator;
-	UINT16 finder_flags;
-	UINT16 coord_x;
-	UINT16 coord_y;
-	UINT16 finder_folder;
+	uint32_t file_type;
+	uint32_t file_creator;
+	uint16_t finder_flags;
+	uint16_t coord_x;
+	uint16_t coord_y;
+	uint16_t finder_folder;
 
 	/* xFInfo */
-	UINT16 icon_id;
-	UINT8 script_code;
-	UINT8 extended_flags;
-	UINT16 comment_id;
-	UINT32 putaway_directory;
+	uint16_t icon_id;
+	uint8_t script_code;
+	uint8_t extended_flags;
+	uint16_t comment_id;
+	uint32_t putaway_directory;
 };
 
 enum creation_policy_t
@@ -186,7 +186,7 @@ enum creation_policy_t
 
 
 
-static time_t prodos_crack_time(UINT32 prodos_time)
+static time_t prodos_crack_time(uint32_t prodos_time)
 {
 	struct tm t;
 	time_t now;
@@ -208,26 +208,26 @@ static time_t prodos_crack_time(UINT32 prodos_time)
 
 
 
-static UINT32 prodos_setup_time(time_t ansi_time)
+static uint32_t prodos_setup_time(time_t ansi_time)
 {
 	struct tm t;
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	t = *localtime(&ansi_time);
 	if ((t.tm_year >= 100) && (t.tm_year <= 149))
 		t.tm_year -= 100;
 
-	result |= (((UINT32) t.tm_min)  & 0x003F) << 16;
-	result |= (((UINT32) t.tm_hour) & 0x001F) << 24;
-	result |= (((UINT32) t.tm_mday) & 0x001F) <<  0;
-	result |= (((UINT32) t.tm_mon)  & 0x000F) <<  5;
-	result |= (((UINT32) t.tm_year) & 0x007F) <<  9;
+	result |= (((uint32_t) t.tm_min)  & 0x003F) << 16;
+	result |= (((uint32_t) t.tm_hour) & 0x001F) << 24;
+	result |= (((uint32_t) t.tm_mday) & 0x001F) <<  0;
+	result |= (((uint32_t) t.tm_mon)  & 0x000F) <<  5;
+	result |= (((uint32_t) t.tm_year) & 0x007F) <<  9;
 	return result;
 }
 
 
 
-static UINT32 prodos_time_now(void)
+static uint32_t prodos_time_now(void)
 {
 	time_t now;
 	time(&now);
@@ -236,7 +236,7 @@ static UINT32 prodos_time_now(void)
 
 
 
-static int is_file_storagetype(UINT8 storage_type)
+static int is_file_storagetype(uint8_t storage_type)
 {
 	return ((storage_type >= 0x10) && (storage_type <= 0x3F))
 		|| ((storage_type >= 0x50) && (storage_type <= 0x5F));
@@ -244,21 +244,21 @@ static int is_file_storagetype(UINT8 storage_type)
 
 
 
-static int is_normalfile_storagetype(UINT8 storage_type)
+static int is_normalfile_storagetype(uint8_t storage_type)
 {
 	return ((storage_type >= 0x10) && (storage_type <= 0x3F));
 }
 
 
 
-static int is_extendedfile_storagetype(UINT8 storage_type)
+static int is_extendedfile_storagetype(uint8_t storage_type)
 {
 	return ((storage_type >= 0x50) && (storage_type <= 0x5F));
 }
 
 
 
-static int is_dir_storagetype(UINT8 storage_type)
+static int is_dir_storagetype(uint8_t storage_type)
 {
 	return (storage_type >= 0xE0) && (storage_type <= 0xEF);
 }
@@ -277,9 +277,9 @@ static prodos_diskinfo *get_prodos_info(imgtool::image &image)
 /* ----------------------------------------------------------------------- */
 
 static void prodos_find_block_525(imgtool::image &image, int block,
-	UINT32 *track, UINT32 *head, UINT32 *sector1, UINT32 *sector2)
+	uint32_t *track, uint32_t *head, uint32_t *sector1, uint32_t *sector2)
 {
-	static const UINT8 skewing[] =
+	static const uint8_t skewing[] =
 	{
 		0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E,
 		0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F
@@ -299,19 +299,19 @@ static imgtoolerr_t prodos_load_block_525(imgtool::image &image,
 	int block, void *buffer)
 {
 	floperr_t ferr;
-	UINT32 track, head, sector1, sector2;
+	uint32_t track, head, sector1, sector2;
 
 	prodos_find_block_525(image, block, &track, &head, &sector1, &sector2);
 
 	/* read first sector */
 	ferr = floppy_read_sector(imgtool_floppy(image), head, track,
-		sector1, 0, ((UINT8 *) buffer) + 0, 256);
+		sector1, 0, ((uint8_t *) buffer) + 0, 256);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
 	/* read second sector */
 	ferr = floppy_read_sector(imgtool_floppy(image), head, track,
-		sector2, 0, ((UINT8 *) buffer) + 256, 256);
+		sector2, 0, ((uint8_t *) buffer) + 256, 256);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -324,19 +324,19 @@ static imgtoolerr_t prodos_save_block_525(imgtool::image &image,
 	int block, const void *buffer)
 {
 	floperr_t ferr;
-	UINT32 track, head, sector1, sector2;
+	uint32_t track, head, sector1, sector2;
 
 	prodos_find_block_525(image, block, &track, &head, &sector1, &sector2);
 
 	/* read first sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector1, 0, ((const UINT8 *) buffer) + 0, 256, 0);  /* TODO: pass ddam argument from imgtool */
+		sector1, 0, ((const uint8_t *) buffer) + 0, 256, 0);  /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
 	/* read second sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector2, 0, ((const UINT8 *) buffer) + 256, 256, 0);    /* TODO: pass ddam argument from imgtool */
+		sector2, 0, ((const uint8_t *) buffer) + 256, 256, 0);    /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -358,7 +358,7 @@ static void prodos_setprocs_525(imgtool::image &image)
 /* ----------------------------------------------------------------------- */
 
 static imgtoolerr_t prodos_find_block_35(imgtool::image &image, int block,
-	UINT32 *track, UINT32 *head, UINT32 *sector)
+	uint32_t *track, uint32_t *head, uint32_t *sector)
 {
 	int sides = 2;
 
@@ -382,7 +382,7 @@ static imgtoolerr_t prodos_load_block_35(imgtool::image &image,
 {
 	imgtoolerr_t err;
 	floperr_t ferr;
-	UINT32 track, head, sector;
+	uint32_t track, head, sector;
 
 	err = prodos_find_block_35(image, block, &track, &head, &sector);
 	if (err)
@@ -402,7 +402,7 @@ static imgtoolerr_t prodos_save_block_35(imgtool::image &image,
 {
 	imgtoolerr_t err;
 	floperr_t ferr;
-	UINT32 track, head, sector;
+	uint32_t track, head, sector;
 
 	err = prodos_find_block_35(image, block, &track, &head, &sector);
 	if (err)
@@ -451,7 +451,7 @@ static imgtoolerr_t prodos_save_block(imgtool::image &image,
 
 static imgtoolerr_t prodos_clear_block(imgtool::image &image, int block)
 {
-	UINT8 buffer[BLOCK_SIZE];
+	uint8_t buffer[BLOCK_SIZE];
 	memset(buffer, 0, sizeof(buffer));
 	return prodos_save_block(image, block, buffer);
 }
@@ -463,9 +463,9 @@ static imgtoolerr_t prodos_clear_block(imgtool::image &image, int block)
 static imgtoolerr_t prodos_diskimage_open(imgtool::image &image)
 {
 	imgtoolerr_t err;
-	UINT8 buffer[BLOCK_SIZE];
+	uint8_t buffer[BLOCK_SIZE];
 	prodos_diskinfo *di;
-	const UINT8 *ent;
+	const uint8_t *ent;
 
 	di = get_prodos_info(image);
 
@@ -520,17 +520,17 @@ static imgtoolerr_t prodos_diskimage_open_35(imgtool::image &image, imgtool::str
 
 /* ----------------------------------------------------------------------- */
 
-static imgtoolerr_t prodos_load_volume_bitmap(imgtool::image &image, UINT8 **bitmap)
+static imgtoolerr_t prodos_load_volume_bitmap(imgtool::image &image, uint8_t **bitmap)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
-	UINT8 *alloc_bitmap;
-	UINT32 bitmap_blocks, i;
+	uint8_t *alloc_bitmap;
+	uint32_t bitmap_blocks, i;
 
 	di = get_prodos_info(image);
 
 	bitmap_blocks = (di->total_blocks + (BLOCK_SIZE * 8) - 1) / (BLOCK_SIZE * 8);
-	alloc_bitmap = (UINT8*)malloc(bitmap_blocks * BLOCK_SIZE);
+	alloc_bitmap = (uint8_t*)malloc(bitmap_blocks * BLOCK_SIZE);
 	if (!alloc_bitmap)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -559,11 +559,11 @@ done:
 
 
 
-static imgtoolerr_t prodos_save_volume_bitmap(imgtool::image &image, const UINT8 *bitmap)
+static imgtoolerr_t prodos_save_volume_bitmap(imgtool::image &image, const uint8_t *bitmap)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
-	UINT32 bitmap_blocks, i;
+	uint32_t bitmap_blocks, i;
 
 	di = get_prodos_info(image);
 
@@ -581,9 +581,9 @@ static imgtoolerr_t prodos_save_volume_bitmap(imgtool::image &image, const UINT8
 
 
 
-static void prodos_set_volume_bitmap_bit(UINT8 *buffer, UINT16 block, int value)
+static void prodos_set_volume_bitmap_bit(uint8_t *buffer, uint16_t block, int value)
 {
-	UINT8 mask;
+	uint8_t mask;
 	buffer += block / 8;
 	mask = 1 << (7 - (block % 8));
 	if (value)
@@ -594,9 +594,9 @@ static void prodos_set_volume_bitmap_bit(UINT8 *buffer, UINT16 block, int value)
 
 
 
-static int prodos_get_volume_bitmap_bit(const UINT8 *buffer, UINT16 block)
+static int prodos_get_volume_bitmap_bit(const uint8_t *buffer, uint16_t block)
 {
-	UINT8 mask;
+	uint8_t mask;
 	buffer += block / 8;
 	mask = 1 << (7 - (block % 8));
 	return (*buffer & mask) ? 1 : 0;
@@ -604,13 +604,13 @@ static int prodos_get_volume_bitmap_bit(const UINT8 *buffer, UINT16 block)
 
 
 
-static imgtoolerr_t prodos_alloc_block(imgtool::image &image, UINT8 *bitmap,
-	UINT16 *block)
+static imgtoolerr_t prodos_alloc_block(imgtool::image &image, uint8_t *bitmap,
+	uint16_t *block)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	prodos_diskinfo *di;
-	UINT16 bitmap_blocks, i;
-	UINT8 *alloc_bitmap = NULL;
+	uint16_t bitmap_blocks, i;
+	uint8_t *alloc_bitmap = NULL;
 
 	di = get_prodos_info(image);
 	*block = 0;
@@ -663,10 +663,10 @@ done:
 static imgtoolerr_t prodos_diskimage_create(imgtool::image &image, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	UINT32 heads, tracks, sectors, sector_bytes;
-	UINT32 dirent_size, volume_bitmap_block, i;
-	UINT32 volume_bitmap_block_count, total_blocks;
-	UINT8 buffer[BLOCK_SIZE];
+	uint32_t heads, tracks, sectors, sector_bytes;
+	uint32_t dirent_size, volume_bitmap_block, i;
+	uint32_t volume_bitmap_block_count, total_blocks;
+	uint8_t buffer[BLOCK_SIZE];
 
 	heads = opts->lookup_int('H');
 	tracks = opts->lookup_int('T');
@@ -721,10 +721,10 @@ static imgtoolerr_t prodos_diskimage_create_35(imgtool::image &image, imgtool::s
 /* ----------------------------------------------------------------------- */
 
 static imgtoolerr_t prodos_enum_seek(imgtool::image &image,
-	prodos_direnum *appleenum, UINT32 block, UINT32 index)
+	prodos_direnum *appleenum, uint32_t block, uint32_t index)
 {
 	imgtoolerr_t err;
-	UINT8 buffer[BLOCK_SIZE];
+	uint8_t buffer[BLOCK_SIZE];
 
 	if (appleenum->block != block)
 	{
@@ -744,11 +744,11 @@ static imgtoolerr_t prodos_enum_seek(imgtool::image &image,
 
 
 
-static UINT8 *next_info_block(UINT8 *buffer, size_t *position)
+static uint8_t *next_info_block(uint8_t *buffer, size_t *position)
 {
 	size_t side = *position & 0x100;
 	size_t subpos = *position & 0x0FF;
-	UINT8 *result;
+	uint8_t *result;
 
 	if (subpos < 8)
 	{
@@ -773,12 +773,12 @@ static UINT8 *next_info_block(UINT8 *buffer, size_t *position)
 
 
 
-static UINT8 *alloc_info_block(UINT8 *buffer, size_t block_size, UINT8 block_type)
+static uint8_t *alloc_info_block(uint8_t *buffer, size_t block_size, uint8_t block_type)
 {
 	size_t position = 0;
 	size_t side;
 	size_t subpos;
-	UINT8 *result;
+	uint8_t *result;
 
 	while(next_info_block(buffer, &position))
 		;
@@ -790,7 +790,7 @@ static UINT8 *alloc_info_block(UINT8 *buffer, size_t block_size, UINT8 block_typ
 		return NULL;
 
 	result = &buffer[side + subpos];
-	*(result++) = (UINT8) block_size;
+	*(result++) = (uint8_t) block_size;
 	*(result++) = block_type;
 	memset(result, 0, block_size - 2);
 	return result;
@@ -804,10 +804,10 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
 	size_t finfo_offset;
-	UINT32 next_block, next_index;
-	UINT32 offset;
-	UINT8 buffer[BLOCK_SIZE];
-	const UINT8 *info_ptr;
+	uint32_t next_block, next_index;
+	uint32_t offset;
+	uint8_t buffer[BLOCK_SIZE];
+	const uint8_t *info_ptr;
 	int fork_num;
 
 	di = get_prodos_info(image);
@@ -908,11 +908,11 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool::image &image,
 
 
 /* changes a normal file to a ProDOS extended file */
-static imgtoolerr_t prodos_promote_file(imgtool::image &image, UINT8 *bitmap, prodos_dirent *ent)
+static imgtoolerr_t prodos_promote_file(imgtool::image &image, uint8_t *bitmap, prodos_dirent *ent)
 {
 	imgtoolerr_t err;
-	UINT16 new_block;
-	UINT8 buffer[BLOCK_SIZE];
+	uint16_t new_block;
+	uint8_t buffer[BLOCK_SIZE];
 
 	assert(is_normalfile_storagetype(ent->storage_type));
 
@@ -938,15 +938,15 @@ static imgtoolerr_t prodos_put_dirent(imgtool::image &image,
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
-	UINT32 offset;
+	uint32_t offset;
 	size_t finfo_offset;
-	UINT8 buffer[BLOCK_SIZE];
+	uint8_t buffer[BLOCK_SIZE];
 	int fork_num;
 	int needs_finfo = FALSE;
 	int needs_xfinfo = FALSE;
-	UINT8 *info_ptr;
-	UINT8 *finfo;
-	UINT8 *xfinfo;
+	uint8_t *info_ptr;
+	uint8_t *finfo;
+	uint8_t *xfinfo;
 
 	di = get_prodos_info(image);
 	offset = appleenum->index * di->dirent_size + 4;
@@ -1071,14 +1071,14 @@ static imgtoolerr_t prodos_lookup_path(imgtool::image &image, const char *path,
 {
 	imgtoolerr_t err;
 	prodos_direnum my_direnum;
-	UINT32 block = ROOTDIR_BLOCK;
+	uint32_t block = ROOTDIR_BLOCK;
 	const char *old_path;
-	UINT16 this_block;
-	UINT32 this_index;
-	UINT16 free_block = 0;
-	UINT32 free_index = 0;
-	UINT16 new_file_block;
-	UINT8 buffer[BLOCK_SIZE];
+	uint16_t this_block;
+	uint32_t this_index;
+	uint16_t free_block = 0;
+	uint32_t free_index = 0;
+	uint16_t new_file_block;
+	uint8_t buffer[BLOCK_SIZE];
 
 	if (!direnum)
 		direnum = &my_direnum;
@@ -1214,16 +1214,16 @@ done:
 
 
 
-static imgtoolerr_t prodos_fill_file(imgtool::image &image, UINT8 *bitmap,
-	UINT16 key_block, int key_block_allocated,
-	int depth, UINT32 blockcount, UINT32 block_index)
+static imgtoolerr_t prodos_fill_file(imgtool::image &image, uint8_t *bitmap,
+	uint16_t key_block, int key_block_allocated,
+	int depth, uint32_t blockcount, uint32_t block_index)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
 	int dirty;
 	int sub_block_allocated;
-	UINT16 i, sub_block, new_sub_block;
-	UINT8 buffer[BLOCK_SIZE];
+	uint16_t i, sub_block, new_sub_block;
+	uint8_t buffer[BLOCK_SIZE];
 
 	di = get_prodos_info(image);
 
@@ -1300,13 +1300,13 @@ static imgtoolerr_t prodos_fill_file(imgtool::image &image, UINT8 *bitmap,
 
 
 static imgtoolerr_t prodos_set_file_block_count(imgtool::image &image, prodos_direnum *direnum,
-	prodos_dirent *ent, UINT8 *bitmap, int fork_num, UINT32 new_blockcount)
+	prodos_dirent *ent, uint8_t *bitmap, int fork_num, uint32_t new_blockcount)
 {
 	imgtoolerr_t err;
 	int depth, new_depth, i;
-	UINT16 new_block, block;
-	UINT8 buffer[BLOCK_SIZE];
-	UINT16 key_pointer;
+	uint16_t new_block, block;
+	uint8_t buffer[BLOCK_SIZE];
+	uint16_t key_pointer;
 
 	if (fork_num && (new_blockcount > 0) && !is_extendedfile_storagetype(ent->storage_type))
 	{
@@ -1345,8 +1345,8 @@ static imgtoolerr_t prodos_set_file_block_count(imgtool::image &image, prodos_di
 
 		/* create this new key block, with a link to the previous one */
 		memset(buffer, 0, sizeof(buffer));
-		buffer[0] = (UINT8) (key_pointer >> 0);
-		buffer[256] = (UINT8) (key_pointer >> 8);
+		buffer[0] = (uint8_t) (key_pointer >> 0);
+		buffer[256] = (uint8_t) (key_pointer >> 8);
 		err = prodos_save_block(image, new_block, buffer);
 		if (err)
 			return err;
@@ -1424,11 +1424,11 @@ static imgtoolerr_t prodos_set_file_block_count(imgtool::image &image, prodos_di
 
 
 static imgtoolerr_t prodos_set_file_size(imgtool::image &image, prodos_direnum *direnum,
-	prodos_dirent *ent, int fork_num, UINT32 new_size)
+	prodos_dirent *ent, int fork_num, uint32_t new_size)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	UINT32 blockcount, new_blockcount;
-	UINT8 *bitmap = NULL;
+	uint32_t blockcount, new_blockcount;
+	uint8_t *bitmap = NULL;
 
 	if (ent->filesize[fork_num] != new_size)
 	{
@@ -1465,9 +1465,9 @@ done:
 
 
 
-static UINT32 prodos_get_storagetype_maxfilesize(UINT8 storage_type)
+static uint32_t prodos_get_storagetype_maxfilesize(uint8_t storage_type)
 {
-	UINT32 max_filesize = 0;
+	uint32_t max_filesize = 0;
 	switch(storage_type & 0xF0)
 	{
 		case 0x10:
@@ -1492,7 +1492,7 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory &enumeration, 
 	imgtool::image &image(enumeration.image());
 	prodos_direnum *appleenum;
 	prodos_dirent ent;
-	UINT16 block = ROOTDIR_BLOCK;
+	uint16_t block = ROOTDIR_BLOCK;
 
 	appleenum = (prodos_direnum *) enumeration.extra_bytes();
 
@@ -1526,7 +1526,7 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, i
 	imgtool::image &image(enumeration.image());
 	prodos_direnum *appleenum;
 	prodos_dirent pd_ent;
-	UINT32 max_filesize;
+	uint32_t max_filesize;
 
 	appleenum = (prodos_direnum *) enumeration.extra_bytes();
 
@@ -1568,13 +1568,13 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, i
 
 
 
-static imgtoolerr_t prodos_read_file_tree(imgtool::image &image, UINT32 *filesize,
-	UINT32 block, int nest_level, imgtool::stream &destf)
+static imgtoolerr_t prodos_read_file_tree(imgtool::image &image, uint32_t *filesize,
+	uint32_t block, int nest_level, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
-	UINT8 buffer[BLOCK_SIZE];
-	UINT16 sub_block;
+	uint8_t buffer[BLOCK_SIZE];
+	uint16_t sub_block;
 	size_t bytes_to_write;
 	int i;
 
@@ -1618,13 +1618,13 @@ static imgtoolerr_t prodos_read_file_tree(imgtool::image &image, UINT32 *filesiz
 
 
 
-static imgtoolerr_t prodos_write_file_tree(imgtool::image &image, UINT32 *filesize,
-	UINT32 block, int nest_level, imgtool::stream &sourcef)
+static imgtoolerr_t prodos_write_file_tree(imgtool::image &image, uint32_t *filesize,
+	uint32_t block, int nest_level, imgtool::stream &sourcef)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
-	UINT8 buffer[BLOCK_SIZE];
-	UINT16 sub_block;
+	uint8_t buffer[BLOCK_SIZE];
+	uint16_t sub_block;
 	size_t bytes_to_read;
 	int i;
 
@@ -1673,13 +1673,13 @@ static imgtoolerr_t prodos_write_file_tree(imgtool::image &image, UINT32 *filesi
 
 
 
-static imgtoolerr_t prodos_diskimage_freespace(imgtool::partition &partition, UINT64 *size)
+static imgtoolerr_t prodos_diskimage_freespace(imgtool::partition &partition, uint64_t *size)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
 	prodos_diskinfo *di;
-	UINT8 *bitmap = NULL;
-	UINT16 i;
+	uint8_t *bitmap = NULL;
+	uint16_t i;
 
 	di = get_prodos_info(image);
 	*size = 0;
@@ -1707,7 +1707,7 @@ static imgtoolerr_t prodos_diskimage_readfile(imgtool::partition &partition, con
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
 	prodos_dirent ent;
-	UINT16 key_pointer;
+	uint16_t key_pointer;
 	int nest_level;
 	mac_fork_t fork_num;
 
@@ -1748,7 +1748,7 @@ static imgtoolerr_t prodos_diskimage_writefile(imgtool::partition &partition, co
 	imgtool::image &image(partition.image());
 	prodos_dirent ent;
 	prodos_direnum direnum;
-	UINT64 file_size;
+	uint64_t file_size;
 	mac_fork_t fork_num;
 
 	file_size = sourcef.size();
@@ -1869,14 +1869,14 @@ static imgtoolerr_t prodos_diskimage_createdir(imgtool::partition &partition, co
 
 
 
-static imgtoolerr_t prodos_free_directory(imgtool::image &image, UINT8 *volume_bitmap, UINT16 key_pointer)
+static imgtoolerr_t prodos_free_directory(imgtool::image &image, uint8_t *volume_bitmap, uint16_t key_pointer)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
 	int i;
-	UINT16 next_block;
-	UINT32 offset;
-	UINT8 buffer[BLOCK_SIZE];
+	uint16_t next_block;
+	uint32_t offset;
+	uint8_t buffer[BLOCK_SIZE];
 
 	di = get_prodos_info(image);
 
@@ -1913,7 +1913,7 @@ static imgtoolerr_t prodos_diskimage_deletedir(imgtool::partition &partition, co
 	imgtool::image &image(partition.image());
 	prodos_dirent ent;
 	prodos_direnum direnum;
-	UINT8 *volume_bitmap = NULL;
+	uint8_t *volume_bitmap = NULL;
 
 	err = prodos_lookup_path(image, path, CREATE_NONE, &direnum, &ent);
 	if (err)
@@ -1952,13 +1952,13 @@ done:
 
 
 static imgtoolerr_t prodos_get_file_tree(imgtool::image &image, imgtool_chainent *chain, size_t chain_size,
-	size_t *chain_pos, UINT16 block, UINT8 total_depth, UINT8 cur_depth)
+	size_t *chain_pos, uint16_t block, uint8_t total_depth, uint8_t cur_depth)
 {
 	imgtoolerr_t err;
 	prodos_diskinfo *di;
 	int i;
-	UINT16 sub_block;
-	UINT8 buffer[BLOCK_SIZE];
+	uint16_t sub_block;
+	uint8_t buffer[BLOCK_SIZE];
 
 	if (block == 0)
 		return IMGTOOLERR_SUCCESS;
@@ -1997,7 +1997,7 @@ static imgtoolerr_t prodos_get_file_tree(imgtool::image &image, imgtool_chainent
 
 
 
-static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition &partition, const char *path, const UINT32 *attrs, imgtool_attribute *values)
+static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition &partition, const char *path, const uint32_t *attrs, imgtool_attribute *values)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
@@ -2060,7 +2060,7 @@ static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition &partition, con
 
 
 
-static imgtoolerr_t prodos_diskimage_setattrs(imgtool::partition &partition, const char *path, const UINT32 *attrs, const imgtool_attribute *values)
+static imgtoolerr_t prodos_diskimage_setattrs(imgtool::partition &partition, const char *path, const uint32_t *attrs, const imgtool_attribute *values)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
@@ -2206,7 +2206,7 @@ static imgtoolerr_t prodos_diskimage_getchain(imgtool::partition &partition, con
 
 
 
-static void generic_prodos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+static void generic_prodos_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -2245,7 +2245,7 @@ static void generic_prodos_get_info(const imgtool_class *imgclass, UINT32 state,
 
 
 
-void prodos_525_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void prodos_525_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -2263,7 +2263,7 @@ void prodos_525_get_info(const imgtool_class *imgclass, UINT32 state, union imgt
 
 
 
-void prodos_35_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void prodos_35_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{

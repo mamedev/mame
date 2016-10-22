@@ -215,15 +215,15 @@ WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
  *******************************************************************/
 void spectrum_state::ts2068_update_memory()
 {
-	UINT8 *messram = nullptr;
+	uint8_t *messram = nullptr;
 	if (m_ram) messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *DOCK = nullptr;
+	uint8_t *DOCK = nullptr;
 	if (m_dock_crt) DOCK = m_dock_crt->base();
 
 
-	UINT8 *ExROM = memregion("maincpu")->base() + 0x014000;
-	UINT8 *ChosenROM;
+	uint8_t *ExROM = memregion("maincpu")->base() + 0x014000;
+	uint8_t *ChosenROM;
 
 	if (m_port_f4_data & 0x01)
 	{
@@ -588,7 +588,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	membank("bank1")->set_base(messram);
 	membank("bank2")->set_base(messram);
@@ -600,13 +600,13 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 
 DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
-	UINT32 size = m_dock->common_get_size("rom");
+	uint32_t size = m_dock->common_get_size("rom");
 
 	if (image.software_entry() == nullptr)
 	{
-		UINT8 *DOCK;
+		uint8_t *DOCK;
 		int chunks_in_file = 0;
-		std::vector<UINT8> header;
+		std::vector<uint8_t> header;
 		header.resize(9);
 
 		if (size % 0x2000 != 9)

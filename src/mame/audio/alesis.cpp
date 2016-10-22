@@ -36,7 +36,7 @@ MACHINE_CONFIG_END
 //  alesis_dm3ag_device - constructor
 //-------------------------------------------------
 
-alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock, "alesis_dm3ag", __FILE__),
 		m_dac(*this, "dac"),
 		m_samples(*this, DEVICE_SELF)
@@ -83,7 +83,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 {
 	if (m_output_active)
 	{
-		INT16 sample = m_samples[m_cur_sample++];
+		int16_t sample = m_samples[m_cur_sample++];
 		int count = 0;
 
 		while (sample == -128)

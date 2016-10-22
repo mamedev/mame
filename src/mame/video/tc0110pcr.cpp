@@ -20,7 +20,7 @@ The data bus is 16 bits wide.
 
 const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 
-tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__)
 	, m_ram(nullptr)
 	, m_type(0)
@@ -45,7 +45,7 @@ void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void tc0110pcr_device::device_start()
 {
-	m_ram = make_unique_clear<UINT16[]>(TC0110PCR_RAM_SIZE);
+	m_ram = make_unique_clear<uint16_t[]>(TC0110PCR_RAM_SIZE);
 
 	save_pointer(NAME(m_ram.get()), TC0110PCR_RAM_SIZE);
 	save_item(NAME(m_type));

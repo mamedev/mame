@@ -39,17 +39,17 @@ public:
 		m_palette(*this, "palette")
 		{}
 
-	required_shared_ptr<UINT8> m_alpharam;
-	required_shared_ptr<UINT8> m_spriteram;
-	UINT8 m_ball_screen_collision_cause;
-	UINT8 m_car_ball_collision_x;
-	UINT8 m_car_ball_collision_y;
-	UINT8 m_car_car_collision_cause;
-	UINT8 m_car_goal_collision_cause;
-	UINT8 m_car_ball_collision_cause;
-	UINT8 m_car_border_collision_cause;
-	UINT8 m_priority_0_extension;
-	UINT8 m_last_wheel_value[4];
+	required_shared_ptr<uint8_t> m_alpharam;
+	required_shared_ptr<uint8_t> m_spriteram;
+	uint8_t m_ball_screen_collision_cause;
+	uint8_t m_car_ball_collision_x;
+	uint8_t m_car_ball_collision_y;
+	uint8_t m_car_car_collision_cause;
+	uint8_t m_car_goal_collision_cause;
+	uint8_t m_car_ball_collision_cause;
+	uint8_t m_car_border_collision_cause;
+	uint8_t m_priority_0_extension;
+	uint8_t m_last_wheel_value[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
 	required_device<ttl74153_device> m_ttl74153_1k;
@@ -92,7 +92,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(carpolo);
-	UINT32 screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_carpolo(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
@@ -115,14 +115,14 @@ public:
 	void normalize_coordinates(int *x1, int *y1, int *x2, int *y2);
 	int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only);
 	int check_sprite_right_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only);
-	int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flipy1);
-	void carpolo_generate_ball_screen_interrupt(UINT8 cause);
+	int check_sprite_border_collision(uint8_t x1, uint8_t y1, int code1, int flipy1);
+	void carpolo_generate_ball_screen_interrupt(uint8_t cause);
 	void carpolo_generate_car_car_interrupt(int car1, int car2);
 	void carpolo_generate_car_goal_interrupt(int car, int right_goal);
 	void carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y);
 	void carpolo_generate_car_border_interrupt(int car, int horizontal_border);
 	void draw_alpha_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int alpha_line, int video_line);
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 x, UINT8 y, int bank, int code, int col);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t x, uint8_t y, int bank, int code, int col);
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);

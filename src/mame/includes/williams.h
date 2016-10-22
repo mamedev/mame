@@ -44,20 +44,20 @@ public:
 		WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256 = 0x01
 	};
 
-	required_shared_ptr<UINT8> m_nvram;
-	required_shared_ptr<UINT8> m_videoram;
-	UINT8 *m_mayday_protection;
-	UINT8 m_blitter_config;
-	UINT16 m_blitter_clip_address;
-	UINT8 m_blitter_window_enable;
-	UINT8 m_cocktail;
-	UINT8 m_port_select;
+	required_shared_ptr<uint8_t> m_nvram;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint8_t *m_mayday_protection;
+	uint8_t m_blitter_config;
+	uint16_t m_blitter_clip_address;
+	uint8_t m_blitter_window_enable;
+	uint8_t m_cocktail;
+	uint8_t m_port_select;
 	std::unique_ptr<rgb_t[]> m_palette_lookup;
-	UINT8 m_blitterram[8];
-	UINT8 m_blitter_xor;
-	UINT8 m_blitter_remap_index;
-	const UINT8 *m_blitter_remap;
-	std::unique_ptr<UINT8[]> m_blitter_remap_lookup;
+	uint8_t m_blitterram[8];
+	uint8_t m_blitter_xor;
+	uint8_t m_blitter_remap_index;
+	const uint8_t *m_blitter_remap;
+	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
 	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
 	DECLARE_WRITE8_MEMBER(williams_cmos_w);
 	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
@@ -90,7 +90,7 @@ public:
 	DECLARE_MACHINE_RESET(williams);
 	DECLARE_MACHINE_START(williams_common);
 	DECLARE_MACHINE_RESET(williams_common);
-	UINT32 screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
@@ -104,7 +104,7 @@ public:
 
 	void state_save_register();
 	void create_palette_lookup();
-	void blitter_init(int blitter_config, const UINT8 *remap_prom);
+	void blitter_init(int blitter_config, const uint8_t *remap_prom);
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 
@@ -118,7 +118,7 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_generic_paletteram_8;
+	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 
 
@@ -132,13 +132,13 @@ public:
 		m_blaster_scanline_control(*this, "blaster_scan") { }
 
 	optional_device<cpu_device> m_soundcpu_b;
-	required_shared_ptr<UINT8> m_blaster_palette_0;
-	required_shared_ptr<UINT8> m_blaster_scanline_control;
+	required_shared_ptr<uint8_t> m_blaster_palette_0;
+	required_shared_ptr<uint8_t> m_blaster_scanline_control;
 
 	rgb_t m_blaster_color0;
-	UINT8 m_blaster_video_control;
-	UINT8 m_vram_bank;
-	UINT8 m_rom_bank;
+	uint8_t m_blaster_video_control;
+	uint8_t m_vram_bank;
+	uint8_t m_rom_bank;
 
 	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
 	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
@@ -152,7 +152,7 @@ public:
 	DECLARE_MACHINE_START(blaster);
 	DECLARE_MACHINE_RESET(blaster);
 	DECLARE_VIDEO_START(blaster);
-	UINT32 screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	inline void update_blaster_banking();
 };
@@ -169,12 +169,12 @@ public:
 
 	required_device<address_map_bank_device> m_bank8000;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_williams2_tileram;
+	required_shared_ptr<uint8_t> m_williams2_tileram;
 
 	tilemap_t *m_bg_tilemap;
-	UINT16 m_tilemap_xscroll;
-	UINT8 m_williams2_fg_color;
-	UINT8 m_williams2_tilemap_config;
+	uint16_t m_tilemap_xscroll;
+	uint8_t m_williams2_fg_color;
+	uint8_t m_williams2_tilemap_config;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_WRITE8_MEMBER(williams2_bank_select_w);
@@ -204,7 +204,7 @@ public:
 	DECLARE_MACHINE_START(williams2);
 	DECLARE_MACHINE_RESET(williams2);
 	DECLARE_VIDEO_START(williams2);
-	UINT32 screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -216,7 +216,7 @@ public:
 		m_cvsd_sound(*this, "cvsd") { }
 
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
-	UINT16 m_joust2_current_sound_data;
+	uint16_t m_joust2_current_sound_data;
 
 	DECLARE_DRIVER_INIT(joust2);
 	DECLARE_MACHINE_START(joust2);

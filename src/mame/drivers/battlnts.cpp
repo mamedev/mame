@@ -214,7 +214,7 @@ GFXDECODE_END
 
 void battlnts_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 

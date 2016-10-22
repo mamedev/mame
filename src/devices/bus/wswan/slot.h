@@ -38,12 +38,12 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_io) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void nvram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_nvram_base() { return &m_nvram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_nvram_size() { return m_nvram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void nvram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_nvram_base() { return &m_nvram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 	void set_has_rtc(bool val) { m_has_rtc = val; }
@@ -52,9 +52,9 @@ public:
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	std::vector<UINT8> m_nvram;
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_nvram;
 	int m_bank_mask;
 
 	bool m_has_rtc, m_is_rotated;
@@ -69,7 +69,7 @@ class ws_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ws_cart_slot_device();
 
 	// device-level overrides
@@ -83,8 +83,8 @@ public:
 
 	int get_type() { return m_type; }
 	int get_is_rotated() { return m_cart->get_is_rotated(); }
-	int get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len);
-	void internal_header_logging(UINT8 *ROM, UINT32 offs, UINT32 len);
+	int get_cart_type(uint8_t *ROM, uint32_t len, uint32_t &nvram_len);
+	void internal_header_logging(uint8_t *ROM, uint32_t offs, uint32_t len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 

@@ -28,7 +28,7 @@
 class namco_52xx_device : public device_t
 {
 public:
-	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
@@ -66,8 +66,8 @@ private:
 	devcb_read8 m_romread;
 	devcb_read8 m_si;
 
-	UINT8 m_latched_cmd;
-	UINT32 m_address;
+	uint8_t m_latched_cmd;
+	uint32_t m_address;
 };
 
 extern const device_type NAMCO_52XX;

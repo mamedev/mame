@@ -14,7 +14,7 @@ class sns_pfest94_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -38,13 +38,13 @@ public:
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
 private:
-	UINT8 m_base_bank;
-	UINT8 m_mask;
-	UINT8 m_status;
-	UINT32 m_count;
+	uint8_t m_base_bank;
+	uint8_t m_mask;
+	uint8_t m_status;
+	uint32_t m_count;
 
-	std::vector<UINT32> m_dsp_prg;
-	std::vector<UINT16> m_dsp_data;
+	std::vector<uint32_t> m_dsp_prg;
+	std::vector<uint16_t> m_dsp_data;
 
 	static const device_timer_id TIMER_EVENT = 0;
 	emu_timer *pfest94_timer;

@@ -35,29 +35,29 @@ public:
 		{ }
 
 	optional_device<i8255_device>  m_ppi8255;
-	required_shared_ptr<UINT8> m_ram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_nob_mcu_latch;
-	optional_shared_ptr<UINT8> m_nob_mcu_status;
-	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_nob_mcu_latch;
+	optional_shared_ptr<uint8_t> m_nob_mcu_status;
+	required_shared_ptr<uint8_t> m_paletteram;
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);
-	UINT8 m_mute_xor;
-	UINT8 m_dakkochn_mux_data;
-	UINT8 m_videomode_prev;
-	UINT8 m_mcu_control;
-	UINT8 m_nob_maincpu_latch;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	void (system1_state::*m_videomode_custom)(uint8_t data, uint8_t prevdata);
+	uint8_t m_mute_xor;
+	uint8_t m_dakkochn_mux_data;
+	uint8_t m_videomode_prev;
+	uint8_t m_mcu_control;
+	uint8_t m_nob_maincpu_latch;
 	int m_nobb_inport23_step;
-	std::unique_ptr<UINT8[]> m_mix_collide;
-	UINT8 m_mix_collide_summary;
-	std::unique_ptr<UINT8[]> m_sprite_collide;
-	UINT8 m_sprite_collide_summary;
+	std::unique_ptr<uint8_t[]> m_mix_collide;
+	uint8_t m_mix_collide_summary;
+	std::unique_ptr<uint8_t[]> m_sprite_collide;
+	uint8_t m_sprite_collide_summary;
 	bitmap_ind16 m_sprite_bitmap;
-	UINT8 m_video_mode;
-	UINT8 m_videoram_bank;
+	uint8_t m_video_mode;
+	uint8_t m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
-	UINT8 m_tilemap_pages;
+	uint8_t m_tilemap_pages;
 
 	DECLARE_WRITE8_MEMBER(videomode_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
@@ -113,9 +113,9 @@ public:
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	DECLARE_MACHINE_START(myherok);
-	UINT32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq_assert);
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
@@ -124,9 +124,9 @@ public:
 	inline void videoram_wait_states(cpu_device *cpu);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset);
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &fgpixmap, bitmap_ind16 **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs);
-	void bank44_custom_w(UINT8 data, UINT8 prevdata);
-	void bank0c_custom_w(UINT8 data, UINT8 prevdata);
-	void dakkochn_custom_w(UINT8 data, UINT8 prevdata);
+	void bank44_custom_w(uint8_t data, uint8_t prevdata);
+	void bank0c_custom_w(uint8_t data, uint8_t prevdata);
+	void dakkochn_custom_w(uint8_t data, uint8_t prevdata);
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
@@ -134,12 +134,12 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
-	optional_region_ptr<UINT8> m_color_prom;
+	optional_region_ptr<uint8_t> m_color_prom;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
-	std::unique_ptr<UINT8[]> m_banked_decrypted_opcodes;
+	std::unique_ptr<uint8_t[]> m_banked_decrypted_opcodes;
 };

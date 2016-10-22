@@ -46,7 +46,7 @@ class midway_ssio_device :  public device_t,
 {
 public:
 	// construction/destruction
-	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ioport_write);
 
 	// configuration
-	void set_custom_input(int which, UINT8 mask, read8_delegate handler);
-	void set_custom_output(int which, UINT8 mask, write8_delegate handler);
+	void set_custom_input(int which, uint8_t mask, read8_delegate handler);
+	void set_custom_output(int which, uint8_t mask, write8_delegate handler);
 
 	// internal communications
 	INTERRUPT_GEN_MEMBER(clock_14024);
@@ -92,18 +92,18 @@ private:
 	optional_ioport_array<5> m_ports;
 
 	// internal state
-	UINT8 m_data[4];
-	UINT8 m_status;
-	UINT8 m_14024_count;
-	UINT8 m_mute;
-	UINT8 m_overall[2];
-	UINT8 m_duty_cycle[2][3];
-	UINT8 m_ayvolume_lookup[16];
+	uint8_t m_data[4];
+	uint8_t m_status;
+	uint8_t m_14024_count;
+	uint8_t m_mute;
+	uint8_t m_overall[2];
+	uint8_t m_duty_cycle[2][3];
+	uint8_t m_ayvolume_lookup[16];
 
 	// I/O port overrides
-	UINT8 m_custom_input_mask[5];
+	uint8_t m_custom_input_mask[5];
 	read8_delegate m_custom_input[5];
-	UINT8 m_custom_output_mask[2];
+	uint8_t m_custom_output_mask[2];
 	write8_delegate m_custom_output[2];
 };
 
@@ -115,7 +115,7 @@ class midway_chip_squeak_deluxe_device :    public device_t,
 {
 public:
 	// construction/destruction
-	midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -143,8 +143,8 @@ private:
 	required_device<dac_word_interface> m_dac;
 
 	// internal state
-	UINT8 m_status;
-	UINT16 m_dacval;
+	uint8_t m_status;
+	uint16_t m_dacval;
 };
 
 
@@ -155,7 +155,7 @@ class midway_sounds_good_device :   public device_t,
 {
 public:
 	// construction/destruction
-	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -181,8 +181,8 @@ private:
 	required_device<dac_word_interface> m_dac;
 
 	// internal state
-	UINT8 m_status;
-	UINT16 m_dacval;
+	uint8_t m_status;
+	uint16_t m_dacval;
 };
 
 
@@ -193,7 +193,7 @@ class midway_turbo_chip_squeak_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);
@@ -219,8 +219,8 @@ private:
 	required_device<dac_word_interface> m_dac;
 
 	// internal state
-	UINT8 m_status;
-	UINT16 m_dacval;
+	uint8_t m_status;
+	uint16_t m_dacval;
 };
 
 
@@ -231,7 +231,7 @@ class midway_squawk_n_talk_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER(write);
@@ -259,8 +259,8 @@ private:
 	optional_device<tms5200_device> m_tms5200;
 
 	// internal state
-	UINT8 m_tms_command;
-	UINT8 m_tms_strobes;
+	uint8_t m_tms_command;
+	uint8_t m_tms_strobes;
 };
 
 

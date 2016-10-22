@@ -21,7 +21,7 @@ class iq151_disc2_device :
 {
 public:
 	// construction/destruction
-	iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -35,14 +35,14 @@ protected:
 	virtual void device_reset() override;
 
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void io_read(offs_t offset, UINT8 &data) override;
-	virtual void io_write(offs_t offset, UINT8 data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void io_read(offs_t offset, uint8_t &data) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
 
 	required_device<upd765a_device> m_fdc;
-	UINT8 *     m_rom;
+	uint8_t *     m_rom;
 	bool        m_rom_enabled;
 };
 

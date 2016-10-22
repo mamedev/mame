@@ -22,7 +22,7 @@ class sb16_lle_device : public device_t,
 {
 public:
 	// construction/destruction
-	sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -85,25 +85,25 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	UINT8 dack_r(int line) override;
-	void dack_w(int line, UINT8 data) override;
-	UINT16 dack16_r(int line) override;
-	void dack16_w(int line, UINT16 data) override;
+	uint8_t dack_r(int line) override;
+	void dack_w(int line, uint8_t data) override;
+	uint16_t dack16_r(int line) override;
+	void dack16_w(int line, uint16_t data) override;
 private:
 	void control_timer(bool start);
 
 	// internal state
 	bool m_data_in;
-	UINT8 m_in_byte;
+	uint8_t m_in_byte;
 	bool m_data_out;
-	UINT8 m_out_byte;
+	uint8_t m_out_byte;
 
-	UINT8 m_freq, m_mode, m_dac_fifo_ctrl, m_adc_fifo_ctrl, m_ctrl8, m_ctrl16, m_mpu_byte;
-	UINT16 m_dma8_len, m_dma16_len, m_dma8_cnt, m_dma16_cnt;
+	uint8_t m_freq, m_mode, m_dac_fifo_ctrl, m_adc_fifo_ctrl, m_ctrl8, m_ctrl16, m_mpu_byte;
+	uint16_t m_dma8_len, m_dma16_len, m_dma8_cnt, m_dma16_cnt;
 	typedef union {
-		UINT32 w;
-		UINT16 h[2];
-		UINT8  b[4];
+		uint32_t w;
+		uint16_t h[2];
+		uint8_t  b[4];
 	} samples;
 	samples m_adc_fifo[16], m_dac_fifo[16];
 	int m_adc_fifo_head, m_adc_fifo_tail, m_dac_fifo_head, m_dac_fifo_tail;

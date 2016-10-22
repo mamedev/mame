@@ -16,17 +16,17 @@
 class time_helper
 {
 public:
-	static inline UINT8 make_bcd(UINT8 data)
+	static inline uint8_t make_bcd(uint8_t data)
 	{
 		return (((data / 10) % 10) << 4) + (data % 10);
 	}
 
-	static inline UINT8 from_bcd(UINT8 data)
+	static inline uint8_t from_bcd(uint8_t data)
 	{
 		return (((data >> 4) & 15) * 10) + (data & 15);
 	}
 
-	static int inc_bcd(UINT8 *data, int mask, int min, int max)
+	static int inc_bcd(uint8_t *data, int mask, int min, int max)
 	{
 		int bcd = (*data + 1) & mask;
 		int carry = 0;

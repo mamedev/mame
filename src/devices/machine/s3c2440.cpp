@@ -33,14 +33,14 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 #include "machine/s3c24xx.hxx"
 #undef DEVICE_S3C2440
 
-UINT32 s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return s3c24xx_video_update( screen, bitmap, cliprect);
 }
 
 const device_type S3C2440 = &device_creator<s3c2440_device>;
 
-s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, S3C2440, "Samsung S3C2440", tag, owner, clock, "s3c2440", __FILE__),
 		m_palette(*this, finder_base::DUMMY_TAG),
 		m_cpu(*this, ":maincpu"),
@@ -148,7 +148,7 @@ void s3c2440_device::device_reset()
 }
 
 
-void s3c2440_device::s3c2440_uart_fifo_w(int uart, UINT8 data)
+void s3c2440_device::s3c2440_uart_fifo_w(int uart, uint8_t data)
 {
 	s3c24xx_uart_fifo_w( uart, data);
 }
@@ -158,12 +158,12 @@ void s3c2440_device::s3c2440_touch_screen(int state)
 	s3c24xx_touch_screen( state);
 }
 
-void s3c2440_device::s3c2440_request_irq(UINT32 int_type)
+void s3c2440_device::s3c2440_request_irq(uint32_t int_type)
 {
 	s3c24xx_request_irq( int_type);
 }
 
-void s3c2440_device::s3c2440_request_eint(UINT32 number)
+void s3c2440_device::s3c2440_request_eint(uint32_t number)
 {
 	s3c24xx_request_eint( number);
 }

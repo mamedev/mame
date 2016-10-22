@@ -304,39 +304,39 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	UINT8 m_data_ram[0x100];
-	UINT8 m_video_ram[0x0400];
-	UINT8 m_color_ram[0x0400];
-	UINT16 m_p1;
-	UINT16 m_p2;
-	UINT8 m_t0_latch;
-	UINT16 m_n_offs;
-	UINT8 m_vp_sound_p2;
-	UINT8 m_p24_data;
-	UINT8 m_sound_latch;
-	UINT8 m_baby_latch;
-	UINT8 m_sound_ant;
-	UINT8 m_dc_4020;
-	UINT8 m_dc_40103;
-	UINT8 m_te_40103;
-	UINT8 m_ld_40103;
-	UINT8 m_ant_jckp;
-	UINT8 m_jckp;
-	UINT8 m_ant_cio;
-	UINT8 m_c_io;
-	UINT8 m_hp_1;
-	UINT8 m_hp_2;
-	UINT8 m_bell;
-	UINT8 m_aux3;
-	UINT8 m_dvrt;
+	uint8_t m_data_ram[0x100];
+	uint8_t m_video_ram[0x0400];
+	uint8_t m_color_ram[0x0400];
+	uint16_t m_p1;
+	uint16_t m_p2;
+	uint8_t m_t0_latch;
+	uint16_t m_n_offs;
+	uint8_t m_vp_sound_p2;
+	uint8_t m_p24_data;
+	uint8_t m_sound_latch;
+	uint8_t m_baby_latch;
+	uint8_t m_sound_ant;
+	uint8_t m_dc_4020;
+	uint8_t m_dc_40103;
+	uint8_t m_te_40103;
+	uint8_t m_ld_40103;
+	uint8_t m_ant_jckp;
+	uint8_t m_jckp;
+	uint8_t m_ant_cio;
+	uint8_t m_c_io;
+	uint8_t m_hp_1;
+	uint8_t m_hp_2;
+	uint8_t m_bell;
+	uint8_t m_aux3;
+	uint8_t m_dvrt;
 	unsigned long m_count0;
 	unsigned long m_count1;
 	unsigned long m_count2;
 	unsigned long m_count3;
 	unsigned long m_count4;
-	UINT8 m_sbp0;
-	UINT8 m_sbp2;
-	UINT8 m_sbp3;
+	uint8_t m_sbp0;
+	uint8_t m_sbp2;
+	uint8_t m_sbp3;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(videopkr_io_r);
 	DECLARE_WRITE8_MEMBER(videopkr_io_w);
@@ -365,9 +365,9 @@ public:
 	DECLARE_VIDEO_START(vidadcba);
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
-	UINT32 screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
-	void count_7dig(unsigned long data, UINT8 index);
+	void count_7dig(unsigned long data, uint8_t index);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
@@ -382,9 +382,9 @@ public:
 *************************/
 
 /* BCD to Seven Segment Decoder */
-static UINT8 dec_7seg(int data)
+static uint8_t dec_7seg(int data)
 {
-	UINT8 segment;
+	uint8_t segment;
 	switch (data)
 	{
 		case 0: segment = 0x3f; break;
@@ -404,9 +404,9 @@ static UINT8 dec_7seg(int data)
 }
 
 /* Display a seven digit counter on layout - Index points to less significant digit*/
-void videopkr_state::count_7dig(unsigned long data, UINT8 index)
+void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 {
-	UINT8 i;
+	uint8_t i;
 	char strn[8];
 	sprintf(strn,"%7lu",data);
 
@@ -418,7 +418,7 @@ void videopkr_state::count_7dig(unsigned long data, UINT8 index)
 
 PALETTE_INIT_MEMBER(videopkr_state, videopkr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < palette.entries(); j++)
@@ -445,7 +445,7 @@ PALETTE_INIT_MEMBER(videopkr_state, videopkr)
 
 PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < palette.entries(); j++)
@@ -476,7 +476,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 
 PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < palette.entries(); j++)
@@ -528,7 +528,7 @@ VIDEO_START_MEMBER(videopkr_state,vidadcba)
 }
 
 
-UINT32 videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -542,9 +542,9 @@ UINT32 videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(videopkr_state::videopkr_io_r)
 {
-	UINT8 valor = 0, hf, co;
+	uint8_t valor = 0, hf, co;
 
-	UINT16 kbdin;
+	uint16_t kbdin;
 
 	switch (m_p2)
 	{
@@ -906,7 +906,7 @@ READ8_MEMBER(videopkr_state::baby_sound_p3_r)
 WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
-	UINT8 lmp_ports, ay_intf;
+	uint8_t lmp_ports, ay_intf;
 	m_sbp3 = data;
 	lmp_ports = m_sbp3 >> 1 & 0x07;
 

@@ -468,7 +468,7 @@ const hdc92x4_device::cmddef hdc92x4_device::s_command[] =
 /*
     Standard constructor for the base class and the two variants
 */
-hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_out_intrq(*this),
 	m_out_dmarq(*this),
@@ -480,13 +480,13 @@ hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hdc92x4_device(mconfig, HDC9224, "SMC HDC9224 Universal Disk Controller", tag, owner, clock, "hdc9224", __FILE__)
 {
 	m_is_hdc9234 = false;
 }
 
-hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hdc92x4_device(mconfig, HDC9234, "SMC HDC9234 Universal Disk Controller", tag, owner, clock, "hdc9234", __FILE__)
 {
 	m_is_hdc9234 = true;
@@ -496,7 +496,7 @@ hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, d
 /*
     Set or reset some bits.
 */
-void hdc92x4_device::set_bits(UINT8& byte, int mask, bool set)
+void hdc92x4_device::set_bits(uint8_t& byte, int mask, bool set)
 {
 	if (set) byte |= mask;
 	else byte &= ~mask;
@@ -628,7 +628,7 @@ bool hdc92x4_device::bad_sector()
 	return (m_selected_drive_type != TYPE_AT) && ((m_register_r[CURRENT_HEAD] & 0x80)!=0);
 }
 
-UINT8 hdc92x4_device::current_command()
+uint8_t hdc92x4_device::current_command()
 {
 	return m_register_w[COMMAND];
 }
@@ -1565,7 +1565,7 @@ void hdc92x4_device::tape_backup()
 */
 void hdc92x4_device::poll_drives()
 {
-	UINT8 drivebit;
+	uint8_t drivebit;
 	if (m_substate == UNDEF)
 	{
 		logerror("POLL DRIVES command %02x\n", current_command());
@@ -2947,7 +2947,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			{
 				m_out_dip(ASSERT_LINE);
 				m_live_state.byte_counter--;
-				UINT8 headbyte = m_in_dma(0, 0xff);
+				uint8_t headbyte = m_in_dma(0, 0xff);
 
 				write_on_track(encode(headbyte), 1, (m_live_state.byte_counter>0)? WRITE_HEADER : WRITE_HEADER_CRC);
 
@@ -2968,7 +2968,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case WRITE_HEADER_CRC:
 			if (m_live_state.byte_counter > 0)
 			{
-				UINT8 crct = (m_live_state.crc >> 8) & 0xff;
+				uint8_t crct = (m_live_state.crc >> 8) & 0xff;
 				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write CRC byte %02x\n", crct);
 				m_live_state.byte_counter--;
 				write_on_track(encode(crct), 1, WRITE_HEADER_CRC);
@@ -3694,7 +3694,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			{
 				m_out_dip(ASSERT_LINE);
 				m_live_state.byte_counter--;
-				UINT8 headbyte = m_in_dma(0, 0xff);
+				uint8_t headbyte = m_in_dma(0, 0xff);
 				if (TRACE_HEADER) logerror("%02x\n", headbyte);
 				write_on_track(encode_hd(headbyte), 1, (m_live_state.byte_counter>0)? WRITE_HEADER : WRITE_HEADER_CRC);
 
@@ -3711,7 +3711,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case WRITE_HEADER_CRC:
 			if (m_live_state.byte_counter > 0)
 			{
-				UINT8 crct = (m_live_state.crc >> 8) & 0xff;
+				uint8_t crct = (m_live_state.crc >> 8) & 0xff;
 				if (TRACE_HEADER) logerror("%02x\n", crct);
 				m_live_state.byte_counter--;
 				write_on_track(encode_hd(crct), 1, WRITE_HEADER_CRC);
@@ -3833,7 +3833,7 @@ void hdc92x4_device::live_abort()
     comprised by WRITE_TRACK_(NEXT_)BYTE
     Arguments: byte to be written, number, state on return
 */
-void hdc92x4_device::write_on_track(UINT16 encoded, int repeat, int next_state)
+void hdc92x4_device::write_on_track(uint16_t encoded, int repeat, int next_state)
 {
 	m_live_state.repeat = repeat;
 	m_live_state.state = WRITE_TRACK_BYTE;
@@ -3854,7 +3854,7 @@ void hdc92x4_device::skip_on_track(int repeat, int next_state)
 	m_live_state.return_state = next_state;
 }
 
-UINT8 hdc92x4_device::get_data_from_encoding(UINT16 raw)
+uint8_t hdc92x4_device::get_data_from_encoding(uint16_t raw)
 {
 	unsigned int value = 0;
 
@@ -3952,10 +3952,10 @@ bool hdc92x4_device::write_one_bit(const attotime &limit)
 	return false;
 }
 
-UINT16 hdc92x4_device::encode(UINT8 byte)
+uint16_t hdc92x4_device::encode(uint8_t byte)
 {
-	UINT16 raw;
-	UINT8 check_pos;
+	uint16_t raw;
+	uint8_t check_pos;
 	bool last_bit_set;
 	check_pos =  0x80;
 
@@ -4003,7 +4003,7 @@ void hdc92x4_device::encode_again()
 	encode_raw(m_live_state.shift_reg_save);
 }
 
-void hdc92x4_device::encode_raw(UINT16 raw)
+void hdc92x4_device::encode_raw(uint16_t raw)
 {
 	m_live_state.bit_counter = 16;
 	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
@@ -4060,7 +4060,7 @@ void hdc92x4_device::checkpoint()
 */
 bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	bool offlimit = false;
 
 	if (m_harddisk != nullptr)
@@ -4098,7 +4098,7 @@ bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 	}
 	else
 	{
-		UINT16 separated = data;
+		uint16_t separated = data;
 		m_live_state.shift_reg = data;
 
 		if (m_hd_encoding == MFM_BYTE)
@@ -4137,7 +4137,7 @@ bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 */
 bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 {
-	UINT16 data;
+	uint16_t data;
 	int count;
 	bool offlimit = false;
 
@@ -4183,10 +4183,10 @@ bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 	return false;
 }
 
-UINT16 hdc92x4_device::encode_hd(UINT8 byte)
+uint16_t hdc92x4_device::encode_hd(uint8_t byte)
 {
-	UINT16 cells;
-	UINT8 check_pos;
+	uint16_t cells;
+	uint8_t check_pos;
 	bool last_bit_set;
 	check_pos =  0x80;
 
@@ -4227,9 +4227,9 @@ UINT16 hdc92x4_device::encode_hd(UINT8 byte)
 	return cells;
 }
 
-UINT16 hdc92x4_device::encode_a1_hd()
+uint16_t hdc92x4_device::encode_a1_hd()
 {
-	UINT16 cells = 0;
+	uint16_t cells = 0;
 
 	switch (m_hd_encoding)
 	{
@@ -4260,7 +4260,7 @@ UINT16 hdc92x4_device::encode_a1_hd()
 */
 READ8_MEMBER( hdc92x4_device::read )
 {
-	UINT8 reply;
+	uint8_t reply;
 	if ((offset & 1) == 0)
 	{
 		// Data register
@@ -4491,7 +4491,7 @@ void hdc92x4_device::set_command_done()
     Read the drive status over the auxbus
     (as said, let the controller board push the values into the controller)
 */
-void hdc92x4_device::auxbus_in(UINT8 data)
+void hdc92x4_device::auxbus_in(uint8_t data)
 {
 	// Kill unwanted input via auxbus until we are initialized.
 	if (!m_initialized)
@@ -4653,7 +4653,7 @@ void hdc92x4_device::auxbus_out()
 	}
 }
 
-void hdc92x4_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
+void hdc92x4_device::dma_address_out(uint8_t addrub, uint8_t addrhb, uint8_t addrlb)
 {
 	if (TRACE_DMA) logerror("Setting DMA address %06x\n", (addrub<<16 | addrhb<<8 | addrlb)&0xffffff);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrub);

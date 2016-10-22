@@ -15,7 +15,7 @@
 #include "machine/i8255.h"
 #include "includes/ut88.h"
 
-static const UINT8 hex_to_7seg[16] =
+static const uint8_t hex_to_7seg[16] =
 {
 	0x3F, 0x06, 0x5B, 0x4F,
 	0x66, 0x6D, 0x7D, 0x07,
@@ -28,7 +28,7 @@ static const UINT8 hex_to_7seg[16] =
 DRIVER_INIT_MEMBER(ut88_state,ut88)
 {
 	/* set initially ROM to be visible on first bank */
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	memset(RAM,0x0000,0x0800); // make first page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xf800);
@@ -55,7 +55,7 @@ void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ8_MEMBER( ut88_state::ut88_8255_portb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if ( m_keyboard_mask & 0x01 )
 		data &= m_io_line0->read();
@@ -122,10 +122,10 @@ READ8_MEMBER( ut88_state::ut88_tape_r )
 READ8_MEMBER( ut88_state::ut88mini_keyboard_r )
 {
 	// This is real keyboard implementation
-	UINT8 *keyrom1 = m_region_proms->base();
-	UINT8 *keyrom2 = m_region_proms->base()+100;
+	uint8_t *keyrom1 = m_region_proms->base();
+	uint8_t *keyrom2 = m_region_proms->base()+100;
 
-	UINT8 key = keyrom2[m_io_line1->read()];
+	uint8_t key = keyrom2[m_io_line1->read()];
 
 	// if keyboard 2nd part returned 0 on 4th bit, output from
 	// first part is used

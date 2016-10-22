@@ -47,7 +47,7 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //  nes_pachinko_device - constructor
 //-------------------------------------------------
 
-nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_PACHINKO, "Famicom Pachinko Controller", tag, owner, clock, "nes_pachinko", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"),
@@ -80,9 +80,9 @@ void nes_pachinko_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_pachinko_device::read_exp(offs_t offset)
+uint8_t nes_pachinko_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	// this controller behaves like a standard P3 joypad, with longer stream of inputs
 	if (offset == 0)    //$4016
 	{
@@ -96,7 +96,7 @@ UINT8 nes_pachinko_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_pachinko_device::write(UINT8 data)
+void nes_pachinko_device::write(uint8_t data)
 {
 	if (data & 0x01)
 		return;

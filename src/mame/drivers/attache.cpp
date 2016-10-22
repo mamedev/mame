@@ -130,7 +130,7 @@ public:
 	};
 
 	// overrides
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_int(screen_device &screen, bool state);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
@@ -156,10 +156,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
-	void operation_strobe(address_space& space,UINT8 data);
+	void operation_strobe(address_space& space,uint8_t data);
 	void keyboard_clock_w(bool state);
-	UINT8 keyboard_data_r();
-	UINT16 get_key();
+	uint8_t keyboard_data_r();
+	uint16_t get_key();
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -190,25 +190,25 @@ private:
 
 	bool m_rom_active;
 	bool m_gfx_enabled;
-	UINT8 m_pio_porta;
-	UINT8 m_pio_portb;
-	UINT8 m_pio_select;
-	UINT8 m_pio_latch;
-	UINT8 m_crtc_reg_select;
-	UINT8 m_current_cmd;
-	UINT8 m_char_ram[128*32];
-	UINT8 m_attr_ram[128*32];
-	UINT8 m_gfx_ram[128*32*5];
-	UINT8 m_char_line;
-	UINT8 m_attr_line;
-	UINT8 m_gfx_line;
-	UINT8 m_cmos_ram[64];
-	UINT8 m_cmos_select;
-	UINT16 m_kb_current_key;
+	uint8_t m_pio_porta;
+	uint8_t m_pio_portb;
+	uint8_t m_pio_select;
+	uint8_t m_pio_latch;
+	uint8_t m_crtc_reg_select;
+	uint8_t m_current_cmd;
+	uint8_t m_char_ram[128*32];
+	uint8_t m_attr_ram[128*32];
+	uint8_t m_gfx_ram[128*32*5];
+	uint8_t m_char_line;
+	uint8_t m_attr_line;
+	uint8_t m_gfx_line;
+	uint8_t m_cmos_ram[64];
+	uint8_t m_cmos_select;
+	uint16_t m_kb_current_key;
 	bool m_kb_clock;
 	bool m_kb_empty;
-	UINT8 m_kb_bitpos;
-	UINT8 m_memmap;
+	uint8_t m_kb_bitpos;
+	uint8_t m_memmap;
 };
 
 // Attributes (based on schematics):
@@ -220,10 +220,10 @@ private:
 // bit 5 = underline
 // bit 6 = superscript
 // bit 7 = subscript (superscript and subscript combined produces strikethrough)
-UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,bit,scan,data;
-	UINT8 dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
+	uint8_t x,y,bit,scan,data;
+	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
 							// as it can start on either odd or even character cells.
 
 	// Graphics output (if enabled)
@@ -268,7 +268,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
-			UINT8 ch = m_char_ram[(y*128)+x];
+			uint8_t ch = m_char_ram[(y*128)+x];
 			pen_t fg = m_palette->pen(m_attr_ram[(y*128)+x] & 0x08 ? 2 : 1); // brightness
 			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
 				dbl_mode++;
@@ -303,7 +303,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					data = ~data;
 				if(m_attr_ram[(y*128)+x] & 0x10) // double-size
 				{
-					UINT8 newdata = 0;
+					uint8_t newdata = 0;
 					if(dbl_mode & 1)
 					{
 						newdata = (data & 0x80) | ((data & 0x80) >> 1)
@@ -323,8 +323,8 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				for(bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					UINT16 xpos = x*8+bit;
-					UINT16 ypos = y*10+scan;
+					uint16_t xpos = x*8+bit;
+					uint16_t ypos = y*10+scan;
 
 					if(BIT(data,7-bit))
 						bitmap.pix32(ypos,xpos) = fg;
@@ -353,10 +353,10 @@ WRITE8_MEMBER(attache_state::rom_w)
 	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
 
-UINT16 attache_state::get_key()
+uint16_t attache_state::get_key()
 {
-	UINT8 row,bits,data;
-	UINT8 res = 0;
+	uint8_t row,bits,data;
+	uint8_t res = 0;
 
 	// scan input ports
 	for(row=0;row<8;row++)
@@ -384,9 +384,9 @@ UINT16 attache_state::get_key()
 	return res;
 }
 
-UINT8 attache_state::keyboard_data_r()
+uint8_t attache_state::keyboard_data_r()
 {
-	UINT16 key;
+	uint16_t key;
 	if(m_kb_bitpos == 1)  // start bit, if data is available
 	{
 		key = get_key();
@@ -424,8 +424,8 @@ void attache_state::keyboard_clock_w(bool state)
 // TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
 READ8_MEMBER(attache_state::pio_portA_r)
 {
-	UINT8 ret = 0xff;
-	UINT8 porta = m_pio_porta;
+	uint8_t ret = 0xff;
+	uint8_t porta = m_pio_porta;
 
 	switch(m_pio_select)
 	{
@@ -473,12 +473,12 @@ READ8_MEMBER(attache_state::pio_portA_r)
 
 READ8_MEMBER(attache_state::pio_portB_r)
 {
-	UINT8 ret = m_pio_portb & 0xbf;
+	uint8_t ret = m_pio_portb & 0xbf;
 	ret |= keyboard_data_r();
 	return ret;
 }
 
-void attache_state::operation_strobe(address_space& space, UINT8 data)
+void attache_state::operation_strobe(address_space& space, uint8_t data)
 {
 	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
 	switch(m_pio_select)
@@ -572,8 +572,8 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 // Display uses A8-A15 placed on the bus by the OUT instruction as an extra parameter
 READ8_MEMBER(attache_state::display_data_r)
 {
-	UINT8 ret = 0xff;
-	UINT8 param = (offset & 0xff00) >> 8;
+	uint8_t ret = 0xff;
+	uint8_t param = (offset & 0xff00) >> 8;
 
 	switch(m_current_cmd)
 	{
@@ -610,7 +610,7 @@ READ8_MEMBER(attache_state::display_data_r)
 
 WRITE8_MEMBER(attache_state::display_data_w)
 {
-	UINT8 param = (offset & 0xff00) >> 8;
+	uint8_t param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
 	{
 	case DISP_GFX_0:
@@ -644,7 +644,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 
 WRITE8_MEMBER(attache_state::display_command_w)
 {
-	UINT8 cmd = (data & 0xe0) >> 5;
+	uint8_t cmd = (data & 0xe0) >> 5;
 
 	m_current_cmd = cmd;
 
@@ -682,8 +682,8 @@ WRITE8_MEMBER(attache_state::memmap_w)
 	// TODO: figure this out properly
 	// Tech manual says that RAM is split into 8kB chunks.
 	// Would seem that bit 4 is always 0 and bit 3 is always 1?
-	UINT8 bank = (data & 0xe0) >> 5;
-	UINT8 loc = data & 0x07;
+	uint8_t bank = (data & 0xe0) >> 5;
+	uint8_t loc = data & 0x07;
 	memory_bank* banknum[8] = { m_membank1, m_membank2, m_membank3, m_membank4, m_membank5, m_membank6, m_membank7, m_membank8 };
 	m_memmap = data;
 
@@ -704,7 +704,7 @@ WRITE8_MEMBER(attache_state::dma_mask_w)
 
 READ8_MEMBER(attache_state::fdc_dma_r)
 {
-	UINT8 ret = m_fdc->dma_r();
+	uint8_t ret = m_fdc->dma_r();
 	return ret;
 }
 
@@ -862,7 +862,7 @@ SLOT_INTERFACE_END
 
 void attache_state::driver_start()
 {
-	UINT8 *RAM = m_ram->pointer();
+	uint8_t *RAM = m_ram->pointer();
 
 	m_membank1->configure_entries(0, 8, &RAM[0x0000], 0x2000);
 	m_membank2->configure_entries(0, 8, &RAM[0x0000], 0x2000);

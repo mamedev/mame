@@ -10,7 +10,7 @@ class tms32082_mp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
@@ -80,9 +80,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -100,41 +100,41 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 
-	static const UINT32 SHIFT_MASK[33];
+	static const uint32_t SHIFT_MASK[33];
 
 
-	UINT32 m_pc;
-	UINT32 m_fetchpc;
+	uint32_t m_pc;
+	uint32_t m_fetchpc;
 	union
 	{
-		UINT32 m_reg[32];
-		UINT64 m_fpair[16];
+		uint32_t m_reg[32];
+		uint64_t m_fpair[16];
 	};
 	union
 	{
-		UINT64 m_acc[4];
+		uint64_t m_acc[4];
 		double m_facc[4];
 	};
-	UINT32 m_ir;
+	uint32_t m_ir;
 
-	UINT32 m_in0p;
-	UINT32 m_in1p;
-	UINT32 m_outp;
-	UINT32 m_ie;
-	UINT32 m_intpen;
-	UINT32 m_epc;
-	UINT32 m_eip;
+	uint32_t m_in0p;
+	uint32_t m_in1p;
+	uint32_t m_outp;
+	uint32_t m_ie;
+	uint32_t m_intpen;
+	uint32_t m_epc;
+	uint32_t m_eip;
 
-	UINT32 m_tcount;
-	UINT32 m_tscale;
+	uint32_t m_tcount;
+	uint32_t m_tscale;
 
-	UINT32 m_param_ram[0x800];
+	uint32_t m_param_ram[0x800];
 
 	int m_icount;
 
@@ -144,16 +144,16 @@ protected:
 	write32_delegate m_cmd_callback;
 
 	void check_interrupts();
-	void processor_command(UINT32 command);
-	UINT32 fetch();
+	void processor_command(uint32_t command);
+	uint32_t fetch();
 	void delay_slot();
 	void execute();
 	void execute_short_imm();
 	void execute_reg_long_imm();
-	UINT32 read_creg(int reg);
-	void write_creg(int reg, UINT32 data);
-	bool test_condition(int condition, UINT32 value);
-	UINT32 calculate_cmp(UINT32 src1, UINT32 src2);
+	uint32_t read_creg(int reg);
+	void write_creg(int reg, uint32_t data);
+	bool test_condition(int condition, uint32_t value);
+	uint32_t calculate_cmp(uint32_t src1, uint32_t src2);
 	void vector_loadstore();
 };
 
@@ -163,7 +163,7 @@ class tms32082_pp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
@@ -176,9 +176,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -195,14 +195,14 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 8; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 8; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 
-	UINT32 m_pc;
-	UINT32 m_fetchpc;
+	uint32_t m_pc;
+	uint32_t m_fetchpc;
 
 	int m_icount;
 

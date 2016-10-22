@@ -33,8 +33,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg1_videoram;
-	required_shared_ptr<UINT16> m_bg2_videoram;
+	required_shared_ptr<uint16_t> m_bg1_videoram;
+	required_shared_ptr<uint16_t> m_bg2_videoram;
 
 	/* video-related */
 	tilemap_t    *m_bg1_tilemap;
@@ -72,7 +72,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);

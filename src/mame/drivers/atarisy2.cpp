@@ -421,9 +421,9 @@ READ8_MEMBER(atarisy2_state::leta_r)
 
 			case 2: /* Fake Spinner */
 			{
-				INT32  diff;
-				UINT32 temp;
-				UINT32 rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
+				int32_t  diff;
+				uint32_t temp;
+				uint32_t rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
 				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
 				 * we use it to generate the LETA0 Center encoder count
 				 */
@@ -3157,7 +3157,7 @@ ROM_END
 DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3186,7 +3186,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3201,7 +3201,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 

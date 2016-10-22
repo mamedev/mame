@@ -63,7 +63,7 @@ enum lr35902_flag
 const device_type LR35902 = &device_creator<lr35902_cpu_device>;
 
 
-lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock, "lr35902", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_A(0)
@@ -91,37 +91,37 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 /* Memory functions                                                         */
 /****************************************************************************/
 
-inline void lr35902_cpu_device::cycles_passed(UINT8 cycles)
+inline void lr35902_cpu_device::cycles_passed(uint8_t cycles)
 {
 	m_icount -= cycles / m_gb_speed;
 	m_timer_func( cycles );
 }
 
 
-inline UINT8 lr35902_cpu_device::mem_read_byte( UINT16 addr )
+inline uint8_t lr35902_cpu_device::mem_read_byte( uint16_t addr )
 {
-	UINT8 data = m_program->read_byte( addr );
+	uint8_t data = m_program->read_byte( addr );
 	cycles_passed( 4 );
 	return data;
 }
 
 
-inline void lr35902_cpu_device::mem_write_byte( UINT16 addr, UINT8 data )
+inline void lr35902_cpu_device::mem_write_byte( uint16_t addr, uint8_t data )
 {
 	m_program->write_byte( addr, data );
 	cycles_passed( 4 );
 }
 
 
-inline UINT16 lr35902_cpu_device::mem_read_word( UINT16 addr )
+inline uint16_t lr35902_cpu_device::mem_read_word( uint16_t addr )
 {
-	UINT16 data = mem_read_byte( addr );
+	uint16_t data = mem_read_byte( addr );
 	data |= ( mem_read_byte( addr + 1 ) << 8 );
 	return data;
 }
 
 
-inline void lr35902_cpu_device::mem_write_word( UINT16 addr, UINT16 data )
+inline void lr35902_cpu_device::mem_write_word( uint16_t addr, uint16_t data )
 {
 	mem_write_byte( addr, data & 0xFF );
 	mem_write_byte( addr + 1, data >> 8 );
@@ -226,7 +226,7 @@ void lr35902_cpu_device::device_reset()
 }
 
 
-offs_t lr35902_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t lr35902_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( lr35902 );
 	return CPU_DISASSEMBLE_NAME(lr35902)(this, buffer, pc, oprom, opram, options);
@@ -235,7 +235,7 @@ offs_t lr35902_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 void lr35902_cpu_device::check_interrupts()
 {
-	UINT8 irq = m_IE & m_IF;
+	uint8_t irq = m_IE & m_IF;
 
 	/* Interrupts should be taken after the first instruction after an EI instruction */
 	if (m_handle_ei_delay) {
@@ -345,7 +345,7 @@ void lr35902_cpu_device::execute_run()
 		else
 		{
 			if ( m_execution_state ) {
-				UINT8   x;
+				uint8_t   x;
 				/* Execute instruction */
 				switch( m_op ) {
 #include "opc_main.hxx"
@@ -391,13 +391,13 @@ void lr35902_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-UINT8 lr35902_cpu_device::get_speed()
+uint8_t lr35902_cpu_device::get_speed()
 {
 	return 0x7E | ( ( m_gb_speed - 1 ) << 7 ) | m_gb_speed_change_pending;
 }
 
 
-void lr35902_cpu_device::set_speed( UINT8 speed_request )
+void lr35902_cpu_device::set_speed( uint8_t speed_request )
 {
 	m_gb_speed_change_pending = speed_request & 0x01;
 }

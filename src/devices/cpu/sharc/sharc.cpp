@@ -53,9 +53,9 @@ enum
 };
 
 
-#define ROPCODE(pc)     ((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 0]) << 32) | \
-						((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
-						((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 2]) << 0)
+#define ROPCODE(pc)     ((uint64_t)(m_internal_ram[((pc-0x20000) * 3) + 0]) << 32) | \
+						((uint64_t)(m_internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
+						((uint64_t)(m_internal_ram[((pc-0x20000) * 3) + 2]) << 0)
 
 
 const device_type ADSP21062 = &device_creator<adsp21062_device>;
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 ADDRESS_MAP_END
 
 
-adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ADSP21062, "ADSP21062", tag, owner, clock, "adsp21062", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, ADDRESS_MAP_NAME(internal_pgm))
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2)
@@ -80,7 +80,7 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 }
 
 
-offs_t adsp21062_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t adsp21062_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sharc );
 	return CPU_DISASSEMBLE_NAME(sharc)(this, buffer, pc, oprom, opram, options);
@@ -92,7 +92,7 @@ void adsp21062_device::enable_recompiler()
 }
 
 
-void adsp21062_device::CHANGE_PC(UINT32 newpc)
+void adsp21062_device::CHANGE_PC(uint32_t newpc)
 {
 	m_core->pc = newpc;
 	m_core->daddr = newpc;
@@ -100,7 +100,7 @@ void adsp21062_device::CHANGE_PC(UINT32 newpc)
 	m_core->nfaddr = newpc+2;
 }
 
-void adsp21062_device::CHANGE_PC_DELAYED(UINT32 newpc)
+void adsp21062_device::CHANGE_PC_DELAYED(uint32_t newpc)
 {
 	m_core->nfaddr = newpc;
 
@@ -136,7 +136,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_iop_delayed_write_callback)
 	m_core->delayed_iop_timer->adjust(attotime::never, 0);
 }
 
-void adsp21062_device::sharc_iop_delayed_w(UINT32 reg, UINT32 data, int cycles)
+void adsp21062_device::sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycles)
 {
 	m_core->iop_delayed_reg = reg;
 	m_core->iop_delayed_data = data;
@@ -146,7 +146,7 @@ void adsp21062_device::sharc_iop_delayed_w(UINT32 reg, UINT32 data, int cycles)
 
 
 /* IOP registers */
-UINT32 adsp21062_device::sharc_iop_r(UINT32 address)
+uint32_t adsp21062_device::sharc_iop_r(uint32_t address)
 {
 	switch (address)
 	{
@@ -160,7 +160,7 @@ UINT32 adsp21062_device::sharc_iop_r(UINT32 address)
 	}
 }
 
-void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
+void adsp21062_device::sharc_iop_w(uint32_t address, uint32_t data)
 {
 	switch (address)
 	{
@@ -175,10 +175,10 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 				m_core->extdma_shift = 0;
 
 			#if 0
-			UINT64 r = pm_read48(m_core->dma[6].int_index);
+			uint64_t r = pm_read48(m_core->dma[6].int_index);
 
-			r &= ~((UINT64)(0xffff) << (m_core->extdma_shift*16));
-			r |= ((UINT64)data & 0xffff) << (m_core->extdma_shift*16);
+			r &= ~((uint64_t)(0xffff) << (m_core->extdma_shift*16));
+			r |= ((uint64_t)data & 0xffff) << (m_core->extdma_shift*16);
 
 			pm_write48(m_core->dma[6].int_index, r);
 
@@ -264,7 +264,7 @@ void adsp21062_device::build_opcode_table()
 
 	for (i=0; i < 512; i++)
 	{
-		UINT16 op = i << 7;
+		uint16_t op = i << 7;
 
 		for (j=0; j < num_ops; j++)
 		{
@@ -285,7 +285,7 @@ void adsp21062_device::build_opcode_table()
 
 /*****************************************************************************/
 
-void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
+void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 {
 	if (address == 0x1c)
 	{
@@ -301,7 +301,7 @@ void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
 	}
 }
 
-void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
+void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 {
 	/*
 	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
@@ -313,9 +313,9 @@ void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
 		case 2:         // 16/48 packing
 		{
 			int shift = address % 3;
-			UINT64 r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
+			uint64_t r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
 
-			r &= ~((UINT64)(0xffff) << (shift*16));
+			r &= ~((uint64_t)(0xffff) << (shift*16));
 			r |= (data & 0xffff) << (shift*16);
 
 			pm_write48((m_core->dma[6].int_index & 0x1ffff) | 0x20000, r);
@@ -350,7 +350,7 @@ void adsp21062_device::device_start()
 	m_internal_ram_block1 = &m_internal_ram[0x20000/2];
 
 	// init UML generator
-	UINT32 umlflags = 0;
+	uint32_t umlflags = 0;
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
 
 	// add UML symbols
@@ -767,7 +767,7 @@ void adsp21062_device::device_start()
 
 void adsp21062_device::device_reset()
 {
-	memset(m_internal_ram, 0, 2 * 0x10000 * sizeof(UINT16));
+	memset(m_internal_ram, 0, 2 * 0x10000 * sizeof(uint16_t));
 
 	switch(m_boot_mode)
 	{
@@ -945,7 +945,7 @@ void adsp21062_device::execute_run()
 					int condition = m_core->laddr.code;
 
 					{
-						UINT32 looptop = TOP_PC();
+						uint32_t looptop = TOP_PC();
 						if (m_core->pc - looptop > 2)
 						{
 							m_core->astat = m_core->astat_old_old_old;
@@ -1012,7 +1012,7 @@ void adsp21062_device::execute_run()
 	}
 }
 
-bool adsp21062_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
+bool adsp21062_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
 {
 	if (spacenum == AS_PROGRAM)
 	{
@@ -1075,25 +1075,25 @@ bool adsp21062_device::memory_read(address_spacenum spacenum, offs_t offset, int
 	return true;
 }
 
-bool adsp21062_device::memory_readop(offs_t offset, int size, UINT64 &value)
+bool adsp21062_device::memory_readop(offs_t offset, int size, uint64_t &value)
 {
-	UINT64 mask = (size < 8) ? (((UINT64)1 << (8 * size)) - 1) : ~(UINT64)0;
+	uint64_t mask = (size < 8) ? (((uint64_t)1 << (8 * size)) - 1) : ~(uint64_t)0;
 	int shift = 8 * (offset & 7);
 	offset >>= 3;
 
 	if (offset >= 0x20000 && offset < 0x28000)
 	{
-		UINT64 op = ((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 0]) << 32) |
-					((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 1]) << 16) |
-					((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 2]) << 0);
+		uint64_t op = ((uint64_t)(m_internal_ram_block0[((offset-0x20000) * 3) + 0]) << 32) |
+					((uint64_t)(m_internal_ram_block0[((offset-0x20000) * 3) + 1]) << 16) |
+					((uint64_t)(m_internal_ram_block0[((offset-0x20000) * 3) + 2]) << 0);
 		value = (op >> shift) & mask;
 		return true;
 	}
 	else if (offset >= 0x28000 && offset < 0x30000)
 	{
-		UINT64 op = ((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 0]) << 32) |
-					((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 1]) << 16) |
-					((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 2]) << 0);
+		uint64_t op = ((uint64_t)(m_internal_ram_block1[((offset-0x28000) * 3) + 0]) << 32) |
+					((uint64_t)(m_internal_ram_block1[((offset-0x28000) * 3) + 1]) << 16) |
+					((uint64_t)(m_internal_ram_block1[((offset-0x28000) * 3) + 2]) << 0);
 		value = (op >> shift) & mask;
 		return true;
 	}

@@ -213,9 +213,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *usr = memregion("user1")->base();
-	UINT8 *gfx = memregion("gfx1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *usr = memregion("user1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {

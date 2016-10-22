@@ -30,8 +30,8 @@ WRITE8_MEMBER(srumbler_state::bankswitch_w)
 	  Note that 5000-8fff can be either ROM or RAM, so we should handle
 	  that as well to be 100% accurate.
 	 */
-	UINT8 *prom1 = memregion("proms")->base() + (data & 0xf0);
-	UINT8 *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
+	uint8_t *prom1 = memregion("proms")->base() + (data & 0xf0);
+	uint8_t *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
 	for (int i = 0x05;i < 0x10;i++)
 	{

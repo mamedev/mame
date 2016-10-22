@@ -630,8 +630,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 {
-	UINT8 *scan, *src;
-	INT16 *dest;
+	uint8_t *scan, *src;
+	int16_t *dest;
 	int start, size;
 	int i, n;
 
@@ -652,7 +652,7 @@ SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 		}
 
 		/* 2009-11 FP: should these be saved? */
-		m_sampledata[i] = std::make_unique<INT16[]>(size);
+		m_sampledata[i] = std::make_unique<int16_t[]>(size);
 		m_samplesize[i] = size;
 
 
@@ -664,7 +664,7 @@ SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 		scan = &src[start];
 		for (n = 0; n < size; n++)
 		{
-			*dest++ = (INT8)((*scan++) ^ 0x80) * 256;
+			*dest++ = (int8_t)((*scan++) ^ 0x80) * 256;
 		}
 	//  logerror("samples num:%02X ofs:%04X lng:%04X\n", i, start, size);
 	}

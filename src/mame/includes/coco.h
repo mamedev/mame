@@ -141,7 +141,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 
 	// disassembly override
-	offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 
 protected:
 	// device-level overrides
@@ -156,13 +156,13 @@ protected:
 	void recalculate_firq(void);
 
 	// changed handlers
-	virtual void pia1_pa_changed(UINT8 data);
-	virtual void pia1_pb_changed(UINT8 data);
+	virtual void pia1_pa_changed(uint8_t data);
+	virtual void pia1_pb_changed(uint8_t data);
 
 	// miscellaneous
-	virtual void update_keyboard_input(UINT8 value, UINT8 z);
+	virtual void update_keyboard_input(uint8_t value, uint8_t z);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(UINT8 *cart_base) = 0;
+	virtual void update_cart_base(uint8_t *cart_base) = 0;
 
 private:
 	// timer constants
@@ -199,8 +199,8 @@ private:
 		ioport_port *m_input[2][2];
 		ioport_port *m_buttons;
 
-		UINT8 input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
-		UINT8 buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
+		uint8_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
@@ -212,7 +212,7 @@ private:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	void poll_joystick(bool *joyin, UINT8 *buttons);
+	void poll_joystick(bool *joyin, uint8_t *buttons);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
@@ -220,7 +220,7 @@ private:
 	void diecom_lightgun_clock(void);
 
 	// thin wrappers for PIA output
-	UINT8 dac_output(void)  { return m_dac_output; }    // PA drives the DAC
+	uint8_t dac_output(void)  { return m_dac_output; }    // PA drives the DAC
 	bool sel1(void)         { return m_pia_0->ca2_output() ? true : false; }
 	bool sel2(void)         { return m_pia_0->cb2_output() ? true : false; }
 	bool snden(void)        { return m_pia_1->cb2_output() ? true : false; }
@@ -229,7 +229,7 @@ private:
 	coco_vhd_image_device *current_vhd(void);
 
 	// floating bus
-	UINT8 floating_bus_read(void);
+	uint8_t floating_bus_read(void);
 
 	// input ports
 	required_ioport_array<7> m_keyboard;
@@ -240,11 +240,11 @@ private:
 	analog_input_t m_diecom_lightgun;
 
 	// DAC output
-	UINT8 m_dac_output;
+	uint8_t m_dac_output;
 
 	// remember the last audio sample level from the analog sources (DAC, cart, cassette) so that we don't
 	// introduce step changes when the audio output is enabled/disabled via PIA1 CB2
-	UINT8 m_analog_audio_level;
+	uint8_t m_analog_audio_level;
 
 	// hires interface
 	emu_timer *m_hiresjoy_transition_timer[2];
@@ -253,13 +253,13 @@ private:
 	// diecom lightgun
 	emu_timer *m_diecom_lightgun_timer;
 	bool m_dclg_previous_bit;
-	UINT8 m_dclg_output_h;
-	UINT8 m_dclg_output_v;
-	UINT8 m_dclg_state;
-	UINT16 m_dclg_timer;
+	uint8_t m_dclg_output_h;
+	uint8_t m_dclg_output_v;
+	uint8_t m_dclg_state;
+	uint16_t m_dclg_timer;
 
 	// VHD selection
-	UINT8 m_vhd_select;
+	uint8_t m_vhd_select;
 
 	// safety to prevent stack overflow when reading floating bus
 	bool m_in_floating_bus_read;

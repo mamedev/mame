@@ -15,10 +15,10 @@
 
 struct midvunit_object_data
 {
-	UINT16 *    destbase;
-	UINT8 *     texbase;
-	UINT16      pixdata;
-	UINT8       dither;
+	uint16_t *    destbase;
+	uint8_t *     texbase;
+	uint16_t      pixdata;
+	uint8_t       dither;
 };
 
 class midvunit_state;
@@ -33,10 +33,10 @@ public:
 private:
 	midvunit_state &m_state;
 
-	void render_flat(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
-	void render_tex(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
-	void render_textrans(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
-	void render_textransmask(INT32 scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_flat(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_tex(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_textrans(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+	void render_textransmask(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
 };
 
 class midvunit_state : public driver_device
@@ -68,41 +68,41 @@ public:
 		m_dcs(*this, "dcs"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
-	optional_shared_ptr<UINT32> m_nvram;
-	required_shared_ptr<UINT32> m_ram_base;
-	optional_shared_ptr<UINT32> m_fastram_base;
-	required_shared_ptr<UINT32> m_tms32031_control;
-	optional_shared_ptr<UINT32> m_midvplus_misc;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT32> m_textureram;
+	optional_shared_ptr<uint32_t> m_nvram;
+	required_shared_ptr<uint32_t> m_ram_base;
+	optional_shared_ptr<uint32_t> m_fastram_base;
+	required_shared_ptr<uint32_t> m_tms32031_control;
+	optional_shared_ptr<uint32_t> m_midvplus_misc;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint32_t> m_textureram;
 
 	optional_ioport_array<3> m_adc_ports;
 
-	UINT8 m_cmos_protected;
-	UINT16 m_control_data;
-	UINT8 m_adc_data;
-	UINT8 m_adc_shift;
-	UINT16 m_last_port0;
-	UINT8 m_shifter_state;
+	uint8_t m_cmos_protected;
+	uint16_t m_control_data;
+	uint8_t m_adc_data;
+	uint8_t m_adc_shift;
+	uint16_t m_last_port0;
+	uint8_t m_shifter_state;
 	timer_device *m_timer[2];
 	double m_timer_rate;
-	UINT16 m_bit_index;
+	uint16_t m_bit_index;
 	int m_lastval;
-	UINT32 *m_generic_speedup;
-	UINT16 m_video_regs[16];
-	UINT16 m_dma_data[16];
-	UINT8 m_dma_data_index;
-	UINT16 m_page_control;
-	UINT8 m_video_changed;
+	uint32_t *m_generic_speedup;
+	uint16_t m_video_regs[16];
+	uint16_t m_dma_data[16];
+	uint8_t m_dma_data_index;
+	uint16_t m_page_control;
+	uint8_t m_video_changed;
 	emu_timer *m_scanline_timer;
 	std::unique_ptr<midvunit_renderer> m_poly;
-	UINT8 m_galil_input_index;
-	UINT8 m_galil_input_length;
+	uint8_t m_galil_input_index;
+	uint8_t m_galil_input_length;
 	const char *m_galil_input;
-	UINT8 m_galil_output_index;
+	uint8_t m_galil_output_index;
 	char m_galil_output[450];
-	UINT32 m_output;
-	UINT8 m_output_mode;
+	uint32_t m_output;
+	uint8_t m_output_mode;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -153,7 +153,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(midvplus);
-	UINT32 screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -163,7 +163,7 @@ public:
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<dcs_audio_device> m_dcs;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	void postload();
 
 protected:

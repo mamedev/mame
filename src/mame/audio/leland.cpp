@@ -351,7 +351,7 @@ void leland_80186_sound_device::device_reset()
 
 const device_type LELAND_80186 = &device_creator<leland_80186_sound_device>;
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LELAND_80186, "80186 DAC (Leland)", tag, owner, clock, "leland_80186_sound", __FILE__),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
@@ -378,7 +378,7 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 	m_type = TYPE_LELAND;
 }
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
@@ -406,7 +406,7 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 
 const device_type REDLINE_80186 = &device_creator<redline_80186_sound_device>;
 
-redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Redline Racer)", tag, owner, clock, "redline_80186_sound", __FILE__)
 {
 	m_type = TYPE_REDLINE;
@@ -414,7 +414,7 @@ redline_80186_sound_device::redline_80186_sound_device(const machine_config &mco
 
 const device_type ATAXX_80186 = &device_creator<ataxx_80186_sound_device>;
 
-ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Ataxx)", tag, owner, clock, "ataxx_80186_sound", __FILE__)
 {
 	m_type = TYPE_ATAXX;
@@ -422,7 +422,7 @@ ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig
 
 const device_type WSF_80186 = &device_creator<wsf_80186_sound_device>;
 
-wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (WSF)", tag, owner, clock, "wsf_80186_sound", __FILE__)
 {
 	m_type = TYPE_WSF;
@@ -438,7 +438,7 @@ WRITE16_MEMBER(leland_80186_sound_device::peripheral_ctrl)
 
 		case 4:
 		{
-			UINT32 temp = (m_peripheral & 0xffc0) << 4;
+			uint32_t temp = (m_peripheral & 0xffc0) << 4;
 			if (data & 0x0040)
 			{
 				m_audiocpu->device_t::memory().space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));

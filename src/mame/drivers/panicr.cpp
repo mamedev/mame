@@ -87,10 +87,10 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_mainram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_textram;
-	required_shared_ptr<UINT8> m_spritebank;
+	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_textram;
+	required_shared_ptr<uint8_t> m_spritebank;
 
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_infotilemap_2;
@@ -116,7 +116,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(panicr);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -136,7 +136,7 @@ public:
 
 PALETTE_INIT_MEMBER(panicr_state, panicr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -155,7 +155,7 @@ PALETTE_INIT_MEMBER(panicr_state, panicr)
 	// txt lookup table
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if (color_prom[i] & 0x40)
 			ctabentry = 0;
@@ -168,7 +168,7 @@ PALETTE_INIT_MEMBER(panicr_state, panicr)
 	// tile lookup table
 	for (i = 0x000; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i+0x100] & 0x3f) | 0x00;
+		uint8_t ctabentry = (color_prom[i+0x100] & 0x3f) | 0x00;
 
 		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x200, ctabentry);
 		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x210, ctabentry);
@@ -177,7 +177,7 @@ PALETTE_INIT_MEMBER(panicr_state, panicr)
 	// sprite lookup table
 	for (i = 0x000; i < 0x100; i++)
 	{
-		UINT8 ctabentry;
+		uint8_t ctabentry;
 
 		if (color_prom[i+0x200] & 0x40)
 			ctabentry = 0;
@@ -282,7 +282,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 	}
 }
 
-UINT32 panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bgtilemap->set_scrollx(0, m_scrollx);
 	m_bgtilemap->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
@@ -298,12 +298,12 @@ UINT32 panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	for (int y=0;y<256;y++)
 	{
-		UINT16* srcline = &m_temprender->pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
+		uint16_t* srcline = &m_temprender->pix16(y);
+		uint16_t* dstline = &bitmap.pix16(y);
 
 		for (int x=0;x<256;x++)
 		{
-			UINT16 dat = srcline[x];
+			uint16_t dat = srcline[x];
 
 			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -315,12 +315,12 @@ UINT32 panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	for (int y=0;y<256;y++)
 	{
-		UINT16* srcline = &m_temprender->pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
+		uint16_t* srcline = &m_temprender->pix16(y);
+		uint16_t* dstline = &bitmap.pix16(y);
 
 		for (int x=0;x<256;x++)
 		{
-			UINT16 dat = srcline[x];
+			uint16_t dat = srcline[x];
 			if (dat & 0x10)
 				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -366,8 +366,8 @@ READ8_MEMBER(panicr_state::collision_r)
 	actual_column &= 0xff;
 
 
-	UINT8 ret = 0;
-	UINT16* srcline = &m_tempbitmap_1->pix16(actual_line);
+	uint8_t ret = 0;
+	uint16_t* srcline = &m_tempbitmap_1->pix16(actual_line);
 
 
 	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;
@@ -714,8 +714,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
-	std::vector<UINT8> buf(0x80000);
-	UINT8 *rom;
+	std::vector<uint8_t> buf(0x80000);
+	uint8_t *rom;
 	int size;
 	int i,j;
 

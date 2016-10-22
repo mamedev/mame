@@ -114,7 +114,7 @@ static const int pi_table[32] =
 const device_type MEA8000 = &device_creator<mea8000_device>;
 
 
-mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_write_req(*this),
@@ -205,12 +205,12 @@ void mea8000_device::init_tables()
 }
 
 
-#ifndef FLOAT_MODE /* UINT16 version */
+#ifndef FLOAT_MODE /* uint16_t version */
 
 
 
 /* linear interpolation */
-int mea8000_device::interp( UINT16 org, UINT16 dst )
+int mea8000_device::interp( uint16_t org, uint16_t dst )
 {
 	return org + (((dst - org) * m_framepos) >> m_framelog);
 }

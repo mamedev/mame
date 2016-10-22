@@ -118,7 +118,7 @@
 
 // Long ALU Functions use bit 63
 #define HandleLongALUNZFlags(rd)                            \
-	((((rd) & ((UINT64)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
+	((((rd) & ((uint64_t)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
 
 #define HandleALULogicalFlags(rd, sc)                  \
 	if (insn & INSN_S)                                   \

@@ -101,17 +101,17 @@ the access to the video memory is unclear to me at the moment.
 MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
-	UINT32  *p = &bitmap.pix32(y);
+	uint8_t *videoram = m_videoram;
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 	if(IsTextMode)
 	{
-		UINT8 *chr_gen = memregion("gfx1")->base();
+		uint8_t *chr_gen = memregion("gfx1")->base();
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT32 offset = ( ( ma + i ) | ((m_GCtrl & GCtrlAddrLines)<<8)) << 1;
-			UINT8 chr = videoram[ offset ];
-			UINT8 attr = videoram[ offset +1 ];
+			uint32_t offset = ( ( ma + i ) | ((m_GCtrl & GCtrlAddrLines)<<8)) << 1;
+			uint8_t chr = videoram[ offset ];
+			uint8_t attr = videoram[ offset +1 ];
 
 			/* Extract non-colour attributes, in character set 1, undeline is used */
 			/* We will extract the colours below, when we have decoded inverse */
@@ -133,8 +133,8 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 			if (i == cursor_x)
 				Invert=~Invert;
 
-			UINT16 fg = 0;
-			UINT16 bg = 0;
+			uint16_t fg = 0;
+			uint16_t bg = 0;
 
 			/* Invert colours if invert is true */
 			if(!Invert)
@@ -150,7 +150,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 
 
 
-			UINT8 data = chr_gen[ chr * 16 + ra ];
+			uint8_t data = chr_gen[ chr * 16 + ra ];
 
 			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
 			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
@@ -175,11 +175,11 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 	{
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT32 offset = ((((ma + i ) & 0x1FFF) << 3) | (ra & 0x07)) << 1;
+			uint32_t offset = ((((ma + i ) & 0x1FFF) << 3) | (ra & 0x07)) << 1;
 
-			UINT8 Lo = videoram[ offset ];
-			UINT8 Hi = videoram[ offset +1 ];
-			UINT16 Word = (Hi<<8) | Lo;
+			uint8_t Lo = videoram[ offset ];
+			uint8_t Hi = videoram[ offset +1 ];
+			uint16_t Word = (Hi<<8) | Lo;
 			int Red;
 			int Green;
 			int Blue;

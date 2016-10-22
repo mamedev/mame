@@ -108,16 +108,16 @@ public:
 		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram1;
-	required_shared_ptr<UINT8> m_colorram1;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram1;
+	required_shared_ptr<uint8_t> m_colorram1;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
-	UINT8    m_star_enable;
-	UINT16   m_star_delay_counter;
-	UINT16   m_star_shift_reg;
+	uint8_t    m_star_enable;
+	uint16_t   m_star_delay_counter;
+	uint16_t   m_star_shift_reg;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -256,11 +256,11 @@ WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data1, data2, color1, color2;
+		uint8_t data1, data2, color1, color2;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 5) & 0x8000) |
@@ -278,7 +278,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit1, bit2, color;
+			uint8_t bit1, bit2, color;
 
 			if (m_flipscreen)
 			{
@@ -322,7 +322,7 @@ void nyny_state::shift_star_generator(  )
 MC6845_END_UPDATE( nyny_state::crtc_end_update )
 {
 	/* draw the star field into the bitmap */
-	UINT16 delay_counter = m_star_delay_counter;
+	uint16_t delay_counter = m_star_delay_counter;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -333,7 +333,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
 				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
-				UINT8 color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
+				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
 								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
 								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
@@ -404,7 +404,7 @@ WRITE8_MEMBER(nyny_state::audio_2_command_w)
 
 READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
 	if (BIT(offset, 2))  ret = m_pia1->read(space, offset & 0x03);

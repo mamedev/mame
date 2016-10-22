@@ -14,7 +14,7 @@
 
 const device_type S11C_BG = &device_creator<s11c_bg_device>;
 
-s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
 	device_mixer_interface(mconfig, *this),
 	m_cpu(*this,"bgcpu"),
@@ -51,12 +51,12 @@ WRITE_LINE_MEMBER( s11c_bg_device::pia40_ca2_w)
 		m_ym2151->reset();
 }
 
-void s11c_bg_device::ctrl_w(UINT8 data)
+void s11c_bg_device::ctrl_w(uint8_t data)
 {
 	m_pia40->cb1_w(data);
 }
 
-void s11c_bg_device::data_w(UINT8 data)
+void s11c_bg_device::data_w(uint8_t data)
 {
 	m_pia40->portb_w(data);
 }
@@ -97,7 +97,7 @@ void s11c_bg_device::device_start()
 
 void s11c_bg_device::device_reset()
 {
-	UINT8* ROM;
+	uint8_t* ROM;
 
 	m_rom = memregion(m_regiontag);
 	ROM = m_rom->base();
@@ -135,6 +135,6 @@ WRITE8_MEMBER( s11c_bg_device::bg_speech_digit_w )
 
 WRITE8_MEMBER( s11c_bg_device::bgbank_w )
 {
-	UINT8 bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
+	uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	m_cpubank->set_entry(bank);
 }

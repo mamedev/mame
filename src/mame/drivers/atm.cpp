@@ -48,14 +48,14 @@ protected:
 	required_device<beta_disk_device> m_beta;
 
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void atm_update_memory();
 };
 
 
 DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
-	UINT16 pc = m_maincpu->state_int(STATE_GENPCBASE);
+	uint16_t pc = m_maincpu->state_int(STATE_GENPCBASE);
 
 	if (m_beta->started() && m_beta->is_active())
 	{
@@ -92,7 +92,7 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 
 void atm_state::atm_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 

@@ -181,13 +181,13 @@ public:
 
 
 	// generic video
-	void flip_screen_set(UINT32 on);
-	void flip_screen_set_no_update(UINT32 on);
-	void flip_screen_x_set(UINT32 on);
-	void flip_screen_y_set(UINT32 on);
-	UINT32 flip_screen() const { return m_flip_screen_x; }
-	UINT32 flip_screen_x() const { return m_flip_screen_x; }
-	UINT32 flip_screen_y() const { return m_flip_screen_y; }
+	void flip_screen_set(uint32_t on);
+	void flip_screen_set_no_update(uint32_t on);
+	void flip_screen_x_set(uint32_t on);
+	void flip_screen_y_set(uint32_t on);
+	uint32_t flip_screen() const { return m_flip_screen_x; }
+	uint32_t flip_screen_x() const { return m_flip_screen_x; }
+	uint32_t flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
@@ -219,7 +219,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 private:
 	// helpers
-	void irq_pulse_clear(void *ptr, INT32 param);
+	void irq_pulse_clear(void *ptr, int32_t param);
 	void updateflip();
 
 	// configuration state
@@ -230,14 +230,14 @@ private:
 	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
 
 	// generic video
-	UINT8                   m_flip_screen_x;
-	UINT8                   m_flip_screen_y;
+	uint8_t                   m_flip_screen_x;
+	uint8_t                   m_flip_screen_y;
 };
 
 
 // this template function creates a stub which constructs a device
 template<class _DriverClass>
-device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 {
 	assert(owner == nullptr);
 	assert(clock == 0);

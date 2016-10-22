@@ -63,21 +63,21 @@ public:
 private:
 	bool m_timer_x;
 	bool m_timer_sb;
-	UINT8 m_timer_s[3];
-	UINT8 m_vol;
-	UINT8 m_ic2a;
-	UINT8 m_ic2b;
-	UINT8 m_ic10a;
-	UINT8 m_ic10b;
-	UINT8 m_ic11a;
+	uint8_t m_timer_s[3];
+	uint8_t m_vol;
+	uint8_t m_ic2a;
+	uint8_t m_ic2b;
+	uint8_t m_ic10a;
+	uint8_t m_ic10b;
+	uint8_t m_ic11a;
 	bool m_ic11_ca2;
 	bool m_ic10_cb2;
 	bool m_ic2_ca2;
 	bool m_ic2_cb2;
-	UINT8 m_counter;
-	UINT8 m_digit;
-	UINT8 m_segment[5];
-	UINT8 *m_p_prom;
+	uint8_t m_counter;
+	uint8_t m_digit;
+	uint8_t m_segment[5];
+	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<m6802_cpu_device> m_audiocpu;
@@ -273,8 +273,8 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 		// use is to place the '1' digit in the centre segments.
 		if (BIT(data, 0) && (m_counter > 8))
 		{
-			static const UINT8 patterns[16] = { 0x3f,0x80,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 with '1' adjusted
-			UINT16 i, seg1, seg2;
+			static const uint8_t patterns[16] = { 0x3f,0x80,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 with '1' adjusted
+			uint16_t i, seg1, seg2;
 			for (i = 0; i < 5; i++)
 			{
 				seg1 = patterns[m_segment[i]];
@@ -353,7 +353,7 @@ WRITE8_MEMBER( hankin_state::ic11_a_w )
 
 READ8_MEMBER( hankin_state::ic11_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_ic11a, 0))
 		data |= m_io_x0->read();

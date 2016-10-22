@@ -32,32 +32,32 @@ Offset  Value   Type    Description
 
 #define CSW_WAV_FREQUENCY   44100
 
-static const UINT8 CSW_HEADER[] = { "Compressed Square Wave" };
+static const uint8_t CSW_HEADER[] = { "Compressed Square Wave" };
 
-static UINT32 get_leuint32(const void *ptr)
+static uint32_t get_leuint32(const void *ptr)
 {
-	UINT32 value;
+	uint32_t value;
 	memcpy(&value, ptr, sizeof(value));
 	return little_endianize_int32(value);
 }
 
 static int mycaslen;
 
-static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
+static int csw_cas_to_wav_size( const uint8_t *casdata, int caslen )
 {
-	UINT32 SampleRate;
-	UINT32 NumberOfPulses;
-	UINT8  MajorRevision;
-	UINT8  MinorRevision;
-	UINT8  CompressionType;
-	UINT8  Flags;
-	UINT8  HeaderExtensionLength;
-	std::vector<UINT8> gz_ptr;
+	uint32_t SampleRate;
+	uint32_t NumberOfPulses;
+	uint8_t  MajorRevision;
+	uint8_t  MinorRevision;
+	uint8_t  CompressionType;
+	uint8_t  Flags;
+	uint8_t  HeaderExtensionLength;
+	std::vector<uint8_t> gz_ptr;
 
 	int         total_size;
 	z_stream    d_stream;
 	int         err;
-	UINT8       *in_ptr;
+	uint8_t       *in_ptr;
 	int         bsize=0;
 
 	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER)-1 ) )
@@ -98,7 +98,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 
 	mycaslen=caslen;
 	//from here on down for now I am assuming it is compressed csw file.
-	in_ptr = (UINT8*) casdata+0x34+HeaderExtensionLength;
+	in_ptr = (uint8_t*) casdata+0x34+HeaderExtensionLength;
 
 	gz_ptr.resize( 8 );
 
@@ -163,20 +163,20 @@ cleanup:
 	return -1;
 }
 
-static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
+static int csw_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 {
-	UINT32 SampleRate;
-	UINT32 NumberOfPulses;
-	UINT8  CompressionType;
-	UINT8  Flags;
-	UINT8  HeaderExtensionLength;
-	INT8   Bit;
+	uint32_t SampleRate;
+	uint32_t NumberOfPulses;
+	uint8_t  CompressionType;
+	uint8_t  Flags;
+	uint8_t  HeaderExtensionLength;
+	int8_t   Bit;
 
-	std::vector<UINT8> gz_ptr;
+	std::vector<uint8_t> gz_ptr;
 	int         total_size;
 	z_stream    d_stream;
 	int         err;
-	UINT8       *in_ptr;
+	uint8_t       *in_ptr;
 	int         bsize=0;
 	int     i;
 
@@ -206,7 +206,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 
 
 	//from here on down for now I am assuming it is compressed csw file.
-	in_ptr = (UINT8*) bytes+0x34+HeaderExtensionLength;
+	in_ptr = (uint8_t*) bytes+0x34+HeaderExtensionLength;
 
 	gz_ptr.resize( 8 );
 
@@ -288,7 +288,7 @@ static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
 
 static cassette_image::error csw_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
 {
-	UINT8 header[22];
+	uint8_t header[22];
 
 	cassette_image_read(cassette, header, 0, sizeof(header));
 	if (memcmp(&header[0], CSW_HEADER, sizeof(CSW_HEADER) - 1)) {

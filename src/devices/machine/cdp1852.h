@@ -58,7 +58,7 @@ class cdp1852_device :  public device_t
 {
 public:
 	// construction/destruction
-	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
 	template<class _Object> static devcb_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }
@@ -83,8 +83,8 @@ private:
 	devcb_write8       m_write_data;
 
 	int m_new_data;             // new data written
-	UINT8 m_data;               // data latch
-	UINT8 m_next_data;          // next data
+	uint8_t m_data;               // data latch
+	uint8_t m_next_data;          // next data
 
 	int m_sr;                   // service request flag
 	int m_next_sr;              // next value of service request flag

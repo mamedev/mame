@@ -432,8 +432,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -444,12 +444,12 @@ public:
 	DECLARE_WRITE8_MEMBER(avt_colorram_w);
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(avt);
-	UINT32 screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 };
 
@@ -511,7 +511,7 @@ void avt_state::video_start()
 }
 
 
-UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
@@ -523,8 +523,8 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT16 tile = m_videoram[count] | ((m_colorram[count] & 1) << 8);
-			UINT8 color = (m_colorram[count] & 0xf0) >> 4;
+			uint16_t tile = m_videoram[count] | ((m_colorram[count] & 1) << 8);
+			uint8_t color = (m_colorram[count] & 0xf0) >> 4;
 
 			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8,(y*8));
 
@@ -538,7 +538,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 
 PALETTE_INIT_MEMBER(avt_state, avt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   Intensity?.

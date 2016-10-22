@@ -12,7 +12,7 @@
 extern const device_type CEDAR_MAGNET_SOUND = &device_creator<cedar_magnet_sound_device>;
 
 
-cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cedar_magnet_board_device(mconfig, CEDAR_MAGNET_SOUND, "Cedar Sound", tag, owner, clock, "cedmag_sound", __FILE__),
 	m_ctc0(*this, "ctc0"),
 	m_ctc1(*this, "ctc1")
@@ -22,12 +22,12 @@ cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconf
 
 READ8_MEMBER(cedar_magnet_sound_device::top_port14_r)
 {
-//	UINT8 ret = m_command;
+//	uint8_t ret = m_command;
 //	m_command = 0;
 	return rand();
 }
 
-void cedar_magnet_sound_device::write_command(UINT8 data)
+void cedar_magnet_sound_device::write_command(uint8_t data)
 {
 	m_command = data;
 	m_cpu->set_input_line(0, HOLD_LINE);
@@ -158,7 +158,7 @@ machine_config_constructor cedar_magnet_sound_device::device_mconfig_additions()
 void cedar_magnet_sound_device::device_start()
 {
 	m_cpu = subdevice<z80_device>("topcpu");
-	m_ram = (UINT8*)memshare("ram")->ptr();
+	m_ram = (uint8_t*)memshare("ram")->ptr();
 }
 
 void cedar_magnet_sound_device::device_reset()

@@ -59,8 +59,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_vram_fg;
-	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<uint16_t> m_vram_fg;
+	required_shared_ptr<uint16_t> m_vram_bg;
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -76,7 +76,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cb2001);
-	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,7 +86,7 @@ public:
 
 #define xxxx 0x90 /* Unknown */
 
-static const UINT8 cb2001_decryption_table[256] = {
+static const uint8_t cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
 //    ssss                ---- **** pppp pppp  ssss           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
@@ -341,7 +341,7 @@ e3 -> c6
 */
 
 
-UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,x,y;
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -377,7 +377,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 
 			for (i= 0;i < 64;i++)
 			{
-				UINT16 scroll;
+				uint16_t scroll;
 
 				scroll = m_vram_bg[0xa00/2 + i/2];
 				if (i&1)
@@ -783,9 +783,9 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = memregion("proms")->base();
+		uint8_t*proms = memregion("proms")->base();
 		int length = memregion("proms")->bytes();
-		UINT16 dat;
+		uint16_t dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
 

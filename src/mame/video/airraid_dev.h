@@ -19,13 +19,13 @@ class airraid_video_device :  public device_t
 {
 public:
 	// construction/destruction
-	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(txram_w);
 	DECLARE_WRITE8_MEMBER(vregs_w);
-	void layer_enable_w(UINT8 enable);
+	void layer_enable_w(uint8_t enable);
 
-	UINT32 screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -39,17 +39,17 @@ private:
 	required_device<screen_device> m_screen;
 
 	// region pointers
-	required_region_ptr<UINT8> m_tx_clut;
-	required_region_ptr<UINT8> m_fg_clut;
-	required_region_ptr<UINT8> m_bg_clut;
-	required_region_ptr<UINT8> m_spr_clut;
-	required_region_ptr<UINT8> m_fgmap;
-	required_region_ptr<UINT8> m_bgmap;
+	required_region_ptr<uint8_t> m_tx_clut;
+	required_region_ptr<uint8_t> m_fg_clut;
+	required_region_ptr<uint8_t> m_bg_clut;
+	required_region_ptr<uint8_t> m_spr_clut;
+	required_region_ptr<uint8_t> m_fgmap;
+	required_region_ptr<uint8_t> m_bgmap;
 
 	// memory pointers
-	required_shared_ptr<UINT8> m_sprite_ram;
-	required_shared_ptr<UINT8> m_txram;
-	required_shared_ptr<UINT8> m_vregs;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_txram;
+	required_shared_ptr<uint8_t> m_vregs;
 
 	// tilemaps
 	tilemap_t *m_bg_tilemap;
@@ -64,12 +64,12 @@ private:
 	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
 
 	// internal variables
-	UINT16 m_hw;
+	uint16_t m_hw;
 
 	// rendering / mixing
 	bitmap_ind16 m_temp_bitmap;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* clut, int base);
+	void mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* clut, int base);
 };
 
 #endif

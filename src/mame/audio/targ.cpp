@@ -22,7 +22,7 @@
 #define SPECTAR_MAXFREQ     525000
 #define TARG_MAXFREQ        125000
 
-static const INT16 sine_wave[32] =
+static const int16_t sine_wave[32] =
 {
 		0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
 	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
@@ -34,7 +34,7 @@ static const INT16 sine_wave[32] =
 #define FALLING_EDGE(bit) (!(data & bit) &&  (m_port_1_last & bit))
 
 
-void exidy_state::adjust_sample(UINT8 freq)
+void exidy_state::adjust_sample(uint8_t freq)
 {
 	m_tone_freq = freq;
 
@@ -107,7 +107,7 @@ WRITE8_MEMBER( exidy_state::targ_audio_2_w )
 {
 	if ((data & 0x01) && !(m_port_2_last & 0x01))
 	{
-		UINT8 *prom = memregion("targ")->base();
+		uint8_t *prom = memregion("targ")->base();
 
 		m_tone_pointer = (m_tone_pointer + 1) & 0x0f;
 

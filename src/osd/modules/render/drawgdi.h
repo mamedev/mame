@@ -50,7 +50,7 @@ public:
 private:
 	/* gdi_info is the information for the current screen */
 	BITMAPINFO              m_bminfo;
-	UINT8 *                 m_bmdata;
+	uint8_t *                 m_bmdata;
 	size_t                  m_bmsize;
 };
 

@@ -14,7 +14,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
 	if (m_samples_region)
 	{
-		m_sample_buf = std::make_unique<INT16[]>(2 * m_samples_region.bytes());
+		m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
 		save_pointer(NAME(m_sample_buf.get()), 2 * m_samples_region.bytes());
 	}
 }
@@ -45,7 +45,7 @@ const device_type CCLIMBER_AUDIO = &device_creator<cclimber_audio_device>;
 //  cclimber_audio_device: Constructor
 //-------------------------------------------------
 
-cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CCLIMBER_AUDIO, "Crazy Climber Sound Board", tag, owner, clock, "cclimber_audio", __FILE__),
 	m_sample_buf(nullptr),
 	m_sample_num(0),

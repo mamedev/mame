@@ -169,7 +169,7 @@ offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 {
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = space.device().safe_pcbase();
-	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
+	if ((uint16_t)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
@@ -195,7 +195,7 @@ WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(
  *
  *************************************/
 
-inline UINT8 segag80r_state::demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
+inline uint8_t segag80r_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
@@ -211,10 +211,10 @@ READ8_MEMBER(segag80r_state::mangled_ports_r)
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = ioport("D7D6")->read();
-	UINT8 d5d4 = ioport("D5D4")->read();
-	UINT8 d3d2 = ioport("D3D2")->read();
-	UINT8 d1d0 = ioport("D1D0")->read();
+	uint8_t d7d6 = ioport("D7D6")->read();
+	uint8_t d5d4 = ioport("D5D4")->read();
+	uint8_t d3d2 = ioport("D3D2")->read();
+	uint8_t d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -226,17 +226,17 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 	/* versus cocktail cabinets; we fix this here. The input ports are */
 	/* coded for cocktail mode; for upright mode, we manually shuffle the */
 	/* bits around. */
-	UINT8 d7d6 = ioport("D7D6")->read();
-	UINT8 d5d4 = ioport("D5D4")->read();
-	UINT8 d3d2 = ioport("D3D2")->read();
-	UINT8 d1d0 = ioport("D1D0")->read();
+	uint8_t d7d6 = ioport("D7D6")->read();
+	uint8_t d5d4 = ioport("D5D4")->read();
+	uint8_t d3d2 = ioport("D3D2")->read();
+	uint8_t d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 
 	/* tweak bits for the upright case */
-	UINT8 upright = d3d2 & 0x04;
+	uint8_t upright = d3d2 & 0x04;
 	if (upright)
 	{
-		UINT8 fc = ioport("FC")->read();
+		uint8_t fc = ioport("FC")->read();
 		d7d6 |= 0x60;
 		d5d4 = (d5d4 & ~0x1c) |
 				((~fc & 0x20) >> 3) | /* IPT_BUTTON2 */
@@ -250,8 +250,8 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 
 READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 {
-	UINT8 upright = ioport("D3D2")->read() & 0x04;
-	UINT8 fc = ioport("FC")->read();
+	uint8_t upright = ioport("D3D2")->read() & 0x04;
+	uint8_t fc = ioport("FC")->read();
 
 	/* tweak bits for the upright case */
 	if (upright)
@@ -1404,13 +1404,13 @@ ROM_END
 
 void segag80r_state::monsterb_expand_gfx(const char *region)
 {
-	UINT8 *dest;
+	uint8_t *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memregion(region)->base();
-	std::vector<UINT8> temp(0x4000);
+	std::vector<uint8_t> temp(0x4000);
 	memcpy(&temp[0], dest, 0x4000);
 
 	/* 16 effective total banks */

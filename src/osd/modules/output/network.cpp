@@ -151,7 +151,7 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, INT32 value) override
+	virtual void notify(const char *outname, int32_t value) override
 	{
 		static char buf[256];
 		sprintf(buf, "%s = %d\n", ((outname==nullptr) ? "none" : outname), value);

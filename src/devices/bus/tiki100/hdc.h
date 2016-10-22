@@ -29,7 +29,7 @@ class tiki100_hdc_t : public device_t,
 {
 public:
 	// construction/destruction
-	tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,8 +40,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_tiki100bus_card_interface overrides
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	required_device<wd2010_device> m_hdc;

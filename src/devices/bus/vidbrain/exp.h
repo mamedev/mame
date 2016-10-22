@@ -84,18 +84,18 @@ public:
 
 protected:
 	// initialization
-	virtual UINT8* videobrain_rom_pointer(running_machine &machine, size_t size);
-	virtual UINT8* videobrain_ram_pointer(running_machine &machine, size_t size);
+	virtual uint8_t* videobrain_rom_pointer(running_machine &machine, size_t size);
+	virtual uint8_t* videobrain_ram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual UINT8 videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; };
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2) { };
+	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; };
+	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) { };
 	virtual void videobrain_extres_w() { };
 
 	videobrain_expansion_slot_device *m_slot;
 
-	std::vector<UINT8> m_rom;
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_rom;
+	std::vector<uint8_t> m_ram;
 
 	size_t m_rom_mask;
 	size_t m_ram_mask;
@@ -110,14 +110,14 @@ class videobrain_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~videobrain_expansion_slot_device() { }
 
 	template<class _Object> static devcb_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }
 
 	// computer interface
-	UINT8 bo_r(address_space &space, offs_t offset, int cs1, int cs2);
-	void bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2);
+	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);
+	void bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2);
 
 	DECLARE_READ8_MEMBER( cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
 	DECLARE_WRITE8_MEMBER( cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }

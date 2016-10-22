@@ -21,7 +21,7 @@
 
 PALETTE_INIT_MEMBER(tceptor_state, tceptor)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -162,7 +162,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_tile_attr_w)
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 {
-	UINT16 data = m_bg_ram[tile_index * 2] | (m_bg_ram[tile_index * 2 + 1] << 8);
+	uint16_t data = m_bg_ram[tile_index * 2] | (m_bg_ram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
 
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 {
-	UINT16 data = m_bg_ram[tile_index * 2 + 0x1000] | (m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
+	uint16_t data = m_bg_ram[tile_index * 2 + 0x1000] | (m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
 
@@ -236,11 +236,11 @@ void tceptor_state::decode_bg(const char * region)
 	};
 
 	int gfx_index = m_bg;
-	UINT8 *src = memregion(region)->base() + 0x8000;
+	uint8_t *src = memregion(region)->base() + 0x8000;
 	int len = 0x8000;
 	int i;
 
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)
@@ -258,7 +258,7 @@ void tceptor_state::decode_bg(const char * region)
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, *layout, (const UINT8 *)data, 0, 64, 1024));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(*m_palette, *layout, (const uint8_t *)data, 0, 64, 1024));
 }
 
 // fix sprite order
@@ -281,11 +281,11 @@ void tceptor_state::decode_sprite16(const char * region)
 		2*16*16
 	};
 
-	UINT8 *src = memregion(region)->base();
+	uint8_t *src = memregion(region)->base();
 	int len = memregion(region)->bytes();
 	int i, y;
 
-	m_decoded_16 = std::make_unique<UINT8[]>(len);
+	m_decoded_16 = std::make_unique<uint8_t[]>(len);
 
 	for (i = 0; i < len / (4*4*16); i++)
 		for (y = 0; y < 16; y++)
@@ -331,13 +331,13 @@ void tceptor_state::decode_sprite32(const char * region)
 		2*32*32
 	};
 
-	UINT8 *src = memregion(region)->base();
+	uint8_t *src = memregion(region)->base();
 	int len = memregion(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	int i;
 
-	m_decoded_32 = make_unique_clear<UINT8[]>(len);
+	m_decoded_32 = make_unique_clear<uint8_t[]>(len);
 
 	for (i = 0; i < total; i++)
 	{
@@ -357,7 +357,7 @@ void tceptor_state::video_start()
 {
 	int gfx_index;
 
-	m_sprite_ram_buffered = make_unique_clear<UINT16[]>(0x200/2);
+	m_sprite_ram_buffered = make_unique_clear<uint16_t[]>(0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -421,8 +421,8 @@ void tceptor_state::video_start()
 
 void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
 {
-	UINT16 *mem1 = &m_sprite_ram_buffered[0x000/2];
-	UINT16 *mem2 = &m_sprite_ram_buffered[0x100/2];
+	uint16_t *mem1 = &m_sprite_ram_buffered[0x000/2];
+	uint16_t *mem2 = &m_sprite_ram_buffered[0x100/2];
 	int need_mask = 0;
 	int i;
 
@@ -498,7 +498,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect;
 	int pri;
@@ -529,14 +529,14 @@ UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-UINT32 tceptor_state::screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tceptor_state::screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((screen.frame_number() & 1) == 1)
 		return UPDATE_HAS_NOT_CHANGED;
 	return screen_update_tceptor_2d(screen, bitmap, cliprect);
 }
 
-UINT32 tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((screen.frame_number() & 1) == 0)
 		return UPDATE_HAS_NOT_CHANGED;

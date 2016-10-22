@@ -16,7 +16,7 @@
 
 struct UINT16xE
 {
-	UINT8 bytes[2];
+	uint8_t bytes[2];
 };
 
 /*
@@ -30,7 +30,7 @@ struct UINT16xE
 
     Returns value of word in native format
 */
-static inline UINT16 get_UINT16xE(int little_endian, UINT16xE word)
+static inline uint16_t get_UINT16xE(int little_endian, UINT16xE word)
 {
 	return little_endian ? (word.bytes[0] | (word.bytes[1] << 8)) : ((word.bytes[0] << 8) | word.bytes[1]);
 }
@@ -46,7 +46,7 @@ static inline UINT16 get_UINT16xE(int little_endian, UINT16xE word)
     word (O): pointer to word to write
     data (I): value to write in word, in native format
 */
-static inline void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
+static inline void set_UINT16xE(int little_endian, UINT16xE *word, uint16_t data)
 {
 	if (little_endian)
 	{
@@ -132,7 +132,7 @@ static void concept_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t concept_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
 static void concept_image_closeenum(imgtool::directory &enumeration);
-static imgtoolerr_t concept_image_freespace(imgtool::partition &partition, UINT64 *size);
+static imgtoolerr_t concept_image_freespace(imgtool::partition &partition, uint64_t *size);
 static imgtoolerr_t concept_image_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf);
 #if 0
 static imgtoolerr_t concept_image_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream *sourcef, util::option_resolution *writeoptions);
@@ -140,7 +140,7 @@ static imgtoolerr_t concept_image_deletefile(imgtool::partition &partition, cons
 static imgtoolerr_t concept_image_create(const imgtool_module *mod, imgtool::stream *f, util::option_resolution *createoptions);
 #endif
 
-void concept_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void concept_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -404,7 +404,7 @@ static void concept_image_closeenum(imgtool::directory &enumeration)
 /*
     Compute free space on disk image
 */
-static imgtoolerr_t concept_image_freespace(imgtool::partition &partition, UINT64 *size)
+static imgtoolerr_t concept_image_freespace(imgtool::partition &partition, uint64_t *size)
 {
 	imgtool::image &img(partition.image());
 	concept_image *image = get_concept_image(img);
@@ -438,7 +438,7 @@ static imgtoolerr_t concept_image_readfile(imgtool::partition &partition, const 
 	unsigned char concept_fname[16];
 	int catalog_index;
 	int i;
-	UINT8 buf[512];
+	uint8_t buf[512];
 
 	if (filename_len > 15)
 		return IMGTOOLERR_BADFILENAME;

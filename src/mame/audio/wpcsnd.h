@@ -27,7 +27,7 @@ class wpcsnd_device : public device_t,
 {
 public:
 	// construction/destruction
-	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -44,10 +44,10 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(volume_w);
 
-	void ctrl_w(UINT8 data);
-	void data_w(UINT8 data);
-	UINT8 ctrl_r();
-	UINT8 data_r();
+	void ctrl_w(uint8_t data);
+	void data_w(uint8_t data);
+	uint8_t ctrl_r();
+	uint8_t data_r();
 
 	static void static_set_romregion(device_t &device, const char *tag);
 
@@ -61,8 +61,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	UINT8 m_latch;
-	UINT8 m_reply;
+	uint8_t m_latch;
+	uint8_t m_reply;
 	bool m_reply_available;
 
 	// callback

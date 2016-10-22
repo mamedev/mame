@@ -187,7 +187,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	std::unique_ptr<UINT8[]> m_main_mem;
+	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
 	int m_input_mux;
@@ -249,7 +249,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios */
 		{
-			UINT8 *mem = m_region_bios->base();
+			uint8_t *mem = m_region_bios->base();
 			m_bank1->set_base(mem);
 			m_bank2->set_base(mem+0x2000);
 		}
@@ -257,7 +257,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = m_region_extrom->base();
+			uint8_t *mem = m_region_extrom->base();
 			m_bank1->set_base(mem+0x4000);
 			m_bank2->set_base(mem+0x6000);
 		}
@@ -265,7 +265,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank1->set_base(mem+0x2000*m_bank[0]);
 			m_bank2->set_base(mem+0x2000*m_bank[1]);
 		}
@@ -273,7 +273,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank1->set_base(mem+0x18000);
 			m_bank2->set_base(mem+0x18000);
 		}
@@ -285,7 +285,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = m_region_bios->base();
+			uint8_t *mem = m_region_bios->base();
 			m_bank3->set_base(mem+0x4000);
 			m_bank4->set_base(mem+0x6000);
 		}
@@ -294,7 +294,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank3->set_base(mem+0x18000);
 			m_bank4->set_base(mem+0x18000);
 		}
@@ -302,7 +302,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank3->set_base(mem+0x2000*m_bank[2]);
 			m_bank4->set_base(mem+0x2000*m_bank[3]);
 		}
@@ -314,7 +314,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = m_region_cartridge->base();
+			uint8_t *mem = m_region_cartridge->base();
 			m_bank5->set_base(mem+0x4000);
 			m_bank6->set_base(mem+0x6000);
 		}
@@ -323,7 +323,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank5->set_base(mem+0x18000);
 			m_bank6->set_base(mem+0x18000);
 		}
@@ -331,7 +331,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank5->set_base(mem+0x2000*m_bank[4]);
 			m_bank6->set_base(mem+0x2000*m_bank[5]);
 		}
@@ -344,7 +344,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank7->set_base(mem+0x18000);
 			m_bank8->set_base(mem+0x18000);
 		}
@@ -352,7 +352,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank7->set_base(mem+0x2000*m_bank[6]);
 			m_bank8->set_base(mem+0x2000*m_bank[7]);
 		}
@@ -614,7 +614,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sfkick_state,sfkick)
 {
-	m_main_mem=std::make_unique<UINT8[]>(0x4000);
+	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
 }
 
 

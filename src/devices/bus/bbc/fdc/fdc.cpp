@@ -48,7 +48,7 @@ device_bbc_fdc_interface::~device_bbc_fdc_interface()
 //  bbc_fdc_slot_device - constructor
 //-------------------------------------------------
 
-bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, BBC_FDC_SLOT, "BBC Micro FDC slot", tag, owner, clock, "bbc_fdc_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 	m_card(nullptr),

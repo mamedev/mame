@@ -100,7 +100,7 @@ machine_config_constructor adam_printer_device::device_mconfig_additions() const
 //  adam_printer_device - constructor
 //-------------------------------------------------
 
-adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_PRN, "Adam printer", tag, owner, clock, "adam_prn", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)
@@ -168,7 +168,7 @@ READ8_MEMBER( adam_printer_device::p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_7;
+	uint8_t data = M6801_MODE_7;
 
 	// NET RXD
 	data |= m_bus->rxd_r(this) << 3;

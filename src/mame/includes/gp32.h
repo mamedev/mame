@@ -43,14 +43,14 @@
 
 struct s3c240x_lcd_t
 {
-	UINT32 vramaddr_cur;
-	UINT32 vramaddr_max;
-	UINT32 offsize;
-	UINT32 pagewidth_cur;
-	UINT32 pagewidth_max;
-	UINT32 bppmode;
-	UINT32 bswp, hwswp;
-	UINT32 hozval, lineval;
+	uint32_t vramaddr_cur;
+	uint32_t vramaddr_max;
+	uint32_t offsize;
+	uint32_t pagewidth_cur;
+	uint32_t pagewidth_max;
+	uint32_t bppmode;
+	uint32_t bswp, hwswp;
+	uint32_t hozval, lineval;
 	int vpos, hpos;
 };
 
@@ -64,8 +64,8 @@ struct smc_t
 	int read;
 	int wp;
 	int busy;
-	UINT8 datarx;
-	UINT8 datatx;
+	uint8_t datarx;
+	uint8_t datatx;
 };
 
 struct i2s_t
@@ -77,14 +77,14 @@ struct i2s_t
 
 struct s3c240x_iic_t
 {
-	UINT8 data[4];
+	uint8_t data[4];
 	int data_index;
-	UINT16 address;
+	uint16_t address;
 };
 
 struct s3c240x_iis_t
 {
-	UINT16 fifo[16/2];
+	uint16_t fifo[16/2];
 	int fifo_index;
 };
 
@@ -106,37 +106,37 @@ public:
 
 	virtual void video_start() override;
 
-	required_shared_ptr<UINT32> m_s3c240x_ram;
-	std::unique_ptr<UINT8[]> m_eeprom_data;
-	UINT32 m_s3c240x_lcd_regs[0x400/4];
+	required_shared_ptr<uint32_t> m_s3c240x_ram;
+	std::unique_ptr<uint8_t[]> m_eeprom_data;
+	uint32_t m_s3c240x_lcd_regs[0x400/4];
 	emu_timer *m_s3c240x_lcd_timer;
 	s3c240x_lcd_t m_s3c240x_lcd;
-	UINT32 m_s3c240x_lcd_palette[0x400/4];
-	UINT32 m_s3c240x_clkpow_regs[0x18/4];
-	UINT32 m_s3c240x_irq_regs[0x18/4];
+	uint32_t m_s3c240x_lcd_palette[0x400/4];
+	uint32_t m_s3c240x_clkpow_regs[0x18/4];
+	uint32_t m_s3c240x_irq_regs[0x18/4];
 	emu_timer *m_s3c240x_pwm_timer[5];
-	UINT32 m_s3c240x_pwm_regs[0x44/4];
+	uint32_t m_s3c240x_pwm_regs[0x44/4];
 	emu_timer *m_s3c240x_dma_timer[4];
-	UINT32 m_s3c240x_dma_regs[0x7c/4];
+	uint32_t m_s3c240x_dma_regs[0x7c/4];
 	smc_t m_smc;
 	i2s_t m_i2s;
-	UINT32 m_s3c240x_gpio[0x60/4];
-	UINT32 m_s3c240x_memcon_regs[0x34/4];
-	UINT32 m_s3c240x_usb_host_regs[0x5C/4];
-	UINT32 m_s3c240x_uart_0_regs[0x2C/4];
-	UINT32 m_s3c240x_uart_1_regs[0x2C/4];
-	UINT32 m_s3c240x_usb_device_regs[0xBC/4];
-	UINT32 m_s3c240x_watchdog_regs[0x0C/4];
+	uint32_t m_s3c240x_gpio[0x60/4];
+	uint32_t m_s3c240x_memcon_regs[0x34/4];
+	uint32_t m_s3c240x_usb_host_regs[0x5C/4];
+	uint32_t m_s3c240x_uart_0_regs[0x2C/4];
+	uint32_t m_s3c240x_uart_1_regs[0x2C/4];
+	uint32_t m_s3c240x_usb_device_regs[0xBC/4];
+	uint32_t m_s3c240x_watchdog_regs[0x0C/4];
 	s3c240x_iic_t m_s3c240x_iic;
 	emu_timer *m_s3c240x_iic_timer;
-	UINT32 m_s3c240x_iic_regs[0x10/4];
+	uint32_t m_s3c240x_iic_regs[0x10/4];
 	s3c240x_iis_t m_s3c240x_iis;
 	emu_timer *m_s3c240x_iis_timer;
-	UINT32 m_s3c240x_iis_regs[0x14/4];
-	UINT32 m_s3c240x_rtc_regs[0x4C/4];
-	UINT32 m_s3c240x_adc_regs[0x08/4];
-	UINT32 m_s3c240x_spi_regs[0x18/4];
-	UINT32 m_s3c240x_mmc_regs[0x40/4];
+	uint32_t m_s3c240x_iis_regs[0x14/4];
+	uint32_t m_s3c240x_rtc_regs[0x4C/4];
+	uint32_t m_s3c240x_adc_regs[0x08/4];
+	uint32_t m_s3c240x_spi_regs[0x18/4];
+	uint32_t m_s3c240x_mmc_regs[0x40/4];
 	bitmap_rgb32 m_bitmap;
 	DECLARE_READ32_MEMBER(s3c240x_lcd_r);
 	DECLARE_WRITE32_MEMBER(s3c240x_lcd_w);
@@ -178,7 +178,7 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c240x_mmc_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(s3c240x_lcd_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_pwm_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
@@ -194,9 +194,9 @@ protected:
 	required_ioport m_io_in1;
 	required_device<palette_device> m_palette;
 
-	UINT32 s3c240x_get_fclk(int reg);
-	UINT32 s3c240x_get_hclk(int reg);
-	UINT32 s3c240x_get_pclk(int reg);
+	uint32_t s3c240x_get_fclk(int reg);
+	uint32_t s3c240x_get_hclk(int reg);
+	uint32_t s3c240x_get_pclk(int reg);
 	void s3c240x_lcd_dma_reload();
 	void s3c240x_lcd_dma_init();
 	void s3c240x_lcd_configure();
@@ -204,7 +204,7 @@ protected:
 	void s3c240x_lcd_stop();
 	void s3c240x_lcd_recalc();
 	void s3c240x_check_pending_irq();
-	void s3c240x_request_irq(UINT32 int_type);
+	void s3c240x_request_irq(uint32_t int_type);
 	void s3c240x_dma_reload(int dma);
 	void s3c240x_dma_trigger(int dma);
 	void s3c240x_dma_request_iis();
@@ -220,21 +220,21 @@ protected:
 	void s3c240x_iis_recalc();
 	void smc_reset();
 	void smc_init();
-	UINT8 smc_read();
-	void smc_write(UINT8 data);
+	uint8_t smc_read();
+	void smc_write(uint8_t data);
 	void smc_update();
 	void i2s_reset();
 	void i2s_init();
 	void i2s_write(int line, int data);
-	UINT8 eeprom_read(UINT16 address);
-	void eeprom_write(UINT16 address, UINT8 data);
+	uint8_t eeprom_read(uint16_t address);
+	void eeprom_write(uint16_t address, uint8_t data);
 	void iic_start();
 	void iic_stop();
 	void iic_resume();
 	void s3c240x_machine_start();
 	void s3c240x_machine_reset();
-	inline rgb_t s3c240x_get_color_5551( UINT16 data);
-	UINT32 s3c240x_lcd_dma_read( );
+	inline rgb_t s3c240x_get_color_5551( uint16_t data);
+	uint32_t s3c240x_lcd_dma_read( );
 	void s3c240x_lcd_render_01( );
 	void s3c240x_lcd_render_02( );
 	void s3c240x_lcd_render_04( );

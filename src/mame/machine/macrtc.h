@@ -36,7 +36,7 @@ class rtc3430042_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
@@ -60,32 +60,32 @@ protected:
 
 private:
 	/* state of rTCEnb and rTCClk lines */
-	UINT8 m_rtc_rTCEnb;
-	UINT8 m_rtc_rTCClk;
+	uint8_t m_rtc_rTCEnb;
+	uint8_t m_rtc_rTCClk;
 
 	/* serial transmit/receive register : bits are shifted in/out of this byte */
-	UINT8 m_rtc_data_byte;
+	uint8_t m_rtc_data_byte;
 	/* serial transmitted/received bit count */
-	UINT8 m_rtc_bit_count;
+	uint8_t m_rtc_bit_count;
 	/* direction of the current transfer (0 : VIA->RTC, 1 : RTC->VIA) */
-	UINT8 m_rtc_data_dir;
+	uint8_t m_rtc_data_dir;
 	/* when rtc_data_dir == 1, state of rTCData as set by RTC (-> data bit seen by VIA) */
-	UINT8 m_rtc_data_out;
+	uint8_t m_rtc_data_out;
 
 	/* set to 1 when command in progress */
-	UINT8 m_rtc_cmd;
+	uint8_t m_rtc_cmd;
 
 	/* write protect flag */
-	UINT8 m_rtc_write_protect;
+	uint8_t m_rtc_write_protect;
 
 	/* internal seconds register */
-	UINT8 m_rtc_seconds[/*8*/4];
+	uint8_t m_rtc_seconds[/*8*/4];
 	/* 20-byte long PRAM, or 256-byte long XPRAM */
-	UINT8 m_pram[256];
+	uint8_t m_pram[256];
 	/* current extended address and RTC state */
-	UINT8 m_rtc_xpaddr;
-	UINT8 m_rtc_state;
-	UINT8 m_data_latch;
+	uint8_t m_rtc_xpaddr;
+	uint8_t m_rtc_state;
+	uint8_t m_data_latch;
 
 	// timers
 	emu_timer *m_clock_timer;

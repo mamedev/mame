@@ -1141,7 +1141,7 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 
 MACHINE_START_MEMBER(homedata_state,reikaids)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
@@ -1157,7 +1157,7 @@ MACHINE_START_MEMBER(homedata_state,reikaids)
 
 MACHINE_START_MEMBER(homedata_state,pteacher)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);

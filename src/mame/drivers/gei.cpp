@@ -97,17 +97,17 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_bitmap;
 
-	UINT8 m_drawctrl[3];
-	UINT8 m_color[8];
+	uint8_t m_drawctrl[3];
+	uint8_t m_color[8];
 	int m_prevoffset;
 	int m_yadd;
 	int m_signature_answer;
 	int m_signature_pos;
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
 	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
 	DECLARE_READ8_MEMBER(catchall);
@@ -181,7 +181,7 @@ void gei_state::video_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -403,7 +403,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const UINT8 signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
 
 		m_signature_answer = signature[m_signature_pos++];
 
@@ -416,7 +416,7 @@ WRITE8_MEMBER(gei_state::signature2_w)
 	if (data == 0) m_signature_pos = 0;
 	else
 	{
-		static const UINT8 signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
+		static const uint8_t signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
 
 		m_signature_answer = signature[m_signature_pos++];
 

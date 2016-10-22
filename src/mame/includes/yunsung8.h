@@ -22,8 +22,8 @@ public:
 	/* video-related */
 	tilemap_t     *m_tilemap_0;
 	tilemap_t     *m_tilemap_1;
-	UINT8       *m_videoram_0;
-	UINT8       *m_videoram_1;
+	uint8_t       *m_videoram_0;
+	uint8_t       *m_videoram_1;
 	int         m_layers_ctrl;
 	int         m_videobank;
 
@@ -39,7 +39,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory */
-	UINT8      m_videoram[0x4000];
+	uint8_t      m_videoram[0x4000];
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
@@ -57,5 +57,5 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

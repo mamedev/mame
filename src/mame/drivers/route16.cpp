@@ -149,7 +149,7 @@ WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
 
 READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_ttmahjng_port_select)
 	{
@@ -981,7 +981,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 
 DRIVER_INIT_MEMBER(route16_state,route16)
 {
-	UINT8 *ROM = memregion("cpu1")->base();
+	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
 
 	/* patch the protection */
@@ -998,7 +998,7 @@ DRIVER_INIT_MEMBER(route16_state,route16)
 
 DRIVER_INIT_MEMBER(route16_state,route16c)
 {
-	UINT8 *ROM = memregion("cpu1")->base();
+	uint8_t *ROM = memregion("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
 	   been removed */
 
@@ -1013,7 +1013,7 @@ DRIVER_INIT_MEMBER(route16_state,route16c)
 
 DRIVER_INIT_MEMBER(route16_state,route16a)
 {
-	UINT8 *ROM = memregion("cpu1")->base();
+	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
 
 	/* patch the protection */

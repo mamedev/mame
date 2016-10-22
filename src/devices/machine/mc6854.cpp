@@ -167,7 +167,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 const device_type MC6854 = &device_creator<mc6854_device>;
 
-mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6854, "MC6854 ADLC", tag, owner, clock, "mc6854", __FILE__),
 	m_out_irq_cb(*this),
 	m_out_txd_cb(*this),
@@ -262,14 +262,14 @@ void mc6854_device::device_reset()
 
 
 /* MC6854 fills bit queue */
-void mc6854_device::send_bits( UINT32 data, int len, int zi )
+void mc6854_device::send_bits( uint32_t data, int len, int zi )
 {
 	attotime expire;
 	int i;
 	if ( zi )
 	{
 		/* zero-insertion mode */
-		UINT32 d = 0;
+		uint32_t d = 0;
 		int l = 0;
 		for ( i = 0; i < len; i++, data >>= 1, l++ )
 		{
@@ -310,7 +310,7 @@ void mc6854_device::send_bits( UINT32 data, int len, int zi )
 
 
 /* CPU push -> tfifo[0] -> ... -> tfifo[MC6854_FIFO_SIZE-1] -> pop */
-void mc6854_device::tfifo_push( UINT8 data )
+void mc6854_device::tfifo_push( uint8_t data )
 {
 	int i;
 
@@ -476,7 +476,7 @@ void mc6854_device::tfifo_clear( )
 
 
 /* MC6854 pushes a field in the FIFO */
-void mc6854_device::rfifo_push( UINT8 d )
+void mc6854_device::rfifo_push( uint8_t d )
 {
 	int i, blen = 8;
 	unsigned data = d;
@@ -577,7 +577,7 @@ void mc6854_device::rfifo_terminate( )
 
 
 /* CPU pops the FIFO */
-UINT8 mc6854_device::rfifo_pop( )
+uint8_t mc6854_device::rfifo_pop( )
 {
 	int i, data = m_rfifo[ MC6854_FIFO_SIZE - 1 ];
 
@@ -684,7 +684,7 @@ void mc6854_device::rfifo_clear( )
 
 
 
-int mc6854_device::send_frame( UINT8* data, int len )
+int mc6854_device::send_frame( uint8_t* data, int len )
 {
 	if ( m_rstate > 1 || m_tstate > 1 || RTS )
 		return -1; /* busy */
@@ -837,7 +837,7 @@ READ8_MEMBER( mc6854_device::read )
 	case 2: /* receiver data register */
 	case 3:
 	{
-		UINT8 data = rfifo_pop( );
+		uint8_t data = rfifo_pop( );
 		LOG(( "%f %s mc6854_r: get data $%02X\n",
 				space.machine().time().as_double(), machine().describe_context(), data ));
 		return data;

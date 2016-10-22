@@ -32,15 +32,15 @@ public:
 	DECLARE_READ8_MEMBER( qtsbc_06_r );
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	required_shared_ptr<UINT8> m_p_ram;
-	UINT8 m_term_data;
+	required_shared_ptr<uint8_t> m_p_ram;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 
 READ8_MEMBER( qtsbc_state::qtsbc_06_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -69,7 +69,7 @@ INPUT_PORTS_END
 
 void qtsbc_state::machine_reset()
 {
-	UINT8* bios = memregion("maincpu")->base()+0x10000;
+	uint8_t* bios = memregion("maincpu")->base()+0x10000;
 	memcpy(m_p_ram, bios, 0x800);
 }
 

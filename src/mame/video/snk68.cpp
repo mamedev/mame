@@ -133,7 +133,7 @@ WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
 ***************************************************************************/
 
 
-UINT32 snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x7ff, cliprect);
 

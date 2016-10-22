@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_t::display_pixels )
 {
-	UINT16 i,gfx = m_video_ram[(address & 0x7fff) >> 1];
+	uint16_t i,gfx = m_video_ram[(address & 0x7fff) >> 1];
 	const pen_t *pen = m_palette->pens();
 
 	for(i=0; i<16; i++)
@@ -61,7 +61,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_t::display_pixels )
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_t::display_pixels )
 {
-	UINT16 i,gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	uint16_t i,gfx = m_video_ram[(address & 0x1ffff) >> 1];
 	const pen_t *pen = m_palette->pens();
 
 	for(i=0; i<16; i++)
@@ -144,7 +144,7 @@ machine_config_constructor compis_uhrg_t::device_mconfig_additions() const
 //  compis_hrg_t - constructor
 //-------------------------------------------------
 
-compis_hrg_t::compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+compis_hrg_t::compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_compis_graphics_card_interface(mconfig, *this),
 	m_crtc(*this, UPD7220_TAG),
@@ -153,12 +153,12 @@ compis_hrg_t::compis_hrg_t(const machine_config &mconfig, device_type type, cons
 {
 }
 
-compis_hrg_t::compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+compis_hrg_t::compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	compis_hrg_t(mconfig, COMPIS_HRG, "Compis HRG", tag, owner, clock, "compis_hrg", __FILE__)
 {
 }
 
-compis_uhrg_t::compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+compis_uhrg_t::compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	compis_hrg_t(mconfig, COMPIS_UHRG, "Compis UHRG", tag, owner, clock, "compis_uhrg", __FILE__)
 {
 }
@@ -186,9 +186,9 @@ void compis_hrg_t::device_reset()
 //  pcs6_6_r -
 //-------------------------------------------------
 
-UINT8 compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
+uint8_t compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset < 2)
 		data = m_crtc->read(space, offset & 0x01);
@@ -223,7 +223,7 @@ UINT8 compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
 //  pcs6_6_w -
 //-------------------------------------------------
 
-void compis_hrg_t::pcs6_6_w(address_space &space, offs_t offset, UINT8 data)
+void compis_hrg_t::pcs6_6_w(address_space &space, offs_t offset, uint8_t data)
 {
 	//logerror("%s PCS 6:6 write %04x : %02x\n", machine().describe_context(), offset, data);
 

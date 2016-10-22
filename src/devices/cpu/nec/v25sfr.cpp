@@ -10,7 +10,7 @@
 #include "v25.h"
 #include "v25priv.h"
 
-UINT8 v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, UINT8 priority)
+uint8_t v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, uint8_t priority)
 {
 	return  (((m_pending_irq & source)     ? 0x80 : 0x00)
 			| ((m_unmasked_irq & source)   ? 0x00 : 0x40)
@@ -18,9 +18,9 @@ UINT8 v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, UINT8 priori
 			| priority);
 }
 
-UINT8 v25_common_device::read_sfr(unsigned o)
+uint8_t v25_common_device::read_sfr(unsigned o)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	switch(o)
 	{
@@ -109,9 +109,9 @@ UINT8 v25_common_device::read_sfr(unsigned o)
 	return ret;
 }
 
-UINT16 v25_common_device::read_sfr_word(unsigned o)
+uint16_t v25_common_device::read_sfr_word(unsigned o)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	switch(o)
 	{
@@ -137,7 +137,7 @@ UINT16 v25_common_device::read_sfr_word(unsigned o)
 	return ret;
 }
 
-void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, UINT8 d)
+void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d)
 {
 	if(d & 0x80)
 		m_pending_irq |= source;
@@ -158,7 +158,7 @@ void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, UINT8 d)
 		m_bankswitch_irq &= ~source;
 }
 
-void v25_common_device::write_sfr(unsigned o, UINT8 d)
+void v25_common_device::write_sfr(unsigned o, uint8_t d)
 {
 	int tmp;
 	attotime time;
@@ -284,7 +284,7 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 	}
 }
 
-void v25_common_device::write_sfr_word(unsigned o, UINT16 d)
+void v25_common_device::write_sfr_word(unsigned o, uint16_t d)
 {
 	switch(o)
 	{
@@ -306,7 +306,7 @@ void v25_common_device::write_sfr_word(unsigned o, UINT16 d)
 	}
 }
 
-UINT8 v25_common_device::v25_read_byte(unsigned a)
+uint8_t v25_common_device::v25_read_byte(unsigned a)
 {
 	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
 	{
@@ -322,7 +322,7 @@ UINT8 v25_common_device::v25_read_byte(unsigned a)
 	return m_program->read_byte(a);
 }
 
-UINT16 v25_common_device::v25_read_word(unsigned a)
+uint16_t v25_common_device::v25_read_word(unsigned a)
 {
 	if( a & 1 )
 		return (v25_read_byte(a) | (v25_read_byte(a + 1) << 8));
@@ -344,7 +344,7 @@ UINT16 v25_common_device::v25_read_word(unsigned a)
 	return m_program->read_word(a);
 }
 
-void v25_common_device::v25_write_byte(unsigned a, UINT8 d)
+void v25_common_device::v25_write_byte(unsigned a, uint8_t d)
 {
 	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
 	{
@@ -366,7 +366,7 @@ void v25_common_device::v25_write_byte(unsigned a, UINT8 d)
 	m_program->write_byte(a, d);
 }
 
-void v25_common_device::v25_write_word(unsigned a, UINT16 d)
+void v25_common_device::v25_write_word(unsigned a, uint16_t d)
 {
 	if( a & 1 )
 	{

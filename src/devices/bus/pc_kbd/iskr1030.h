@@ -29,7 +29,7 @@ class iskr_1030_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -79,10 +79,10 @@ private:
 	required_ioport m_md22;
 	required_ioport m_md23;
 
-	std::vector<UINT8> m_ram;
-	UINT8 m_bus;
-	UINT8 m_p1;
-	UINT8 m_p2;
+	std::vector<uint8_t> m_ram;
+	uint8_t m_bus;
+	uint8_t m_p1;
+	uint8_t m_p2;
 	int m_q;
 };
 

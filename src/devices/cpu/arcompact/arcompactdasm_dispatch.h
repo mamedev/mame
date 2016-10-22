@@ -6,8 +6,8 @@
 
 \*********************************/
 
-#define DASM_OPS_16 char *output, offs_t pc, UINT16 op, const UINT8* oprom
-#define DASM_OPS_32 char *output, offs_t pc, UINT32 op, const UINT8* oprom
+#define DASM_OPS_16 char *output, offs_t pc, uint16_t op, const uint8_t* oprom
+#define DASM_OPS_32 char *output, offs_t pc, uint32_t op, const uint8_t* oprom
 #define DASM_PARAMS output, pc, op, oprom
 
 #define LIMM_REG 62

@@ -23,7 +23,7 @@ typedef enum {
 typedef struct
 {
 	/* static part */
-	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
+	uint32_t off_mask;             /* offset bit-mask, indicates the real size */
 	read8_delegate read;
 	const char *read_name;
 	write8_delegate write;
@@ -31,9 +31,9 @@ typedef struct
 	int isnop;
 
 	/* configurable part */
-	UINT8  state;                /* one of HP48_MODULE_ */
-	UINT32 base;                 /* base address */
-	UINT32 mask;                 /* often improperly called size, it is an address select mask */
+	uint8_t  state;                /* one of HP48_MODULE_ */
+	uint32_t base;                 /* base address */
+	uint32_t mask;                 /* often improperly called size, it is an address select mask */
 
 } hp48_module;
 
@@ -50,35 +50,35 @@ public:
 		m_dac(*this, "dac"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 *m_videoram;
-	UINT8 m_io[64];
+	uint8_t *m_videoram;
+	uint8_t m_io[64];
 	hp48_models m_model;
 
 	/* OUT register from SATURN (actually 12-bit) */
-	UINT16 m_out;
+	uint16_t m_out;
 
 	/* keyboard interrupt */
-	UINT8 m_kdn;
+	uint8_t m_kdn;
 
 	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
 	hp48_module m_modules[6];
 
-	/* RAM/ROM extensions, GX/SX only (each UINT8 stores one nibble)
+	/* RAM/ROM extensions, GX/SX only (each uint8_t stores one nibble)
 	   port1: SX/GX: 32/128 KB
 	   port2: SX:32/128KB, GX:128/512/4096 KB
 	*/
-	UINT32 m_port_size[2];
-	UINT8 m_port_write[2];
-	std::unique_ptr<UINT8[]> m_port_data[2];
+	uint32_t m_port_size[2];
+	uint8_t m_port_write[2];
+	std::unique_ptr<uint8_t[]> m_port_data[2];
 
-	UINT32 m_bank_switch;
-	UINT32 m_io_addr;
-	UINT16 m_crc;
-	UINT8 m_timer1;
-	UINT32 m_timer2;
-	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
+	uint32_t m_bank_switch;
+	uint32_t m_io_addr;
+	uint16_t m_crc;
+	uint8_t m_timer1;
+	uint32_t m_timer2;
+	uint8_t m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
-	UINT8* m_rom;
+	uint8_t* m_rom;
 
 	DECLARE_DRIVER_INIT(hp48);
 	virtual void machine_reset() override;
@@ -89,7 +89,7 @@ public:
 	DECLARE_MACHINE_START(hp48gp);
 	DECLARE_MACHINE_START(hp48sx);
 	DECLARE_MACHINE_START(hp48s);
-	UINT32 screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hp48_machine_start(hp48_models model);
 	DECLARE_WRITE8_MEMBER(hp48_io_w);
 	DECLARE_READ8_MEMBER(hp48_io_r);
@@ -106,13 +106,13 @@ public:
 	required_device<dac_bit_interface> m_dac;
 	required_device<palette_device> m_palette;
 	void hp48_pulse_irq( int irq_line);
-	void hp48_rs232_start_recv_byte( UINT8 data );
+	void hp48_rs232_start_recv_byte( uint8_t data );
 	void hp48_rs232_send_byte(  );
 	int hp48_get_in(  );
 	void hp48_update_kdn(  );
 	void hp48_reset_modules(  );
-	void hp48_decode_nibble( UINT8* dst, UINT8* src, int size );
-	void hp48_encode_nibble( UINT8* dst, UINT8* src, int size );
+	void hp48_decode_nibble( uint8_t* dst, uint8_t* src, int size );
+	void hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size );
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER( hp48_mem_reset );
@@ -173,7 +173,7 @@ class hp48_port_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_port_config(device_t &device, int port, int module, int max_size)
 	{

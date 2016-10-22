@@ -7370,12 +7370,12 @@ static const gfx_layout tiles8x32x4alt_layout =
 	16*32
 };
 
-static const UINT32 layout_xoffset[128] =
+static const uint32_t layout_xoffset[128] =
 {
 	STEP32(0*128,4),STEP32(1*128,4),STEP32(2*128,4),STEP32(3*128,4)
 };
 
-static const UINT32 layout_yoffset[128] =
+static const uint32_t layout_yoffset[128] =
 {
 	STEP32(0*16384, 512),STEP32(1*16384,512),STEP32(2*16384,512),STEP32(3*16384,512)
 };
@@ -7394,12 +7394,12 @@ static const gfx_layout tiles128x128x4_layout =
 };
 
 
-static const UINT32 layout_xoffset256[256] =
+static const uint32_t layout_xoffset256[256] =
 {
 	STEP32(0*128,4),STEP32(1*128,4),STEP32(2*128,4),STEP32(3*128,4), STEP32(4*128,4), STEP32(5*128,4), STEP32(6*128,4), STEP32(7*128,4)
 };
 
-static const UINT32 layout_yoffset256[256] =
+static const uint32_t layout_yoffset256[256] =
 {
 	STEP32(0*32768, 1024),STEP32(1*32768,1024),STEP32(2*32768,1024),STEP32(3*32768,1024),STEP32(4*32768,1024), STEP32(5*32768,1024),STEP32(6*32768,1024),STEP32(7*32768,1024)
 };
@@ -8019,8 +8019,8 @@ PALETTE_INIT_MEMBER(goldstar_state, cm)
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 data;
-		UINT8*proms = memregion("proms")->base();
+		uint8_t data;
+		uint8_t*proms = memregion("proms")->base();
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
@@ -8035,7 +8035,7 @@ PALETTE_INIT_MEMBER(goldstar_state, cmast91)
 	{
 		int r,g,b;
 
-		UINT8*proms = memregion("proms")->base();
+		uint8_t*proms = memregion("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
@@ -8050,8 +8050,8 @@ PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 	/* BBGGGRRR */
 
 	int i;
-	UINT8 data;
-	UINT8 *proms;
+	uint8_t data;
+	uint8_t *proms;
 
 	proms = memregion("proms")->base();
 	for (i = 0; i < 0x100; i++)
@@ -8446,10 +8446,10 @@ PALETTE_INIT_MEMBER(wingco_state, magodds)
 {
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 *proms = memregion("proms")->base();
-		UINT8 b = proms[0x000 + i] << 4;
-		UINT8 g = proms[0x100 + i] << 4;
-		UINT8 r = proms[0x200 + i] << 4;
+		uint8_t *proms = memregion("proms")->base();
+		uint8_t b = proms[0x000 + i] << 4;
+		uint8_t g = proms[0x100 + i] << 4;
+		uint8_t r = proms[0x200 + i] << 4;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -11556,7 +11556,7 @@ is this the original Magical Odds?
 DRIVER_INIT_MEMBER(wingco_state, magoddsc)
 {
 	int A;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -12950,10 +12950,10 @@ ROM_END
 DRIVER_INIT_MEMBER(cmaster_state, fb2010)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0x22)
 		{
@@ -14898,7 +14898,7 @@ ROM_END
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 {
 	int A;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -14911,11 +14911,11 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
-void cb3_state::do_blockswaps(UINT8* ROM)
+void cb3_state::do_blockswaps(uint8_t* ROM)
 {
 	int A;
 
-	static const UINT16 cherry_swaptables[32] = {
+	static const uint16_t cherry_swaptables[32] = {
 		/* to align with goldstar */
 		0x0800, 0x4000, 0x2800, 0x5800,
 		0x1800, 0x3000, 0x6800, 0x7000,
@@ -14929,7 +14929,7 @@ void cb3_state::do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	std::vector<UINT8> buffer(0x10000);
+	std::vector<uint8_t> buffer(0x10000);
 	memcpy(&buffer[0], ROM, 0x10000);
 
 	// swap some 0x800 blocks around..
@@ -14939,7 +14939,7 @@ void cb3_state::do_blockswaps(UINT8* ROM)
 	}
 }
 
-void cb3_state::dump_to_file( UINT8* ROM)
+void cb3_state::dump_to_file( uint8_t* ROM)
 {
 	#if 0
 	{
@@ -14956,10 +14956,10 @@ void cb3_state::dump_to_file( UINT8* ROM)
 	#endif
 }
 
-UINT8 cb3_state::cb3_decrypt(UINT8 cipherText, UINT16 address)
+uint8_t cb3_state::cb3_decrypt(uint8_t cipherText, uint16_t address)
 {
 	int idx;
-	UINT8 output;
+	uint8_t output;
 	int rotation[8] = {1, 0, 0, 1, 0, 1, 1, 1};
 	int sbox[8] = {0x08, 0x08, 0x28, 0x00, 0x20, 0x20, 0x88, 0x88};
 
@@ -14973,14 +14973,14 @@ UINT8 cb3_state::cb3_decrypt(UINT8 cipherText, UINT16 address)
 	return output ^ sbox[idx];
 }
 
-UINT8 cb3_state::chry10_decrypt(UINT8 cipherText)
+uint8_t cb3_state::chry10_decrypt(uint8_t cipherText)
 {
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
 
 DRIVER_INIT_MEMBER(cb3_state, chry10)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
 
@@ -15004,7 +15004,7 @@ DRIVER_INIT_MEMBER(cb3_state, chry10)
 
 DRIVER_INIT_MEMBER(cb3_state, cb3)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
 
@@ -15023,13 +15023,13 @@ DRIVER_INIT_MEMBER(cb3_state, cb3)
 DRIVER_INIT_MEMBER(cb3_state, chrygld)
 {
 	int A;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
 	// a data bitswap
 	for (A = 0; A < 0x10000; A++)
 	{
-		UINT8 dat = ROM[A];
+		uint8_t dat = ROM[A];
 		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
 		ROM[A] = dat;
 	}
@@ -15039,7 +15039,7 @@ DRIVER_INIT_MEMBER(cb3_state, chrygld)
 
 DRIVER_INIT_MEMBER(cmaster_state, cm)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -15050,7 +15050,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cm)
 
 DRIVER_INIT_MEMBER(cmaster_state, cmv4)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -15061,7 +15061,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cmv4)
 
 DRIVER_INIT_MEMBER(goldstar_state, cmast91)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -15072,7 +15072,7 @@ DRIVER_INIT_MEMBER(goldstar_state, cmast91)
 
 DRIVER_INIT_MEMBER(wingco_state, lucky8a)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
@@ -15080,11 +15080,11 @@ DRIVER_INIT_MEMBER(wingco_state, lucky8a)
 DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		switch(i & 7)
 		{
 			case 0: x = BITSWAP8(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
@@ -15105,10 +15105,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
 DRIVER_INIT_MEMBER(cmaster_state, schery97)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		switch(i & 0x12)
 		{
 			case 0x00: x = BITSWAP8(x ^ 0x3e, 1, 0, 7, 6, 5, 4, 3, 2); break;
@@ -15127,10 +15127,10 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97)
 DRIVER_INIT_MEMBER(cmaster_state, schery97a)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		switch(i & 6)
 		{
 			case 0: x = BITSWAP8(x ^ 0xb9, 4, 0, 6, 7, 3, 1, 5, 2); break;
@@ -15150,10 +15150,10 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97a)
 DRIVER_INIT_MEMBER(cmaster_state, skill98)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 		switch(i & 0x12)
 		{
 			case 0x00: x = BITSWAP8(x ^ 0x21, 2, 1, 0, 7, 6, 5, 4, 3); break;
@@ -15171,10 +15171,10 @@ DRIVER_INIT_MEMBER(cmaster_state, skill98)
 DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0x12)
 		{
@@ -15192,10 +15192,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
 DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0x22)
 		{
@@ -15213,10 +15213,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
 DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 5)
 		{
@@ -15240,10 +15240,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
 DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 5)
 		{
@@ -15261,10 +15261,10 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
 DRIVER_INIT_MEMBER(cmaster_state, rp35)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 3)
 		{
@@ -15283,10 +15283,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp35)
 DRIVER_INIT_MEMBER(cmaster_state, rp36)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 5)
 		{
@@ -15305,10 +15305,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36)
 DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0xa)
 		{
@@ -15327,10 +15327,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 5)
 		{
@@ -15350,10 +15350,10 @@ DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs s
 DRIVER_INIT_MEMBER(cmaster_state, po33)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0x14)
 		{
@@ -15373,10 +15373,10 @@ DRIVER_INIT_MEMBER(cmaster_state, po33)
 DRIVER_INIT_MEMBER(cmaster_state, match133)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		switch(i & 0x12)
 		{
@@ -15396,7 +15396,7 @@ DRIVER_INIT_MEMBER(cmaster_state, match133)
 DRIVER_INIT_MEMBER(cb3_state, cherrys)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	unsigned char rawData[256] = {
 		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
@@ -15436,7 +15436,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch1)
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
 }
@@ -15446,7 +15446,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch3)
 	// game stores $04 at ($D77F) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
 }
@@ -15456,7 +15456,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch4)
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;
 }
@@ -15474,7 +15474,7 @@ DRIVER_INIT_MEMBER(cmaster_state, tonypok)
 DRIVER_INIT_MEMBER(goldstar_state, super9)
 {
 	int i;
-	UINT8 *src = memregion("gfx1")->base();
+	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 //      src[i] = BITSWAP8(src[i], 7, 4, 2, 1, 6, 5, 3, 0);
@@ -15482,7 +15482,7 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 		src[i] = BITSWAP8(src[i], 7, 3, 2, 6, 5, 1, 4, 0);
 	}
 
-	UINT8 *src2 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 //      src2[i] = BITSWAP8(src2[i], 7, 4, 2, 1, 6, 5, 3, 0);
@@ -15496,26 +15496,26 @@ DRIVER_INIT_MEMBER(cb3_state, cb3e)
 {
 /*  program bitswap */
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
 	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 dat = ROM[i];
+		uint8_t dat = ROM[i];
 		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
 		ROM[i] = dat;
 	}
 
 /*  bank 1 graphics */
 //  int i;
-	UINT8 *src = memregion("gfx1")->base();
+	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
-	UINT8 *src2 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
@@ -15526,14 +15526,14 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 {
 /*  bank 1 graphics */
 	int i;
-	UINT8 *src = memregion("gfx1")->base();
+	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
-	UINT8 *src2 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
@@ -15551,14 +15551,14 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 {
 /*  bank 1 graphics */
 	int i;
-	UINT8 *src = memregion("gfx1")->base();
+	uint8_t *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
-	UINT8 *src2 = memregion("gfx2")->base();
+	uint8_t *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
@@ -15570,7 +15570,7 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
           just patched to jump to $5D80 (jmp $6115)
           where the check is succesfull.
 */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x5d7a] = 0x05;
 }
 
@@ -15589,7 +15589,7 @@ DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
           Just patched to jump to $60B9 (jmp $644E) where the check
           is succesfull.
 */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x60b3] = 0x05;
 
 }

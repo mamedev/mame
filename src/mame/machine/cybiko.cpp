@@ -38,7 +38,7 @@ DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 {
-	image.fread(m_flash1->get_ptr(), std::min(image.length(), UINT64(0x84000)));
+	image.fread(m_flash1->get_ptr(), std::min(image.length(), uint64_t(0x84000)));
 
 	return image_init_result::PASS;
 }
@@ -46,9 +46,9 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 {
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
-	UINT32 size = std::min(image.length(), UINT64(RAMDISK_SIZE));
+	uint32_t size = std::min(image.length(), uint64_t(RAMDISK_SIZE));
 
-	std::vector<UINT8> buffer(size);
+	std::vector<uint8_t> buffer(size);
 	image.fread(&buffer[0], size);
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
@@ -86,7 +86,7 @@ void cybiko_state::machine_reset()
 
 READ16_MEMBER( cybiko_state::cybiko_lcd_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	if (ACCESSING_BITS_8_15) data |= (m_crtc->reg_idx_r(space, offset) << 8);
 	if (ACCESSING_BITS_0_7) data |= (m_crtc->reg_dat_r(space, offset) << 0);
 	return data;
@@ -100,8 +100,8 @@ WRITE16_MEMBER( cybiko_state::cybiko_lcd_w )
 
 int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)
 {
-	UINT16 data = 0xFFFF;
-	for (UINT8 i = 0; i < 15; i++)
+	uint16_t data = 0xFFFF;
+	for (uint8_t i = 0; i < 15; i++)
 	{
 		if (m_input[i].found() && !BIT(offset, i))
 			data &= ~m_input[i]->read();
@@ -120,7 +120,7 @@ READ16_MEMBER( cybiko_state::cybikov1_key_r )
 
 READ16_MEMBER( cybiko_state::cybikov2_key_r )
 {
-	UINT16 data = cybiko_key_r(offset, mem_mask);
+	uint16_t data = cybiko_key_r(offset, mem_mask);
 	if (!BIT(offset, 0))
 		data |= 0x0002; // or else [esc] does not work in "lost in labyrinth"
 	return data;
@@ -134,7 +134,7 @@ READ16_MEMBER( cybiko_state::cybikoxt_key_r )
 #if 0
 READ16_MEMBER( cybiko_state::cybikov1_io_reg_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 #if 0
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -182,7 +182,7 @@ READ16_MEMBER( cybiko_state::cybikov1_io_reg_r )
 
 READ16_MEMBER( cybiko_state::cybikov2_io_reg_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 #if 0
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -230,7 +230,7 @@ READ16_MEMBER( cybiko_state::cybikov2_io_reg_r )
 
 READ16_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 #if 0
 	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)

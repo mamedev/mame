@@ -949,7 +949,7 @@ ROM_START( gcastle )
 ROM_END
 
 
-void gladiatr_state::swap_block(UINT8 *src1,UINT8 *src2,int len)
+void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 {
 	int i,t;
 
@@ -963,7 +963,7 @@ void gladiatr_state::swap_block(UINT8 *src1,UINT8 *src2,int len)
 
 DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i,j;
 
 	rom = memregion("gfx2")->base();
@@ -1014,7 +1014,7 @@ READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
 
 DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i,j;
 
 	rom = memregion("gfx2")->base();

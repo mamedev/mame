@@ -380,8 +380,8 @@ void menu_crosshair::populate()
 	crosshair_item_data *data;
 	char temp_text[16];
 	int player;
-	UINT8 use_auto = false;
-	UINT32 flags = 0;
+	uint8_t use_auto = false;
+	uint32_t flags = 0;
 
 	/* loop over player and add the manual items */
 	for (player = 0; player < MAX_PLAYERS; player++)
@@ -775,7 +775,7 @@ void menu_machine_configure::populate()
 	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		UINT32 arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
+		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else

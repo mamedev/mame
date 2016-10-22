@@ -9,16 +9,16 @@
 
 struct kcc_header
 {
-	UINT8   name[10];
-	UINT8   reserved[6];
-	UINT8   number_addresses;
-	UINT8   load_address_l;
-	UINT8   load_address_h;
-	UINT8   end_address_l;
-	UINT8   end_address_h;
-	UINT8   execution_address_l;
-	UINT8   execution_address_h;
-	UINT8   pad[128-2-2-2-1-16];
+	uint8_t   name[10];
+	uint8_t   reserved[6];
+	uint8_t   number_addresses;
+	uint8_t   load_address_l;
+	uint8_t   load_address_h;
+	uint8_t   end_address_l;
+	uint8_t   end_address_h;
+	uint8_t   execution_address_l;
+	uint8_t   execution_address_h;
+	uint8_t   pad[128-2-2-2-1-16];
 };
 
 /* appears to work a bit.. */
@@ -29,18 +29,18 @@ struct kcc_header
 QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 {
 	struct kcc_header *header;
-	UINT16 addr;
-	UINT16 datasize;
-	UINT16 execution_address;
-	UINT16 i;
+	uint16_t addr;
+	uint16_t datasize;
+	uint16_t execution_address;
+	uint16_t i;
 
 	/* get file size */
-	UINT64 size = image.length();
+	uint64_t size = image.length();
 
 	if (size == 0)
 		return image_init_result::FAIL;
 
-	std::vector<UINT8> data(size);
+	std::vector<uint8_t> data(size);
 	image.fread( &data[0], size);
 
 	header = (struct kcc_header *) &data[0];
@@ -50,7 +50,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 
 	if (datasize > size - 128)
 	{
-		osd_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)size - 128);
+		osd_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (uint32_t)size - 128);
 		datasize = size - 128;
 	}
 
@@ -79,7 +79,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 
 READ8_MEMBER( kc_state::expansion_read )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
@@ -113,14 +113,14 @@ WRITE8_MEMBER( kc_state::expansion_write )
 
 READ8_MEMBER( kc_state::expansion_io_read )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
 
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if (slot_id == 0x08 || slot_id == 0x0c)
 			result = m_expansions[(slot_id - 8) >> 2]->module_id_r();
@@ -143,7 +143,7 @@ WRITE8_MEMBER( kc_state::expansion_io_write )
 
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if (slot_id == 0x08 || slot_id == 0x0c)
 			m_expansions[(slot_id - 8) >> 2]->control_w(data);
@@ -485,7 +485,7 @@ void kc85_4_state::update_0x08000()
 		/* IRM enabled - has priority over RAM8 enabled */
 		LOG(("IRM enabled\n"));
 
-		UINT8* ram_page = m_video_ram + ((BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14));
+		uint8_t* ram_page = m_video_ram + ((BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14));
 
 		membank("bank3")->set_base(ram_page);
 		space.install_readwrite_bank(0x8000, 0xa7ff, "bank3");
@@ -498,7 +498,7 @@ void kc85_4_state::update_0x08000()
 		LOG(("RAM8 enabled\n"));
 
 		int ram8_block;
-		UINT8 *mem_ptr;
+		uint8_t *mem_ptr;
 
 		/* ram8 block chosen */
 

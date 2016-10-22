@@ -41,32 +41,32 @@ public:
 
 	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
-	UINT8 m_input_port_4_f0;
-	UINT8 m_kikstart_gears[2];
-	required_shared_ptr<UINT8> m_videoram_1;
-	required_shared_ptr<UINT8> m_videoram_2;
-	required_shared_ptr<UINT8> m_videoram_3;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_characterram;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_colscrolly;
-	required_shared_ptr<UINT8> m_gfxpointer;
-	required_shared_ptr<UINT8> m_colorbank;
-	required_shared_ptr<UINT8> m_video_mode;
-	required_shared_ptr<UINT8> m_video_priority;
-	required_shared_ptr<UINT8> m_collision_reg;
-	optional_shared_ptr<UINT8> m_kikstart_scrollram;
-	UINT8 m_fromz80;
-	UINT8 m_toz80;
-	UINT8 m_zaccept;
-	UINT8 m_zready;
-	UINT8 m_busreq;
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
-	UINT8 m_spacecr_prot_value;
-	UINT8 m_protection_value;
-	UINT32 m_address;
+	uint8_t m_input_port_4_f0;
+	uint8_t m_kikstart_gears[2];
+	required_shared_ptr<uint8_t> m_videoram_1;
+	required_shared_ptr<uint8_t> m_videoram_2;
+	required_shared_ptr<uint8_t> m_videoram_3;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_characterram;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colscrolly;
+	required_shared_ptr<uint8_t> m_gfxpointer;
+	required_shared_ptr<uint8_t> m_colorbank;
+	required_shared_ptr<uint8_t> m_video_mode;
+	required_shared_ptr<uint8_t> m_video_priority;
+	required_shared_ptr<uint8_t> m_collision_reg;
+	optional_shared_ptr<uint8_t> m_kikstart_scrollram;
+	uint8_t m_fromz80;
+	uint8_t m_toz80;
+	uint8_t m_zaccept;
+	uint8_t m_zready;
+	uint8_t m_busreq;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
+	uint8_t m_spacecr_prot_value;
+	uint8_t m_protection_value;
+	uint32_t m_address;
 	bool m_sndnmi_disable; // AKA "CIOB0" on schematic, bit 0 of AY-3-8910 @ IC50 Port B
 	bool m_sound_cmd_written;  // 74ls74 1/2 @ GAME BOARD IC42
 	bool m_sound_semaphore;  // 74ls74 2/2 @ GAME BOARD IC42
@@ -115,8 +115,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
@@ -124,8 +124,8 @@ public:
 	void reset_common();
 	void set_pens();
 	void compute_draw_order();
-	inline int get_sprite_xy(UINT8 which, UINT8* sx, UINT8* sy);
-	inline gfx_element *get_sprite_gfx_element(UINT8 which);
+	inline int get_sprite_xy(uint8_t which, uint8_t* sx, uint8_t* sy);
+	inline gfx_element *get_sprite_gfx_element(uint8_t which);
 	void check_sprite_sprite_collision();
 	void calculate_sprite_areas(int *sprites_on, rectangle *sprite_areas);
 	int check_sprite_layer_bitpattern(int which, rectangle *sprite_areas);

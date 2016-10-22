@@ -94,14 +94,14 @@ class superfx_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_irq_func(device_t &device, _Object object) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(object); }
 
-	UINT8 mmio_read(UINT32 addr);
-	void mmio_write(UINT32 addr, UINT8 data);
-	void add_clocks(INT32 clocks);
+	uint8_t mmio_read(uint32_t addr);
+	void mmio_write(uint32_t addr, uint8_t data);
+	void add_clocks(int32_t clocks);
 	int access_ram();
 	int access_rom();
 
@@ -111,9 +111,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -124,89 +124,89 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
 	devcb_write_line   m_out_irq_func;
 
-	UINT8  m_pipeline;
-	UINT16 m_ramaddr; // RAM Address
+	uint8_t  m_pipeline;
+	uint16_t m_ramaddr; // RAM Address
 
-	UINT16 m_r[16];   // GPRs
-	UINT16 m_sfr;     // Status Flag Register
-	UINT8  m_pbr;     // Program Bank Register
-	UINT8  m_rombr;   // Game Pack ROM Bank Register
-	UINT8  m_rambr;   // Game Pack RAM Bank Register
-	UINT16 m_cbr;     // Cache Base Register
-	UINT8  m_scbr;    // Screen Base Register
-	UINT8  m_scmr;    // Screen Mode Register
-	UINT8  m_colr;    // Color Register
-	UINT8  m_por;     // Plot Option Register
-	UINT8  m_bramr;   // Back-Up RAM Register
-	UINT8  m_vcr;     // Version Code Register
-	UINT8  m_cfgr;    // Config Register
-	UINT8  m_clsr;    // Clock Select Register
+	uint16_t m_r[16];   // GPRs
+	uint16_t m_sfr;     // Status Flag Register
+	uint8_t  m_pbr;     // Program Bank Register
+	uint8_t  m_rombr;   // Game Pack ROM Bank Register
+	uint8_t  m_rambr;   // Game Pack RAM Bank Register
+	uint16_t m_cbr;     // Cache Base Register
+	uint8_t  m_scbr;    // Screen Base Register
+	uint8_t  m_scmr;    // Screen Mode Register
+	uint8_t  m_colr;    // Color Register
+	uint8_t  m_por;     // Plot Option Register
+	uint8_t  m_bramr;   // Back-Up RAM Register
+	uint8_t  m_vcr;     // Version Code Register
+	uint8_t  m_cfgr;    // Config Register
+	uint8_t  m_clsr;    // Clock Select Register
 
-	UINT32 m_romcl;   // Clock ticks until ROMDR is valid
-	UINT8  m_romdr;   // ROM Buffer Data Register
+	uint32_t m_romcl;   // Clock ticks until ROMDR is valid
+	uint8_t  m_romdr;   // ROM Buffer Data Register
 
-	UINT32 m_ramcl;   // Clock ticks until RAMDR is valid;
-	UINT16 m_ramar;   // RAM Buffer Address Register
-	UINT8  m_ramdr;   // RAM Buffer Data Register
+	uint32_t m_ramcl;   // Clock ticks until RAMDR is valid;
+	uint16_t m_ramar;   // RAM Buffer Address Register
+	uint8_t  m_ramdr;   // RAM Buffer Data Register
 
-	UINT16 *m_sreg;   // Source Register (From)
-	UINT8  m_sreg_idx;// Source Register (To), index
-	UINT16 *m_dreg;   // Destination Register (To)
-	UINT8  m_dreg_idx;// Destination Register (To), index
-	UINT8  m_r15_modified;
+	uint16_t *m_sreg;   // Source Register (From)
+	uint8_t  m_sreg_idx;// Source Register (To), index
+	uint16_t *m_dreg;   // Destination Register (To)
+	uint8_t  m_dreg_idx;// Destination Register (To), index
+	uint8_t  m_r15_modified;
 
-	UINT8  m_irq;     // IRQ Pending
+	uint8_t  m_irq;     // IRQ Pending
 
-	UINT32 m_cache_access_speed;
-	UINT32 m_memory_access_speed;
+	uint32_t m_cache_access_speed;
+	uint32_t m_memory_access_speed;
 
 	struct {
-		UINT8 buffer[0x200];
-		UINT8 valid[0x20];
+		uint8_t buffer[0x200];
+		uint8_t valid[0x20];
 	} m_cache;
 	struct {
-		UINT16 offset;
-		UINT8 bitpend;
-		UINT8 data[8];
+		uint16_t offset;
+		uint8_t bitpend;
+		uint8_t data[8];
 	} m_pixelcache[2];
 
 	address_space *m_program;
 	int m_icount;
 
-	UINT32 m_debugger_temp;
+	uint32_t m_debugger_temp;
 
 	inline void superfx_regs_reset();
 	void superfx_update_speed();
 	void superfx_cache_flush();
-	UINT8 superfx_cache_mmio_read(UINT32 addr);
-	void superfx_cache_mmio_write(UINT32 addr, UINT8 data);
+	uint8_t superfx_cache_mmio_read(uint32_t addr);
+	void superfx_cache_mmio_write(uint32_t addr, uint8_t data);
 	void superfx_memory_reset();
-	inline UINT8 superfx_bus_read(UINT32 addr);
-	inline void superfx_bus_write(UINT32 addr, UINT8 data);
-	inline void superfx_pixelcache_flush(INT32 line);
-	inline void superfx_plot(UINT8 x, UINT8 y);
-	UINT8 superfx_rpix(UINT8 x, UINT8 y);
-	inline UINT8 superfx_color(UINT8 source);
+	inline uint8_t superfx_bus_read(uint32_t addr);
+	inline void superfx_bus_write(uint32_t addr, uint8_t data);
+	inline void superfx_pixelcache_flush(int32_t line);
+	inline void superfx_plot(uint8_t x, uint8_t y);
+	uint8_t superfx_rpix(uint8_t x, uint8_t y);
+	inline uint8_t superfx_color(uint8_t source);
 	inline void superfx_rambuffer_sync();
-	inline UINT8 superfx_rambuffer_read(UINT16 addr);
-	inline void superfx_rambuffer_write(UINT16 addr, UINT8 data);
+	inline uint8_t superfx_rambuffer_read(uint16_t addr);
+	inline void superfx_rambuffer_write(uint16_t addr, uint8_t data);
 	inline void superfx_rombuffer_sync();
 	inline void superfx_rombuffer_update();
-	inline UINT8 superfx_rombuffer_read();
-	inline void superfx_gpr_write(UINT8 r, UINT16 data);
-	inline UINT8 superfx_op_read(UINT16 addr);
-	inline UINT8 superfx_peekpipe();
-	inline UINT8 superfx_pipe();
-	inline void superfx_add_clocks_internal(UINT32 clocks);
+	inline uint8_t superfx_rombuffer_read();
+	inline void superfx_gpr_write(uint8_t r, uint16_t data);
+	inline uint8_t superfx_op_read(uint16_t addr);
+	inline uint8_t superfx_peekpipe();
+	inline uint8_t superfx_pipe();
+	inline void superfx_add_clocks_internal(uint32_t clocks);
 	void superfx_timing_reset();
 	inline void superfx_dreg_sfr_sz_update();
 };

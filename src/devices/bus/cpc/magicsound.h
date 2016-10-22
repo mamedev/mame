@@ -38,7 +38,7 @@ class al_magicsound_device  : public device_t,
 {
 public:
 	// construction/destruction
-	al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -75,13 +75,13 @@ private:
 
 	void set_timer_gate(bool state);
 
-	UINT8 m_volume[4];
-	UINT32 m_page[4][4];
-	UINT8 m_output[4];
+	uint8_t m_volume[4];
+	uint32_t m_page[4][4];
+	uint8_t m_output[4];
 	bool m_dack[4];
-	INT8 m_current_channel;
+	int8_t m_current_channel;
 	ram_device* m_ramptr;
-	UINT8 m_current_output;
+	uint8_t m_current_output;
 };
 
 // device type definition

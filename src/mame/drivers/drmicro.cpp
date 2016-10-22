@@ -43,7 +43,7 @@ WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 
 WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 {
-	UINT8 *PCM = memregion("adpcm")->base();
+	uint8_t *PCM = memregion("adpcm")->base();
 
 	int data = PCM[m_pcm_adr / 2];
 

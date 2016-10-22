@@ -121,7 +121,7 @@ const tiny_rom_entry *a2bus_timemasterho_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
@@ -131,7 +131,7 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 	m_started = false;
 }
 
-a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_TIMEMASTERHO, "Applied Engineering TimeMaster H.O.", tag, owner, clock, "a2tmstho", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
@@ -164,7 +164,7 @@ void a2bus_timemasterho_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_timemasterho_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_timemasterho_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	if (offset <= 3)
 	{
@@ -179,7 +179,7 @@ UINT8 a2bus_timemasterho_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_timemasterho_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_timemasterho_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	if (offset <= 3)
 	{
@@ -191,7 +191,7 @@ void a2bus_timemasterho_device::write_c0nx(address_space &space, UINT8 offset, U
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_timemasterho_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_timemasterho_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	if (m_started)
 	{
@@ -209,7 +209,7 @@ UINT8 a2bus_timemasterho_device::read_cnxx(address_space &space, UINT8 offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_timemasterho_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_timemasterho_device::read_c800(address_space &space, uint16_t offset)
 {
 	return m_rom[offset+0xc00];
 }
@@ -242,7 +242,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 
 void a2bus_timemasterho_device::update_irqs()
 {
-	UINT8 dip = 0;
+	uint8_t dip = 0;
 
 	if (m_started)
 	{

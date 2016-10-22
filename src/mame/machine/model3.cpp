@@ -23,7 +23,7 @@
 
 #define NEXT(new_state) fsm[m_tap_state][new_state]
 
-static const INT32 fsm[][2] = {
+static const int32_t fsm[][2] = {
 							{  1,  0 },  // 0  Test-Logic/Reset
 							{  1,  2 },  // 1  Run-Test/Idle
 							{  3,  9 },  // 2  Select-DR-Scan
@@ -50,9 +50,9 @@ static const INT32 fsm[][2] = {
  * the MSB of the first byte in the buffer.
  */
 
-static void insert_bit(UINT8 *buf, INT32 bit_num, INT32 bit)
+static void insert_bit(uint8_t *buf, int32_t bit_num, int32_t bit)
 {
-	INT32 bit_in_byte;
+	int32_t bit_in_byte;
 
 	bit_in_byte = 7 - (bit_num & 7);
 
@@ -66,7 +66,7 @@ static void insert_bit(UINT8 *buf, INT32 bit_num, INT32 bit)
  * Inserts a 32-bit ID code into the ID bit field.
  */
 
-void model3_state::insert_id(UINT32 id, INT32 start_bit)
+void model3_state::insert_id(uint32_t id, int32_t start_bit)
 {
 	for (int i = 31; i >= 0; i--)
 		insert_bit(m_id_data, start_bit++, (id >> i) & 1);
@@ -80,9 +80,9 @@ void model3_state::insert_id(UINT32 id, INT32 start_bit)
  * returned.
  */
 
-static int shift(UINT8 *data, INT32 num_bits)
+static int shift(uint8_t *data, int32_t num_bits)
 {
-	INT32     i;
+	int32_t     i;
 	int    shift_out, shift_in;
 
 	/*
@@ -150,7 +150,7 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 	switch (m_tap_state)
 	{
 	case 3:     // Capture-DR
-		//printf("capture dr (IR = %08X%08X\n", (UINT32)(m_ir >> 32),(UINT32)(m_ir));
+		//printf("capture dr (IR = %08X%08X\n", (uint32_t)(m_ir >> 32),(uint32_t)(m_ir));
 
 		if (m_ir == U64(0x000023fffffffffe))
 		{
@@ -161,11 +161,11 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 
 			m_id_size = 41;
 
-			UINT64 res = 0x0040000000;
+			uint64_t res = 0x0040000000;
 
 			int start_bit = 0;
 			for (int i = 41; i >= 0; i--)
-				insert_bit(m_id_data, start_bit++, ((UINT64)(1 << i) & res) ? 1 : 0);
+				insert_bit(m_id_data, start_bit++, ((uint64_t)(1 << i) & res) ? 1 : 0);
 		}
 		else if (m_ir == U64(0x00000c631f8c7ffe))
 		{
@@ -195,7 +195,7 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 
 		m_tdo = m_ir & 1;   // shift LSB to output
 		m_ir >>= 1;
-		m_ir |= ((UINT64) tdi << 45);
+		m_ir |= ((uint64_t) tdi << 45);
 		break;
 
 	case 15:    // Update-IR
@@ -290,7 +290,7 @@ void model3_state::tap_reset()
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-static UINT8 rtc_get_reg(running_machine &machine, int reg)
+static uint8_t rtc_get_reg(running_machine &machine, int reg)
 {
 	system_time systime;
 
@@ -354,7 +354,7 @@ static UINT8 rtc_get_reg(running_machine &machine, int reg)
 READ32_MEMBER(model3_state::rtc72421_r)
 {
 	int reg = offset;
-	UINT32 data;
+	uint32_t data;
 	data = rtc_get_reg(machine(), reg) << 24;
 	data |= 0x30000;    /* these bits are set to pass the battery voltage test */
 	return data;

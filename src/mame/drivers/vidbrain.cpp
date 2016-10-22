@@ -103,7 +103,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	*/
 
-	UINT8 data = m_joy_r->read();
+	uint8_t data = m_joy_r->read();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 {
 	if (state && m_joy_enable && !m_timer_ne555->enabled())
 	{
-		UINT8 joydata = 0;
+		uint8_t joydata = 0;
 
 		if (!BIT(m_keylatch, 0)) joydata = m_joy1_x->read();
 		if (!BIT(m_keylatch, 1)) joydata = m_joy1_y->read();
@@ -426,7 +426,7 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 
 IRQ_CALLBACK_MEMBER(vidbrain_state::vidbrain_int_ack)
 {
-	UINT16 vector = m_vector;
+	uint16_t vector = m_vector;
 
 	switch (m_int_enable)
 	{

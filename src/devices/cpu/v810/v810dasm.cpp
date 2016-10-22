@@ -41,8 +41,8 @@ static const char *const dRegs[]=
 
 CPU_DISASSEMBLE( v810 )
 {
-	UINT32 flags = 0;
-	UINT32 opc,opc2;
+	uint32_t flags = 0;
+	uint32_t opc,opc2;
 	unsigned size;
 	opc = oprom[0] | (oprom[1] << 8);
 	opc2 = oprom[2] | (oprom[3] << 8);

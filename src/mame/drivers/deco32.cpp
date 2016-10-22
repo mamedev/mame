@@ -447,7 +447,7 @@ WRITE32_MEMBER(deco32_state::sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-void deco32_state::deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -684,12 +684,12 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 /**********************************************************************************/
 
 
-UINT16 deco32_state::port_b_nslasher(int unused)
+uint16_t deco32_state::port_b_nslasher(int unused)
 {
 	return (m_eeprom->do_read());
 }
 
-void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_soundlatch->write(space,0,(data)&0xff);
@@ -697,12 +697,12 @@ void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT16 deco32_state::port_b_tattass(int unused)
+uint16_t deco32_state::port_b_tattass(int unused)
 {
 	return m_tattass_eprom_bit;
 }
 
-void deco32_state::tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 	int soundcommand = (data)&0xff;
@@ -806,7 +806,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 {
-	UINT32 retdata = 0x0000ffff;
+	uint32_t retdata = 0x0000ffff;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -814,8 +814,8 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
-		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+		uint8_t cs = 0;
+		uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
 
 
@@ -833,7 +833,7 @@ WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
+		uint8_t cs = 0;
 		m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 	}
 }
@@ -908,8 +908,8 @@ READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -917,7 +917,7 @@ WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1088,8 +1088,8 @@ READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -1097,7 +1097,7 @@ WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1886,17 +1886,17 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 MACHINE_CONFIG_END
 
 
-UINT16 deco32_state::port_a_fghthist(int unused)
+uint16_t deco32_state::port_a_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN0")->read();
 }
 
-UINT16 deco32_state::port_b_fghthist(int unused)
+uint16_t deco32_state::port_b_fghthist(int unused)
 {
 	return machine().device<eeprom_serial_93cxx_device>(":eeprom")->do_read();
 }
 
-UINT16 deco32_state::port_c_fghthist(int unused)
+uint16_t deco32_state::port_c_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN1")->read();
 }
@@ -3954,12 +3954,12 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 	save_item(NAME(m_irq_source));
 }
 
-extern void process_dvi_data(device_t *device,UINT8* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
-	const UINT8 *SRC_RAM = memregion("gfx1")->base();
-	UINT8 *DST_RAM = memregion("gfx2")->base();
+	const uint8_t *SRC_RAM = memregion("gfx1")->base();
+	uint8_t *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3970,7 +3970,7 @@ void dragngun_state::dragngun_init_common()
 
 #if 0
 	{
-		UINT8 *ROM = memregion("dvi")->base();
+		uint8_t *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -4000,7 +4000,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4008,7 +4008,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4020,8 +4020,8 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
+//  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -4041,8 +4041,8 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	std::vector<UINT8> tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);
@@ -4068,8 +4068,8 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	std::vector<UINT8> tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);

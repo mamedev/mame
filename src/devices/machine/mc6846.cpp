@@ -45,7 +45,7 @@
 
 const device_type MC6846 = &device_creator<mc6846_device>;
 
-mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6846, "MC6846 Programmable Timer", tag, owner, clock, "mc6846", __FILE__),
 	m_out_port_cb(*this),
 	m_out_cp1_cb(*this),
@@ -125,7 +125,7 @@ void mc6846_device::device_reset()
 }
 
 
-inline UINT16 mc6846_device::counter()
+inline uint16_t mc6846_device::counter()
 {
 	if ( m_timer_started )
 	{
@@ -477,7 +477,7 @@ WRITE8_MEMBER(mc6846_device::write)
 		break;
 
 	case 7:
-		m_latch = ( ((UINT16) m_time_MSB) << 8 ) + data;
+		m_latch = ( ((uint16_t) m_time_MSB) << 8 ) + data;
 		LOG (( "%s %f: mc6846 COUNT write %i\n", machine().describe_context(), space.machine().time().as_double(), m_latch  ));
 		if (!(m_tcr & 0x38))
 		{
@@ -541,28 +541,28 @@ void mc6846_device::set_input_cp2(int data)
 
 
 
-UINT8 mc6846_device::get_output_port()
+uint8_t mc6846_device::get_output_port()
 {
 	return PORT;
 }
 
 
 
-UINT8 mc6846_device::get_output_cto()
+uint8_t mc6846_device::get_output_cto()
 {
 	return CTO;
 }
 
 
 
-UINT8 mc6846_device::get_output_cp2()
+uint8_t mc6846_device::get_output_cp2()
 {
 	return m_cp2_cpu;
 }
 
 
 
-UINT16 mc6846_device::get_preset()
+uint16_t mc6846_device::get_preset()
 {
 	return m_preset;
 }

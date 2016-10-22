@@ -130,13 +130,13 @@
     successfully for all known keys, given the values of the 'shift' and 'B'
     parameters, as well as an initial 'seed' for the generator:
 
-    void genkey(UINT32 seed, UINT8 *output)
+    void genkey(uint32_t seed, uint8_t *output)
     {
         int bytenum;
 
         for (bytenum = 4; bytenum < 8192; bytenum++)
         {
-            UINT8 byteval;
+            uint8_t byteval;
 
             seed = seed * 0x29;
             seed += seed << 16;
@@ -393,7 +393,7 @@ const device_type FD1094 = &device_creator<fd1094_device>;
 0x1e7a,
 this only happens with 317-0162 so far; I assume it is a fault in the CPU.
 */
-const UINT16 fd1094_device::s_masked_opcodes[] =
+const uint16_t fd1094_device::s_masked_opcodes[] =
 {
 	0x013a,0x033a,0x053a,0x073a,0x083a,0x093a,0x0b3a,0x0d3a,0x0f3a,
 
@@ -510,7 +510,7 @@ void fd1094_decryption_cache::reset()
 //  of the region we are caching
 //-------------------------------------------------
 
-void fd1094_decryption_cache::configure(offs_t baseaddress, UINT32 size, offs_t rgnoffset)
+void fd1094_decryption_cache::configure(offs_t baseaddress, uint32_t size, offs_t rgnoffset)
 {
 	// if something important changes, throw away what we have
 	if (m_baseaddress != baseaddress || m_size != size || m_rgnoffset != rgnoffset)
@@ -528,7 +528,7 @@ void fd1094_decryption_cache::configure(offs_t baseaddress, UINT32 size, offs_t 
 //  decrypted opcodes for the given state
 //-------------------------------------------------
 
-UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
+uint16_t *fd1094_decryption_cache::decrypted_opcodes(uint8_t state)
 {
 	// if we have already decrypted this state, use it
 	if (!m_decrypted_opcodes[state].empty())
@@ -552,7 +552,7 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 //-------------------------------------------------
 
 
-fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_device(mconfig, tag, owner, clock, "fd1094", __FILE__)
 	, m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes")
 	, m_state(0x00)
@@ -635,7 +635,7 @@ void fd1094_device::change_state(int newstate)
 void fd1094_device::device_start()
 {
 	m_srcbase = m_rom;
-	UINT32 size = m_rom.bytes();
+	uint32_t size = m_rom.bytes();
 
 	// if no ROM region, see if there's a memory share with our name
 	if (!m_rom.found())
@@ -644,7 +644,7 @@ void fd1094_device::device_start()
 		if (!share)
 			throw emu_fatalerror("FD1094 found no data to decrypt!");
 
-		m_srcbase = reinterpret_cast<UINT16 *>(share->ptr());
+		m_srcbase = reinterpret_cast<uint16_t *>(share->ptr());
 		size = share->bytes();
 	}
 
@@ -704,12 +704,12 @@ void fd1094_device::device_postload()
 //  (physical address / 2)
 //-------------------------------------------------
 
-UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_key, UINT8 state, bool vector_fetch)
+uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t *main_key, uint8_t state, bool vector_fetch)
 {
 	// extract and adjust the global key
-	UINT8 gkey1 = main_key[1];
-	UINT8 gkey2 = main_key[2];
-	UINT8 gkey3 = main_key[3];
+	uint8_t gkey1 = main_key[1];
+	uint8_t gkey2 = main_key[2];
+	uint8_t gkey3 = main_key[3];
 	if (state & 0x0001)
 	{
 		gkey1 ^= 0x04;  // global_xor1
@@ -760,13 +760,13 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 	}
 
 	// for address xx0000-xx0006 (but only if >= 000008), use key xx2000-xx2006
-	UINT8 mainkey;
+	uint8_t mainkey;
 	if ((address & 0x0ffc) == 0 && address >= 4)
 		mainkey = main_key[(address & 0x1fff) | 0x1000];
 	else
 		mainkey = main_key[address & 0x1fff];
 
-	UINT8 key_F;
+	uint8_t key_F;
 	if (address & 0x1000)   key_F = BIT(mainkey,7);
 	else                    key_F = BIT(mainkey,6);
 
@@ -780,40 +780,40 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 		if (address <= 1) key_F = 0;
 	}
 
-	UINT8 global_xor0         = 1^BIT(gkey1,5);
-	UINT8 global_xor1         = 1^BIT(gkey1,2);
-	UINT8 global_swap2        = 1^BIT(gkey1,0);
+	uint8_t global_xor0         = 1^BIT(gkey1,5);
+	uint8_t global_xor1         = 1^BIT(gkey1,2);
+	uint8_t global_swap2        = 1^BIT(gkey1,0);
 
-	UINT8 global_swap0a       = 1^BIT(gkey2,5);
-	UINT8 global_swap0b       = 1^BIT(gkey2,2);
+	uint8_t global_swap0a       = 1^BIT(gkey2,5);
+	uint8_t global_swap0b       = 1^BIT(gkey2,2);
 
-	UINT8 global_swap3        = 1^BIT(gkey3,6);
-	UINT8 global_swap1        = 1^BIT(gkey3,4);
-	UINT8 global_swap4        = 1^BIT(gkey3,2);
+	uint8_t global_swap3        = 1^BIT(gkey3,6);
+	uint8_t global_swap1        = 1^BIT(gkey3,4);
+	uint8_t global_swap4        = 1^BIT(gkey3,2);
 
-	UINT8 key_0a = BIT(mainkey,0) ^ BIT(gkey3,1);
-	UINT8 key_0b = BIT(mainkey,0) ^ BIT(gkey1,7);
-	UINT8 key_0c = BIT(mainkey,0) ^ BIT(gkey1,1);
+	uint8_t key_0a = BIT(mainkey,0) ^ BIT(gkey3,1);
+	uint8_t key_0b = BIT(mainkey,0) ^ BIT(gkey1,7);
+	uint8_t key_0c = BIT(mainkey,0) ^ BIT(gkey1,1);
 
-	UINT8 key_1a = BIT(mainkey,1) ^ BIT(gkey2,7);
-	UINT8 key_1b = BIT(mainkey,1) ^ BIT(gkey1,3);
+	uint8_t key_1a = BIT(mainkey,1) ^ BIT(gkey2,7);
+	uint8_t key_1b = BIT(mainkey,1) ^ BIT(gkey1,3);
 
-	UINT8 key_2a = BIT(mainkey,2) ^ BIT(gkey3,7);
-	UINT8 key_2b = BIT(mainkey,2) ^ BIT(gkey1,4);
+	uint8_t key_2a = BIT(mainkey,2) ^ BIT(gkey3,7);
+	uint8_t key_2b = BIT(mainkey,2) ^ BIT(gkey1,4);
 
-	UINT8 key_3a = BIT(mainkey,3) ^ BIT(gkey2,0);
-	UINT8 key_3b = BIT(mainkey,3) ^ BIT(gkey3,3);
+	uint8_t key_3a = BIT(mainkey,3) ^ BIT(gkey2,0);
+	uint8_t key_3b = BIT(mainkey,3) ^ BIT(gkey3,3);
 
-	UINT8 key_4a = BIT(mainkey,4) ^ BIT(gkey2,3);
-	UINT8 key_4b = BIT(mainkey,4) ^ BIT(gkey3,0);
+	uint8_t key_4a = BIT(mainkey,4) ^ BIT(gkey2,3);
+	uint8_t key_4b = BIT(mainkey,4) ^ BIT(gkey3,0);
 
-	UINT8 key_5a = BIT(mainkey,5) ^ BIT(gkey3,5);
-	UINT8 key_5b = BIT(mainkey,5) ^ BIT(gkey1,6);
+	uint8_t key_5a = BIT(mainkey,5) ^ BIT(gkey3,5);
+	uint8_t key_5b = BIT(mainkey,5) ^ BIT(gkey1,6);
 
-	UINT8 key_6a = BIT(mainkey,6) ^ BIT(gkey2,1);
-	UINT8 key_6b = BIT(mainkey,6) ^ BIT(gkey2,6);
+	uint8_t key_6a = BIT(mainkey,6) ^ BIT(gkey2,1);
+	uint8_t key_6b = BIT(mainkey,6) ^ BIT(gkey2,6);
 
-	UINT8 key_7a = BIT(mainkey,7) ^ BIT(gkey2,4);
+	uint8_t key_7a = BIT(mainkey,7) ^ BIT(gkey2,4);
 
 
 	if (val & 0x8000)           // block invariant: val & 0x8000 != 0
@@ -891,7 +891,7 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 //  decrypt - decrypt a buffers' worth of opcodes
 //-------------------------------------------------
 
-void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT8 state)
+void fd1094_device::decrypt(offs_t baseaddr, uint32_t size, const uint16_t *srcptr, uint16_t *opcodesptr, uint8_t state)
 {
 	for (offs_t offset = 0; offset < size; offset += 2)
 		opcodesptr[offset / 2] = decrypt_one((baseaddr + offset) / 2, srcptr[offset / 2], &m_key[0], state, (baseaddr + offset) < 8);
@@ -903,7 +903,7 @@ void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, 
 //  for standard cases
 //-------------------------------------------------
 
-void fd1094_device::default_state_change(UINT8 state)
+void fd1094_device::default_state_change(uint8_t state)
 {
 	m_decrypted_opcodes_bank->set_base(m_cache.decrypted_opcodes(state));
 }

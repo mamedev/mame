@@ -63,11 +63,11 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	UINT8 m_flipscreen;
-	UINT32 m_ttl74123_output;
-	UINT8 m_AY8910_selected;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	uint8_t m_flipscreen;
+	uint32_t m_ttl74123_output;
+	uint8_t m_AY8910_selected;
 
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
 
@@ -150,7 +150,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.de
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = m_soundlatch2->read(space, 0);
+	uint8_t ret = m_soundlatch2->read(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
 
 	return ret;
@@ -187,7 +187,7 @@ if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().desc
 
 READ8_MEMBER(r2dtank_state::AY8910_port_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_AY8910_selected & 0x08)
 		ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);
@@ -265,11 +265,11 @@ WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data, fore_color;
+		uint8_t data, fore_color;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x1f00) |
@@ -284,7 +284,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit, color;
+			uint8_t bit, color;
 
 			if (m_flipscreen)
 			{

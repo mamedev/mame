@@ -175,7 +175,7 @@ public:
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
-	UINT8    m_last_trackball_val[2];
+	uint8_t    m_last_trackball_val[2];
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
@@ -183,15 +183,15 @@ public:
 	DECLARE_MACHINE_RESET(champbwl);
 	DECLARE_MACHINE_START(doraemon);
 	DECLARE_PALETTE_INIT(champbwl);
-	UINT32 screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_champbwl(screen_device &screen, bool state);
 	void screen_eof_doraemon(screen_device &screen, bool state);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, col;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -204,9 +204,9 @@ PALETTE_INIT_MEMBER(champbwl_state,champbwl)
 
 READ8_MEMBER(champbwl_state::trackball_r)
 {
-	UINT8 ret;
-	UINT8 port4 = ioport("FAKEX")->read();
-	UINT8 port5 = ioport("FAKEY")->read();
+	uint8_t ret;
+	uint8_t port4 = ioport("FAKEX")->read();
+	uint8_t port5 = ioport("FAKEY")->read();
 
 	ret = (((port4 - m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
 
@@ -454,7 +454,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(champbwl_state,champbwl)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
@@ -470,7 +470,7 @@ MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 
 }
 
-UINT32 champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -530,7 +530,7 @@ MACHINE_CONFIG_END
 
 
 
-UINT32 champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -550,7 +550,7 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 
 MACHINE_START_MEMBER(champbwl_state,doraemon)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 

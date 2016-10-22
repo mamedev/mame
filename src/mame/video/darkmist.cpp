@@ -67,17 +67,17 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
-	const UINT8 *bg_clut = memregion("bg_clut")->base();
-	const UINT8 *fg_clut = memregion("fg_clut")->base();
-	const UINT8 *spr_clut = memregion("spr_clut")->base();
-	const UINT8 *tx_clut = memregion("tx_clut")->base();
+	const uint8_t *bg_clut = memregion("bg_clut")->base();
+	const uint8_t *fg_clut = memregion("fg_clut")->base();
+	const uint8_t *spr_clut = memregion("spr_clut")->base();
+	const uint8_t *tx_clut = memregion("tx_clut")->base();
 
 	palette.set_indirect_color(0x100, rgb_t::black);
 
 	for (int i = 0; i < 0x400; i++)
 	{
 		int ctabentry;
-		UINT8 clut = 0;
+		uint8_t clut = 0;
 
 		switch (i & 0x300)
 		{
@@ -118,7 +118,7 @@ void darkmist_state::video_start()
 	save_item(NAME(m_hw));
 }
 
-UINT32 darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 

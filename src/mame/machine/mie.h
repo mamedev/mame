@@ -28,7 +28,7 @@ class mie_jvs_device;
 class mie_device : public maple_device
 {
 public:
-	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_gpio_name(device_t &device, int entry, const char *name);
 	static void static_set_jvs_name(device_t &device, const char *name);
@@ -71,7 +71,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void maple_w(const UINT32 *data, UINT32 in_size) override;
+	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
 protected:
@@ -105,12 +105,12 @@ private:
 	mie_jvs_device *jvs;
 	ioport_port *gpio_port[8];
 
-	UINT32 tbuf[TBUF_SIZE];
-	UINT32 control, lreg, jvs_rpos;
-	UINT8 gpiodir, gpio_val[8];
-	UINT8 irq_enable, irq_pending, maple_irqlevel;
-	UINT8 jvs_control, jvs_dest;
-	UINT8 jvs_lcr;
+	uint32_t tbuf[TBUF_SIZE];
+	uint32_t control, lreg, jvs_rpos;
+	uint8_t gpiodir, gpio_val[8];
+	uint8_t irq_enable, irq_pending, maple_irqlevel;
+	uint8_t jvs_control, jvs_dest;
+	uint8_t jvs_lcr;
 
 	void raise_irq(int level);
 	void recalc_irq();
@@ -123,7 +123,7 @@ public:
 	friend class mie_device;
 
 	// construction/destruction
-	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

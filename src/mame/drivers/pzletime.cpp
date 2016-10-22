@@ -40,12 +40,12 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_video_regs;
-	required_shared_ptr<UINT16> m_tilemap_regs;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mid_videoram;
-	required_shared_ptr<UINT16> m_txt_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_video_regs;
+	required_shared_ptr<uint16_t> m_tilemap_regs;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mid_videoram;
+	required_shared_ptr<uint16_t> m_txt_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t      *m_mid_tilemap;
@@ -66,7 +66,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pzletime);
-	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -104,7 +104,7 @@ void pzletime_state::video_start()
 	m_txt_tilemap->set_transparent_pen(0);
 }
 
-UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count;
 	int y, x;
@@ -136,7 +136,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	{
-		UINT16 *spriteram = m_spriteram;
+		uint16_t *spriteram = m_spriteram;
 		int offs, spr_offs, colour, sx, sy;
 
 		for(offs = 0; offs < 0x2000 / 2; offs += 4)

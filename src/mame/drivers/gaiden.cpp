@@ -1562,12 +1562,12 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	if (descramble_cpu)
 	{
-		std::vector<UINT8> buffer(size);
+		std::vector<uint8_t> buffer(size);
 
 		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
@@ -1584,7 +1584,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	ROM = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes();
 	{
-		std::vector<UINT8> buffer(size);
+		std::vector<uint8_t> buffer(size);
 
 		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
@@ -1613,13 +1613,13 @@ DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
 	descramble_drgnbowl(0);
 }
 
-void gaiden_state::descramble_mastninj_gfx(UINT8* src)
+void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 {
 	int len = 0x80000;
 
 	/*  rearrange gfx */
 	{
-		std::vector<UINT8> buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 		{
@@ -1635,7 +1635,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 	}
 
 	{
-		std::vector<UINT8> buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0; i < len; i++)
 		{

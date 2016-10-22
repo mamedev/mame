@@ -81,7 +81,7 @@ TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
 }
 
 
-UINT32 taotaido_state::tile_callback( UINT32 code )
+uint32_t taotaido_state::tile_callback( uint32_t code )
 {
 	code = m_spriteram2_older[code&0x7fff];
 
@@ -100,18 +100,18 @@ void taotaido_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taotaido_state::bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::tilemap_scan_rows),this),16,16,128,64);
 
-	m_spriteram_old = std::make_unique<UINT16[]>(0x2000/2);
-	m_spriteram_older = std::make_unique<UINT16[]>(0x2000/2);
+	m_spriteram_old = std::make_unique<uint16_t[]>(0x2000/2);
+	m_spriteram_older = std::make_unique<uint16_t[]>(0x2000/2);
 
-	m_spriteram2_old = std::make_unique<UINT16[]>(0x10000/2);
-	m_spriteram2_older = std::make_unique<UINT16[]>(0x10000/2);
+	m_spriteram2_old = std::make_unique<uint16_t[]>(0x10000/2);
+	m_spriteram2_older = std::make_unique<uint16_t[]>(0x10000/2);
 
 	save_item(NAME(m_sprite_character_bank_select));
 	save_item(NAME(m_video_bank_select));
 }
 
 
-UINT32 taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  m_bg_tilemap->set_scrollx(0,(m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
 //  m_bg_tilemap->set_scrolly(0,(m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame

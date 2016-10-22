@@ -46,7 +46,7 @@ enum
 const device_type PIT8253 = &device_creator<pit8253_device>;
 
 
-pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PIT8253, "8253 PIT", tag, owner, clock, "pit8253", __FILE__),
 	m_clk0(0),
 	m_clk1(0),
@@ -57,7 +57,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_clk0(0),
 	m_clk1(0),
@@ -71,7 +71,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 
 const device_type PIT8254 = &device_creator<pit8254_device>;
 
-pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)
 {
 }
@@ -190,7 +190,7 @@ void pit8253_device::device_reset()
 #define CTRL_BCD(control)           (((control) >> 0) & 0x01)
 
 
-inline UINT32 pit8253_device::adjusted_count(int bcd, UINT16 val)
+inline uint32_t pit8253_device::adjusted_count(int bcd, uint16_t val)
 {
 	if (!bcd)
 		return (val == 0) ? 0x10000 : val;
@@ -217,10 +217,10 @@ inline UINT32 pit8253_device::adjusted_count(int bcd, UINT16 val)
 /* This function subtracts 1 from timer->value "cycles" times, taking into
    account binary or BCD operation, and wrapping around from 0 to 0xFFFF or
    0x9999 as necessary. */
-void pit8253_device::decrease_counter_value(pit8253_timer *timer, INT64 cycles)
+void pit8253_device::decrease_counter_value(pit8253_timer *timer, int64_t cycles)
 {
-	UINT16 value;
-	UINT8 units, tens, hundreds, thousands;
+	uint16_t value;
+	uint8_t units, tens, hundreds, thousands;
 
 	if (CTRL_BCD(timer->control) == 0)
 	{
@@ -309,13 +309,13 @@ void pit8253_device::set_output(pit8253_timer *timer, int output)
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
-void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
+void pit8253_device::simulate2(pit8253_timer *timer, int64_t elapsed_cycles)
 {
-	UINT32 adjusted_value;
+	uint32_t adjusted_value;
 	int bcd = CTRL_BCD(timer->control);
 	int mode = CTRL_MODE(timer->control);
-	static const UINT32 CYCLES_NEVER = (0xffffffff);
-	UINT32 cycles_to_output = 0;
+	static const uint32_t CYCLES_NEVER = (0xffffffff);
+	uint32_t cycles_to_output = 0;
 
 	LOG2(("simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, timer->index, mode, bcd, timer->phase, timer->gate, timer->output, timer->value));
@@ -705,7 +705,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles, broken down into
    sections punctuated by callbacks. */
-void pit8253_device::simulate(pit8253_timer *timer, INT64 elapsed_cycles)
+void pit8253_device::simulate(pit8253_timer *timer, int64_t elapsed_cycles)
 {
 	if (elapsed_cycles > 0)
 		simulate2(timer, elapsed_cycles);
@@ -721,7 +721,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	   years of time. Should be enough for now. */
 	attotime now = machine().time();
 	attotime elapsed_time = now - timer->last_updated;
-	INT64 elapsed_cycles = elapsed_time.as_double() * timer->clockin;
+	int64_t elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
 	LOG1(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
@@ -737,7 +737,7 @@ void pit8253_device::update(pit8253_timer *timer)
 /* We recycle bit 0 of timer->value to hold the phase in mode 3 when count is
    odd. Since read commands in mode 3 always return even numbers, we need to
    mask this bit off. */
-UINT16 pit8253_device::masked_value(pit8253_timer *timer)
+uint16_t pit8253_device::masked_value(pit8253_timer *timer)
 {
 	LOG2(("masked_value\n"));
 	if (CTRL_MODE(timer->control) == 3)
@@ -753,8 +753,8 @@ UINT16 pit8253_device::masked_value(pit8253_timer *timer)
 READ8_MEMBER( pit8253_device::read )
 {
 	pit8253_timer *timer = get_timer(offset);
-	UINT8 data;
-	UINT16 value;
+	uint8_t data;
+	uint16_t value;
 
 	LOG2(("read(): offset %d\n", offset));
 
@@ -822,7 +822,7 @@ READ8_MEMBER( pit8253_device::read )
 
 
 /* Loads a new value from the bus to the count register (CR) */
-void pit8253_device::load_count(pit8253_timer *timer, UINT16 newcount)
+void pit8253_device::load_count(pit8253_timer *timer, uint16_t newcount)
 {
 	int mode = CTRL_MODE(timer->control);
 	LOG1(("load_count(): %04x\n", newcount));
@@ -854,7 +854,7 @@ void pit8253_device::load_count(pit8253_timer *timer, UINT16 newcount)
 
 void pit8253_device::readback(pit8253_timer *timer, int command)
 {
-	UINT16 value;
+	uint16_t value;
 	update(timer);
 
 	if ((command & 1) == 0)
@@ -904,13 +904,13 @@ void pit8253_device::readback(pit8253_timer *timer, int command)
 }
 
 
-void pit8253_device::readback_command(UINT8 data)
+void pit8253_device::readback_command(uint8_t data)
 {
 	/* Readback command. Illegal on 8253 */
 	/* Todo: find out what (if anything) the 8253 hardware actually does here. */
 }
 
-void pit8254_device::readback_command(UINT8 data)
+void pit8254_device::readback_command(uint8_t data)
 {
 	LOG1(("write(): readback %02x\n", data & 0x3f));
 

@@ -54,10 +54,10 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 private:
-	UINT16 m_vblank_count;
-	UINT32 m_irq_count;
-	UINT8 m_bankmask;
-	UINT8 m_ram[0x3000];
+	uint16_t m_vblank_count;
+	uint32_t m_irq_count;
+	uint8_t m_bankmask;
+	uint8_t m_ram[0x3000];
 	emu_timer* m_vblank_timer;
 	emu_timer* m_irq_timer;
 };
@@ -296,9 +296,9 @@ void wpc_an_state::machine_reset()
 
 DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *fixed = memregion("fixed")->base();
-	UINT32 codeoff = memregion("maincpu")->bytes() - 0x8000;
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *fixed = memregion("fixed")->base();
+	uint32_t codeoff = memregion("maincpu")->bytes() - 0x8000;
 	m_cpubank->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 	m_cpubank->set_entry(0);
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);

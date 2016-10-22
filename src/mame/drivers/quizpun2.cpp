@@ -105,8 +105,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	struct prot_t m_prot;
-	required_shared_ptr<UINT8> m_fg_ram;
-	required_shared_ptr<UINT8> m_bg_ram;
+	required_shared_ptr<uint8_t> m_fg_ram;
+	required_shared_ptr<uint8_t> m_bg_ram;
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
 	DECLARE_WRITE8_MEMBER(bg_ram_w);
@@ -120,7 +120,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -137,14 +137,14 @@ public:
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
-	UINT16 code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
+	uint16_t code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
-	UINT16 code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
-	UINT8  color = m_fg_ram[ tile_index * 4 + 2 ];
+	uint16_t code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
+	uint8_t  color = m_fg_ram[ tile_index * 4 + 2 ];
 	SET_TILE_INFO_MEMBER(1, code, color & 0x0f, 0);
 }
 
@@ -169,7 +169,7 @@ void quizpun2_state::video_start()
 	m_fg_tmap->set_transparent_pen(0);
 }
 
-UINT32 quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -229,7 +229,7 @@ static void log_protection( address_space &space, const char *warning )
 READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 {
 	struct prot_t &prot = m_prot;
-	UINT8 ret;
+	uint8_t ret;
 
 	switch ( prot.state )
 	{
@@ -262,7 +262,7 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 
 		case STATE_EEPROM_R:        // EEPROM read
 		{
-			UINT8 *eeprom = memregion("eeprom")->base();
+			uint8_t *eeprom = memregion("eeprom")->base();
 			ret = eeprom[prot.addr];
 			break;
 		}
@@ -289,7 +289,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = memregion("eeprom")->base();
+			uint8_t *eeprom = memregion("eeprom")->base();
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -356,7 +356,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 

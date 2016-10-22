@@ -34,7 +34,7 @@ static const char *const em_name[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 em_flags[] =
+static const uint32_t em_flags[] =
 {
 	0, _OUT, _OVER, _OVER,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -56,7 +56,7 @@ enum e_params
 
 // 0-digit is number of bits per opcode parameter, 0 bits is literal,
 // 0x10-digit is for shift-right, 0x100-digit is special flag for r/q param
-static const UINT16 ep_bits[] =
+static const uint16_t ep_bits[] =
 {
 	8, 8, 4, 0x102, 0x122, 0x142, 0x102,
 	0, 0, 0, 0,
@@ -65,7 +65,7 @@ static const UINT16 ep_bits[] =
 };
 
 // redirect for r/q param
-static const UINT8 ep_redirect_r[4] = { ep_A, ep_B, ep_MX, ep_MY };
+static const uint8_t ep_redirect_r[4] = { ep_A, ep_B, ep_MX, ep_MY };
 
 // literal opcode parameter
 static const char *const ep_name[] =
@@ -77,11 +77,11 @@ static const char *const ep_name[] =
 };
 
 
-static char* decode_param(UINT16 opcode, int param, char* buffer)
+static char* decode_param(uint16_t opcode, int param, char* buffer)
 {
 	int bits = ep_bits[param] & 0xf;
 	int shift = ep_bits[param] >> 4 & 0xf;
-	UINT16 opmask = opcode >> shift & ((1 << bits) - 1);
+	uint16_t opmask = opcode >> shift & ((1 << bits) - 1);
 
 	// redirect r/q to A/B/MX/MY
 	if (ep_bits[param] & 0x100)
@@ -112,7 +112,7 @@ static char* decode_param(UINT16 opcode, int param, char* buffer)
 
 CPU_DISASSEMBLE(e0c6200)
 {
-	UINT16 op = (oprom[1] | oprom[0] << 8) & 0xfff;
+	uint16_t op = (oprom[1] | oprom[0] << 8) & 0xfff;
 
 	int m;
 	int p1 = -1;

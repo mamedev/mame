@@ -35,7 +35,7 @@ class votrax_sc01_device :  public device_t,
 {
 public:
 	// construction/destruction
-	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
 
@@ -58,7 +58,7 @@ protected:
 private:
 	// internal helpers
 	void update_subphoneme_clock_period();
-	static double bits_to_caps(UINT32 value, int caps_count, const double *caps_values);
+	static double bits_to_caps(uint32_t value, int caps_count, const double *caps_values);
 	static void shift_hist(double val, double *hist_array, int hist_size);
 	static void filter_s_to_z(const double *k, double fs, double *a, double *b);
 	static double apply_filter(const double *x, const double *y, const double *a, const double *b);
@@ -66,72 +66,72 @@ private:
 	// internal state
 	sound_stream *              m_stream;               // output stream
 	emu_timer *                 m_phoneme_timer;        // phoneme timer
-	const UINT8 *               m_rom;                  // pointer to our ROM
+	const uint8_t *               m_rom;                  // pointer to our ROM
 
 	// inputs
-	UINT8                       m_inflection;           // 2-bit inflection value
-	UINT8                       m_phoneme;              // 6-bit phoneme value
+	uint8_t                       m_inflection;           // 2-bit inflection value
+	uint8_t                       m_phoneme;              // 6-bit phoneme value
 
 	// outputs
 	devcb_write_line           m_request_cb;           // callback for request
-	UINT8                       m_request_state;        // request as seen to the outside world
-	UINT8                       m_internal_request;     // request managed by stream timing
+	uint8_t                       m_request_state;        // request as seen to the outside world
+	uint8_t                       m_internal_request;     // request managed by stream timing
 
 	// timing circuit
-	UINT32                      m_master_clock_freq;    // frequency of the master clock
-	UINT8                       m_master_clock;         // master clock
-	UINT16                      m_counter_34;           // ripple counter @ 34
-	UINT8                       m_latch_70;             // 4-bit latch @ 70
-	UINT8                       m_latch_72;             // 4-bit latch @ 72
-	UINT8                       m_beta1;                // beta1 clock state
-	UINT8                       m_p2;                   // P2 clock state
-	UINT8                       m_p1;                   // P1 clock state
-	UINT8                       m_phi2;                 // phi2 clock state
-	UINT8                       m_phi1;                 // phi1 clock state
-	UINT8                       m_phi2_20;              // alternate phi2 clock state (20kHz)
-	UINT8                       m_phi1_20;              // alternate phi1 clock state (20kHz)
-	UINT32                      m_subphoneme_period;    // period of the subphoneme timer
-	UINT32                      m_subphoneme_count;     // number of ticks executed already
-	UINT8                       m_clock_88;             // subphoneme clock output @ 88
-	UINT8                       m_latch_42;             // D flip-flop @ 42
-	UINT8                       m_counter_84;           // 4-bit phoneme counter @ 84
-	UINT8                       m_latch_92;             // 2-bit latch @ 92
+	uint32_t                      m_master_clock_freq;    // frequency of the master clock
+	uint8_t                       m_master_clock;         // master clock
+	uint16_t                      m_counter_34;           // ripple counter @ 34
+	uint8_t                       m_latch_70;             // 4-bit latch @ 70
+	uint8_t                       m_latch_72;             // 4-bit latch @ 72
+	uint8_t                       m_beta1;                // beta1 clock state
+	uint8_t                       m_p2;                   // P2 clock state
+	uint8_t                       m_p1;                   // P1 clock state
+	uint8_t                       m_phi2;                 // phi2 clock state
+	uint8_t                       m_phi1;                 // phi1 clock state
+	uint8_t                       m_phi2_20;              // alternate phi2 clock state (20kHz)
+	uint8_t                       m_phi1_20;              // alternate phi1 clock state (20kHz)
+	uint32_t                      m_subphoneme_period;    // period of the subphoneme timer
+	uint32_t                      m_subphoneme_count;     // number of ticks executed already
+	uint8_t                       m_clock_88;             // subphoneme clock output @ 88
+	uint8_t                       m_latch_42;             // D flip-flop @ 42
+	uint8_t                       m_counter_84;           // 4-bit phoneme counter @ 84
+	uint8_t                       m_latch_92;             // 2-bit latch @ 92
 
 	// low parameter clocking
 	bool                        m_srff_132;             // S/R flip-flop @ 132
 	bool                        m_srff_114;             // S/R flip-flop @ 114
 	bool                        m_srff_112;             // S/R flip-flop @ 112
 	bool                        m_srff_142;             // S/R flip-flop @ 142
-	UINT8                       m_latch_80;             // phoneme timing latch @ 80
+	uint8_t                       m_latch_80;             // phoneme timing latch @ 80
 
 	// glottal circuit
-	UINT8                       m_counter_220;          // 4-bit counter @ 220
-	UINT8                       m_counter_222;          // 4-bit counter @ 222
-	UINT8                       m_counter_224;          // 4-bit counter @ 224
-	UINT8                       m_counter_234;          // 4-bit counter @ 234
-	UINT8                       m_counter_236;          // 4-bit counter @ 236
-	UINT8                       m_fgate;                // FGATE signal
-	UINT8                       m_glottal_sync;         // Glottal Sync signal
+	uint8_t                       m_counter_220;          // 4-bit counter @ 220
+	uint8_t                       m_counter_222;          // 4-bit counter @ 222
+	uint8_t                       m_counter_224;          // 4-bit counter @ 224
+	uint8_t                       m_counter_234;          // 4-bit counter @ 234
+	uint8_t                       m_counter_236;          // 4-bit counter @ 236
+	uint8_t                       m_fgate;                // FGATE signal
+	uint8_t                       m_glottal_sync;         // Glottal Sync signal
 
 	// transition circuit
-	UINT8                       m_0625_clock;           // state of 0.625kHz clock
-	UINT8                       m_counter_46;           // 4-bit counter in block @ 46
-	UINT8                       m_latch_46;             // 4-bit latch in block @ 46
-	UINT8                       m_ram[8];               // RAM to hold parameters
-	UINT8                       m_latch_168;            // 4-bit latch @ 168
-	UINT8                       m_latch_170;            // 4-bit latch @ 170
-	UINT8                       m_f1;                   // latched 4-bit F1 value
-	UINT8                       m_f2;                   // latched 5-bit F2 value
-	UINT8                       m_fc;                   // latched 4-bit FC value
-	UINT8                       m_f3;                   // latched 4-bit F3 value
-	UINT8                       m_f2q;                  // latched 4-bit F2Q value
-	UINT8                       m_va;                   // latched 4-bit VA value
-	UINT8                       m_fa;                   // latched 4-bit FA value
+	uint8_t                       m_0625_clock;           // state of 0.625kHz clock
+	uint8_t                       m_counter_46;           // 4-bit counter in block @ 46
+	uint8_t                       m_latch_46;             // 4-bit latch in block @ 46
+	uint8_t                       m_ram[8];               // RAM to hold parameters
+	uint8_t                       m_latch_168;            // 4-bit latch @ 168
+	uint8_t                       m_latch_170;            // 4-bit latch @ 170
+	uint8_t                       m_f1;                   // latched 4-bit F1 value
+	uint8_t                       m_f2;                   // latched 5-bit F2 value
+	uint8_t                       m_fc;                   // latched 4-bit FC value
+	uint8_t                       m_f3;                   // latched 4-bit F3 value
+	uint8_t                       m_f2q;                  // latched 4-bit F2Q value
+	uint8_t                       m_va;                   // latched 4-bit VA value
+	uint8_t                       m_fa;                   // latched 4-bit FA value
 
 	// noise generator circuit
-	UINT8                       m_noise_clock;          // clock input to noise generator
-	UINT32                      m_shift_252;            // shift register @ 252
-	UINT8                       m_counter_250;          // 4-bit counter @ 250
+	uint8_t                       m_noise_clock;          // clock input to noise generator
+	uint32_t                      m_shift_252;            // shift register @ 252
+	uint8_t                       m_counter_250;          // 4-bit counter @ 250
 
 	// stages outputs history
 	double                      m_ni_hist[4];

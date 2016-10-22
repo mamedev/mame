@@ -35,16 +35,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_mainram;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_spriteram2;
 
 	// internal state
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_gfx_bank;
-	UINT8 m_palette_bank;
+	uint8_t m_gfx_bank;
+	uint8_t m_palette_bank;
 
 	// handlers
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
@@ -72,8 +72,8 @@ public:
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 
-	UINT32 screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

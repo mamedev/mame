@@ -20,7 +20,7 @@ class cpc_symbiface2_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -62,20 +62,20 @@ private:
 	required_ioport m_mouse_y;
 	required_ioport m_mouse_buttons;
 
-	std::vector<UINT8> m_rom_space;
+	std::vector<uint8_t> m_rom_space;
 
 	bool m_iohigh;
-	UINT16 m_ide_data;
+	uint16_t m_ide_data;
 
-	UINT8 m_mouse_state;
-	UINT8 m_input_x;
-	UINT8 m_input_y;
+	uint8_t m_mouse_state;
+	uint8_t m_input_x;
+	uint8_t m_input_y;
 
 	// stores backup pointers so that mapping can be restored
-	UINT8* m_4xxx_ptr_r;
-	UINT8* m_4xxx_ptr_w;
-	UINT8* m_6xxx_ptr_r;
-	UINT8* m_6xxx_ptr_w;
+	uint8_t* m_4xxx_ptr_r;
+	uint8_t* m_4xxx_ptr_w;
+	uint8_t* m_6xxx_ptr_r;
+	uint8_t* m_6xxx_ptr_w;
 };
 
 // device type definition

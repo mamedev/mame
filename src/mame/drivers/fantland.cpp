@@ -93,19 +93,19 @@ WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
 
 READ16_MEMBER(fantland_state::spriteram_16_r)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	return spriteram[2 * offset + 0] | (spriteram[2 * offset + 1] << 8);
 }
 
 READ16_MEMBER(fantland_state::spriteram2_16_r)
 {
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram_2 = m_spriteram2;
 	return spriteram_2[2 * offset + 0] | (spriteram_2[2 * offset + 1] << 8);
 }
 
 WRITE16_MEMBER(fantland_state::spriteram_16_w)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	if (ACCESSING_BITS_0_7)
 		spriteram[2 * offset + 0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -114,7 +114,7 @@ WRITE16_MEMBER(fantland_state::spriteram_16_w)
 
 WRITE16_MEMBER(fantland_state::spriteram2_16_w)
 {
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram_2 = m_spriteram2;
 	if (ACCESSING_BITS_0_7)
 		spriteram_2[2 * offset + 0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -360,7 +360,7 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 
 void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	size_t len;
 	int start, stop;
 

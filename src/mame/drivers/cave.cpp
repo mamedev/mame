@@ -257,7 +257,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 {
 	if (m_soundbuf_len > 0)
 	{
-		UINT8 data = m_soundbuf_data[0];
+		uint8_t data = m_soundbuf_data[0];
 		memmove(m_soundbuf_data, m_soundbuf_data + 1, (32 - 1) * sizeof(m_soundbuf_data[0]));
 		m_soundbuf_len--;
 		return data;
@@ -790,12 +790,12 @@ WRITE16_MEMBER(cave_state::ppsatan_io_mux_w)
 	COMBINE_DATA(&m_ppsatan_io_mux);
 }
 
-UINT16 cave_state::ppsatan_touch_r(int player)
+uint16_t cave_state::ppsatan_touch_r(int player)
 {
-	UINT8 ret_x = 0, ret_y = 0;
+	uint8_t ret_x = 0, ret_y = 0;
 
-	UINT16 x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
-	UINT16 y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
+	uint16_t x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
+	uint16_t y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
 
 	if (x & 0x8000) // touching
 	{
@@ -913,9 +913,9 @@ READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 	return ~8 + ((m_eeprom->do_read() & 1) ? 8 : 0);
 }
 
-inline void cave_state::vctrl_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
+inline void cave_state::vctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask, int GFX)
 {
-	UINT16 *VCTRL = m_vctrl[GFX];
+	uint16_t *VCTRL = m_vctrl[GFX];
 	if (offset == 4 / 2)
 	{
 		switch (data & 0x000f)
@@ -2770,14 +2770,14 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 void cave_state::unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data = *src--;
+		uint8_t data = *src--;
 		/* swap even and odd pixels */
 		*dst-- = data >> 4;     *dst-- = data & 0xF;
 	}
@@ -2787,17 +2787,17 @@ void cave_state::unpack_sprites(const char *region)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 void cave_state::ddonpach_unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data1 = *src--;
-		UINT8 data2 = *src--;
-		UINT8 data3 = *src--;
-		UINT8 data4 = *src--;
+		uint8_t data1 = *src--;
+		uint8_t data2 = *src--;
+		uint8_t data3 = *src--;
+		uint8_t data4 = *src--;
 
 		/* swap even and odd pixels, and even and odd words */
 		*dst-- = data2 & 0xF;       *dst-- = data2 >> 4;
@@ -2811,13 +2811,13 @@ void cave_state::ddonpach_unpack_sprites(const char *region)
 /* 2 pages of 4 bits -> 8 bits */
 void cave_state::esprade_unpack_sprites(const char *region)
 {
-	UINT8 *src      =   memregion(region)->base();
-	UINT8 *dst      =   src + memregion(region)->bytes();
+	uint8_t *src      =   memregion(region)->base();
+	uint8_t *dst      =   src + memregion(region)->bytes();
 
 	while(src < dst)
 	{
-		UINT8 data1 = src[0];
-		UINT8 data2 = src[1];
+		uint8_t data1 = src[0];
+		uint8_t data2 = src[1];
 
 		src[0] = ((data1 & 0x0f)<<4) + (data2 & 0x0f);
 		src[1] = (data1 & 0xf0) + ((data2 & 0xf0)>>4);
@@ -4736,14 +4736,14 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 void cave_state::sailormn_unpack_tiles( const char *region )
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn      =   memregion(region)->base();
-	UINT8 *src      =   rgn + (len/4)*3 - 1;
-	UINT8 *dst      =   rgn + (len/4)*4 - 2;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn      =   memregion(region)->base();
+	uint8_t *src      =   rgn + (len/4)*3 - 1;
+	uint8_t *dst      =   rgn + (len/4)*4 - 2;
 
 	while(src <= dst)
 	{
-		UINT8 data = src[0];
+		uint8_t data = src[0];
 
 		dst[0] = ((data & 0x03) << 4) + ((data & 0x0c) >> 2);
 		dst[1] = ((data & 0x30) >> 0) + ((data & 0xc0) >> 6);
@@ -4765,7 +4765,7 @@ void cave_state::init_cave()
 
 DRIVER_INIT_MEMBER(cave_state,agallet)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	init_cave();
 
 	membank("z80bank")->configure_entries(0, 0x20, &ROM[0x00000], 0x4000);
@@ -4827,7 +4827,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 
 #if 0       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;         //palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4854,7 +4854,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 
 DRIVER_INIT_MEMBER(cave_state,hotdogst)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4871,8 +4871,8 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 
 DRIVER_INIT_MEMBER(cave_state,mazinger)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4884,7 +4884,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -4900,7 +4900,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 
 DRIVER_INIT_MEMBER(cave_state,metmqstr)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4937,8 +4937,8 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 
 DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 	int i, j;
 
@@ -4946,7 +4946,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4973,7 +4973,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 #if 1       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;           // kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4982,8 +4982,8 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 DRIVER_INIT_MEMBER(cave_state,sailormn)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4999,7 +4999,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	std::vector<UINT8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)

@@ -52,17 +52,17 @@ public:
 	optional_device<screen_device> m_lscreen;
 	optional_device<screen_device> m_rscreen;
 
-	UINT16          m_current_slip[2];
-	UINT8           m_playfield_palette_bank[2];
-	UINT16          m_playfield_xscroll[2];
-	UINT16          m_playfield_yscroll[2];
+	uint16_t          m_current_slip[2];
+	uint8_t           m_playfield_palette_bank[2];
+	uint16_t          m_playfield_xscroll[2];
+	uint16_t          m_playfield_yscroll[2];
 
-	UINT8           m_fast_68k_int;
-	UINT8           m_io_68k_int;
-	UINT8           m_sound_data_from_68k;
-	UINT8           m_sound_data_from_6502;
-	UINT8           m_sound_data_from_68k_ready;
-	UINT8           m_sound_data_from_6502_ready;
+	uint8_t           m_fast_68k_int;
+	uint8_t           m_io_68k_int;
+	uint8_t           m_sound_data_from_68k;
+	uint8_t           m_sound_data_from_6502;
+	uint8_t           m_sound_data_from_68k_ready;
+	uint8_t           m_sound_data_from_6502_ready;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_state_r);
@@ -85,9 +85,9 @@ public:
 	DECLARE_VIDEO_START(cyberbal);
 	DECLARE_MACHINE_RESET(cyberbal2p);
 	DECLARE_VIDEO_START(cyberbal2p);
-	UINT32 screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_68k_irq_gen);
 
 	static const atari_motion_objects_config s_mob_config;
@@ -95,6 +95,6 @@ public:
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();
-	UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
+	uint32_t update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void update_sound_68k_interrupts();
 };

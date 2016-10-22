@@ -30,7 +30,7 @@ READ8_MEMBER( stereo_fx_device::p1_r )
 
 READ8_MEMBER( stereo_fx_device::p3_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	ret |= m_data_out << 2; // INT0
 	ret |= m_data_in << 3;  // INT1
@@ -147,14 +147,14 @@ WRITE8_MEMBER( stereo_fx_device::dsp_cmd_w )
 	m_in_byte = data;
 }
 
-UINT8 stereo_fx_device::dack_r(int line)
+uint8_t stereo_fx_device::dack_r(int line)
 {
 	m_data_out = false;
 	m_isa->drq1_w(0);
 	return m_out_byte;
 }
 
-void stereo_fx_device::dack_w(int line, UINT8 data)
+void stereo_fx_device::dack_w(int line, uint8_t data)
 {
 	m_data_in = true;
 	m_isa->drq1_w(0);
@@ -189,7 +189,7 @@ READ8_MEMBER( stereo_fx_device::invalid_r )
 	return 0xff;
 }
 
-stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock, "stereo_fx", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),

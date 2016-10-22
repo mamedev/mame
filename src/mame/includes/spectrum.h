@@ -103,8 +103,8 @@ public:
 	int m_frame_invert_count;
 	int m_frame_number;    /* Used for handling FLASH 1 */
 	int m_flash_invert;
-	optional_shared_ptr<UINT8> m_video_ram;
-	UINT8 *m_screen_location;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	uint8_t *m_screen_location;
 
 	int m_ROMSelection;
 
@@ -116,8 +116,8 @@ public:
 	int m_LastFrameStartTime;
 	int m_CyclesPerFrame;
 
-	UINT8 *m_ram_0000;
-	UINT8 m_ram_disabled_by_beta;
+	uint8_t *m_ram_0000;
+	uint8_t m_ram_disabled_by_beta;
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
@@ -152,9 +152,9 @@ public:
 	DECLARE_MACHINE_RESET(spectrum_plus3);
 	DECLARE_MACHINE_RESET(ts2068);
 	DECLARE_VIDEO_START(ts2068);
-	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	void screen_eof_timex(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
@@ -215,7 +215,7 @@ protected:
 	void spectrum_UpdateBorderBitmap();
 	void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);
-	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
 	void ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
 	void ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);

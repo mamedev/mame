@@ -101,7 +101,7 @@ public:
 
 	// open a file with the specified filename, read it into memory, and return a pointer
 	static osd_file::error load(std::string const &filename, void **data, std::uint32_t &length);
-	static osd_file::error load(std::string const &filename, std::vector<UINT8> &data);
+	static osd_file::error load(std::string const &filename, std::vector<uint8_t> &data);
 
 
 	// ----- file write -----

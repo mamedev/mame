@@ -76,24 +76,24 @@ public:
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_objectram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
 private:
 	bool m_ack1;
 	bool m_ack2;
 	bool m_ackv;
 	bool m_flip;
-	UINT8 m_irq_state;
-	UINT8 m_row_data;
-	UINT8 m_sound_data;
-	UINT8 m_gfx_bank;
-	UINT8 m_video_data;
-	UINT8 m_video_status;
-	UINT8 m_video_ctrl[8];
+	uint8_t m_irq_state;
+	uint8_t m_row_data;
+	uint8_t m_sound_data;
+	uint8_t m_gfx_bank;
+	uint8_t m_video_data;
+	uint8_t m_video_status;
+	uint8_t m_video_ctrl[8];
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m68000_device> m_maincpu;
@@ -207,7 +207,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mrgame_state::rsw_r )
 {
-	return m_io_dsw0->read() | ((UINT8)m_ack1 << 5) | ((UINT8)m_ack2 << 4);
+	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
@@ -295,7 +295,7 @@ WRITE8_MEMBER( mrgame_state::portb_w )
 
 READ8_MEMBER( mrgame_state::portc_r )
 {
-	return m_io_dsw1->read() | ((UINT8)m_ackv << 4);
+	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
 }
 
 void mrgame_state::machine_start()
@@ -372,8 +372,8 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	UINT8 i, bit0, bit1, bit2, r, g, b;
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	uint8_t i, bit0, bit1, bit2, r, g, b;
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
@@ -407,11 +407,11 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 }
 
 // most of this came from pinmame as the diagram doesn't make a lot of sense
-UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,ptr=0,col;
-	INT32 scrolly[32];
-	UINT16 chr;
+	uint8_t x,y,ptr=0,col;
+	int32_t scrolly[32];
+	uint16_t chr;
 	bool flipx,flipy;
 
 	// text

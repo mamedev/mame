@@ -74,7 +74,7 @@ Notes:
 
 struct blitter_t
 {
-	UINT16  x, y, w, h,
+	uint16_t  x, y, w, h,
 			gfx_lo, gfx_hi,
 			depth,
 			pen,
@@ -105,37 +105,37 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_priority_ram;
-	optional_shared_ptr<UINT16> m_vbowl_trackball;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_priority_ram;
+	optional_shared_ptr<uint16_t> m_vbowl_trackball;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 
 	/* memory regions */
 	required_memory_region m_gfx_region;
 	optional_memory_region m_gfx2_region;
 
-	std::unique_ptr<UINT8[]> m_layer[8];
-	UINT16 m_priority;
-	UINT8 m_lhb2_pen_hi;
-	UINT16 m_igs_dips_sel;
-	UINT16 m_igs_input_sel;
-	UINT16 m_igs_hopper;
-	UINT8 m_prot1;
-	UINT8 m_prot1_swap;
-	UINT32 m_prot1_addr;
-	UINT8 m_prot2;
-	UINT8 m_igs012_prot;
-	UINT8 m_igs012_prot_swap;
-	UINT8 m_igs012_prot_mode;
-	UINT16 m_igs003_reg[2];
-	UINT16 m_lhb_irq_enable;
+	std::unique_ptr<uint8_t[]> m_layer[8];
+	uint16_t m_priority;
+	uint8_t m_lhb2_pen_hi;
+	uint16_t m_igs_dips_sel;
+	uint16_t m_igs_input_sel;
+	uint16_t m_igs_hopper;
+	uint8_t m_prot1;
+	uint8_t m_prot1_swap;
+	uint32_t m_prot1_addr;
+	uint8_t m_prot2;
+	uint8_t m_igs012_prot;
+	uint8_t m_igs012_prot_swap;
+	uint8_t m_igs012_prot_mode;
+	uint16_t m_igs003_reg[2];
+	uint16_t m_lhb_irq_enable;
 	blitter_t m_blitter;
 
-	UINT16 m_igs003_prot_hold;
-	UINT8 m_igs003_prot_x;
-	UINT8 m_igs003_prot_y;
-	UINT8 m_igs003_prot_z;
-	UINT8 m_igs003_prot_h1;
-	UINT8 m_igs003_prot_h2;
+	uint16_t m_igs003_prot_hold;
+	uint8_t m_igs003_prot_x;
+	uint8_t m_igs003_prot_y;
+	uint8_t m_igs003_prot_z;
+	uint8_t m_igs003_prot_h1;
+	uint8_t m_igs003_prot_h2;
 
 	DECLARE_WRITE16_MEMBER(igs011_priority_w);
 	DECLARE_READ16_MEMBER(igs011_layers_r);
@@ -199,7 +199,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vbowl_link_1_w);
 	DECLARE_WRITE16_MEMBER(vbowl_link_2_w);
 	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
-	UINT16 igs_dips_r(int NUM);
+	uint16_t igs_dips_r(int NUM);
 	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
 	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
 	DECLARE_READ16_MEMBER(ics2115_word_r);
@@ -228,7 +228,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
@@ -283,7 +283,7 @@ void igs011_state::video_start()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_layer[i] = std::make_unique<UINT8[]>(512 * 256);
+		m_layer[i] = std::make_unique<uint8_t[]>(512 * 256);
 		save_pointer(NAME(m_layer[i].get()), 512 * 256, i);
 	}
 
@@ -302,14 +302,14 @@ void igs011_state::video_start()
 	save_item(NAME(m_blitter.flags));
 }
 
-UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
 #endif
 
 	int x,y,l,scr_addr,pri_addr;
-	UINT16 *pri_ram;
+	uint16_t *pri_ram;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z))
@@ -382,8 +382,8 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0].get();
-	UINT8 *l1 = m_layer[layer0+1].get();
+	uint8_t *l0 = m_layer[layer0].get();
+	uint8_t *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -393,12 +393,12 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 
 WRITE16_MEMBER(igs011_state::igs011_layers_w)
 {
-	UINT16 word;
+	uint16_t word;
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0].get();
-	UINT8 *l1 = m_layer[layer0+1].get();
+	uint8_t *l0 = m_layer[layer0].get();
+	uint8_t *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -490,13 +490,13 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	int x, xstart, xend, xinc, flipx;
 	int y, ystart, yend, yinc, flipy;
 	int depth4, clear, opaque, z;
-	UINT8 trans_pen, clear_pen, pen_hi, *dest;
-	UINT8 pen = 0;
+	uint8_t trans_pen, clear_pen, pen_hi, *dest;
+	uint8_t pen = 0;
 
-	UINT8 *gfx      =   m_gfx_region->base();
+	uint8_t *gfx      =   m_gfx_region->base();
 	int gfx_size    =   m_gfx_region->bytes();
 
-	UINT8 *gfx2     =   (m_gfx2_region != nullptr) ? m_gfx2_region->base() : nullptr;
+	uint8_t *gfx2     =   (m_gfx2_region != nullptr) ? m_gfx2_region->base() : nullptr;
 	int gfx2_size   =   (m_gfx2_region != nullptr) ? m_gfx2_region->bytes() : 0;
 
 	const rectangle &clip = m_screen->visible_area();
@@ -634,10 +634,10 @@ WRITE16_MEMBER(igs011_state::igs_dips_w)
 	COMBINE_DATA(&m_igs_dips_sel);
 }
 
-UINT16 igs011_state::igs_dips_r(int NUM)
+uint16_t igs011_state::igs_dips_r(int NUM)
 {
 	int i;
-	UINT16 ret=0;
+	uint16_t ret=0;
 	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };
 
 	for (i = 0; i < NUM; i++)
@@ -662,13 +662,13 @@ READ16_MEMBER(igs011_state::igs_5_dips_r){ return igs_dips_r(5); }
 void igs011_state::wlcc_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -686,13 +686,13 @@ void igs011_state::wlcc_decrypt()
 void igs011_state::lhb_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ((i & 0x1100) != 0x0100)
 			x ^= 0x0200;
@@ -711,13 +711,13 @@ void igs011_state::lhb_decrypt()
 void igs011_state::drgnwrld_type3_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -739,13 +739,13 @@ void igs011_state::drgnwrld_type3_decrypt()
 void igs011_state::drgnwrld_type2_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if(((i & 0x000090) == 0x000000) || ((i & 0x002004) != 0x002004))
 			x ^= 0x0004;
@@ -772,13 +772,13 @@ void igs011_state::drgnwrld_type2_decrypt()
 void igs011_state::drgnwrld_type1_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
@@ -802,12 +802,12 @@ void igs011_state::lhb2_decrypt()
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
-	std::vector<UINT16> result_data(rom_size/2);
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	std::vector<uint16_t> result_data(rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
 			x ^= 0x0004;
@@ -832,12 +832,12 @@ void igs011_state::nkishusp_decrypt()
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
-	std::vector<UINT16> result_data(rom_size/2);
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
+	std::vector<uint16_t> result_data(rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		// lhb2 address scrambling
 		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
@@ -868,13 +868,13 @@ void igs011_state::nkishusp_decrypt()
 void igs011_state::vbowlj_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for(i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if((i & 0x4100) == 0x0100)
 			x ^= 0x0200;
@@ -902,13 +902,13 @@ void igs011_state::vbowlj_decrypt()
 void igs011_state::dbc_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if( i & 0x1000/2 )
 		{
@@ -952,12 +952,12 @@ void igs011_state::dbc_decrypt()
 void igs011_state::ryukobou_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *) memregion("maincpu")->base();
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if ( (i & 0x00100) && (i & 0x00400) )
 			x ^= 0x0200;
@@ -984,8 +984,8 @@ void igs011_state::lhb2_decrypt_gfx()
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (memregion("blitter")->base());
-	std::vector<UINT8> result_data(rom_size);
+	uint8_t *src = (uint8_t *) (memregion("blitter")->base());
+	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
@@ -997,8 +997,8 @@ void igs011_state::drgnwrld_gfx_decrypt()
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (memregion("blitter")->base());
-	std::vector<UINT8> result_data(rom_size);
+	uint8_t *src = (uint8_t *) (memregion("blitter")->base());
+	std::vector<uint8_t> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
@@ -1083,7 +1083,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500)
 			{
 				// b1 . (b2|b3) . b2 . (b0&b3)
-				UINT8 x = m_prot1;
+				uint8_t x = m_prot1;
 				m_prot1_swap = (BIT(x,1)<<3) | ((BIT(x,2)|BIT(x,3))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,3));
 				return;
 			}
@@ -1095,7 +1095,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 READ16_MEMBER(igs011_state::igs011_prot1_r)
 {
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
-	UINT8 x = m_prot1;
+	uint8_t x = m_prot1;
 	return (((BIT(x,1)&BIT(x,2))^1)<<5) | ((BIT(x,0)^BIT(x,3))<<2);
 }
 
@@ -1108,7 +1108,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 //  m_prot2 = 0x00;
 
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// Plug previous address range with ROM access
 	sp.install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
@@ -1192,7 +1192,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3&b0) . b2 . (b0|b1) . (b2^!b4) . (!b1^b3)
-		UINT8 x = m_prot2;
+		uint8_t x = m_prot2;
 		m_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
 	}
 //  else
@@ -1207,7 +1207,7 @@ WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (!b0|b1) . b2 . (b0&b1)
-		UINT8 x = m_prot2;
+		uint8_t x = m_prot2;
 		m_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
 	}
 //  else
@@ -1222,7 +1222,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . !(b4 ^ b0) . !(b4 ^ b3)
-		UINT8 x = m_prot2;
+		uint8_t x = m_prot2;
 		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
 	}
 //  else
@@ -1237,7 +1237,7 @@ WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . (b4 ^ b0) . (b4 ^ b3)
-		UINT8 x = m_prot2;
+		uint8_t x = m_prot2;
 		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
 	}
 //  else
@@ -1250,15 +1250,15 @@ WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 READ16_MEMBER(igs011_state::drgnwrldv21_igs011_prot2_r)
 {
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
-	UINT8 x = m_prot2;
-	UINT8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
+	uint8_t x = m_prot2;
+	uint8_t b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
 	return (b9 << 9);
 }
 READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
 {
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
-	UINT8 x = m_prot2;
-	UINT8 b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
+	uint8_t x = m_prot2;
+	uint8_t b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
 	return (b9 << 9);
 }
 
@@ -1266,8 +1266,8 @@ READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
 READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
 {
 	// b9 = !b2 | (b1 & b0)
-	UINT8 x = m_prot2;
-	UINT8 b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
+	uint8_t x = m_prot2;
+	uint8_t b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
 	return (b9 << 9);
 }
 
@@ -1275,8 +1275,8 @@ READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
 READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
 {
 	// b9 = !b1 | (!b0 & b2)
-	UINT8 x = m_prot2;
-	UINT8 b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
+	uint8_t x = m_prot2;
+	uint8_t b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
 	return (b9 << 9);
 }
 
@@ -1284,8 +1284,8 @@ READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
 READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
 {
 	// b9 = (!b1 | b2) & b0
-	UINT8 x = m_prot2;
-	UINT8 b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
+	uint8_t x = m_prot2;
+	uint8_t b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
 	return (b9 << 9);
 }
 
@@ -1293,16 +1293,16 @@ READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
 READ16_MEMBER(igs011_state::lhb2_igs011_prot2_r)
 {
 	// b3 = !b2 | !b1 | b0
-	UINT8 x = m_prot2;
-	UINT8 b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
+	uint8_t x = m_prot2;
+	uint8_t b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
 	return (b3 << 3);
 }
 
 // vbowl
 READ16_MEMBER(igs011_state::vbowl_igs011_prot2_r)
 {
-	UINT8 x = m_prot2;
-	UINT8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
+	uint8_t x = m_prot2;
+	uint8_t b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
 	return (b9 << 9);
 }
 
@@ -1414,7 +1414,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
 	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
 		// !(3 | 1)..(2 & 1)..(3 ^ 0)..(!2)
-		UINT8 x = m_igs012_prot;
+		uint8_t x = m_igs012_prot;
 		m_igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
 	}
 	else
@@ -1424,10 +1424,10 @@ WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
 READ16_MEMBER(igs011_state::igs012_prot_r)
 {
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
-	UINT8 x = m_igs012_prot;
+	uint8_t x = m_igs012_prot;
 
-	UINT8 b1 = (BIT(x,3) | BIT(x,1))^1;
-	UINT8 b0 = BIT(x,3) ^ BIT(x,0);
+	uint8_t b1 = (BIT(x,3) | BIT(x,1))^1;
+	uint8_t b0 = BIT(x,3) ^ BIT(x,0);
 
 	return (b1 << 1) | (b0 << 0);
 }
@@ -1619,7 +1619,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 		case 0x86:
 		case 0x87:
 			{
-				UINT16 old;
+				uint16_t old;
 
 				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
 				m_igs003_prot_z = data;
@@ -1891,7 +1891,7 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 		case 0x86:
 		case 0x87:
 			{
-				UINT16 old;
+				uint16_t old;
 
 				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
 				m_igs003_prot_z = data;
@@ -1967,7 +1967,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 // V0400O
 DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -1993,7 +1993,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2018,7 +2018,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type2_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2047,7 +2047,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2074,7 +2074,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2120,7 +2120,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2146,7 +2146,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 
 DRIVER_INIT_MEMBER(igs011_state,lhb)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	lhb_decrypt();
 
@@ -2156,7 +2156,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb)
 
 DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	lhb_decrypt();
 
@@ -2166,7 +2166,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 
 DRIVER_INIT_MEMBER(igs011_state,dbc)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	dbc_decrypt();
 
@@ -2196,7 +2196,7 @@ DRIVER_INIT_MEMBER(igs011_state,dbc)
 
 DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	ryukobou_decrypt();
 
@@ -2209,7 +2209,7 @@ DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 
 DRIVER_INIT_MEMBER(igs011_state,xymg)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	lhb_decrypt();
 /*
@@ -2243,7 +2243,7 @@ DRIVER_INIT_MEMBER(igs011_state,xymg)
 
 DRIVER_INIT_MEMBER(igs011_state,wlcc)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	wlcc_decrypt();
 /*
@@ -2267,7 +2267,7 @@ DRIVER_INIT_MEMBER(igs011_state,wlcc)
 
 DRIVER_INIT_MEMBER(igs011_state,lhb2)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	lhb2_decrypt();
 	lhb2_decrypt_gfx();
@@ -2290,8 +2290,8 @@ DRIVER_INIT_MEMBER(igs011_state,lhb2)
 
 DRIVER_INIT_MEMBER(igs011_state,vbowl)
 {
-	UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  memregion("blitter")->base();
+	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+	uint8_t  *gfx = (uint8_t *)  memregion("blitter")->base();
 	int i;
 
 	vbowlj_decrypt();
@@ -2317,8 +2317,8 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 
 DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 {
-//  UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  memregion("blitter")->base();
+//  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
+	uint8_t  *gfx = (uint8_t *)  memregion("blitter")->base();
 	int i;
 
 	vbowlj_decrypt();
@@ -2341,7 +2341,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 
 DRIVER_INIT_MEMBER(igs011_state,nkishusp)
 {
-	UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
 	nkishusp_decrypt();
 	lhb2_decrypt_gfx();

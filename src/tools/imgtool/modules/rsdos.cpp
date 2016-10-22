@@ -115,22 +115,22 @@ static imgtoolerr_t lookup_rsdos_file(imgtool::image &f, const char *fname, stru
 
 
 
-static UINT8 get_granule_count(imgtool::image &img)
+static uint8_t get_granule_count(imgtool::image &img)
 {
-	UINT16 tracks;
-	UINT16 granules;
+	uint16_t tracks;
+	uint16_t granules;
 
 	tracks = floppy_get_tracks_per_disk(imgtool_floppy(img));
 	granules = (tracks - 1) * 2;
-	return (granules > 255) ? 255 : (UINT8) granules;
+	return (granules > 255) ? 255 : (uint8_t) granules;
 }
 
 #define MAX_GRANULEMAP_SIZE 256
 
 /* granule_map must be an array of MAX_GRANULEMAP_SIZE bytes */
-static floperr_t get_granule_map(imgtool::image &img, UINT8 *granule_map, UINT8 *granule_count)
+static floperr_t get_granule_map(imgtool::image &img, uint8_t *granule_map, uint8_t *granule_count)
 {
-	UINT8 count;
+	uint8_t count;
 
 	count = get_granule_count(img);
 	if (granule_count)
@@ -141,7 +141,7 @@ static floperr_t get_granule_map(imgtool::image &img, UINT8 *granule_map, UINT8 
 
 
 
-static floperr_t put_granule_map(imgtool::image &img, const UINT8 *granule_map, UINT8 granule_count)
+static floperr_t put_granule_map(imgtool::image &img, const uint8_t *granule_map, uint8_t granule_count)
 {
 	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count, 0);    /* TODO: pass ddam argument from imgtool */
 }
@@ -149,10 +149,10 @@ static floperr_t put_granule_map(imgtool::image &img, const UINT8 *granule_map, 
 
 
 
-static imgtoolerr_t transfer_granule(imgtool::image &img, UINT8 granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image &, int, int, int, int, size_t, imgtool::stream &))
+static imgtoolerr_t transfer_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image &, int, int, int, int, size_t, imgtool::stream &))
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	UINT8 track, sector;
+	uint8_t track, sector;
 
 	track = granule / 2;
 	if (track >= 17)
@@ -167,14 +167,14 @@ static imgtoolerr_t transfer_granule(imgtool::image &img, UINT8 granule, int len
 
 
 
-static imgtoolerr_t transfer_from_granule(imgtool::image &img, UINT8 granule, int length, imgtool::stream &destf)
+static imgtoolerr_t transfer_from_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &destf)
 {
 	return transfer_granule(img, granule, length, destf, imgtool_floppy_read_sector_to_stream);
 }
 
 
 
-static imgtoolerr_t transfer_to_granule(imgtool::image &img, UINT8 granule, int length, imgtool::stream &sourcef)
+static imgtoolerr_t transfer_to_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &sourcef)
 {
 	return transfer_granule(img, granule, length, sourcef, imgtool_floppy_write_sector_from_stream);
 }
@@ -185,10 +185,10 @@ static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool::image 
 {
 	floperr_t ferr;
 	size_t s, lastgransize;
-	UINT8 granule_count;
+	uint8_t granule_count;
 	unsigned char i = 0, granule;
-	UINT8 usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	ferr = get_granule_map(img, granule_map, &granule_count);
 	if (ferr)
@@ -326,13 +326,13 @@ eof:
 
 
 
-static imgtoolerr_t rsdos_diskimage_freespace(imgtool::partition &partition, UINT64 *size)
+static imgtoolerr_t rsdos_diskimage_freespace(imgtool::partition &partition, uint64_t *size)
 {
 	floperr_t ferr;
-	UINT8 i;
+	uint8_t i;
 	size_t s = 0;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 	imgtool::image &image(partition.image());
 
 	ferr = get_granule_map(image, granule_map, &granule_count);
@@ -354,8 +354,8 @@ static imgtoolerr_t delete_entry(imgtool::image &img, struct rsdos_dirent *ent, 
 {
 	floperr_t ferr;
 	unsigned char g, i;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	/* Write a NUL in the filename, marking it deleted */
 	ent->fname[0] = 0;
@@ -415,12 +415,12 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition &partition, con
 	imgtool::image &img(partition.image());
 	struct rsdos_dirent ent, ent2;
 	size_t i;
-	UINT64 sz;
-	UINT64 freespace = 0;
+	uint64_t sz;
+	uint64_t freespace = 0;
 	unsigned char g;
 	unsigned char *gptr;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	/* can we write to this image? */
 	if (floppy_is_read_only(imgtool_floppy(img)))
@@ -441,7 +441,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition &partition, con
 		return err;
 
 	ent.ftype = writeoptions->lookup_int(RSDOS_OPTIONS_FTYPE);
-	ent.asciiflag = UINT8(writeoptions->lookup_int(RSDOS_OPTIONS_ASCII)) - 1;
+	ent.asciiflag = uint8_t(writeoptions->lookup_int(RSDOS_OPTIONS_ASCII)) - 1;
 	ent.lastsectorbytes_lsb = sz % 256;
 	ent.lastsectorbytes_msb = (((sz % 256) == 0) && (sz > 0)) ? 1 : 0;
 	gptr = &ent.first_granule;
@@ -464,7 +464,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool::partition &partition, con
 		gptr = &granule_map[g];
 
 
-		i = std::min(sz, UINT64(9*256));
+		i = std::min(sz, uint64_t(9*256));
 		err = transfer_to_granule(img, g, i, sourcef);
 		if (err)
 			return err;
@@ -593,7 +593,7 @@ OPTION_GUIDE_END
 
 
 
-void rsdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void rsdos_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{

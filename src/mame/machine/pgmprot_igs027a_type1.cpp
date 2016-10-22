@@ -117,7 +117,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w )
 
 READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
 {
-	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, space.device().safe_pc());
@@ -126,7 +126,7 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
 
 WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
 {
-	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, space.device().safe_pc());
@@ -261,7 +261,7 @@ READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
 	if (regionhack != 0xff) return regionhack;
 
 	offset = 0x4;
-	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_arm7_shareram.target());
+	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -368,8 +368,8 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshxas)
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)(memregion("tiles")->base() + 0x180000);
-	std::vector<UINT16> dst(0x800000);
+	uint16_t *src = (uint16_t *)(memregion("tiles")->base() + 0x180000);
+	std::vector<uint16_t> dst(0x800000);
 
 	for (i = 0; i < 0x800000 / 2; i++)
 	{
@@ -381,10 +381,10 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 	memcpy( src, &dst[0], 0x800000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( UINT8 *src )
+void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
 {
 	int i, j;
-	std::vector<UINT8> dst(0x800000);
+	std::vector<uint8_t> dst(0x800000);
 
 	for (i = 0; i < 0x800000; i++)
 	{
@@ -399,7 +399,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( UINT8 *src )
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
 {
 	int i;
-	UINT8 *src = (UINT8 *)(memregion("ics")->base() + 0x400000);
+	uint8_t *src = (uint8_t *)(memregion("ics")->base() + 0x400000);
 
 	for (i = 0; i < 0x400000; i+=2) {
 		src[i + 0x000001] = src[i + 0x400001];
@@ -411,8 +411,8 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
 void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memregion("maincpu")->base() + 0x100000);
-	std::vector<UINT16> dst(0x400000);
+	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
+	std::vector<uint16_t> dst(0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
@@ -427,8 +427,8 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memregion("maincpu")->base() + 0x100000);
-	std::vector<UINT16> dst(0x400000);
+	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
+	std::vector<uint16_t> dst(0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
@@ -496,8 +496,8 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_r )
 {
 	if (offset == 0)
 	{
-		UINT16 d = m_valueresponse & 0xffff;
-		UINT16 realkey = m_valuekey >> 8;
+		uint16_t d = m_valueresponse & 0xffff;
+		uint16_t realkey = m_valuekey >> 8;
 		realkey |= m_valuekey;
 		d ^= realkey;
 
@@ -506,8 +506,8 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_r )
 	}
 	else if (offset == 1)
 	{
-		UINT16 d = m_valueresponse >> 16;
-		UINT16 realkey = m_valuekey >> 8;
+		uint16_t d = m_valueresponse >> 16;
+		uint16_t realkey = m_valuekey >> 8;
 		realkey |= m_valuekey;
 		d ^= realkey;
 		return d;
@@ -565,7 +565,7 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 /* preliminary */
 
 // should be correct, note each value only appears once
-UINT8 puzzli2_level_decode[256] = {
+uint8_t puzzli2_level_decode[256] = {
 	// 0  ,  1  ,  2  ,  3  ,  4  ,  5   , 6  ,  7  ,  8  ,  9  ,  a  ,  b  ,  c  ,  d  ,  e  ,  f  ,
 	0x32, 0x3e, 0xb2, 0x37, 0x31, 0x22, 0xd6, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x7a, 0x5f, 0xd7, 0xac, // 0x0
 //   0  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  x  ,  x  ,
@@ -703,8 +703,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 						// but different for the writes on startup?
 						m_valueresponse = 0x00d20000;
 
-						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//uint8_t tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+						//uint8_t xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
 
 						hackcount2++;
@@ -717,8 +717,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 						// when the ARM detects the end of the stream has been reached it returns a 0x63 status with the number of columns in the data word
 						m_valueresponse = 0x00630000 | numbercolumns;
 
-						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//uint8_t tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+						//uint8_t xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
 
 
@@ -748,7 +748,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// this is the how to play screen, correctly returned with current code
 			/*
-			UINT16 retvals[61] =
+			uint16_t retvals[61] =
 			{ 0x0008, // depth (-2?)
 			  0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // first column
 			  0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -760,7 +760,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			*/
 
 
-			UINT16* leveldata = &level_structure[0][0];
+			uint16_t* leveldata = &level_structure[0][0];
 			if (hackcount==0)
 			{
 				m_valueresponse = 0x002d0000 | ((depth>>4)+1); // this *seems* to come from upper bits of the first real value written to the device during the level stream (verify, seems wrong for some levels because you get a black bar on the bottom of the screen, but might be bad xors)
@@ -1267,13 +1267,13 @@ void pgm_arm_type1_state::command_handler_pstars(int pc)
 
 /* Old KOV and bootlegs sim ... really these should be read out... */
 
-static const UINT8 kov_BATABLE[0x40] = {
+static const uint8_t kov_BATABLE[0x40] = {
 	0x00,0x29,0x2c,0x35,0x3a,0x41,0x4a,0x4e,0x57,0x5e,0x77,0x79,0x7a,0x7b,0x7c,0x7d,
 	0x7e,0x7f,0x80,0x81,0x82,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x90,
 	0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9e,0xa3,0xd4,0xa9,0xaf,0xb5,0xbb,0xc1
 };
 
-static const UINT8 kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
+static const uint8_t kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
 
 
 void pgm_arm_type1_state::command_handler_kov(int pc)
@@ -1364,7 +1364,7 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 		{
 			m_valueresponse = 0x880000;
 
-			INT32 sel = (m_curslots >> 12) & 0x0f;
+			int32_t sel = (m_curslots >> 12) & 0x0f;
 			m_slots[sel] = (m_slots[sel] & 0x00ff0000) | ((m_value0 & 0xffff) <<  0);
 		}
 		break;
@@ -1374,7 +1374,7 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 			m_valueresponse = 0x880000;
 			m_curslots = m_value0;
 
-			INT32 sel = (m_curslots >> 12) & 0x0f;
+			int32_t sel = (m_curslots >> 12) & 0x0f;
 			m_slots[sel] = (m_slots[sel] & 0x0000ffff) | ((m_value0 & 0x00ff) << 16);
 		}
 		break;
@@ -1744,7 +1744,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 	}
 	else if (offset == 1)
 	{
-		UINT16 realkey;
+		uint16_t realkey;
 		if ((data >> 8) == 0xff)
 			m_valuekey = 0xff00;
 		realkey = m_valuekey >> 8;
@@ -1814,7 +1814,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,espgal)
 }
 
 
-int count_bits(UINT16 value)
+int count_bits(uint16_t value)
 {
 	int count = 0;
 	for (int i=0;i<16;i++)
@@ -1827,7 +1827,7 @@ int count_bits(UINT16 value)
 	return count;
 }
 
-int get_position_of_bit(UINT16 value, int bit_wanted)
+int get_position_of_bit(uint16_t value, int bit_wanted)
 {
 	int count = 0;
 	for (int i=0;i<16;i++)
@@ -1843,7 +1843,7 @@ int get_position_of_bit(UINT16 value, int bit_wanted)
 	return -1;
 }
 
-int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
+int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 {
 	if (stage==-1)
 	{
@@ -1864,8 +1864,8 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 	}
 	else
 	{
-		UINT8 rawvalue = datvalue;
-		UINT8 tableloc = (tableoffs+tableoffs2)&0xff;
+		uint8_t rawvalue = datvalue;
+		uint8_t tableloc = (tableoffs+tableoffs2)&0xff;
 		rawvalue ^= puzzli2_level_decode[tableloc];
 
 		tableoffs2++;
@@ -2001,7 +2001,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		}
 		else if (stage==3)
 		{
-			UINT16 object_value;
+			uint16_t object_value;
 
 			// return values
 			// 0x0100 = normal fish
@@ -2116,7 +2116,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG
 #ifdef PUZZLI2_LEVEL_STRUCTURE_LOG
-	UINT8 *src2 = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
+	uint8_t *src2 = (uint8_t *) (machine().root_device().memregion("maincpu")->base());
 
 	int offset;
 	int limit;
@@ -2139,9 +2139,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 
 	for (int i=0;i<limit;i++)
 	{
-		UINT32 val1 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
+		uint32_t val1 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 		offset += 4;
-		UINT32 val2 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
+		uint32_t val2 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 
 
 		printf("(%d) data range %08x %08x\n", i, val1, val2);
@@ -2200,7 +2200,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 #if 0
 	if (!strcmp(machine().system().name,"puzzli2"))
 	{
-	UINT8 *src3 = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
+	uint8_t *src3 = (uint8_t *) (machine().root_device().memregion("maincpu")->base());
 	printf("how to play data pointer %02x %02x %02x %02x\n", src3[0x17b28e ^1], src3[0x17b28f ^1], src3[0x17b290 ^1], src3[0x17b291 ^1]);
 	src3[0x17b28e ^1] = 0x00;
 	src3[0x17b28f ^1] = 0x11;
@@ -2212,7 +2212,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 	pgm_puzzli2_decrypt(machine());
 
 	{
-		UINT8 *ROM = (UINT8*)memregion("maincpu")->base();
+		uint8_t *ROM = (uint8_t*)memregion("maincpu")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -2261,7 +2261,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,pstar)
 	m_extra_ram[0] = 0;
 	m_extra_ram[1] = 0;
 	m_extra_ram[2] = 0;
-	memset(m_slots, 0, 16 * sizeof(UINT32));
+	memset(m_slots, 0, 16 * sizeof(uint32_t));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
@@ -2307,8 +2307,8 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,oldsplus)
 	pgm_basic_init();
 	pgm_oldsplus_decrypt(machine());
 	pgm_arm7_type1_latch_init();
-	memset(m_extra_ram, 0, 0x100 * sizeof(UINT16));
-	memset(m_slots, 0, 0x100 * sizeof(UINT32));
+	memset(m_extra_ram, 0, 0x100 * sizeof(uint16_t));
+	memset(m_slots, 0, 0x100 * sizeof(uint32_t));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));

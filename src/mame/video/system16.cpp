@@ -36,7 +36,7 @@ void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 {
 	if (m_spritebank_type == 0)
 	{
-		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		static const uint8_t alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
 		int i;
 		for (i = 0; i < 16; i++)
 			m_sprites->set_bank(i, alternate_banklist[i]);
@@ -105,7 +105,7 @@ static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 #ifdef UNUSED_CODE
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
 {
-	UINT16 newword;
+	uint16_t newword;
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	newword = m_generic_paletteram_16[offset];
@@ -229,7 +229,7 @@ void segas1x_bootleg_state::update_page(  )
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 {
-	const UINT16 *source = 64 * 32 * m_bg_page[tile_index / (64 * 32)] + m_tileram;
+	const uint16_t *source = 64 * 32 * m_bg_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index%(64*32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
 
@@ -241,7 +241,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 {
-	const UINT16 *source = 64 * 32 * m_fg_page[tile_index / (64 * 32)] + m_tileram;
+	const uint16_t *source = 64 * 32 * m_fg_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
 
@@ -253,7 +253,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 {
-	const UINT16 *source = 64 * 32 * m_bg2_page[tile_index / (64 * 32)] + m_tileram;
+	const uint16_t *source = 64 * 32 * m_bg2_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
 
@@ -265,7 +265,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 {
-	const UINT16 *source = 64 * 32 * m_fg2_page[tile_index / (64 * 32)] + m_tileram;
+	const uint16_t *source = 64 * 32 * m_fg2_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
 
@@ -277,7 +277,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
 {
-	UINT16 oldword = m_tileram[offset];
+	uint16_t oldword = m_tileram[offset];
 
 	COMBINE_DATA(&m_tileram[offset]);
 
@@ -315,7 +315,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 {
-	const UINT16 *source = m_textram;
+	const uint16_t *source = m_textram;
 	int tile_number = source[tile_index];
 	int pri = tile_number >> 8;
 
@@ -586,7 +586,7 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_passsht)
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
-UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// passing shot
 	int offset_txtx = 192;
@@ -643,13 +643,13 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+//          uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
@@ -673,7 +673,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 }
 
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
-UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// passing shot
 	int offset_txtx = 192;
@@ -713,13 +713,13 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+//          uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
@@ -745,7 +745,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 
 /***************************************************************************/
 
-UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_refreshenable)
 	{
@@ -792,13 +792,13 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+//          uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority
@@ -821,7 +821,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 }
 
 
-UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_refreshenable)
 	{
@@ -855,13 +855,13 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+//          uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority

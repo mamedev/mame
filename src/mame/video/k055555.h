@@ -80,10 +80,10 @@
 class k055555_device : public device_t
 {
 public:
-	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k055555_device() { }
 
-	void K055555_write_reg(UINT8 regnum, UINT8 regdat);
+	void K055555_write_reg(uint8_t regnum, uint8_t regdat);
 
 	DECLARE_WRITE16_MEMBER( K055555_word_w );
 	DECLARE_WRITE32_MEMBER( K055555_long_w );
@@ -98,7 +98,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8   m_regs[128];
+	uint8_t   m_regs[128];
 };
 
 extern const device_type K055555;

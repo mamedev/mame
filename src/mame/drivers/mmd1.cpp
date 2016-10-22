@@ -169,8 +169,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	UINT8 m_return_code;
-	UINT8 m_digit;
+	uint8_t m_return_code;
+	uint8_t m_digit;
 	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
@@ -217,9 +217,9 @@ WRITE8_MEMBER( mmd1_state::mmd1_port2_w )
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
 READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 {
-	UINT8 line1 = ioport("LINE1")->read();
-	UINT8 line2 = ioport("LINE2")->read();
-	UINT8 i, data = 0xff;
+	uint8_t line1 = ioport("LINE1")->read();
+	uint8_t line2 = ioport("LINE2")->read();
+	uint8_t i, data = 0xff;
 
 
 	for (i = 0; i < 8; i++)
@@ -381,7 +381,7 @@ READ8_MEMBER( mmd1_state::mmd2_bank_r )
 READ8_MEMBER( mmd1_state::mmd2_01_r )
 {
 	// need to add cassin, ttyin bits
-	UINT8 data = 0x87;
+	uint8_t data = 0x87;
 	data |= ioport("DSW")->read();
 	return data;
 }
@@ -399,7 +399,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 4)
 	{
@@ -448,7 +448,7 @@ DRIVER_INIT_MEMBER(mmd1_state,mmd2)
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
 */
-	UINT8 *p_ram = memregion("maincpu")->base();
+	uint8_t *p_ram = memregion("maincpu")->base();
 	membank("bank1")->configure_entry(0, &p_ram[0x0000]);
 	membank("bank1")->configure_entry(1, &p_ram[0xd800]);
 	membank("bank1")->configure_entry(2, &p_ram[0x0c00]);

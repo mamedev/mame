@@ -40,14 +40,14 @@ TILEMAP_MAPPER_MEMBER(deadang_state::bg_scan)
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)memregion("gfx6")->base();
+	const uint16_t *bgMap = (const uint16_t *)memregion("gfx6")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)memregion("gfx7")->base();
+	const uint16_t *bgMap = (const uint16_t *)memregion("gfx7")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
 }
@@ -125,7 +125,7 @@ void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-UINT32 deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );

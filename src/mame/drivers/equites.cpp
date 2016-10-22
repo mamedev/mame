@@ -392,7 +392,7 @@ TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 {
-	UINT8 frq = ioport(FRQ_ADJUSTER_TAG)->read();
+	uint8_t frq = ioport(FRQ_ADJUSTER_TAG)->read();
 
 	m_msm->set_clock(MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_eq8155_port_c, m_eq8155_port_a, m_ay_port_a, m_ay_port_b, m_eq_cymbal_ctrl & 15);
@@ -1931,7 +1931,7 @@ ROM_END
 
 void equites_state::unpack_block(const char *region, int offset, int size)
 {
-	UINT8 *rom = memregion(region)->base();
+	uint8_t *rom = memregion(region)->base();
 
 	for (int i = 0; i < size; i++)
 	{

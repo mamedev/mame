@@ -110,7 +110,7 @@ machine_config_constructor pet_userport_joystick_and_sound_device::device_mconfi
 //  pet_user_port_dual_joystick_and_sound_device - constructor
 //-------------------------------------------------
 
-pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, "Dual Joysticks and Sound", tag, owner, clock, "2joysnd", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	m_dac(*this, "dac"),

@@ -34,7 +34,7 @@
 class mc6846_device : public device_t
 {
 public:
-	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mc6846_device() {}
 
 	template<class _Object> static devcb_base &set_out_port_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_port_cb.set_callback(object); }
@@ -53,12 +53,12 @@ public:
 	void set_input_cp2(int data);
 
 	/* polling from outside world */
-	UINT8  get_output_port();
-	UINT8  get_output_cto();
-	UINT8  get_output_cp2();
+	uint8_t  get_output_port();
+	uint8_t  get_output_cto();
+	uint8_t  get_output_cp2();
 
 	/* partial access to internal state */
-	UINT16 get_preset(); /* timer interval - 1 in us */
+	uint16_t get_preset(); /* timer interval - 1 in us */
 
 protected:
 	// device-level overrides
@@ -69,26 +69,26 @@ private:
 	// internal state
 
 	/* registers */
-	UINT8    m_csr;      /* 0,4: combination status register */
-	UINT8    m_pcr;      /* 1:   peripheral control register */
-	UINT8    m_ddr;      /* 2:   data direction register */
-	UINT8    m_pdr;      /* 3:   peripheral data register (last cpu write) */
-	UINT8    m_tcr;      /* 5:   timer control register */
+	uint8_t    m_csr;      /* 0,4: combination status register */
+	uint8_t    m_pcr;      /* 1:   peripheral control register */
+	uint8_t    m_ddr;      /* 2:   data direction register */
+	uint8_t    m_pdr;      /* 3:   peripheral data register (last cpu write) */
+	uint8_t    m_tcr;      /* 5:   timer control register */
 
 	/* lines */
-	UINT8 m_cp1;         /* 1-bit input */
-	UINT8 m_cp2;         /* 1-bit input/output: last external write */
-	UINT8 m_cp2_cpu;     /* last cpu write */
-	UINT8 m_cto;         /* 1-bit timer output (unmasked) */
+	uint8_t m_cp1;         /* 1-bit input */
+	uint8_t m_cp2;         /* 1-bit input/output: last external write */
+	uint8_t m_cp2_cpu;     /* last cpu write */
+	uint8_t m_cto;         /* 1-bit timer output (unmasked) */
 
 	/* internal state */
-	UINT8  m_time_MSB; /* MSB buffer register */
-	UINT8  m_csr0_to_be_cleared;
-	UINT8  m_csr1_to_be_cleared;
-	UINT8  m_csr2_to_be_cleared;
-	UINT16 m_latch;   /* timer latch */
-	UINT16 m_preset;  /* preset value */
-	UINT8  m_timer_started;
+	uint8_t  m_time_MSB; /* MSB buffer register */
+	uint8_t  m_csr0_to_be_cleared;
+	uint8_t  m_csr1_to_be_cleared;
+	uint8_t  m_csr2_to_be_cleared;
+	uint16_t m_latch;   /* timer latch */
+	uint16_t m_preset;  /* preset value */
+	uint8_t  m_timer_started;
 
 	/* timers */
 	emu_timer *m_interval; /* interval programmable timer */
@@ -111,7 +111,7 @@ private:
 	int m_old_cif;
 	int m_old_cto;
 
-	inline UINT16 counter();
+	inline uint16_t counter();
 	inline void update_irq();
 	inline void update_cto();
 	inline void timer_launch();

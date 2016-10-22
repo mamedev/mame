@@ -64,8 +64,8 @@ class nubus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,8 +87,8 @@ class nubus_device : public device_t
 {
 public:
 	// construction/destruction
-	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~nubus_device() { m_device_list.detach_all(); }
 
 	// inline configuration
@@ -101,12 +101,12 @@ public:
 	template<class _Object> static devcb_base &set_out_irqe_callback(device_t &device, _Object object) { return downcast<nubus_device &>(device).m_out_irqe_cb.set_callback(object); }
 
 	void add_nubus_card(device_nubus_card_interface *card);
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask=0xffffffff);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask=0xffffffff);
-	void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, UINT32 mask=0xffffffff);
-	void install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, UINT32 mask=0xffffffff);
-	void install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, UINT32 mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);
+	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask=0xffffffff);
+	void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask=0xffffffff);
+	void install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, uint32_t mask=0xffffffff);
+	void install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, uint32_t mask=0xffffffff);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void set_irq_line(int slot, int state);
 
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );
@@ -156,10 +156,10 @@ public:
 
 	// helper functions for card devices
 	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
-	UINT32 get_slotspace() { return 0xf0000000 | (m_slot<<24); }
-	UINT32 get_super_slotspace() { return m_slot<<28; }
+	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
+	uint32_t get_super_slotspace() { return m_slot<<28; }
 
 	void raise_slot_irq() { m_nubus->set_irq_line(m_slot, ASSERT_LINE); }
 	void lower_slot_irq() { m_nubus->set_irq_line(m_slot, CLEAR_LINE); }
@@ -171,7 +171,7 @@ public:
 	const char *m_nubus_tag, *m_nubus_slottag;
 	int m_slot;
 	device_nubus_card_interface *m_next;
-	std::vector<UINT8> m_declaration_rom;
+	std::vector<uint8_t> m_declaration_rom;
 };
 
 #endif  /* __NUBUS_H__ */

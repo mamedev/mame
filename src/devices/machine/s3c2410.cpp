@@ -33,14 +33,14 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 #include "machine/s3c24xx.hxx"
 #undef DEVICE_S3C2410
 
-UINT32 s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return s3c24xx_video_update(screen, bitmap, cliprect);
 }
 
 const device_type S3C2410 = &device_creator<s3c2410_device>;
 
-s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, S3C2410, "S3C2410 MCU", tag, owner, clock, "s3c2410", __FILE__),
 		m_palette(*this, finder_base::DUMMY_TAG),
 		m_cpu(*this, ":maincpu"),
@@ -142,7 +142,7 @@ void s3c2410_device::device_reset()
 	s3c24xx_device_reset();
 }
 
-void s3c2410_device::s3c2410_uart_fifo_w( int uart, UINT8 data)
+void s3c2410_device::s3c2410_uart_fifo_w( int uart, uint8_t data)
 {
 	s3c24xx_uart_fifo_w( uart, data);
 }
@@ -157,13 +157,13 @@ WRITE_LINE_MEMBER( s3c2410_device::frnb_w )
 	s3c24xx_pin_frnb_w(state);
 }
 
-void s3c2410_device::s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)
+void s3c2410_device::s3c2410_nand_calculate_mecc( uint8_t *data, uint32_t size, uint8_t *mecc)
 {
 	mecc[0] = mecc[1] = mecc[2] = mecc[3] = 0xFF;
 	for (int i = 0; i < size; i++) nand_update_mecc( mecc, i, data[i]);
 }
 
-void s3c2410_device::s3c2410_request_eint(UINT32 number)
+void s3c2410_device::s3c2410_request_eint(uint32_t number)
 {
 	s3c24xx_request_eint(number);
 }

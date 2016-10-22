@@ -130,32 +130,32 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 	DECLARE_DRIVER_INIT(applix);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 m_video_latch;
-	UINT8 m_pa;
+	uint8_t m_video_latch;
+	uint8_t m_pa;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(applix);
-	UINT8 m_palette_latch[4];
-	required_shared_ptr<UINT16> m_base;
+	uint8_t m_palette_latch[4];
+	required_shared_ptr<uint16_t> m_base;
 private:
-	UINT8 m_pb;
-	UINT8 m_analog_latch;
-	UINT8 m_dac_latch;
-	UINT8 m_port08;
-	UINT8 m_data_to_fdc;
-	UINT8 m_data_from_fdc;
+	uint8_t m_pb;
+	uint8_t m_analog_latch;
+	uint8_t m_dac_latch;
+	uint8_t m_port08;
+	uint8_t m_data_to_fdc;
+	uint8_t m_data_from_fdc;
 	bool m_data;
 	bool m_data_or_cmd;
 	bool m_buffer_empty;
 	bool m_fdc_cmd;
-	UINT8 m_clock_count;
+	uint8_t m_clock_count;
 	bool m_cp;
-	UINT8   m_p1;
-	UINT8   m_p1_data;
-	UINT8   m_p2;
-	UINT8   m_p3;
-	UINT16  m_last_write_addr;
-	UINT8 m_cass_data[4];
+	uint8_t   m_p1;
+	uint8_t   m_p1_data;
+	uint8_t   m_p2;
+	uint8_t   m_p3;
+	uint16_t  m_last_write_addr;
+	uint8_t m_cass_data[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
@@ -191,7 +191,7 @@ private:
 	required_ioport m_io_k3a0;
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
-	required_shared_ptr<UINT16> m_expansion;
+	required_shared_ptr<uint16_t> m_expansion;
 public:
 	required_device<palette_device> m_palette;
 };
@@ -319,7 +319,7 @@ d3 = test switch
 */
 READ8_MEMBER( applix_state::port00_r )
 {
-	return (UINT8)m_data_or_cmd | ((UINT8)m_data << 1) | ((UINT8)m_buffer_empty << 2) | m_io_fdc->read();
+	return (uint8_t)m_data_or_cmd | ((uint8_t)m_data << 1) | ((uint8_t)m_buffer_empty << 2) | m_io_fdc->read();
 }
 
 /*
@@ -402,12 +402,12 @@ WRITE8_MEMBER( applix_state::port60_w )
 
 READ16_MEMBER( applix_state::fdc_stat_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch (offset)
 	{
-	case 0: data = (UINT8)m_buffer_empty^1; break;
-	case 1: data = (UINT8)m_data^1; break;
-	default: data = (UINT8)m_fdc_cmd; // case 2
+	case 0: data = (uint8_t)m_buffer_empty^1; break;
+	case 1: data = (uint8_t)m_data^1; break;
+	default: data = (uint8_t)m_fdc_cmd; // case 2
 	}
 	return data << 7;
 }
@@ -717,7 +717,7 @@ INPUT_PORTS_END
 
 void applix_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_expansion, ROM, 8);
 	membank("bank1")->set_entry(0);
 	m_p3 = 0xff;
@@ -736,7 +736,7 @@ SLOT_INTERFACE_END
 
 PALETTE_INIT_MEMBER(applix_state, applix)
 { // shades need to be verified - the names on the right are from the manual
-	const UINT8 colors[16*3] = {
+	const uint8_t colors[16*3] = {
 	0x00, 0x00, 0x00,   //  0 Black
 	0x40, 0x40, 0x40,   //  1 Dark Grey
 	0x00, 0x00, 0x80,   //  2 Dark Blue
@@ -754,7 +754,7 @@ PALETTE_INIT_MEMBER(applix_state, applix)
 	0xbf, 0xbf, 0xbf,   // 14 Light Grey
 	0xff, 0xff, 0xff }; // 15 White
 
-	UINT8 r, b, g, i, color_count = 0;
+	uint8_t r, b, g, i, color_count = 0;
 
 	for (i = 0; i < 48; color_count++)
 	{
@@ -774,9 +774,9 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 // Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 i;
-	UINT16 chr,x;
-	UINT32 mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
+	uint8_t i;
+	uint16_t chr,x;
+	uint32_t mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -814,7 +814,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 {
 	/* cassette - turn 2500/5000Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -928,7 +928,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(applix_state, applix)
 {
-	UINT8 *RAM = memregion("subcpu")->base();
+	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
 }
 
@@ -1084,7 +1084,7 @@ WRITE8_MEMBER( applix_state::p2_write )
 
 READ8_MEMBER( applix_state::p3_read )
 {
-	UINT8 data = m_p3;
+	uint8_t data = m_p3;
 
 	data &= ~0x14;
 

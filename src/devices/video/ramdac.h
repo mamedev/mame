@@ -41,11 +41,11 @@ class ramdac_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_color_base(device_t &device, UINT32 color_base) { downcast<ramdac_device &>(device).m_color_base = color_base; }
+	static void static_set_color_base(device_t &device, uint32_t color_base) { downcast<ramdac_device &>(device).m_color_base = color_base; }
 	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations
@@ -67,21 +67,21 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
-	inline void reg_increment(UINT8 inc_type);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
+	inline void reg_increment(uint8_t inc_type);
 
 private:
-	UINT8 m_pal_index[2];
-	UINT8 m_pal_mask;
-	UINT8 m_int_index[2];
-	std::unique_ptr<UINT8[]> m_palram;
+	uint8_t m_pal_index[2];
+	uint8_t m_pal_mask;
+	uint8_t m_int_index[2];
+	std::unique_ptr<uint8_t[]> m_palram;
 
 	const address_space_config      m_space_config;
 	required_device<palette_device> m_palette;
 
-	UINT32 m_color_base;
-	UINT8 m_split_read_reg; // read register index is separated, seen in rltennis
+	uint32_t m_color_base;
+	uint8_t m_split_read_reg; // read register index is separated, seen in rltennis
 };
 
 

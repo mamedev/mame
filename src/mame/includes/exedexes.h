@@ -25,11 +25,11 @@ public:
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_nbg_yscroll;
-	required_shared_ptr<UINT8> m_nbg_xscroll;
-	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_nbg_yscroll;
+	required_shared_ptr<uint8_t> m_nbg_xscroll;
+	required_shared_ptr<uint8_t> m_bg_scroll;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;
@@ -53,7 +53,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(exedexes);
-	UINT32 screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(exedexes_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	required_device<cpu_device> m_maincpu;

@@ -202,11 +202,11 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	int m_system_type;
-	UINT8 m_duart_io;
-	UINT8 otis_irq_state;
-	UINT8 dmac_irq_state;
+	uint8_t m_duart_io;
+	uint8_t otis_irq_state;
+	uint8_t dmac_irq_state;
 	int dmac_irq_vector;
-	UINT8 duart_irq_state;
+	uint8_t duart_irq_state;
 	int duart_irq_vector;
 
 	void update_irq_to_maincpu();
@@ -214,8 +214,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
-	UINT16  *m_rom, *m_ram;
-	UINT16 m_analog_values[8];
+	uint16_t  *m_rom, *m_ram;
+	uint16_t m_analog_values[8];
 
 public:
 	DECLARE_DRIVER_INIT(eps);
@@ -263,8 +263,8 @@ void esq5505_state::machine_start()
 	m_pump->set_otis(m_otis);
 	m_pump->set_esp(m_esp);
 
-	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
-	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
+	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
+	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 }
 
 void esq5505_state::machine_reset()
@@ -332,8 +332,8 @@ READ16_MEMBER(esq5505_state::lower_r)
 	// get pointers when 68k resets
 	if (!m_rom)
 	{
-		m_rom = (UINT16 *)(void *)memregion("osrom")->base();
-		m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
+		m_rom = (uint16_t *)(void *)memregion("osrom")->base();
+		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
 	if (!space.debugger_access() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
@@ -548,7 +548,7 @@ WRITE8_MEMBER(esq5505_state::fdc_write_byte)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (UINT8)(uintptr_t)param;
+	int val = (uint8_t)(uintptr_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -591,7 +591,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (UINT8)(uintptr_t)param);
+	//        printf("key off %x\n", (uint8_t)(uintptr_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}
@@ -974,9 +974,9 @@ DRIVER_INIT_MEMBER(esq5505_state,sq1)
 
 DRIVER_INIT_MEMBER(esq5505_state,denib)
 {
-	UINT8 *pNibbles = (UINT8 *)memregion("nibbles")->base();
-	UINT8 *pBS0L = (UINT8 *)memregion("waverom")->base();
-	UINT8 *pBS0H = pBS0L + 0x100000;
+	uint8_t *pNibbles = (uint8_t *)memregion("nibbles")->base();
+	uint8_t *pBS0L = (uint8_t *)memregion("waverom")->base();
+	uint8_t *pBS0H = pBS0L + 0x100000;
 
 	DRIVER_INIT_CALL(common);
 

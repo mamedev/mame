@@ -88,7 +88,7 @@ machine_config_constructor p1_sound_device::device_mconfig_additions() const
 //  p1_sound_device - constructor
 //-------------------------------------------------
 
-p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, P1_SOUND, "Poisk-1 sound card (B623)", tag, owner, clock, "p1_sound", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_dac(*this, "dac"),

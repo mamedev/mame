@@ -55,60 +55,60 @@ public:
 	required_device<timer_device> m_scanline_timer;
 
 	/* global data */
-	UINT8 m_shooter;
-	UINT8 m_shooter_x;
-	UINT8 m_shooter_y;
-	UINT8 m_adc_shift;
+	uint8_t m_shooter;
+	uint8_t m_shooter_x;
+	uint8_t m_shooter_y;
+	uint8_t m_adc_shift;
 
 	/* 8253 counter state */
 	struct
 	{
 		timer_device *timer;
-		UINT8 timer_active;
-		INT32 initial;
-		INT32 count;
-		UINT8 gate;
-		UINT8 out;
-		UINT8 mode;
-		UINT8 readbyte;
-		UINT8 writebyte;
+		uint8_t timer_active;
+		int32_t initial;
+		int32_t count;
+		uint8_t gate;
+		uint8_t out;
+		uint8_t mode;
+		uint8_t readbyte;
+		uint8_t writebyte;
 	} m_counter[3];
 
 
 	/* manually clocked counter 0 states */
-	UINT8 m_counter_control;
-	UINT8 m_counter_0_ff;
+	uint8_t m_counter_control;
+	uint8_t m_counter_0_ff;
 	required_device<timer_device> m_counter_0_timer;
-	UINT8 m_counter_0_timer_active;
+	uint8_t m_counter_0_timer_active;
 
 	/* random number generator states */
-	UINT8 m_poly17[POLY17_SIZE + 1];
-	UINT8 m_rand17[POLY17_SIZE + 1];
+	uint8_t m_poly17[POLY17_SIZE + 1];
+	uint8_t m_rand17[POLY17_SIZE + 1];
 
 	/* ADC I/O states */
-	INT8 m_analog_input_data[4];
-	UINT8 m_adc_value;
+	int8_t m_analog_input_data[4];
+	uint8_t m_adc_value;
 
 	/* CEM3394 DAC control states */
-	UINT16 m_dac_value;
-	UINT8 m_dac_register;
-	UINT8 m_chip_select;
+	uint16_t m_dac_value;
+	uint8_t m_dac_register;
+	uint8_t m_chip_select;
 
 	/* main CPU 6850 states */
-	UINT8 m_m6850_status;
-	UINT8 m_m6850_control;
-	UINT8 m_m6850_input;
-	UINT8 m_m6850_output;
-	UINT8 m_m6850_data_ready;
+	uint8_t m_m6850_status;
+	uint8_t m_m6850_control;
+	uint8_t m_m6850_input;
+	uint8_t m_m6850_output;
+	uint8_t m_m6850_data_ready;
 
 	/* sound CPU 6850 states */
-	UINT8 m_m6850_sound_status;
-	UINT8 m_m6850_sound_control;
-	UINT8 m_m6850_sound_input;
-	UINT8 m_m6850_sound_output;
+	uint8_t m_m6850_sound_status;
+	uint8_t m_m6850_sound_control;
+	uint8_t m_m6850_sound_input;
+	uint8_t m_m6850_sound_output;
 
 	/* noise generator states */
-	UINT32 m_noise_position[6];
+	uint32_t m_noise_position[6];
 	required_device<cem3394_device> m_cem1;
 	required_device<cem3394_device> m_cem2;
 	required_device<cem3394_device> m_cem3;
@@ -118,26 +118,26 @@ public:
 	cem3394_device *m_cem_device[6];
 
 	/* game-specific states */
-	UINT8 m_nstocker_bits;
-	UINT8 m_spiker_expand_color;
-	UINT8 m_spiker_expand_bgcolor;
-	UINT8 m_spiker_expand_bits;
-	UINT8 m_grudge_steering_result;
-	UINT8 m_grudge_last_steering[3];
-	UINT8 m_teamht_input;
+	uint8_t m_nstocker_bits;
+	uint8_t m_spiker_expand_color;
+	uint8_t m_spiker_expand_bgcolor;
+	uint8_t m_spiker_expand_bits;
+	uint8_t m_grudge_steering_result;
+	uint8_t m_grudge_last_steering[3];
+	uint8_t m_teamht_input;
 
 	/* video data */
-	UINT8 m_expanded_videoram[256*256];
-	UINT8 *m_sprite_data;
-	UINT32 m_sprite_mask;
-	UINT8 *m_sprite_bank[2];
+	uint8_t m_expanded_videoram[256*256];
+	uint8_t *m_sprite_data;
+	uint32_t m_sprite_mask;
+	uint8_t *m_sprite_bank[2];
 
-	UINT8 m_palettebank_vis;
+	uint8_t m_palettebank_vis;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT16> m_shrike_io;
-	optional_shared_ptr<UINT16> m_shrike_shared;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint16_t> m_shrike_io;
+	optional_shared_ptr<uint16_t> m_shrike_shared;
 
 	DECLARE_WRITE8_MEMBER(balsente_random_reset_w);
 	DECLARE_READ8_MEMBER(balsente_random_num_r);
@@ -205,7 +205,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(balsente_update_analog_inputs);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(m6850_data_ready_callback);
@@ -214,13 +214,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_interrupt_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_counter_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_clock_counter_0_ff);
-	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite);
+	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *sprite);
 	void poly17_init();
 	void m6850_update_io();
 	void set_counter_0_ff(timer_device &timer, int newstate);
 	void update_grudge_steering();
-	void expand_roms(UINT8 cd_rom_mask);
-	inline void config_shooter_adc(UINT8 shooter, UINT8 adc_shift);
+	void expand_roms(uint8_t cd_rom_mask);
+	inline void config_shooter_adc(uint8_t shooter, uint8_t adc_shift);
 	inline void noise_gen_chip(int chip, int count, short *buffer);
 	CEM3394_EXT_INPUT(noise_gen_0);
 	CEM3394_EXT_INPUT(noise_gen_1);
@@ -233,7 +233,7 @@ public:
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 
 

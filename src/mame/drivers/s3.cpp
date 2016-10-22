@@ -85,10 +85,10 @@ public:
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
 private:
-	UINT8 m_t_c;
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
+	uint8_t m_t_c;
+	uint8_t m_sound_data;
+	uint8_t m_strobe;
+	uint8_t m_kbdrow;
 	bool m_data_ok;
 	bool m_chimes;
 	required_device<cpu_device> m_maincpu;
@@ -309,7 +309,7 @@ WRITE8_MEMBER( s3_state::sol1_w )
 	}
 	else
 	{
-		UINT8 sound_data = ioport("SND")->read(); // 0xff or 0xbf
+		uint8_t sound_data = ioport("SND")->read(); // 0xff or 0xbf
 		if (BIT(data, 0))
 			sound_data &= 0xfe;
 
@@ -385,7 +385,7 @@ WRITE8_MEMBER( s3_state::dig0_w )
 
 WRITE8_MEMBER( s3_state::dig1_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
 		output().set_digit_value(m_strobe+16, patterns[data&15]);

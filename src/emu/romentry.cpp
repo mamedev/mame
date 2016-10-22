@@ -50,7 +50,7 @@ static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
 //  ctor (with move constructors)
 //-------------------------------------------------
 
-rom_entry::rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags)
+rom_entry::rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags)
 	: m_name(std::move(name))
 	, m_hashdata(std::move(hashdata))
 	, m_offset(offset)

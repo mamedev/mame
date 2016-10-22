@@ -1340,7 +1340,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,cyclshtg)
 DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 {
 	int i;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
@@ -1351,7 +1351,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 DRIVER_INIT_MEMBER(nycaptor_state,colt)
 {
 	int i;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);

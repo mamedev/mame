@@ -173,7 +173,7 @@ const tiny_rom_entry *saa5057_device::device_rom_region() const
 //  saa5050_device - constructor
 //-------------------------------------------------
 
-saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_char_rom(*this, "chargen"),
 	m_read_d(*this),
@@ -184,7 +184,7 @@ saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SAA5050, "SAA5050 Video", tag, owner, clock, "saa5050", __FILE__),
 	m_char_rom(*this, "chargen"),
 	m_read_d(*this),
@@ -195,25 +195,25 @@ saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-saa5051_device::saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5051_device::saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5051, "SAA5051", tag, owner, clock, "saa5051", __FILE__) { }
 
-saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, "saa5052", __FILE__) { }
 
-saa5053_device::saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5053_device::saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5053, "SAA5053", tag, owner, clock, "saa5053", __FILE__) { }
 
-saa5054_device::saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5054_device::saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5054, "SAA5054", tag, owner, clock, "saa5054", __FILE__) { }
 
-saa5055_device::saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5055_device::saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5055, "SAA5055", tag, owner, clock, "saa5055", __FILE__) { }
 
-saa5056_device::saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5056_device::saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5056, "SAA5056", tag, owner, clock, "saa5056", __FILE__) { }
 
-saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: saa5050_device(mconfig, SAA5057, "SAA5057", tag, owner, clock, "saa5057", __FILE__) { }
 
 
@@ -268,7 +268,7 @@ void saa5050_device::device_reset()
 //  process_control_character -
 //-------------------------------------------------
 
-void saa5050_device::process_control_character(UINT8 data)
+void saa5050_device::process_control_character(uint8_t data)
 {
 	m_hold_clear = false;
 	m_hold_off = false;
@@ -372,9 +372,9 @@ void saa5050_device::set_next_chartype()
 //  get_gfx_data - graphics generator
 //-------------------------------------------------
 
-UINT16 saa5050_device::get_gfx_data(UINT8 data, offs_t row, bool separated)
+uint16_t saa5050_device::get_gfx_data(uint8_t data, offs_t row, bool separated)
 {
-	UINT16 c = 0;
+	uint16_t c = 0;
 	switch (row >> 1)
 	{
 	case 0: case 1:
@@ -416,9 +416,9 @@ UINT16 saa5050_device::get_gfx_data(UINT8 data, offs_t row, bool separated)
 //  get_rom_data - read rom
 //-------------------------------------------------
 
-UINT16 saa5050_device::get_rom_data(UINT8 data, offs_t row)
+uint16_t saa5050_device::get_rom_data(uint8_t data, offs_t row)
 {
-	UINT16 c;
+	uint16_t c;
 	if (row < 0 || row >= 20)
 	{
 		c = 0;
@@ -436,7 +436,7 @@ UINT16 saa5050_device::get_rom_data(UINT8 data, offs_t row)
 //  character_rounding
 //-------------------------------------------------
 
-UINT16 saa5050_device::character_rounding(UINT16 a, UINT16 b)
+uint16_t saa5050_device::character_rounding(uint16_t a, uint16_t b)
 {
 	return a | ((a >> 1) & b & ~(b >> 1)) | ((a << 1) & b & ~(b << 1));
 }
@@ -446,7 +446,7 @@ UINT16 saa5050_device::character_rounding(UINT16 a, UINT16 b)
 //  get_character_data -
 //-------------------------------------------------
 
-void saa5050_device::get_character_data(UINT8 data)
+void saa5050_device::get_character_data(uint8_t data)
 {
 	m_double_height_old = m_double_height;
 	m_prev_col = m_fg;
@@ -565,7 +565,7 @@ WRITE_LINE_MEMBER( saa5050_device::lose_w )
 //  write - character data write
 //-------------------------------------------------
 
-void saa5050_device::write(UINT8 data)
+void saa5050_device::write(uint8_t data)
 {
 	m_code = data & 0x7f;
 }
@@ -614,7 +614,7 @@ int saa5050_device::get_rgb()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	dew_w(1);
 	dew_w(0);
@@ -632,7 +632,7 @@ UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		for (int sx = 0; sx < m_cols; sx++)
 		{
-			UINT8 code = m_read_d(video_ram_addr++);
+			uint8_t code = m_read_d(video_ram_addr++);
 
 			write(code & 0x7f);
 

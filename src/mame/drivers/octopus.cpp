@@ -223,8 +223,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_fontram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_fontram;
 	required_device<am9517a_device> m_dma1;
 	required_device<am9517a_device> m_dma2;
 	required_device<pic8259_device> m_pic1;
@@ -242,23 +242,23 @@ private:
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
 
-	UINT8 m_hd_bank;  // HD bank select
-	UINT8 m_fd_bank;  // Floppy bank select
-	UINT8 m_z80_bank; // Z80 bank / RAM refresh
-	INT8 m_current_dma;  // current DMA channel (-1 for none)
-	UINT8 m_current_drive;
-	UINT8 m_cntl;  // RTC / FDC control (PPI port B)
-	UINT8 m_gpo;  // General purpose outputs (PPI port C)
-	UINT8 m_vidctrl;
+	uint8_t m_hd_bank;  // HD bank select
+	uint8_t m_fd_bank;  // Floppy bank select
+	uint8_t m_z80_bank; // Z80 bank / RAM refresh
+	int8_t m_current_dma;  // current DMA channel (-1 for none)
+	uint8_t m_current_drive;
+	uint8_t m_cntl;  // RTC / FDC control (PPI port B)
+	uint8_t m_gpo;  // General purpose outputs (PPI port C)
+	uint8_t m_vidctrl;
 	bool m_speaker_active;
 	bool m_beep_active;
 	bool m_speaker_level;
 	bool m_z80_active;
 	bool m_rtc_address;
 	bool m_rtc_data;
-	UINT8 m_prev_cntl;
-	UINT8 m_rs232_vector;
-	UINT8 m_rs422_vector;
+	uint8_t m_prev_cntl;
+	uint8_t m_rs232_vector;
+	uint8_t m_rs422_vector;
 	bool m_printer_busy;
 	bool m_printer_slctout;
 
@@ -429,7 +429,7 @@ WRITE8_MEMBER(octopus_state::system_w)
 
 READ8_MEMBER(octopus_state::system_r)
 {
-	UINT8 val = 0x00;
+	uint8_t val = 0x00;
 	switch(offset)
 	{
 	case 0:
@@ -498,7 +498,7 @@ WRITE8_MEMBER(octopus_state::z80_vector_w)
 // bit 3 = Address strobe?
 READ8_MEMBER(octopus_state::rtc_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(m_rtc_data)
 		ret = m_rtc->read(space,1);
@@ -678,7 +678,7 @@ WRITE8_MEMBER(octopus_state::parallel_w)
 
 READ8_MEMBER(octopus_state::dma_read)
 {
-	UINT8 byte;
+	uint8_t byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_current_dma == -1)
 		return 0;
@@ -705,7 +705,7 @@ WRITE_LINE_MEMBER( octopus_state::dma_hrq_changed )
 // Any interrupt will also give bus control back to the 8088
 IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 {
-	UINT8 vector;
+	uint8_t vector;
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_z80_active = false;
@@ -748,8 +748,8 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 {
 	if(!lg)
 	{
-		UINT8 tile = m_vram[address & 0x0fff];
-		UINT8 data = m_fontram[(tile * 16) + linecount];
+		uint8_t tile = m_vram[address & 0x0fff];
+		uint8_t data = m_fontram[(tile * 16) + linecount];
 		for (int z=0;z<8;z++)
 			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white : rgb_t::black;
 	}

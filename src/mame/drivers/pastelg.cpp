@@ -38,7 +38,7 @@ void pastelg_state::machine_start()
 
 READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
-	UINT8 *ROM = memregion("voice")->base();
+	uint8_t *ROM = memregion("voice")->base();
 
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }

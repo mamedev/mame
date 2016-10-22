@@ -154,7 +154,7 @@ NEP-16
 #include "includes/suprnova.h"
 #include "machine/msm6242.h"
 
-static void hit_calc_orig(UINT16 p, UINT16 s, UINT16 org, UINT16 *l, UINT16 *r)
+static void hit_calc_orig(uint16_t p, uint16_t s, uint16_t org, uint16_t *l, uint16_t *r)
 {
 	switch(org & 3) {
 	case 0:
@@ -176,11 +176,11 @@ static void hit_calc_orig(UINT16 p, UINT16 s, UINT16 org, UINT16 *l, UINT16 *r)
 	}
 }
 
-static void hit_calc_axis(UINT16 x1p, UINT16 x1s, UINT16 x2p, UINT16 x2s, UINT16 org,
-				UINT16 *x1_p1, UINT16 *x1_p2, UINT16 *x2_p1, UINT16 *x2_p2,
-				INT16 *x_in, UINT16 *x1tox2)
+static void hit_calc_axis(uint16_t x1p, uint16_t x1s, uint16_t x2p, uint16_t x2s, uint16_t org,
+				uint16_t *x1_p1, uint16_t *x1_p2, uint16_t *x2_p1, uint16_t *x2_p2,
+				int16_t *x_in, uint16_t *x1tox2)
 {
-	UINT16 x1l=0, x1r=0, x2l=0, x2r=0;
+	uint16_t x1l=0, x1r=0, x2l=0, x2r=0;
 	hit_calc_orig(x1p, x1s, org,      &x1l, &x1r);
 	hit_calc_orig(x2p, x2s, org >> 8, &x2l, &x2r);
 
@@ -227,7 +227,7 @@ void skns_state::hit_recalc()
 }
 
 WRITE32_MEMBER(skns_state::hit_w)
-//void hit_w(UINT32 adr, UINT32 data, int type)
+//void hit_w(uint32_t adr, uint32_t data, int type)
 {
 	hit_t &hit = m_hit;
 	int adr = offset * 4;
@@ -325,7 +325,7 @@ WRITE32_MEMBER(skns_state::hit2_w)
 
 
 READ32_MEMBER(skns_state::hit_r)
-//UINT32 hit_r(UINT32 adr, int type)
+//uint32_t hit_r(uint32_t adr, int type)
 {
 	hit_t &hit = m_hit;
 	int adr = offset *4;
@@ -337,15 +337,15 @@ READ32_MEMBER(skns_state::hit_r)
 	switch(adr) {
 	case 0x28:
 	case 0x2a:
-		return (UINT16)machine().rand();
+		return (uint16_t)machine().rand();
 	case 0x00:
 	case 0x10:
-		return (UINT16)hit.x_in;
+		return (uint16_t)hit.x_in;
 	case 0x04:
 	case 0x14:
-		return (UINT16)hit.y_in;
+		return (uint16_t)hit.y_in;
 	case 0x18:
-		return (UINT16)hit.z_in;
+		return (uint16_t)hit.z_in;
 	case 0x08:
 	case 0x1c:
 		return hit.flag;
@@ -991,7 +991,7 @@ void skns_state::init_drc()
 	m_maincpu->sh2drc_add_fastram(0x02600000, 0x02607fff, 0, &m_v3slc_ram[0]);
 }
 
-void skns_state::set_drc_pcflush(UINT32 addr)
+void skns_state::set_drc_pcflush(uint32_t addr)
 {
 	m_maincpu->sh2drc_add_pcflush(addr);
 }

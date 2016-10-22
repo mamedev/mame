@@ -63,20 +63,20 @@ public:
 	// direct update handler
 	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) { return address; }
 
-	virtual void setup_addon_ptr(UINT8 *ptr) {}
+	virtual void setup_addon_ptr(uint8_t *ptr) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8*  get_ram_base() { return &m_ram[0]; }
-	UINT32  get_rom_size() { return m_rom_size; }
-	UINT32  get_ram_size() { return m_ram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t*  get_ram_base() { return &m_ram[0]; }
+	uint32_t  get_rom_size() { return m_rom_size; }
+	uint32_t  get_ram_size() { return m_ram.size(); }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	std::vector<UINT8> m_ram;
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
 };
 
 
@@ -88,7 +88,7 @@ class vcs_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vcs_cart_slot_device();
 
 	// device-level overrides
@@ -101,7 +101,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(UINT8 *ROM, UINT32 len);
+	int identify_cart_type(uint8_t *ROM, uint32_t len);
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -126,21 +126,21 @@ private:
 	device_vcs_cart_interface*       m_cart;
 	int m_type;
 
-	int detect_snowhite(UINT8 *cart, UINT32 len);
-	int detect_modeDC(UINT8 *cart, UINT32 len);
-	int detect_modeF6(UINT8 *cart, UINT32 len);
-	int detect_mode3E(UINT8 *cart, UINT32 len);
-	int detect_modeSS(UINT8 *cart, UINT32 len);
-	int detect_modeFE(UINT8 *cart, UINT32 len);
-	int detect_modeE0(UINT8 *cart, UINT32 len);
-	int detect_modeCV(UINT8 *cart, UINT32 len);
-	int detect_modeFV(UINT8 *cart, UINT32 len);
-	int detect_modeJVP(UINT8 *cart, UINT32 len);
-	int detect_modeE7(UINT8 *cart, UINT32 len);
-	int detect_modeUA(UINT8 *cart, UINT32 len);
-	int detect_8K_mode3F(UINT8 *cart, UINT32 len);
-	int detect_32K_mode3F(UINT8 *cart, UINT32 len);
-	int detect_super_chip(UINT8 *cart, UINT32 len);
+	int detect_snowhite(uint8_t *cart, uint32_t len);
+	int detect_modeDC(uint8_t *cart, uint32_t len);
+	int detect_modeF6(uint8_t *cart, uint32_t len);
+	int detect_mode3E(uint8_t *cart, uint32_t len);
+	int detect_modeSS(uint8_t *cart, uint32_t len);
+	int detect_modeFE(uint8_t *cart, uint32_t len);
+	int detect_modeE0(uint8_t *cart, uint32_t len);
+	int detect_modeCV(uint8_t *cart, uint32_t len);
+	int detect_modeFV(uint8_t *cart, uint32_t len);
+	int detect_modeJVP(uint8_t *cart, uint32_t len);
+	int detect_modeE7(uint8_t *cart, uint32_t len);
+	int detect_modeUA(uint8_t *cart, uint32_t len);
+	int detect_8K_mode3F(uint8_t *cart, uint32_t len);
+	int detect_32K_mode3F(uint8_t *cart, uint32_t len);
+	int detect_super_chip(uint8_t *cart, uint32_t len);
 };
 
 

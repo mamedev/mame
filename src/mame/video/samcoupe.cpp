@@ -31,7 +31,7 @@ void samcoupe_state::video_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -39,10 +39,10 @@ UINT32 samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void samcoupe_state::draw_mode4_line(int y, int hpos)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	/* get start address */
-	UINT8 *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	uint8_t *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
@@ -63,10 +63,10 @@ void samcoupe_state::draw_mode4_line(int y, int hpos)
 
 void samcoupe_state::draw_mode3_line(int y, int hpos)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	/* get start address */
-	UINT8 *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
+	uint8_t *vram = videoram + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
 
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
@@ -85,11 +85,11 @@ void samcoupe_state::draw_mode3_line(int y, int hpos)
 	}
 }
 
-void samcoupe_state::draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask)
+void samcoupe_state::draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, uint8_t mask)
 {
 	/* extract colors from attribute */
-	UINT8 ink = m_clut[ATTR_FG(m_attribute)];
-	UINT8 pap = m_clut[ATTR_BG(m_attribute)];
+	uint8_t ink = m_clut[ATTR_FG(m_attribute)];
+	uint8_t pap = m_clut[ATTR_BG(m_attribute)];
 
 	/* draw block of 8 pixels (doubled to 16) */
 	for (int i = 0; i < SAM_BLOCK; i++)
@@ -101,11 +101,11 @@ void samcoupe_state::draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos,
 
 void samcoupe_state::draw_mode2_line(int y, int hpos)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
 	int cell = (y - SAM_BORDER_TOP) * 32 + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2;
 
-	UINT8 mask = videoram[cell];
+	uint8_t mask = videoram[cell];
 	m_attribute = videoram[cell + 0x2000];
 
 	draw_mode12_block(m_bitmap, y, hpos, mask);
@@ -113,9 +113,9 @@ void samcoupe_state::draw_mode2_line(int y, int hpos)
 
 void samcoupe_state::draw_mode1_line(int y, int hpos)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 
-	UINT8 mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
+	uint8_t mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 	m_attribute = videoram[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 
 	draw_mode12_block(m_bitmap, y, hpos, mask);

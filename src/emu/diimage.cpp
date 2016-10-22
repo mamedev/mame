@@ -177,7 +177,7 @@ void device_image_interface::device_compute_hash(util::hash_collection &hashes, 
 	if (partialhash)
 		partialhash(hashes, (const unsigned char*)data, length, types);
 	else
-		hashes.compute(reinterpret_cast<const UINT8 *>(data), length, types);
+		hashes.compute(reinterpret_cast<const uint8_t *>(data), length, types);
 }
 
 //-------------------------------------------------
@@ -431,7 +431,7 @@ const std::string &device_image_interface::working_directory()
 //  get_software_region
 //-------------------------------------------------
 
-UINT8 *device_image_interface::get_software_region(const char *tag)
+uint8_t *device_image_interface::get_software_region(const char *tag)
 {
 	char full_tag[256];
 
@@ -448,7 +448,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 //  image_get_software_region_length
 //-------------------------------------------------
 
-UINT32 device_image_interface::get_software_region_length(const char *tag)
+uint32_t device_image_interface::get_software_region_length(const char *tag)
 {
 	char full_tag[256];
 
@@ -473,7 +473,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<uint8_t> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
@@ -498,11 +498,11 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 void device_image_interface::run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
 	util::hash_collection &hashes, const char *types)
 {
-	UINT32 size;
-	std::vector<UINT8> buf;
+	uint32_t size;
+	std::vector<uint8_t> buf;
 
 	hashes.reset();
-	size = (UINT32) length();
+	size = (uint32_t) length();
 
 	buf.resize(size);
 	memset(&buf[0], 0, size);
@@ -527,7 +527,7 @@ void device_image_interface::image_checkhash()
 	device_image_partialhash_func partialhash;
 
 	// only calculate CRC if it hasn't been calculated, and the open_mode is read only
-	UINT32 crcval;
+	uint32_t crcval;
 	if (!m_hash.crc(crcval) && is_readonly() && !m_created)
 	{
 		// do not cause a linear read of 600 megs please
@@ -547,9 +547,9 @@ void device_image_interface::image_checkhash()
 	return;
 }
 
-UINT32 device_image_interface::crc()
+uint32_t device_image_interface::crc()
 {
-	UINT32 crc = 0;
+	uint32_t crc = 0;
 
 	image_checkhash();
 	m_hash.crc(crc);
@@ -741,7 +741,7 @@ image_error_t device_image_interface::image_error_from_file_error(osd_file::erro
 //  specific path
 //-------------------------------------------------
 
-image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const std::string &path)
+image_error_t device_image_interface::load_image_by_path(uint32_t open_flags, const std::string &path)
 {
 	std::string revised_path;
 
@@ -786,9 +786,9 @@ int device_image_interface::reopen_for_write(const std::string &path)
 //  flags to use, and in what order
 //-------------------------------------------------
 
-std::vector<UINT32> device_image_interface::determine_open_plan(bool is_create)
+std::vector<uint32_t> device_image_interface::determine_open_plan(bool is_create)
 {
-	std::vector<UINT32> open_plan;
+	std::vector<uint32_t> open_plan;
 
 	// emit flags into a vector
 	if (!is_create && is_readable() && is_writeable())
@@ -822,13 +822,13 @@ static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes
 //  and hash signatures of a file
 //-------------------------------------------------
 
-static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const util::hash_collection &hashes)
+static int verify_length_and_hash(emu_file *file, const char *name, uint32_t explength, const util::hash_collection &hashes)
 {
 	int retVal = 0;
 	if (file==nullptr) return 0;
 
 	// verify length
-	UINT32 actlength = file->size();
+	uint32_t actlength = file->size();
 	if (explength != actlength)
 	{
 		osd_printf_error("%s WRONG LENGTH (expected: %d found: %d)\n", name, explength, actlength);
@@ -879,14 +879,14 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 			{
 				osd_file::error filerr = osd_file::error::NOT_FOUND;
 
-				UINT32 crc = 0;
+				uint32_t crc = 0;
 				bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 				const software_info *swinfo = swlist.find(swname);
 				if (swinfo == nullptr)
 					return false;
 
-				UINT32 supported = swinfo->supported();
+				uint32_t supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name().c_str());
 				if (supported == SOFTWARE_SUPPORTED_NO)
@@ -984,7 +984,7 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	if (core_opens_image_file())
 	{
 		// determine open plan
-		std::vector<UINT32> open_plan = determine_open_plan(is_create);
+		std::vector<uint32_t> open_plan = determine_open_plan(is_create);
 
 		// attempt to open the file in various ways
 		for (auto iter = open_plan.cbegin(); !m_file && iter != open_plan.cend(); iter++)
@@ -1491,7 +1491,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 
 //----------------------------------------------------------------------------
 
-static int image_fseek_thunk(void *file, INT64 offset, int whence)
+static int image_fseek_thunk(void *file, int64_t offset, int whence)
 {
 	device_image_interface *image = (device_image_interface *) file;
 	return image->fseek(offset, whence);
@@ -1509,7 +1509,7 @@ static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
 	return image->fwrite(buffer, length);
 }
 
-static UINT64 image_fsize_thunk(void *file)
+static uint64_t image_fsize_thunk(void *file)
 {
 	device_image_interface *image = (device_image_interface *) file;
 	return image->length();

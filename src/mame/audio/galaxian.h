@@ -8,7 +8,7 @@ class galaxian_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~galaxian_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( sound_w );
@@ -29,7 +29,7 @@ protected:
 
 private:
 	// internal state
-	UINT8 m_lfo_val;
+	uint8_t m_lfo_val;
 	discrete_device *m_discrete;
 };
 

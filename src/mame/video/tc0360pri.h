@@ -6,7 +6,7 @@
 class tc0360pri_device : public device_t
 {
 public:
-	tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0360pri_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );
@@ -19,7 +19,7 @@ protected:
 
 private:
 	// internal state
-	UINT8   m_regs[16];
+	uint8_t   m_regs[16];
 };
 
 extern const device_type TC0360PRI;

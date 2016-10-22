@@ -15,14 +15,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 
-	std::unique_ptr<UINT8[]> m_bg_ram;
-	std::unique_ptr<UINT8[]> m_fg_ram;
+	std::unique_ptr<uint8_t[]> m_bg_ram;
+	std::unique_ptr<uint8_t[]> m_fg_ram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 m_bg_xscroll[2];
+	uint8_t m_bg_xscroll[2];
 	int m_flipscreen;
 	int m_video_enable;
 
@@ -44,6 +44,6 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

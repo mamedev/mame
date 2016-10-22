@@ -55,17 +55,17 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void line_update();
-	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
 private:
 	int             m_vpos;
-	UINT64          m_line_start_cycles;
-	UINT32          m_line_pos_cycles;
-	UINT8           m_port_a;
-	UINT8           m_port_b;
-	UINT8           m_port_c;
-	UINT8           m_port_d;
+	uint64_t          m_line_start_cycles;
+	uint32_t          m_line_pos_cycles;
+	uint8_t           m_port_a;
+	uint8_t           m_port_b;
+	uint8_t           m_port_c;
+	uint8_t           m_port_d;
 	bitmap_rgb32    m_bitmap;
 };
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER(uzebox_state::port_a_w)
 	m_ctrl1->write_strobe(BIT(data, 2));
 	m_ctrl2->write_strobe(BIT(data, 2));
 
-	UINT8 changed = m_port_a ^ data;
+	uint8_t changed = m_port_a ^ data;
 	if ((changed & data & 0x08) || (changed & (~data) & 0x04))
 	{
 		m_port_a &= ~0x03;
@@ -130,7 +130,7 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 		{
 			line_update();
 
-			UINT32 cycles = (UINT32)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles);
+			uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles);
 			if (cycles < 1000 && m_vpos >= 448)
 				m_vpos = INTERLACED ? ((m_vpos ^ 0x01) & 0x01) : 0;
 			else if (cycles > 1000)
@@ -220,10 +220,10 @@ INPUT_PORTS_END
 
 void uzebox_state::line_update()
 {
-	UINT32 cycles = (UINT32)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
+	uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
 	rgb_t color = rgb_t(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
 
-	for (UINT32 x = m_line_pos_cycles; x < cycles; x++)
+	for (uint32_t x = m_line_pos_cycles; x < cycles; x++)
 	{
 		if (m_bitmap.cliprect().contains(x, m_vpos))
 			m_bitmap.pix32(m_vpos, x) = color;
@@ -235,7 +235,7 @@ void uzebox_state::line_update()
 	m_line_pos_cycles = cycles;
 }
 
-UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -243,13 +243,13 @@ UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &b
 
 DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	if (image.software_entry() == nullptr)
 	{
-		std::vector<UINT8> data(size);
+		std::vector<uint8_t> data(size);
 		image.fread(&data[0], size);
 
 		if (!strncmp((const char*)&data[0], "UZEBOX", 6))

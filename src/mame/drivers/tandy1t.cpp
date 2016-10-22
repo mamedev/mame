@@ -47,7 +47,7 @@ class t1000_mb_device : public pc_noppi_mb_device
 {
 public:
 	// construction/destruction
-	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: pc_noppi_mb_device(mconfig, tag, owner, clock) { }
 protected:
 	virtual void device_start() override;
@@ -97,7 +97,7 @@ public:
 	DECLARE_READ8_MEMBER( unk_r );
 
 	int tandy1000_read_eeprom();
-	void tandy1000_write_eeprom(UINT8 data);
+	void tandy1000_write_eeprom(uint8_t data);
 	void tandy1000_set_bios_bank();
 
 	void machine_start() override;
@@ -106,19 +106,19 @@ public:
 
 	struct
 	{
-		UINT8 low, high;
+		uint8_t low, high;
 	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
 
 	int m_eeprom_state;
 	int m_eeprom_clock;
-	UINT8 m_eeprom_oper;
-	UINT16 m_eeprom_data;
+	uint8_t m_eeprom_oper;
+	uint16_t m_eeprom_data;
 
-	UINT8 m_tandy_data[8];
+	uint8_t m_tandy_data[8];
 
-	UINT8 m_tandy_bios_bank;    /* I/O port FFEAh */
-	UINT8 m_tandy_ppi_portb, m_tandy_ppi_portc;
-	UINT8 m_vram_bank;
+	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
+	uint8_t m_vram_bank;
 };
 
 /* tandy 1000 eeprom
@@ -137,7 +137,7 @@ int tandy1000_state::tandy1000_read_eeprom()
 	return 1;
 }
 
-void tandy1000_state::tandy1000_write_eeprom(UINT8 data)
+void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 {
 	if (!m_eeprom_clock && (data&4) )
 	{
@@ -340,7 +340,7 @@ READ8_MEMBER( tandy1000_state::unk_r )
 
 READ8_MEMBER( tandy1000_state::vram_r )
 {
-	UINT8 vram_base = (m_ram->size() >> 17) - 1;
+	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
 		return m_ram->pointer()[offset & 0x1ffff];
 	return 0xff;
@@ -348,7 +348,7 @@ READ8_MEMBER( tandy1000_state::vram_r )
 
 WRITE8_MEMBER( tandy1000_state::vram_w )
 {
-	UINT8 vram_base = (m_ram->size() >> 17) - 1;
+	uint8_t vram_base = (m_ram->size() >> 17) - 1;
 	if((m_vram_bank - vram_base) == (offset >> 17))
 		m_ram->pointer()[offset & 0x1ffff] = data;
 }
@@ -396,7 +396,7 @@ void tandy1000_state::machine_start()
 
 READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
 

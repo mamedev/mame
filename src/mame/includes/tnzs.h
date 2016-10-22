@@ -74,7 +74,7 @@ public:
 	optional_ioport m_an2;
 
 	/* sound-related */
-	std::unique_ptr<INT16[]>    m_sampledata[MAX_SAMPLES];
+	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
 	int      m_samplesize[MAX_SAMPLES];
 
 	/* misc / mcu */
@@ -87,10 +87,10 @@ public:
 	int      m_mcu_readcredits;
 	int      m_mcu_reportcoin;
 	int      m_insertcoin;
-	UINT8    m_mcu_coinage[4];
-	UINT8    m_mcu_coins_a;
-	UINT8    m_mcu_coins_b;
-	UINT8    m_mcu_credits;
+	uint8_t    m_mcu_coinage[4];
+	uint8_t    m_mcu_coins_a;
+	uint8_t    m_mcu_coins_b;
+	uint8_t    m_mcu_credits;
 	int      m_bank2;
 
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
@@ -132,7 +132,7 @@ public:
 	DECLARE_MACHINE_START(tnzs_common);
 	DECLARE_MACHINE_RESET(jpopnics);
 
-	UINT32 screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tnzs(screen_device &screen, bool state);
 
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);

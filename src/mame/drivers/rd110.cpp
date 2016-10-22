@@ -62,7 +62,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(d110);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
@@ -77,11 +77,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
 private:
-	UINT8 lcd_data_buffer[256];
+	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
-	UINT8 midi;
+	uint8_t midi;
 	int midi_pos;
-	UINT8 port0;
+	uint8_t port0;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -99,14 +99,14 @@ d110_state::d110_state(const machine_config &mconfig, device_type type, const ch
 }
 
 
-UINT32 d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0);
-	const UINT8 *data = lcd->render();
+	const uint8_t *data = lcd->render();
 	for(int l=0; l<2; l++)
 		for(int c=0; c<20; c++)
 			for(int y=0; y<8; y++) {
-				UINT8 v = data[c*16 + l*40*16 + y];
+				uint8_t v = data[c*16 + l*40*16 + y];
 				for(int x=0; x<5; x++)
 					bitmap.pix16(y+9*l, c*6+x) = v & (0x10 >> x) ? 1 : 0;
 			}
@@ -170,7 +170,7 @@ WRITE16_MEMBER(d110_state::midi_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(d110_state::midi_timer_cb)
 {
-	const static UINT8 midi_data[3] = { 0x91, 0x40, 0x7f };
+	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	midi = midi_data[midi_pos++];
 	logerror("midi_in %02x\n", midi);
 	cpu->serial_w(midi);

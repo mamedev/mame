@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(ut88_8255_portb_r);
 	DECLARE_READ8_MEMBER(ut88_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(ut88_8255_porta_w);
-	optional_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 	int m_keyboard_mask;
 	int m_lcd_digit[6];
 	DECLARE_DRIVER_INIT(ut88);
@@ -69,7 +69,7 @@ public:
 	DECLARE_VIDEO_START(ut88);
 	DECLARE_MACHINE_START(ut88mini);
 	DECLARE_MACHINE_RESET(ut88mini);
-	UINT32 screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_memory_region m_region_maincpu;

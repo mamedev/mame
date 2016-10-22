@@ -129,12 +129,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	DECLARE_WRITE8_MEMBER(outport_w);
 	DECLARE_PALETTE_INIT(murogem);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -217,7 +217,7 @@ GFXDECODE_END
 PALETTE_INIT_MEMBER(murogem_state, murogem)
 {}
 
-UINT32 murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int xx,yy,count;
 	count = 0x000;

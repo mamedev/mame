@@ -128,7 +128,7 @@ const device_type MOS5710 = &device_creator<mos5710_device>;
 
 inline void mos6526_device::update_pa()
 {
-	UINT8 pa = m_pra | (m_pa_in & ~m_ddra);
+	uint8_t pa = m_pra | (m_pa_in & ~m_ddra);
 
 	if (m_pa != pa)
 	{
@@ -144,7 +144,7 @@ inline void mos6526_device::update_pa()
 
 inline void mos6526_device::update_pb()
 {
-	UINT8 pb = m_prb | (m_pb_in & ~m_ddrb);
+	uint8_t pb = m_prb | (m_pb_in & ~m_ddrb);
 
 	if (CRA_PBON)
 	{
@@ -174,7 +174,7 @@ inline void mos6526_device::update_pb()
 //  set_cra - control register A write
 //-------------------------------------------------
 
-inline void mos6526_device::set_cra(UINT8 data)
+inline void mos6526_device::set_cra(uint8_t data)
 {
 	if (!CRA_STARTED && (data & CRA_START))
 	{
@@ -204,7 +204,7 @@ inline void mos6526_device::set_cra(UINT8 data)
 //  set_crb - control register B write
 //-------------------------------------------------
 
-inline void mos6526_device::set_crb(UINT8 data)
+inline void mos6526_device::set_crb(uint8_t data)
 {
 	if (!CRB_STARTED && (data & CRB_START))
 	{
@@ -220,7 +220,7 @@ inline void mos6526_device::set_crb(UINT8 data)
 //  bcd_increment -
 //-------------------------------------------------
 
-inline UINT8 mos6526_device::bcd_increment(UINT8 value)
+inline uint8_t mos6526_device::bcd_increment(uint8_t value)
 {
 	value++;
 
@@ -237,10 +237,10 @@ inline UINT8 mos6526_device::bcd_increment(UINT8 value)
 
 inline void mos6526_device::clock_tod()
 {
-	UINT8 subsecond = (UINT8) (m_tod >>  0);
-	UINT8 second    = (UINT8) (m_tod >>  8);
-	UINT8 minute    = (UINT8) (m_tod >> 16);
-	UINT8 hour      = (UINT8) (m_tod >> 24);
+	uint8_t subsecond = (uint8_t) (m_tod >>  0);
+	uint8_t second    = (uint8_t) (m_tod >>  8);
+	uint8_t minute    = (uint8_t) (m_tod >> 16);
+	uint8_t hour      = (uint8_t) (m_tod >> 24);
 
 	m_tod_count++;
 
@@ -278,10 +278,10 @@ inline void mos6526_device::clock_tod()
 		}
 	}
 
-	m_tod = (((UINT32) subsecond)   <<  0)
-			| (((UINT32) second)        <<  8)
-			| (((UINT32) minute)        << 16)
-			| (((UINT32) hour)      << 24);
+	m_tod = (((uint32_t) subsecond)   <<  0)
+			| (((uint32_t) second)        <<  8)
+			| (((uint32_t) minute)        << 16)
+			| (((uint32_t) hour)      << 24);
 }
 
 
@@ -300,7 +300,7 @@ inline void mos8520_device::clock_tod()
 //  read_tod - time-of-day read
 //-------------------------------------------------
 
-inline UINT8 mos6526_device::read_tod(int offset)
+inline uint8_t mos6526_device::read_tod(int offset)
 {
 	int shift = 8 * offset;
 
@@ -319,7 +319,7 @@ inline UINT8 mos6526_device::read_tod(int offset)
 //  write_tod - time-of-day write
 //-------------------------------------------------
 
-inline void mos6526_device::write_tod(int offset, UINT8 data)
+inline void mos6526_device::write_tod(int offset, uint8_t data)
 {
 	int shift = 8 * offset;
 
@@ -586,7 +586,7 @@ inline void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -603,7 +603,7 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock, "mos6526", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -619,13 +619,13 @@ mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, d
 		m_write_pb(*this)
 { }
 
-mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6526_device(mconfig, MOS6526A, "MOS6526A", tag, owner, clock, TYPE_6526A, "mos6526a", __FILE__) { }
 
-mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock, TYPE_8520, "mos8520", __FILE__) { }
 
-mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock, TYPE_5710, "mos5710", __FILE__) { }
 
 
@@ -804,7 +804,7 @@ READ8_MEMBER( mos6526_device::read )
 	if (space.debugger_access())
 		return 0xff;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x0f)
 	{
@@ -921,7 +921,7 @@ READ8_MEMBER( mos6526_device::read )
 
 READ8_MEMBER( mos8520_device::read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	switch (offset & 0x0f)
 	{

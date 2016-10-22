@@ -47,8 +47,8 @@ public:
 	DECLARE_READ16_MEMBER( dms86_86_r );
 	DECLARE_READ16_MEMBER( dms86_9a_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_ram;
-	UINT8 m_term_data;
+	uint8_t *m_ram;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
@@ -61,7 +61,7 @@ READ16_MEMBER( dms86_state::dms86_82_r )
 
 READ16_MEMBER( dms86_state::dms86_84_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

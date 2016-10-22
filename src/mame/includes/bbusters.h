@@ -30,21 +30,21 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	optional_shared_ptr<UINT16> m_eprom_data;
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_pf1_data;
-	required_shared_ptr<UINT16> m_pf2_data;
-	required_shared_ptr<UINT16> m_pf1_scroll_data;
-	required_shared_ptr<UINT16> m_pf2_scroll_data;
+	optional_shared_ptr<uint16_t> m_eprom_data;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_pf1_data;
+	required_shared_ptr<uint16_t> m_pf2_data;
+	required_shared_ptr<uint16_t> m_pf1_scroll_data;
+	required_shared_ptr<uint16_t> m_pf2_scroll_data;
 
 	int m_sound_status;
 	int m_gun_select;
 	tilemap_t *m_fix_tilemap;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_pf2_tilemap;
-	const UINT8 *m_scale_table_ptr;
-	UINT8 m_scale_line_count;
+	const uint8_t *m_scale_table_ptr;
+	uint8_t m_scale_line_count;
 
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_status_w);
@@ -68,10 +68,10 @@ public:
 	DECLARE_VIDEO_START(bbuster);
 	DECLARE_VIDEO_START(mechatt);
 
-	UINT32 screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bbuster(screen_device &screen, bool state);
-	inline const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block);
-	void draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block);
-	void draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask);
+	inline const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
+	void draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block);
+	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask);
 };

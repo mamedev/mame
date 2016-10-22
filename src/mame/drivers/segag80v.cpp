@@ -189,7 +189,7 @@ offs_t segag80v_state::decrypt_offset(address_space &space, offs_t offset)
 {
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = space.device().safe_pcbase();
-	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
+	if ((uint16_t)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
@@ -215,7 +215,7 @@ WRITE8_MEMBER(segag80v_state::vectorram_w)
  *
  *************************************/
 
-inline UINT8 segag80v_state::demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
+inline uint8_t segag80v_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
@@ -231,10 +231,10 @@ READ8_MEMBER(segag80v_state::mangled_ports_r)
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = ioport("D7D6")->read();
-	UINT8 d5d4 = ioport("D5D4")->read();
-	UINT8 d3d2 = ioport("D3D2")->read();
-	UINT8 d1d0 = ioport("D1D0")->read();
+	uint8_t d7d6 = ioport("D7D6")->read();
+	uint8_t d5d4 = ioport("D5D4")->read();
+	uint8_t d3d2 = ioport("D3D2")->read();
+	uint8_t d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -255,7 +255,7 @@ WRITE8_MEMBER(segag80v_state::spinner_select_w)
 
 READ8_MEMBER(segag80v_state::spinner_input_r)
 {
-	INT8 delta;
+	int8_t delta;
 
 	if (m_spinner_select & 1)
 		return ioport("FC")->read();
@@ -293,7 +293,7 @@ CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
 
 READ8_MEMBER(segag80v_state::elim4_input_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	/* bit 3 enables demux */
 	if (m_spinner_select & 8)
@@ -334,7 +334,7 @@ WRITE8_MEMBER(segag80v_state::multiply_w)
 
 READ8_MEMBER(segag80v_state::multiply_r)
 {
-	UINT8 result = m_mult_result;
+	uint8_t result = m_mult_result;
 	m_mult_result >>= 8;
 	return result;
 }

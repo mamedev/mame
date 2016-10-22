@@ -24,7 +24,7 @@ class bml3bus_kanji_device:
 {
 public:
 	// construction/destruction
-	bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -37,10 +37,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT16 m_kanji_addr;
+	uint16_t m_kanji_addr;
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 };
 
 // device type definition

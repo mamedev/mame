@@ -148,7 +148,7 @@ void menu_dats_view::populate()
 //  draw - draw dats menu
 //-------------------------------------------------
 
-void menu_dats_view::draw(UINT32 flags)
+void menu_dats_view::draw(uint32_t flags)
 {
 	auto line_height = ui().get_line_height();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();

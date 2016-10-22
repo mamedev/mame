@@ -33,7 +33,7 @@ INPUT_CHANGED_MEMBER(cchasm_state::set_coin_flag )
 
 READ8_MEMBER(cchasm_state::coin_sound_r)
 {
-	UINT8 coin = (ioport("IN3")->read() >> 4) & 0x7;
+	uint8_t coin = (ioport("IN3")->read() >> 4) & 0x7;
 	return m_sound_flags | (m_coin_flag << 3) | coin;
 }
 

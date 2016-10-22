@@ -24,8 +24,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
-	required_shared_ptr<UINT8> m_gfxram;
-	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<uint8_t> m_gfxram;
+	required_shared_ptr<uint8_t> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
@@ -36,13 +36,13 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mogura);
-	UINT32 screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 PALETTE_INIT_MEMBER(mogura_state, mogura)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j;
 
 	j = 0;
@@ -91,7 +91,7 @@ void mogura_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 

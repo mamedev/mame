@@ -264,7 +264,7 @@ WRITE16_MEMBER(atarig42_state::roadriot_sloop_data_w)
 
 void atarig42_state::guardians_sloop_tweak(int offset)
 {
-	UINT32 *last_accesses = m_last_accesses;
+	uint32_t *last_accesses = m_last_accesses;
 
 	if (offset >= 0x7f7c0/2)
 	{
@@ -828,7 +828,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
-	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
+	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
 	Road Riot color MUX
@@ -859,11 +859,11 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
+	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
-	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
+	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
 	Guardians color MUX

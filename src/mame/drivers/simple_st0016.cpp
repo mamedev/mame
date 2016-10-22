@@ -106,7 +106,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static UINT32 latches[8];
+static uint32_t latches[8];
 
 READ32_MEMBER(st0016_state::latch32_r)
 {
@@ -456,7 +456,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
  *
  *************************************/
 
-UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return m_maincpu->update(screen,bitmap,cliprect);
 }

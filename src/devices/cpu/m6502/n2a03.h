@@ -16,13 +16,13 @@
 
 class n2a03_device : public m6502_device {
 public:
-	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<nesapu_device> m_apu;
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 	virtual void device_clock_changed() override;
@@ -36,19 +36,19 @@ protected:
 	class mi_2a03_normal : public memory_interface {
 	public:
 		virtual ~mi_2a03_normal() {}
-		virtual UINT8 read(UINT16 adr) override;
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
-		virtual void write(UINT16 adr, UINT8 val) override;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
 	class mi_2a03_nd : public memory_interface {
 	public:
 		virtual ~mi_2a03_nd() {}
-		virtual UINT8 read(UINT16 adr) override;
-		virtual UINT8 read_sync(UINT16 adr) override;
-		virtual UINT8 read_arg(UINT16 adr) override;
-		virtual void write(UINT16 adr, UINT8 val) override;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
 	virtual void device_start() override;

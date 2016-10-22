@@ -30,7 +30,7 @@ class dmac_hdc_device : public device_t
 public:
 	// construction/destruction
 	dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-		device_t *owner, UINT32 clock, const char *name, const char *shortname);
+		device_t *owner, uint32_t clock, const char *name, const char *shortname);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -62,7 +62,7 @@ protected:
 	required_device<dmac_device> m_dmac;
 	required_device<wd33c93_device> m_wdc;
 
-	std::vector<UINT8> m_ram;
+	std::vector<uint8_t> m_ram;
 };
 
 // ======================> a590_device
@@ -71,7 +71,7 @@ class a590_device : public dmac_hdc_device, public device_exp_card_interface
 {
 public:
 	// construction/destruction
-	a590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -102,7 +102,7 @@ class a2091_device : public dmac_hdc_device, public device_zorro2_card_interface
 {
 public:
 	// construction/destruction
-	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

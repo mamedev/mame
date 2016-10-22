@@ -178,7 +178,7 @@ public:
 *            Read/Write Handlers             *
 *********************************************/
 
-static const UINT8 led_map[16] = // 7748 IC?
+static const uint8_t led_map[16] = // 7748 IC?
 	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 WRITE8_MEMBER(jankenmn_state::lamps1_w)

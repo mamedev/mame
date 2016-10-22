@@ -625,7 +625,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(skykid_state,skykid)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	/* unpack the third sprite ROM */

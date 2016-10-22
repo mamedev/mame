@@ -60,7 +60,7 @@ void lynx_state::video_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -152,10 +152,10 @@ ROM_END
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	std::vector<UINT8> data;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
-	UINT16 start, length;
+	std::vector<uint8_t> data;
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t header[10]; // 80 08 dw Start dw Len B S 9 3
+	uint16_t start, length;
 	int i;
 
 	if (image.fread( header, sizeof(header)) != sizeof(header))

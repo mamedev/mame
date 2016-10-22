@@ -129,7 +129,7 @@ static const POCKETC_FIGURE busy={
 #define DOWN 57
 #define RIGHT 114
 
-UINT32 pc1401_state::screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc1401_state::screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, i, j;
 	int color[2];

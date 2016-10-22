@@ -42,14 +42,14 @@ public:
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
 
 	int m_tilexor;
-	UINT8 m_blacklamp;
-	UINT8 m_redlamp;
-	std::unique_ptr<UINT8[]> m_vram;
+	uint8_t m_blacklamp;
+	uint8_t m_redlamp;
+	std::unique_ptr<uint8_t[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -71,10 +71,10 @@ public:
 
 void chsuper_state::video_start()
 {
-	m_vram = make_unique_clear<UINT8[]>(1 << 14);
+	m_vram = make_unique_clear<uint8_t[]>(1 << 14);
 }
 
-UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -466,13 +466,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x7f00;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -488,13 +488,13 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x0e00;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -510,13 +510,13 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 
 DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	std::unique_ptr<UINT8[]> buffer;
-	UINT8 *rom = memregion("gfx1")->base();
+	std::unique_ptr<uint8_t[]> buffer;
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x1800;
 
-	buffer = std::make_unique<UINT8[]>(0x100000);
+	buffer = std::make_unique<uint8_t[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{

@@ -31,10 +31,10 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_hardhead_ip;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_wram;
-	optional_shared_ptr<UINT8> m_banked_paletteram;
+	optional_shared_ptr<uint8_t> m_hardhead_ip;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_wram;
+	optional_shared_ptr<uint8_t> m_banked_paletteram;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -46,21 +46,21 @@ public:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank1d;
 
-	UINT8 m_rombank;
-	UINT8 m_rombank_latch;
-	UINT8 m_spritebank;
-	UINT8 m_palettebank;
-	UINT8 m_paletteram_enab;
-	UINT8 m_prot2;
-	UINT8 m_prot2_prev;
+	uint8_t m_rombank;
+	uint8_t m_rombank_latch;
+	uint8_t m_spritebank;
+	uint8_t m_palettebank;
+	uint8_t m_paletteram_enab;
+	uint8_t m_prot2;
+	uint8_t m_prot2_prev;
 
-	UINT8 m_protection_val;
-	UINT8 m_nmi_enable;
-	UINT8 m_spritebank_latch;
-	UINT8 m_write_disable;
-	UINT8 m_prot_opcode_toggle;
-	UINT8 m_remap_sound;
-	UINT8* m_decrypt;
+	uint8_t m_protection_val;
+	uint8_t m_nmi_enable;
+	uint8_t m_spritebank_latch;
+	uint8_t m_write_disable;
+	uint8_t m_prot_opcode_toggle;
+	uint8_t m_remap_sound;
+	uint8_t* m_decrypt;
 
 	enum GFXBANK_TYPE_T
 	{
@@ -68,12 +68,12 @@ public:
 		GFXBANK_TYPE_BRICKZN,
 		GFXBANK_TYPE_STARFIGH
 	}   m_gfxbank_type;
-	UINT8 m_gfxbank;
+	uint8_t m_gfxbank;
 
 	bool m_has_text; // has text sprites (older games)
 
 	// samples
-	std::unique_ptr<INT16[]> m_samplebuf;
+	std::unique_ptr<int16_t[]> m_samplebuf;
 	int m_sample, m_play;
 	int m_numsamples;
 
@@ -162,7 +162,7 @@ public:
 
 	DECLARE_MACHINE_RESET(brickzn);
 	DECLARE_MACHINE_RESET(hardhea2);
-	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 
 	// samples
@@ -174,5 +174,5 @@ public:
 
 	void draw_sprites     (screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which);
 	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);
-	UINT8 *brickzn_decrypt();
+	uint8_t *brickzn_decrypt();
 };

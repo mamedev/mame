@@ -47,11 +47,11 @@ public:
 	int  m_rombank0;
 	int  m_rombank1;
 
-	UINT32 m_dac_adr;
-	UINT32 m_dac_bank;
-	UINT32 m_dac_adr_s;
-	UINT32 m_dac_adr_e;
-	UINT32 m_dac_busy;
+	uint32_t m_dac_adr;
+	uint32_t m_dac_bank;
+	uint32_t m_dac_adr_s;
+	uint32_t m_dac_adr_e;
+	uint32_t m_dac_busy;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -59,8 +59,8 @@ public:
 	required_device<dac_byte_interface> m_dac;
 
 	/* memory */
-	UINT8 m_videoram0[0x8000];
-	UINT8 m_videoram1[0x8000];
+	uint8_t m_videoram0[0x8000];
+	uint8_t m_videoram1[0x8000];
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
 	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
@@ -73,10 +73,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw();
-	void plot0( int offset, UINT8 data );
-	void plot1( int offset, UINT8 data );
+	void plot0( int offset, uint8_t data );
+	void plot1( int offset, uint8_t data );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -98,7 +98,7 @@ void mjsister_state::video_start()
 	save_item(NAME(m_videoram1));
 }
 
-void mjsister_state::plot0( int offset, UINT8 data )
+void mjsister_state::plot0( int offset, uint8_t data )
 {
 	int x, y, c1, c2;
 
@@ -112,7 +112,7 @@ void mjsister_state::plot0( int offset, UINT8 data )
 	m_tmpbitmap0->pix16(y, x * 2 + 1) = c2;
 }
 
-void mjsister_state::plot1( int offset, UINT8 data )
+void mjsister_state::plot1( int offset, uint8_t data )
 {
 	int x, y, c1, c2;
 
@@ -145,7 +145,7 @@ WRITE8_MEMBER(mjsister_state::videoram_w)
 	}
 }
 
-UINT32 mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mjsister_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = m_flip_screen;
 	int i, j;
@@ -196,7 +196,7 @@ void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
-	UINT8 *DACROM = memregion("samples")->base();
+	uint8_t *DACROM = memregion("samples")->base();
 
 	m_dac->write(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
@@ -437,7 +437,7 @@ void mjsister_state::redraw()
 
 void mjsister_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 

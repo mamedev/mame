@@ -206,7 +206,7 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		UINT16 triggerscanline=m_c116->get_reg(5)-(32+1);
+		uint16_t triggerscanline=m_c116->get_reg(5)-(32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
@@ -790,7 +790,7 @@ ROM_END
 
 void namcofl_state::common_init()
 {
-	m_workram = std::make_unique<UINT32[]>(0x100000/4);
+	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
 
 	membank("bank1")->set_base(memregion("maincpu")->base() );
 	membank("bank2")->set_base(m_workram.get());

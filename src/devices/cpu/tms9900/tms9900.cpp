@@ -170,7 +170,7 @@ enum
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
@@ -198,7 +198,7 @@ tms99xx_device::~tms99xx_device()
     Constructor for TMS9900
 ****************************************************************************/
 
-tms9900_device::tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9900_device::tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms99xx_device(mconfig, TMS9900, "TMS9900", tag, 16, 16, 12, owner, clock, "tms9900", __FILE__)
 {
 }
@@ -340,21 +340,21 @@ void tms99xx_device::state_import(const device_state_entry &entry)
 			// bits of the STATUS register
 			break;
 		case TMS9900_PC:
-			PC = (UINT16)(m_state_any & m_prgaddr_mask & 0xfffe);
+			PC = (uint16_t)(m_state_any & m_prgaddr_mask & 0xfffe);
 			break;
 		case TMS9900_WP:
-			WP = (UINT16)(m_state_any & m_prgaddr_mask & 0xfffe);
+			WP = (uint16_t)(m_state_any & m_prgaddr_mask & 0xfffe);
 			break;
 		case TMS9900_STATUS:
-			ST = (UINT16)m_state_any;
+			ST = (uint16_t)m_state_any;
 			break;
 		case TMS9900_IR:
-			IR = (UINT16)m_state_any;
+			IR = (uint16_t)m_state_any;
 			break;
 		default:
 			// Workspace registers
 			if (index <= TMS9900_R15)
-				write_workspace_register_debug(index-TMS9900_R0, (UINT16)m_state_any);
+				write_workspace_register_debug(index-TMS9900_R0, (uint16_t)m_state_any);
 			break;
 	}
 }
@@ -398,7 +398,7 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 	static const char *statestr = "LAECOPX-----IIII";
 	char flags[17];
 	for (auto &flag : flags) flag = 0x00;
-	UINT16 val = 0x8000;
+	uint16_t val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{
 		for (int i=0; i < 16; i++)
@@ -412,17 +412,17 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 
 /**************************************************************************/
 
-UINT16 tms99xx_device::read_workspace_register_debug(int reg)
+uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
 	m_prgspace->set_debugger_access(true);
-	UINT16 value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
+	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
 	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 	return value;
 }
 
-void tms99xx_device::write_workspace_register_debug(int reg, UINT16 data)
+void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
 	m_prgspace->set_debugger_access(true);
@@ -457,7 +457,7 @@ const address_space_config *tms99xx_device::memory_space_config(address_spacenum
 
 /*
     Define the indices for the micro-operation table. This is done for the sake
-    of a simpler microprogram definition as an UINT8[].
+    of a simpler microprogram definition as an uint8_t[].
 */
 enum
 {
@@ -513,7 +513,7 @@ enum
 
 
 #define MICROPROGRAM(_MP) \
-	static const UINT8 _MP[] =
+	static const uint8_t _MP[] =
 
 /*
     This is a kind of subroutine with 6 variants. Might be done in countless
@@ -1087,7 +1087,7 @@ void tms99xx_device::build_command_lookup_table()
 	int cmdindex;
 	int bitcount;
 	const tms_instruction *inst;
-	UINT16 opcode;
+	uint16_t opcode;
 
 	m_command_lookup_table = std::make_unique<lookup_entry[]>(16);
 
@@ -1225,10 +1225,10 @@ void tms99xx_device::execute_run()
 		}
 		else
 		{
-			const UINT8* program = nullptr;
+			const uint8_t* program = nullptr;
 			// When we are in the data derivation sequence, the caller_index is set
 			if (m_program_index != NOPRG)
-				program = (m_caller_index == NOPRG)? (UINT8*)s_command[m_program_index].prog : data_derivation;
+				program = (m_caller_index == NOPRG)? (uint8_t*)s_command[m_program_index].prog : data_derivation;
 
 			// Handle HOLD
 			// A HOLD request is signalled through the input line HOLD.
@@ -1260,7 +1260,7 @@ void tms99xx_device::execute_run()
 					set_wait_state(false);
 					m_check_ready = false;
 					// If we don't have a microprogram, acquire the next instruction
-					UINT8 op = (m_program_index==NOPRG)? IAQ : program[MPC];
+					uint8_t op = (m_program_index==NOPRG)? IAQ : program[MPC];
 
 					if (TRACE_MICRO) logerror("MPC = %d, op = %d\n", MPC, op);
 					// Call the operation of the microprogram
@@ -1441,11 +1441,11 @@ inline void tms99xx_device::set_wait_state(bool state)
     Acquire the next word as an instruction. The program counter advances by
     one word.
 */
-void tms99xx_device::decode(UINT16 inst)
+void tms99xx_device::decode(uint16_t inst)
 {
 	int ix = 0;
 	lookup_entry* table = m_command_lookup_table.get();
-	UINT16 opcode = inst;
+	uint16_t opcode = inst;
 	bool complete = false;
 
 	m_state = 0;
@@ -1592,7 +1592,7 @@ void tms99xx_device::register_read()
 void tms99xx_device::register_write()
 {
 	// This will be called twice; m_pass is set by the embedded mem_write
-	UINT16 addr_save = m_address;
+	uint16_t addr_save = m_address;
 	m_address = (WP + (m_regnumber<<1)) & m_prgaddr_mask & 0xfffe;
 	mem_write();
 	m_address = addr_save;
@@ -1711,7 +1711,7 @@ void tms99xx_device::command_completed()
 */
 void tms99xx_device::data_derivation_subprogram()
 {
-	UINT16 ircopy = IR;
+	uint16_t ircopy = IR;
 
 	// Save the return program and position
 	m_caller_index = m_program_index;
@@ -1744,7 +1744,7 @@ inline void tms99xx_device::set_status_bit(int bit, bool state)
 	else ST &= ~bit;
 }
 
-void tms99xx_device::set_status_parity(UINT8 value)
+void tms99xx_device::set_status_parity(uint8_t value)
 {
 	int count = 0;
 	for (int i=0; i < 8; i++)
@@ -1755,11 +1755,11 @@ void tms99xx_device::set_status_parity(UINT8 value)
 	set_status_bit(ST_OP, (count & 1)!=0);
 }
 
-inline void tms99xx_device::compare_and_set_lae(UINT16 value1, UINT16 value2)
+inline void tms99xx_device::compare_and_set_lae(uint16_t value1, uint16_t value2)
 {
 	set_status_bit(ST_EQ, value1 == value2);
 	set_status_bit(ST_LH, value1 > value2);
-	set_status_bit(ST_AGT, (INT16)value1 > (INT16)value2);
+	set_status_bit(ST_AGT, (int16_t)value1 > (int16_t)value2);
 	if (TRACE_STATUS) logerror("ST = %04x (val1=%04x, val2=%04x)\n", ST, value1, value2);
 }
 
@@ -1843,10 +1843,10 @@ void tms99xx_device::alu_reg()
 
 void tms99xx_device::alu_f1()
 {
-	UINT32 dest_new = 0;
+	uint32_t dest_new = 0;
 
 	// Save the destination value
-	UINT16 prev_dest_value = m_current_value;
+	uint16_t prev_dest_value = m_current_value;
 
 	m_destination_even = ((m_address & 1)==0);  // this is the destination address; the source address has already been saved
 	bool byteop = byte_operation();
@@ -1934,7 +1934,7 @@ void tms99xx_device::alu_f1()
 
 	if (byteop)
 	{
-		set_status_parity((UINT8)(dest_new>>8));
+		set_status_parity((uint8_t)(dest_new>>8));
 
 		// destnew is the new value to be written (high byte); needs to be
 		// merged with the existing word
@@ -1942,12 +1942,12 @@ void tms99xx_device::alu_f1()
 			m_current_value = (prev_dest_value & 0x00ff) | (dest_new & 0xff00);
 		else
 			m_current_value = (prev_dest_value & 0xff00) | ((dest_new >> 8) & 0x00ff);
-		compare_and_set_lae((UINT16)(dest_new & 0xff00), 0);
+		compare_and_set_lae((uint16_t)(dest_new & 0xff00), 0);
 	}
 	else
 	{
-		m_current_value = (UINT16)(dest_new & 0xffff);
-		compare_and_set_lae((UINT16)(dest_new & 0xffff), 0);
+		m_current_value = (uint16_t)(dest_new & 0xffff);
+		compare_and_set_lae((uint16_t)(dest_new & 0xffff), 0);
 	}
 
 	pulse_clock(2);
@@ -1960,7 +1960,7 @@ void tms99xx_device::alu_comp()
 	{
 		if (!m_destination_even) m_current_value <<= 8;
 		if (!m_source_even) m_source_value <<= 8;
-		set_status_parity((UINT8)(m_source_value>>8));
+		set_status_parity((uint8_t)(m_source_value>>8));
 		compare_and_set_lae(m_source_value & 0xff00, m_current_value & 0xff00);
 	}
 	else
@@ -2007,7 +2007,7 @@ void tms99xx_device::alu_f3()
 
 void tms99xx_device::alu_multiply()
 {
-	UINT32 result;
+	uint32_t result;
 
 	switch (m_state)
 	{
@@ -2034,9 +2034,9 @@ void tms99xx_device::alu_multiply()
 void tms99xx_device::alu_divide()
 {
 	// Format is DIV Divisor,REG(dividend)
-	UINT32 uval32;
+	uint32_t uval32;
 	bool overflow = true;
-	UINT16 value1;
+	uint16_t value1;
 
 	switch (m_state)
 	{
@@ -2148,9 +2148,9 @@ void tms99xx_device::alu_xop()
 
 void tms99xx_device::alu_clr_swpb()
 {
-	UINT32 dest_new = 0;
-	UINT32 src_val = m_current_value & 0x0000ffff;
-	UINT16 sign = 0;
+	uint32_t dest_new = 0;
+	uint32_t src_val = m_current_value & 0x0000ffff;
+	uint16_t sign = 0;
 
 	bool setstatus = true;
 	bool check_ov = true;
@@ -2302,7 +2302,7 @@ void tms99xx_device::alu_blwp()
 
 void tms99xx_device::alu_ldcr()
 {
-	UINT16 value;
+	uint16_t value;
 
 	// Spec: "If the source operand address is odd, the address is truncated
 	//        to an even address prior to data transfer."
@@ -2326,7 +2326,7 @@ void tms99xx_device::alu_ldcr()
 		if (m_count <= 8)
 		{
 			if (m_source_even) value>>=8;
-			set_status_parity((UINT8)(value & 0xff));
+			set_status_parity((uint8_t)(value & 0xff));
 			compare_and_set_lae(value<<8, 0);
 		}
 		else
@@ -2343,7 +2343,7 @@ void tms99xx_device::alu_ldcr()
 
 void tms99xx_device::alu_stcr()
 {
-	UINT16 value;
+	uint16_t value;
 	int n = 2;
 	// For STCR transfers with more than 8 bits, the first CRU bit is
 	// always put into the least significant bit of the destination word.
@@ -2368,7 +2368,7 @@ void tms99xx_device::alu_stcr()
 		if (m_count < 9)
 		{
 			if (TRACE_CRU) logerror("Store CRU at %04x (%d bits) in %04x, result = %02x\n", m_cru_address, m_count, m_source_address, value);
-			set_status_parity((UINT8)(value & 0xff));
+			set_status_parity((uint8_t)(value & 0xff));
 			compare_and_set_lae(value<<8, 0);
 			if (m_source_even)
 				m_current_value = (m_source_value & 0x00ff) | (value<<8);
@@ -2394,7 +2394,7 @@ void tms99xx_device::alu_stcr()
 
 void tms99xx_device::alu_sbz_sbo()
 {
-	INT8 displacement;
+	int8_t displacement;
 	if (m_state==0)
 	{
 		m_address = WP + 24;
@@ -2402,7 +2402,7 @@ void tms99xx_device::alu_sbz_sbo()
 	else
 	{
 		m_value = (m_command==SBO)? 1 : 0;
-		displacement = (INT8)(IR & 0xff);
+		displacement = (int8_t)(IR & 0xff);
 		m_cru_address = m_current_value + (displacement<<1);
 		m_count = 1;
 	}
@@ -2412,14 +2412,14 @@ void tms99xx_device::alu_sbz_sbo()
 
 void tms99xx_device::alu_tb()
 {
-	INT8 displacement;
+	int8_t displacement;
 	switch (m_state)
 	{
 	case 0:
 		m_address = WP + 24;
 		break;
 	case 1:
-		displacement = (INT8)(IR & 0xff);
+		displacement = (int8_t)(IR & 0xff);
 		m_cru_address = m_current_value + (displacement<<1);
 		m_count = 1;
 		break;
@@ -2434,7 +2434,7 @@ void tms99xx_device::alu_tb()
 
 void tms99xx_device::alu_jmp()
 {
-	INT8 displacement;
+	int8_t displacement;
 	bool cond = false;
 
 	if (m_state==0)
@@ -2502,8 +2502,8 @@ void tms99xx_device::alu_shift()
 {
 	bool carry = false;
 	bool overflow = false;
-	UINT16 sign = 0;
-	UINT32 value;
+	uint16_t sign = 0;
+	uint32_t value;
 	int count;
 
 	switch (m_state)
@@ -2585,7 +2585,7 @@ void tms99xx_device::alu_shift()
 
 void tms99xx_device::alu_ai_ori()
 {
-	UINT32 dest_new = 0;
+	uint32_t dest_new = 0;
 	switch (m_command)
 	{
 	case AI:
@@ -2734,18 +2734,18 @@ void tms99xx_device::alu_int()
 }
 
 /**************************************************************************/
-UINT32 tms99xx_device::execute_min_cycles() const
+uint32_t tms99xx_device::execute_min_cycles() const
 {
 	return 2;
 }
 
 // TODO: Compute this value, just a wild guess for the average
-UINT32 tms99xx_device::execute_max_cycles() const
+uint32_t tms99xx_device::execute_max_cycles() const
 {
 	return 10;
 }
 
-UINT32 tms99xx_device::execute_input_lines() const
+uint32_t tms99xx_device::execute_input_lines() const
 {
 	return 2;
 }
@@ -2755,17 +2755,17 @@ UINT32 tms99xx_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-UINT32 tms99xx_device::disasm_min_opcode_bytes() const
+uint32_t tms99xx_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
 
-UINT32 tms99xx_device::disasm_max_opcode_bytes() const
+uint32_t tms99xx_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
 
-offs_t tms99xx_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms99xx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9900 );
 	return CPU_DISASSEMBLE_NAME(tms9900)(this, buffer, pc, oprom, opram, options);

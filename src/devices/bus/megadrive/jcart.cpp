@@ -40,7 +40,7 @@ const device_type MD_SEPROM_CODEMAST = &device_creator<md_seprom_codemast_device
 const device_type MD_SEPROM_MM96 = &device_creator<md_seprom_mm96_device>;
 
 // Sampras, Super Skidmarks?
-md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_md_cart_interface( mconfig, *this ),
 					m_jcart3(*this, "JCART3"),
@@ -48,7 +48,7 @@ md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type
 {
 }
 
-md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, MD_JCART, "MD J-Cart games", tag, owner, clock, "md_jcart", __FILE__),
 					device_md_cart_interface( mconfig, *this ),
 					m_jcart3(*this, "JCART3"),
@@ -57,20 +57,20 @@ md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag,
 }
 
 // Micro Machines 2, Micro Machines Military
-md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: md_jcart_device(mconfig, type, name, tag, owner, clock, shortname, source),
 					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 				{
 }
 
-md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_jcart_device(mconfig, MD_SEPROM_CODEMAST, "MD J-Cart games + SEPROM", tag, owner, clock, "md_seprom_codemast", __FILE__),
 					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 				{
 }
 
 // Micro Machines 96
-md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_seprom_codemast_device(mconfig, MD_SEPROM_MM96, "MD Micro Machine 96", tag, owner, clock, "md_seprom_mm96", __FILE__)
 {
 }
@@ -176,7 +176,7 @@ READ16_MEMBER(md_jcart_device::read)
 {
 	if (offset == 0x38fffe/2)
 	{
-		UINT8 joy[2];
+		uint8_t joy[2];
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
@@ -219,7 +219,7 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 	}
 	if (offset == 0x38fffe/2)
 	{
-		UINT8 joy[2];
+		uint8_t joy[2];
 
 		if (m_jcart_io_data[0] & 0x40)
 		{

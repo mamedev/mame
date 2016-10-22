@@ -69,9 +69,9 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<okim6295_device> m_oki1;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram_1;
-	required_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT16> m_bgram;
+	required_shared_ptr<uint16_t> m_spriteram_1;
+	required_shared_ptr<uint16_t> m_spriteram_2;
+	required_shared_ptr<uint16_t> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -85,7 +85,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -112,9 +112,9 @@ void k3_state::video_start()
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT16 *source = m_spriteram_1;
-	UINT16 *source2 = m_spriteram_2;
-	UINT16 *finish = source + 0x1000 / 2;
+	uint16_t *source = m_spriteram_1;
+	uint16_t *source2 = m_spriteram_2;
+	uint16_t *finish = source + 0x1000 / 2;
 
 	while (source < finish)
 	{
@@ -134,7 +134,7 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

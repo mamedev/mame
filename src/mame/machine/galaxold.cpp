@@ -155,7 +155,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	/* Decrypt Program Roms */
 	for (i = 0; i < len; i++)
@@ -185,7 +185,7 @@ DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
 	int i;
 
 	// patch char supposed to be space
-	UINT8 *gfxrom = memregion("gfx1")->base();
+	uint8_t *gfxrom = memregion("gfx1")->base();
 	for (i = 0; i < 8; i++)
 	{
 		gfxrom[i] = 0;

@@ -139,7 +139,7 @@ void menu_custom_ui::handle()
 
 void menu_custom_ui::populate()
 {
-	UINT32 arrow_flags;
+	uint32_t arrow_flags;
 	item_append(_("Fonts"), "", 0, (void *)(uintptr_t)FONT_MENU);
 	item_append(_("Colors"), "", 0, (void *)(uintptr_t)COLORS_MENU);
 
@@ -149,7 +149,7 @@ void menu_custom_ui::populate()
 		item_append(_("Language"), m_lang[m_currlang].c_str(), arrow_flags, (void *)(uintptr_t)LANGUAGE_MENU);
 	}
 
-	arrow_flags = get_arrow_flags<UINT16>(0, HIDE_BOTH, ui_globals::panels_status);
+	arrow_flags = get_arrow_flags<uint16_t>(0, HIDE_BOTH, ui_globals::panels_status);
 	item_append(_("Show side panels"), _(HIDE_STATUS[ui_globals::panels_status]), arrow_flags, (void *)(uintptr_t)HIDE_MENU);
 
 	item_append(menu_item_type::SEPARATOR);
@@ -341,7 +341,7 @@ void menu_font_ui::handle()
 void menu_font_ui::populate()
 {
 	// set filter arrow
-	UINT32 arrow_flags;
+	uint32_t arrow_flags;
 
 	// add fonts option
 	arrow_flags = get_arrow_flags<std::uint16_t>(0, m_fonts.size() - 1, m_actual);
@@ -466,7 +466,7 @@ menu_colors_ui::~menu_colors_ui()
 	std::string error_string, dec_color;
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
-		dec_color = string_format("%x", (UINT32)m_color_table[index].color);
+		dec_color = string_format("%x", (uint32_t)m_color_table[index].color);
 		ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	}
 }
@@ -681,7 +681,7 @@ void menu_colors_ui::restore_colors()
 {
 	ui_options options;
 	for (int index = 1; index < MUI_RESTORE; index++)
-		m_color_table[index].color = rgb_t((UINT32)strtoul(options.value(m_color_table[index].option), nullptr, 16));
+		m_color_table[index].color = rgb_t((uint32_t)strtoul(options.value(m_color_table[index].option), nullptr, 16));
 }
 
 //-------------------------------------------------
@@ -827,13 +827,13 @@ void menu_rgb_ui::handle()
 void menu_rgb_ui::populate()
 {
 	// set filter arrow
-	UINT32 arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	std::string s_text = std::string(m_search).append("_");
 	item_append(_("ARGB Settings"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 
 	if (m_lock_ref != RGB_ALPHA)
 	{
-		arrow_flags = get_arrow_flags<UINT8>(0, 255, m_color->a());
+		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
 		item_append(_("Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(uintptr_t)RGB_ALPHA);
 	}
 	else
@@ -841,7 +841,7 @@ void menu_rgb_ui::populate()
 
 	if (m_lock_ref != RGB_RED)
 	{
-		arrow_flags = get_arrow_flags<UINT8>(0, 255, m_color->r());
+		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
 		item_append(_("Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(uintptr_t)RGB_RED);
 	}
 	else
@@ -849,7 +849,7 @@ void menu_rgb_ui::populate()
 
 	if (m_lock_ref != RGB_GREEN)
 	{
-		arrow_flags = get_arrow_flags<UINT8>(0, 255, m_color->g());
+		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
 		item_append(_("Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(uintptr_t)RGB_GREEN);
 	}
 	else
@@ -857,7 +857,7 @@ void menu_rgb_ui::populate()
 
 	if (m_lock_ref != RGB_BLUE)
 	{
-		arrow_flags = get_arrow_flags<UINT8>(0, 255, m_color->b());
+		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
 		item_append(_("Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(uintptr_t)RGB_BLUE);
 	}
 	else
@@ -1024,7 +1024,7 @@ void menu_palette_sel::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			m_original = rgb_t((UINT32)strtoul(item[selected].subtext.c_str(), nullptr, 16));
+			m_original = rgb_t((uint32_t)strtoul(item[selected].subtext.c_str(), nullptr, 16));
 			reset_parent(reset_options::SELECT_FIRST);
 			stack_pop();
 		}
@@ -1055,7 +1055,7 @@ void menu_palette_sel::custom_render(void *selectedref, float top, float bottom,
 //  draw - draw palette menu
 //-------------------------------------------------
 
-void menu_palette_sel::draw(UINT32 flags)
+void menu_palette_sel::draw(uint32_t flags)
 {
 	auto line_height = ui().get_line_height();
 	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
@@ -1216,7 +1216,7 @@ void menu_palette_sel::draw(UINT32 flags)
 		else
 		{
 			const char *subitem_text = pitem.subtext.c_str();
-			rgb_t color = rgb_t((UINT32)strtoul(subitem_text, nullptr, 16));
+			rgb_t color = rgb_t((uint32_t)strtoul(subitem_text, nullptr, 16));
 
 			// draw the left-side text
 			ui().draw_text_full(container(), itemtext, effective_left, line_y, effective_width,

@@ -28,7 +28,7 @@ class alesis_dm3ag_device : public device_t
 {
 public:
 	// construction/destruction
-	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -45,14 +45,14 @@ protected:
 private:
 	static const device_timer_id TIMER_DAC_UPDATE = 1;
 	required_device<dac_word_interface> m_dac;
-	required_region_ptr<INT8> m_samples;
+	required_region_ptr<int8_t> m_samples;
 
 	emu_timer * m_dac_update_timer;
 	bool        m_output_active;
 	int         m_count;
 	int         m_shift;
-	UINT32      m_cur_sample;
-	UINT8       m_cmd[5];
+	uint32_t      m_cur_sample;
+	uint8_t       m_cmd[5];
 };
 
 
@@ -81,7 +81,7 @@ public:
 	DECLARE_PALETTE_INIT(alesis);
 	virtual void machine_reset() override;
 
-	void update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, UINT8 x, int state);
+	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
 	DECLARE_DRIVER_INIT(hr16);
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( mmt8_led_w );
@@ -97,9 +97,9 @@ public:
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
 private:
-	UINT8       m_kb_matrix;
-	UINT8       m_leds;
-	UINT8       m_lcd_digits[5];
+	uint8_t       m_kb_matrix;
+	uint8_t       m_leds;
+	uint8_t       m_lcd_digits[5];
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_col1;
 	required_ioport m_col2;

@@ -51,7 +51,7 @@ VIDEO_START_MEMBER(alpha68k_state,alpha68k)
 //AT
 void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
 	for (offs = s; offs < e; offs += 0x40)
@@ -101,7 +101,7 @@ void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 /******************************************************************************/
 
-UINT32 alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_last_bank != m_bank_base)
 		machine().tilemap().mark_all_dirty();
@@ -193,7 +193,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
 
 void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
 	for (offs = s; offs < e; offs += 0x40)
@@ -244,9 +244,9 @@ void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &clip
 	}
 }
 
-UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 
 	if (m_last_bank != m_bank_base)
 		machine().tilemap().mark_all_dirty();
@@ -284,7 +284,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 	return 0;
 }
 
-UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_last_bank != m_bank_base)
 		machine().tilemap().mark_all_dirty();
@@ -308,9 +308,9 @@ UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap
 //AT
 void alpha68k_state::draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int data, offs, mx, my, tile, color, fy, i;
-	UINT8 *color_prom = memregion("user1")->base();
+	uint8_t *color_prom = memregion("user1")->base();
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	for (offs = 0; offs < 0x400; offs += 0x20)
@@ -333,7 +333,7 @@ void alpha68k_state::draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &clip
 	}
 }
 
-UINT32 alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int yshift = (m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
@@ -350,7 +350,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_in
 
 PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -368,14 +368,14 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = ((color_prom[i] & 0x0f) << 4) | (color_prom[i + 0x100] & 0x0f);
+		uint8_t ctabentry = ((color_prom[i] & 0x0f) << 4) | (color_prom[i + 0x100] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -393,7 +393,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 
 	for (i = 0; i < 0x400; i++)
 	{
-		UINT8 ctabentry = ((color_prom[i + 0x400] & 0x0f) << 4) | (color_prom[i] & 0x0f);
+		uint8_t ctabentry = ((color_prom[i + 0x400] & 0x0f) << 4) | (color_prom[i] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -410,10 +410,10 @@ void alpha68k_state::jongbou_video_banking(int *bank, int data)
 
 void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, mx, my, color, tile, i, bank, fy, fx;
 	int data;
-	UINT8 *color_prom = memregion("user1")->base();
+	uint8_t *color_prom = memregion("user1")->base();
 
 //AT
 	for (offs = 0; offs < 0x400; offs += 0x20)
@@ -460,7 +460,7 @@ void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-UINT32 alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
 	bitmap.fill(0x100, cliprect); //AT
@@ -476,7 +476,7 @@ UINT32 alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16 &
 void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
 //AT
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int data, offs, mx, my, color, tile, i, bank, fy, fx;
 
 	for (offs = 0; offs < 0x400; offs += 0x20)
@@ -518,7 +518,7 @@ void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-UINT32 alpha68k_state::screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alpha68k_state::screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
 	bitmap.fill(0x100, cliprect); //AT

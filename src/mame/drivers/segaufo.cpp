@@ -90,14 +90,14 @@ public:
 	{
 		struct Motor
 		{
-			UINT8 running;
-			UINT8 direction;
+			uint8_t running;
+			uint8_t direction;
 			float position;
 			float speed;
 		} motor[4];
 	} m_player[2];
 
-	UINT8 m_stepper;
+	uint8_t m_stepper;
 
 	void motor_tick(int p, int m);
 
@@ -161,7 +161,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	// 3 C: 000 = closed, 100 = open
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 4; m++)
-			output().set_indexed_value("counter", p*4 + m, (UINT8)(m_player[p].motor[m].position * 100));
+			output().set_indexed_value("counter", p*4 + m, (uint8_t)(m_player[p].motor[m].position * 100));
 
 #if 0
 	char msg1[0x100] = {0};
@@ -208,7 +208,7 @@ WRITE_LINE_MEMBER(ufo_state::pit_out2)
 READ8_MEMBER(ufo_state::crane_limits_r)
 {
 	int p = offset & 1;
-	UINT8 ret = 0x7f;
+	uint8_t ret = 0x7f;
 
 	// d0: left limit sw (right for p2)
 	// d1: right limit sw (left for p2)
@@ -242,12 +242,12 @@ WRITE8_MEMBER(ufo_state::stepper_w)
 		// controlled with 4 output bits connected to a Toshiba TB6560AHQ motor driver.
 		// I don't know which bits connect to which pins specifically.
 		// To run it, the game writes a continuous sequence of $5, $9, $a, $6, ..
-		static const UINT8 sequence[4] =
+		static const uint8_t sequence[4] =
 			{ 0x5, 0x9, 0xa, 0x6 };
 
 		// d0-d3: p1, d4-d7: p2
-		UINT8 cur = data >> (p*4) & 0xf;
-		UINT8 prev = m_stepper >> (p*4) & 0xf;
+		uint8_t cur = data >> (p*4) & 0xf;
+		uint8_t prev = m_stepper >> (p*4) & 0xf;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -278,7 +278,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
 {
-	static const UINT8 lut_7448[0x10] =
+	static const uint8_t lut_7448[0x10] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d0-d3: cpanel digit
@@ -329,7 +329,7 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 READ8_MEMBER(ufo_state::ex_crane_limits_r)
 {
 	int p = offset & 1;
-	UINT8 ret = 0xf0;
+	uint8_t ret = 0xf0;
 
 	// d0: left limit sw (invert)
 	// d1: right limit sw (invert)
@@ -352,7 +352,7 @@ READ8_MEMBER(ufo_state::ex_crane_limits_r)
 READ8_MEMBER(ufo_state::ex_crane_open_r)
 {
 	// d0-d3: p1, d4-d7: p2
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	for (int p = 0; p < 2; p++)
 	{

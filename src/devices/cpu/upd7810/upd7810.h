@@ -94,8 +94,8 @@ class upd7810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
@@ -160,9 +160,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 40; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 40; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -173,9 +173,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
@@ -204,10 +204,10 @@ protected:
 
 	struct opcode_s {
 		opcode_func opfunc;
-		UINT8 oplen;
-		UINT8 cycles;
-		UINT8 cycles_skip;
-		UINT8 mask_l0_l1;
+		uint8_t oplen;
+		uint8_t cycles;
+		uint8_t cycles_skip;
+		uint8_t mask_l0_l1;
 	};
 
 	static const struct opcode_s s_op48[256];
@@ -250,10 +250,10 @@ protected:
 	PAIR    m_ppc;    /* previous program counter */
 	PAIR    m_pc;     /* program counter */
 	PAIR    m_sp;     /* stack pointer */
-	UINT8   m_op;     /* opcode */
-	UINT8   m_op2;    /* opcode part 2 */
-	UINT8   m_iff;    /* interrupt enable flip flop */
-	UINT8   m_psw;    /* processor status word */
+	uint8_t   m_op;     /* opcode */
+	uint8_t   m_op2;    /* opcode part 2 */
+	uint8_t   m_iff;    /* interrupt enable flip flop */
+	uint8_t   m_psw;    /* processor status word */
 	PAIR    m_ea;     /* extended accumulator */
 	PAIR    m_va;     /* accumulator + vector register */
 	PAIR    m_bc;     /* 8bit B and C registers / 16bit BC register */
@@ -268,69 +268,69 @@ protected:
 	PAIR    m_tm;     /* 8 bit timer 0/1 comparator inputs */
 	PAIR    m_ecnt;   /* timer counter register / capture register */
 	PAIR    m_etm;    /* timer 0/1 comparator inputs */
-	UINT8   m_ma;     /* port A input or output mask */
-	UINT8   m_mb;     /* port B input or output mask */
-	UINT8   m_mcc;    /* port C control/port select */
-	UINT8   m_mc;     /* port C input or output mask */
-	UINT8   m_mm;     /* memory mapping */
-	UINT8   m_mf;     /* port F input or output mask */
-	UINT8   m_tmm;    /* timer 0 and timer 1 operating parameters */
-	UINT8   m_etmm;   /* 16-bit multifunction timer/event counter */
-	UINT8   m_eom;    /* 16-bit timer/event counter output control */
-	UINT8   m_sml;    /* serial interface parameters low */
-	UINT8   m_smh;    /* -"- high */
-	UINT8   m_panm;   /* previous analog to digital converter operating parameters */
-	UINT8   m_anm;    /* analog to digital converter operating parameters */
-	UINT8   m_mkl;    /* interrupt mask low */
-	UINT8   m_mkh;    /* -"- high */
-	UINT8   m_zcm;    /* bias circuitry for ac zero-cross detection */
-	UINT8   m_pa_in;  /* port A,B,C,D,F inputs */
-	UINT8   m_pb_in;
-	UINT8   m_pc_in;
-	UINT8   m_pd_in;
-	UINT8   m_pf_in;
-	UINT8   m_pa_out; /* port A,B,C,D,F outputs */
-	UINT8   m_pb_out;
-	UINT8   m_pc_out;
-	UINT8   m_pd_out;
-	UINT8   m_pf_out;
-	UINT8   m_cr0;    /* analog digital conversion register 0 */
-	UINT8   m_cr1;    /* analog digital conversion register 1 */
-	UINT8   m_cr2;    /* analog digital conversion register 2 */
-	UINT8   m_cr3;    /* analog digital conversion register 3 */
-	UINT8   m_txb;    /* transmitter buffer */
-	UINT8   m_rxb;    /* receiver buffer */
-	UINT8   m_txd;    /* port C control line states */
-	UINT8   m_rxd;
-	UINT8   m_sck;
-	UINT8   m_ti;
-	UINT8   m_to;
-	UINT8   m_ci;
-	UINT8   m_lv0;    /* level flip flop for co0 */
-	UINT8   m_lv1;    /* level flip flop for co1 */
-	UINT8   m_co0;
-	UINT8   m_co1;
-	UINT16  m_irr;    /* interrupt request register */
-	UINT16  m_itf;    /* interrupt test flag register */
+	uint8_t   m_ma;     /* port A input or output mask */
+	uint8_t   m_mb;     /* port B input or output mask */
+	uint8_t   m_mcc;    /* port C control/port select */
+	uint8_t   m_mc;     /* port C input or output mask */
+	uint8_t   m_mm;     /* memory mapping */
+	uint8_t   m_mf;     /* port F input or output mask */
+	uint8_t   m_tmm;    /* timer 0 and timer 1 operating parameters */
+	uint8_t   m_etmm;   /* 16-bit multifunction timer/event counter */
+	uint8_t   m_eom;    /* 16-bit timer/event counter output control */
+	uint8_t   m_sml;    /* serial interface parameters low */
+	uint8_t   m_smh;    /* -"- high */
+	uint8_t   m_panm;   /* previous analog to digital converter operating parameters */
+	uint8_t   m_anm;    /* analog to digital converter operating parameters */
+	uint8_t   m_mkl;    /* interrupt mask low */
+	uint8_t   m_mkh;    /* -"- high */
+	uint8_t   m_zcm;    /* bias circuitry for ac zero-cross detection */
+	uint8_t   m_pa_in;  /* port A,B,C,D,F inputs */
+	uint8_t   m_pb_in;
+	uint8_t   m_pc_in;
+	uint8_t   m_pd_in;
+	uint8_t   m_pf_in;
+	uint8_t   m_pa_out; /* port A,B,C,D,F outputs */
+	uint8_t   m_pb_out;
+	uint8_t   m_pc_out;
+	uint8_t   m_pd_out;
+	uint8_t   m_pf_out;
+	uint8_t   m_cr0;    /* analog digital conversion register 0 */
+	uint8_t   m_cr1;    /* analog digital conversion register 1 */
+	uint8_t   m_cr2;    /* analog digital conversion register 2 */
+	uint8_t   m_cr3;    /* analog digital conversion register 3 */
+	uint8_t   m_txb;    /* transmitter buffer */
+	uint8_t   m_rxb;    /* receiver buffer */
+	uint8_t   m_txd;    /* port C control line states */
+	uint8_t   m_rxd;
+	uint8_t   m_sck;
+	uint8_t   m_ti;
+	uint8_t   m_to;
+	uint8_t   m_ci;
+	uint8_t   m_lv0;    /* level flip flop for co0 */
+	uint8_t   m_lv1;    /* level flip flop for co1 */
+	uint8_t   m_co0;
+	uint8_t   m_co1;
+	uint16_t  m_irr;    /* interrupt request register */
+	uint16_t  m_itf;    /* interrupt test flag register */
 	int     m_nmi;    /* keep track of current nmi state. Needed for 7810 irq checking. */
 	int     m_int1;   /* keep track of current int1 state. Needed for irq checking. */
 	int     m_int2;   /* keep track to current int2 state. Needed for irq checking. */
 
 	/* internal helper variables */
-	UINT16  m_txs;    /* transmitter shift register */
-	UINT16  m_rxs;    /* receiver shift register */
-	UINT8   m_txcnt;  /* transmitter shift register bit count */
-	UINT8   m_rxcnt;  /* receiver shift register bit count */
-	UINT8   m_txbuf;  /* transmitter buffer was written */
-	INT32   m_ovc0;   /* overflow counter for timer 0 (for clock div 12/384) */
-	INT32   m_ovc1;   /* overflow counter for timer 0 (for clock div 12/384) */
-	INT32   m_ovce;   /* overflow counter for ecnt */
-	INT32   m_ovcf;   /* overflow counter for fixed clock div 3 mode */
-	INT32   m_ovcs;   /* overflow counter for serial I/O */
-	UINT8   m_edges;  /* rising/falling edge flag for serial I/O */
-	UINT16  m_adcnt;  /* A/D converter cycle count */
-	UINT8   m_adtot;  /* A/D converter total cycles per conversion */
-	UINT8   m_tmpcr;  /* temporary analog digital conversion register */
+	uint16_t  m_txs;    /* transmitter shift register */
+	uint16_t  m_rxs;    /* receiver shift register */
+	uint8_t   m_txcnt;  /* transmitter shift register bit count */
+	uint8_t   m_rxcnt;  /* receiver shift register bit count */
+	uint8_t   m_txbuf;  /* transmitter buffer was written */
+	int32_t   m_ovc0;   /* overflow counter for timer 0 (for clock div 12/384) */
+	int32_t   m_ovc1;   /* overflow counter for timer 0 (for clock div 12/384) */
+	int32_t   m_ovce;   /* overflow counter for ecnt */
+	int32_t   m_ovcf;   /* overflow counter for fixed clock div 3 mode */
+	int32_t   m_ovcs;   /* overflow counter for serial I/O */
+	uint8_t   m_edges;  /* rising/falling edge flag for serial I/O */
+	uint16_t  m_adcnt;  /* A/D converter cycle count */
+	uint8_t   m_adtot;  /* A/D converter total cycles per conversion */
+	uint8_t   m_tmpcr;  /* temporary analog digital conversion register */
 	int     m_shdone; /* A/D converter sample and hold done */
 	int     m_adout;  /* currently selected A/D converter output register */
 	int     m_adin;   /* currently selected A/D converter input */
@@ -349,8 +349,8 @@ protected:
 	address_space *m_io;
 	int m_icount;
 
-	UINT8 RP(offs_t port);
-	void WP(offs_t port, UINT8 data);
+	uint8_t RP(offs_t port);
+	void WP(offs_t port, uint8_t data);
 	void upd7810_write_EOM();
 	void upd7810_write_TXB();
 	void upd7810_sio_output();
@@ -1373,10 +1373,10 @@ class upd7807_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 
@@ -1384,12 +1384,12 @@ class upd7801_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_reset() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void handle_timers(int cycles) override;
 	virtual void upd7810_take_irq() override;
 };
@@ -1399,15 +1399,15 @@ class upd78c05_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void handle_timers(int cycles) override;
 };
 
@@ -1416,7 +1416,7 @@ class upd78c06_device : public upd78c05_device
 {
 public:
 	// construction/destruction
-	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

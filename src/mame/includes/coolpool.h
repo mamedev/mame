@@ -21,28 +21,28 @@ public:
 	required_device<cpu_device> m_dsp;
 	optional_device<tlc34076_device> m_tlc34076;
 
-	required_shared_ptr<UINT16> m_vram_base;
-	required_shared_ptr<UINT16> m_nvram;
+	required_shared_ptr<uint16_t> m_vram_base;
+	required_shared_ptr<uint16_t> m_nvram;
 
-	UINT8 m_cmd_pending;
-	UINT16 m_iop_cmd;
-	UINT16 m_iop_answer;
+	uint8_t m_cmd_pending;
+	uint16_t m_iop_cmd;
+	uint16_t m_iop_answer;
 	int m_iop_romaddr;
 
-	UINT8 m_newx[3];
-	UINT8 m_newy[3];
-	UINT8 m_oldx[3];
-	UINT8 m_oldy[3];
+	uint8_t m_newx[3];
+	uint8_t m_newy[3];
+	uint8_t m_oldx[3];
+	uint8_t m_oldy[3];
 	int m_dx[3];
 	int m_dy[3];
 
-	UINT16 m_result;
-	UINT16 m_lastresult;
+	uint16_t m_result;
+	uint16_t m_lastresult;
 
-	UINT16 m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
-	UINT8 m_nvram_write_enable;
-	UINT8 m_old_cmd;
-	UINT8 m_same_cmd_count;
+	uint16_t m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
+	uint8_t m_nvram_write_enable;
+	uint8_t m_old_cmd;
+	uint8_t m_same_cmd_count;
 	DECLARE_WRITE16_MEMBER(nvram_thrash_w);
 	DECLARE_WRITE16_MEMBER(nvram_data_w);
 	DECLARE_WRITE16_MEMBER(nvram_thrash_data_w);

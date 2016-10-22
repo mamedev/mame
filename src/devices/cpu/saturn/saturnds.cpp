@@ -45,13 +45,13 @@ static const char *const adr_a[]=
 static const char number_2_hex[]=
 { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-#define SATURN_PEEKOP_DIS8(v)   v = (INT8)( oprom[pos] | ( oprom[pos+1] << 4 ) ); pos+= 2;
+#define SATURN_PEEKOP_DIS8(v)   v = (int8_t)( oprom[pos] | ( oprom[pos+1] << 4 ) ); pos+= 2;
 
 #define SATURN_PEEKOP_DIS12(v)  v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ); \
 								pos += 3;                                                       \
 								if ( v & 0x0800 )   v = -0x1000 + v;
 
-#define SATURN_PEEKOP_DIS16(v)  v = (INT16)( oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) ); pos += 4;
+#define SATURN_PEEKOP_DIS16(v)  v = (int16_t)( oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) ); pos += 4;
 
 #define SATURN_PEEKOP_ADR(v)    v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) | ( oprom[pos+4] << 16 ); pos += 5;
 

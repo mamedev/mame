@@ -47,7 +47,7 @@ public:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_prgbank;
 	required_memory_bank m_nvram_bank;
-	std::vector<UINT8> m_nvram_mem;
+	std::vector<uint8_t> m_nvram_mem;
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	DECLARE_READ8_MEMBER(audio_r);

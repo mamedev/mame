@@ -165,7 +165,7 @@ WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 
 WRITE8_MEMBER( s11b_state::dig1_w )
 {
-	UINT32 seg = get_segment2();
+	uint32_t seg = get_segment2();
 	seg |= data;
 	seg |= 0x20000;
 	if((seg & 0x70000) == 0x30000)
@@ -181,7 +181,7 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 
 WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 {
-	UINT32 seg = get_segment1();
+	uint32_t seg = get_segment1();
 	seg |= (data<<8);
 	seg |= 0x10000;
 	if((seg & 0x70000) == 0x30000)
@@ -197,7 +197,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 
 WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 {
-	UINT32 seg = get_segment1();
+	uint32_t seg = get_segment1();
 	seg |= data;
 	seg |= 0x20000;
 	if((seg & 0x70000) == 0x30000)
@@ -213,7 +213,7 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 
 WRITE8_MEMBER( s11b_state::pia34_pa_w )
 {
-	UINT32 seg = get_segment2();
+	uint32_t seg = get_segment2();
 	seg |= (data<<8);
 	seg |= 0x10000;
 	if((seg & 0x70000) == 0x30000)

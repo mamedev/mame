@@ -750,7 +750,7 @@ WRITE8_MEMBER(galaxian_state::coin_count_1_w)
 READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
 	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
 	return result;
@@ -775,7 +775,7 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 
 WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 {
-	UINT8 old = m_konami_sound_control;
+	uint8_t old = m_konami_sound_control;
 	m_konami_sound_control = data;
 
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
@@ -804,8 +804,8 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 	    current counter index, we use the sound cpu clock times 8 mod
 	    16*16*2*8*5*2.
 	*/
-	UINT32 cycles = (m_audiocpu->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
-	UINT8 hibit = 0;
+	uint32_t cycles = (m_audiocpu->total_cycles() * 8) % (uint64_t)(16*16*2*8*5*2);
+	uint8_t hibit = 0;
 
 	/* separate the high bit from the others */
 	if (cycles >= 16*16*2*8*5)
@@ -836,7 +836,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 		if (machine().device(ayname[which]) != nullptr)
 			for (chan = 0; chan < 3; chan++)
 			{
-				UINT8 bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
+				uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
@@ -866,7 +866,7 @@ WRITE8_MEMBER(galaxian_state::konami_portc_1_w)
 READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x0100) result &= m_ppi8255_0->read(space, offset & 3);
 	if (offset & 0x0200) result &= m_ppi8255_1->read(space, offset & 3);
 	return result;
@@ -962,7 +962,7 @@ READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x04) result &= m_ppi8255_2->read(space, offset & 3);
 	return result;
 }
@@ -978,7 +978,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 
 WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
 {
-	UINT8 old = m_sfx_sample_control;
+	uint8_t old = m_sfx_sample_control;
 	m_sfx_sample_control = data;
 
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
@@ -1013,7 +1013,7 @@ READ8_MEMBER(galaxian_state::monsterz_protection_r)
 void galaxian_state::monsterz_set_latch()
 {
 	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
 
 	// and an irq on the main z80 afterwards
@@ -1054,7 +1054,7 @@ WRITE8_MEMBER(galaxian_state::monsterz_portc_1_w)
 READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x1000) result &= m_ppi8255_1->read(space, (offset >> 1) & 3);
 	if (offset & 0x2000) result &= m_ppi8255_0->read(space, (offset >> 1) & 3);
 	return result;
@@ -1072,7 +1072,7 @@ WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x40) result &= m_ay8910_0->data_r(space, 0);
 	return result;
 }
@@ -1092,7 +1092,7 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
-	UINT8 konami_value = konami_sound_timer_r(space, 0);
+	uint8_t konami_value = konami_sound_timer_r(space, 0);
 	return BITSWAP8(konami_value, 7,6,3,4,5,2,1,0);
 }
 
@@ -1119,7 +1119,7 @@ IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
 READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x1000) result &= m_ppi8255_0->read(space, (offset >> 3) & 3);
 	if (offset & 0x2000) result &= m_ppi8255_1->read(space, (offset >> 3) & 3);
 	return result;
@@ -1157,7 +1157,7 @@ WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255_1->write(space, (o
 READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	if (offset & 0x08) result &= m_ay8910_2->data_r(space, 0);
 	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
 	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
@@ -1179,8 +1179,8 @@ WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 
 READ8_MEMBER(galaxian_state::scorpion_protection_r)
 {
-	UINT16 paritybits;
-	UINT8 parity = 0;
+	uint16_t paritybits;
+	uint8_t parity = 0;
 
 	/* compute parity of the current (bitmask & $CE29) */
 	for (paritybits = m_protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
@@ -4902,7 +4902,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 
 	signed char dialread = ioport(dialname[p])->read();
 
-	UINT8 ret;
+	uint8_t ret;
 
 	if (dialread < 0) m_direction[p] = 0x00;
 	else if (dialread > 0) m_direction[p] = 0x10;
@@ -5706,7 +5706,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 {
-	UINT8 split = param + 16;
+	uint8_t split = param + 16;
 
 	// change spriteram base per each 64-line part of the screen
 	if ((split & 0x3f) == 0)
@@ -6187,15 +6187,15 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-void galaxian_state::decode_mooncrst(int length, UINT8 *dest)
+void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
 	{
-		UINT8 data = rom[offs];
-		UINT8 res = data;
+		uint8_t data = rom[offs];
+		uint8_t res = data;
 		if (BIT(data,1)) res ^= 0x40;
 		if (BIT(data,5)) res ^= 0x04;
 		if ((offs & 1) == 0) res = BITSWAP8(res,7,2,5,4,3,6,1,0);
@@ -6240,7 +6240,7 @@ void galaxian_state::decode_checkman()
 	             +-------+
 	    Pin layout is such that links can replace the PAL if encryption is not used.
 	*/
-	static const UINT8 xortable[8][4] =
+	static const uint8_t xortable[8][4] =
 	{
 		{ 6,0,6,0 },
 		{ 5,1,5,1 },
@@ -6251,14 +6251,14 @@ void galaxian_state::decode_checkman()
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = memregion("maincpu")->base();
-	UINT32 romlength = memregion("maincpu")->bytes();
-	UINT32 offs;
+	uint8_t *rombase = memregion("maincpu")->base();
+	uint32_t romlength = memregion("maincpu")->bytes();
+	uint32_t offs;
 
 	for (offs = 0; offs < romlength; offs++)
 	{
-		UINT8 data = rombase[offs];
-		UINT32 line = offs & 0x07;
+		uint8_t data = rombase[offs];
+		uint32_t line = offs & 0x07;
 
 		data ^= (BIT(data,xortable[line][0]) << xortable[line][1]) | (BIT(data,xortable[line][2]) << xortable[line][3]);
 		rombase[offs] = data;
@@ -6268,13 +6268,13 @@ void galaxian_state::decode_checkman()
 
 void galaxian_state::decode_dingoe()
 {
-	UINT8 *rombase = memregion("maincpu")->base();
-	UINT32 romlength = memregion("maincpu")->bytes();
-	UINT32 offs;
+	uint8_t *rombase = memregion("maincpu")->base();
+	uint32_t romlength = memregion("maincpu")->bytes();
+	uint32_t offs;
 
 	for (offs = 0; offs < romlength; offs++)
 	{
-		UINT8 data = rombase[offs];
+		uint8_t data = rombase[offs];
 
 		/* XOR bit 4 with bit 2, and bit 0 with bit 5, and invert bit 1 */
 		data ^= BIT(data, 2) << 4;
@@ -6291,8 +6291,8 @@ void galaxian_state::decode_dingoe()
 
 void galaxian_state::decode_frogger_sound()
 {
-	UINT8 *rombase = memregion("audiocpu")->base();
-	UINT32 offs;
+	uint8_t *rombase = memregion("audiocpu")->base();
+	uint32_t offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x800; offs++)
@@ -6302,8 +6302,8 @@ void galaxian_state::decode_frogger_sound()
 // froggermc has a bigger first ROM of the sound CPU, thus a different decode
 void galaxian_state::decode_froggermc_sound()
 {
-	UINT8 *rombase = memregion("audiocpu")->base();
-	UINT32 offs;
+	uint8_t *rombase = memregion("audiocpu")->base();
+	uint32_t offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x1000; offs++)
@@ -6313,8 +6313,8 @@ void galaxian_state::decode_froggermc_sound()
 
 void galaxian_state::decode_frogger_gfx()
 {
-	UINT8 *rombase = memregion("gfx1")->base();
-	UINT32 offs;
+	uint8_t *rombase = memregion("gfx1")->base();
+	uint32_t offs;
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
 	for (offs = 0x0800; offs < 0x1000; offs++)
@@ -6324,15 +6324,15 @@ void galaxian_state::decode_frogger_gfx()
 
 void galaxian_state::decode_anteater_gfx()
 {
-	UINT32 romlength = memregion("gfx1")->bytes();
-	UINT8 *rombase = memregion("gfx1")->base();
-	std::vector<UINT8> scratch(romlength);
-	UINT32 offs;
+	uint32_t romlength = memregion("gfx1")->bytes();
+	uint8_t *rombase = memregion("gfx1")->base();
+	std::vector<uint8_t> scratch(romlength);
+	uint32_t offs;
 
 	memcpy(&scratch[0], rombase, romlength);
 	for (offs = 0; offs < romlength; offs++)
 	{
-		UINT32 srcoffs = offs & 0x9bf;
+		uint32_t srcoffs = offs & 0x9bf;
 		srcoffs |= (BIT(offs,4) ^ BIT(offs,9) ^ (BIT(offs,2) & BIT(offs,10))) << 6;
 		srcoffs |= (BIT(offs,2) ^ BIT(offs,10)) << 9;
 		srcoffs |= (BIT(offs,0) ^ BIT(offs,6) ^ 1) << 10;
@@ -6343,15 +6343,15 @@ void galaxian_state::decode_anteater_gfx()
 
 void galaxian_state::decode_losttomb_gfx()
 {
-	UINT32 romlength = memregion("gfx1")->bytes();
-	UINT8 *rombase = memregion("gfx1")->base();
-	std::vector<UINT8> scratch(romlength);
-	UINT32 offs;
+	uint32_t romlength = memregion("gfx1")->bytes();
+	uint8_t *rombase = memregion("gfx1")->base();
+	std::vector<uint8_t> scratch(romlength);
+	uint32_t offs;
 
 	memcpy(&scratch[0], rombase, romlength);
 	for (offs = 0; offs < romlength; offs++)
 	{
-		UINT32 srcoffs = offs & 0xa7f;
+		uint32_t srcoffs = offs & 0xa7f;
 		srcoffs |= ((BIT(offs,1) & BIT(offs,8)) | ((1 ^ BIT(offs,1)) & (BIT(offs,10)))) << 7;
 		srcoffs |= (BIT(offs,7) ^ (BIT(offs,1) & (BIT(offs,7) ^ BIT(offs,10)))) << 8;
 		srcoffs |= ((BIT(offs,1) & BIT(offs,7)) | ((1 ^ BIT(offs,1)) & (BIT(offs,8)))) << 10;
@@ -6363,7 +6363,7 @@ void galaxian_state::decode_losttomb_gfx()
 void galaxian_state::decode_superbon()
 {
 	offs_t i;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	/* Decryption worked out by hand by Chris Hardy. */
 
@@ -6450,9 +6450,9 @@ DRIVER_INIT_MEMBER(galaxian_state,nolock)
 
 DRIVER_INIT_MEMBER(galaxian_state, warofbugg)
 {
-	UINT8* romdata = memregion("maincpu")->base();
+	uint8_t* romdata = memregion("maincpu")->base();
 	assert(memregion("maincpu")->bytes() == 0x4000);
-	UINT8 buf[0x4000];
+	uint8_t buf[0x4000];
 	memcpy(buf, romdata, 0x4000);
 
 	// the rom data is at the very least, backwards, but there still seems to be missing code
@@ -6602,8 +6602,8 @@ READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 {
 	char tmp[64];
-	UINT8* srcregion;
-	UINT8* dstregion;
+	uint8_t* srcregion;
+	uint8_t* dstregion;
 	int x;
 
 	sprintf(tmp,"game_%d_cpu", bank);
@@ -6825,14 +6825,14 @@ DRIVER_INIT_MEMBER(galaxian_state,kong)
 }
 
 
-void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
+void galaxian_state::mshuttle_decode(const uint8_t convtable[8][16])
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{
 		int i,j;
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
 		/* and from bits 1 7 of the source data */
@@ -6849,7 +6849,7 @@ void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
 
 DRIVER_INIT_MEMBER(galaxian_state,mshuttle)
 {
-	static const UINT8 convtable[8][16] =
+	static const uint8_t convtable[8][16] =
 	{
 		/* 0xff marks spots which are unused and therefore unknown */
 		{ 0x40,0x41,0x44,0x15,0x05,0x51,0x54,0x55,0x50,0x00,0x01,0x04,0xff,0x10,0x11,0x14 },
@@ -6875,7 +6875,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mshuttle)
 
 DRIVER_INIT_MEMBER(galaxian_state,mshuttlj)
 {
-	static const UINT8 convtable[8][16] =
+	static const uint8_t convtable[8][16] =
 	{
 		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
 		{ 0x50,0x11,0x40,0x55,0x51,0x14,0x45,0x04,0x54,0x15,0x10,0x05,0x44,0x01,0x00,0x41 },
@@ -6910,7 +6910,7 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 	m_bullets_base = 0xc0;
 
 	/* decode code */
-	static const UINT16 lut_am_unscramble[32] = {
+	static const uint16_t lut_am_unscramble[32] = {
 		0, 2, 4, 6, // ok!
 		7, 3, 5, 1, // ok!
 		6, 0, 2, 4, // ok!
@@ -6921,9 +6921,9 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 		3, 7, 7, 7  // ok!
 	};
 
-	UINT8* romdata = memregion("maincpu")->base();
+	uint8_t* romdata = memregion("maincpu")->base();
 	assert(memregion("maincpu")->bytes() == 0x8000);
-	UINT8 buf[0x8000];
+	uint8_t buf[0x8000];
 	memcpy(buf, romdata, 0x8000);
 
 	for (int i = 0; i < 32; i++)
@@ -7067,7 +7067,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scobra)
 
 DRIVER_INIT_MEMBER(galaxian_state,scobrae)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int offs;
 
 	for (offs = 0; offs < 0x6000; offs++)
@@ -7188,13 +7188,13 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 	save_item(NAME(m_protection_state));
 /*
 {
-    const UINT8 *rom = memregion("speech")->base();
+    const uint8_t *rom = memregion("speech")->base();
     int i;
 
     for (i = 0; i < 0x2c; i++)
     {
-        UINT16 addr = (rom[2*i] << 8) | rom[2*i+1];
-        UINT16 endaddr = (rom[2*i+2] << 8) | rom[2*i+3];
+        uint16_t addr = (rom[2*i] << 8) | rom[2*i+1];
+        uint16_t endaddr = (rom[2*i+2] << 8) | rom[2*i+3];
         int j;
         printf("Cmd %02X -> %04X-%04X:", i, addr, endaddr - 1);
         for (j = 0; j < 32 && addr < endaddr; j++)

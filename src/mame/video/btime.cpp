@@ -39,7 +39,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 		return;
 	}
 
-	const UINT8 *color_prom = m_prom_region->base();
+	const uint8_t *color_prom = m_prom_region->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -84,7 +84,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 
 PALETTE_INIT_MEMBER(btime_state,lnc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -279,16 +279,16 @@ WRITE8_MEMBER(btime_state::disco_video_control_w)
 }
 
 
-void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority )
+void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority )
 {
 	offs_t offs;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 x = 31 - (offs / 32);
-		UINT8 y = offs % 32;
+		uint8_t x = 31 - (offs / 32);
+		uint8_t y = offs % 32;
 
-		UINT16 code = m_videoram[offs] + 256 * (m_colorram[offs] & 3);
+		uint16_t code = m_videoram[offs] + 256 * (m_colorram[offs] & 3);
 
 		/* check priority */
 		if ((priority != -1) && (priority != ((code >> 7) & 0x01)))
@@ -309,9 +309,9 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 	}
 }
 
-void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
-							UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
-							UINT8 *sprite_ram, offs_t interleave )
+void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,
+							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
+							uint8_t *sprite_ram, offs_t interleave )
 {
 	int i;
 	offs_t offs;
@@ -320,7 +320,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
 		int x, y;
-		UINT8 flipx, flipy;
+		uint8_t flipx, flipy;
 
 		if (!(sprite_ram[offs + 0] & 0x01)) continue;
 
@@ -359,10 +359,10 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 }
 
 
-void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color )
+void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* tmap, uint8_t color )
 {
 	int i;
-	const UINT8 *gfx = memregion("bg_map")->base();
+	const uint8_t *gfx = memregion("bg_map")->base();
 	int scroll = -(m_bnj_scroll2 | ((m_bnj_scroll1 & 0x03) << 8));
 
 	// One extra iteration for wrap around
@@ -398,7 +398,7 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bnj_scroll1 & 0x10)
 	{
@@ -428,7 +428,7 @@ UINT32 btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 btime_state::screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_chars(bitmap, cliprect, FALSE, 0, -1);
 	draw_sprites(bitmap, cliprect, 0, 0, 0, m_videoram, 0x20);
@@ -437,7 +437,7 @@ UINT32 btime_state::screen_update_eggs(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-UINT32 btime_state::screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_chars(bitmap, cliprect, FALSE, 0, -1);
 	draw_sprites(bitmap, cliprect, 0, 1, 2, m_videoram, 0x20);
@@ -446,7 +446,7 @@ UINT32 btime_state::screen_update_lnc(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 btime_state::screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bnj_scroll1 & 0x04)
 	{
@@ -464,7 +464,7 @@ UINT32 btime_state::screen_update_zoar(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bnj_scroll1)
 	{
@@ -513,7 +513,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -544,7 +544,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 btime_state::screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t btime_state::screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_chars(bitmap, cliprect, FALSE, m_btime_palette, -1);
 	draw_sprites(bitmap, cliprect, m_btime_palette, 0, 0, m_spriteram, 1);

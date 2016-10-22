@@ -47,11 +47,11 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<UINT8> m_main_ram;
-	UINT8 m_out_data; // byte written to 0xFFFF
-	UINT8 m_out_req; // byte written to 0xFFFE
-	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
-	UINT8 m_out_ack; // byte written to 0xFFFC
+	required_shared_ptr<uint8_t> m_main_ram;
+	uint8_t m_out_data; // byte written to 0xFFFF
+	uint8_t m_out_req; // byte written to 0xFFFE
+	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
+	uint8_t m_out_ack; // byte written to 0xFFFC
 	virtual void machine_reset() override;
 };
 
@@ -66,8 +66,8 @@ DRIVER_INIT_MEMBER(zexall_state,zexall)
 void zexall_state::machine_reset()
 {
 // rom is self-modifying, so need to refresh it on each run
-	UINT8 *rom = memregion("romcode")->base();
-	UINT8 *ram = m_main_ram;
+	uint8_t *rom = memregion("romcode")->base();
+	uint8_t *ram = m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);
 }

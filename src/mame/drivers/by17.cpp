@@ -78,22 +78,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 private:
-	UINT8 m_u10a;
-	UINT8 m_u10b;
-	UINT8 m_u11a;
-	UINT8 m_u11b;
+	uint8_t m_u10a;
+	uint8_t m_u10b;
+	uint8_t m_u11a;
+	uint8_t m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb1;
 	bool m_u10_cb2;
 	bool m_u11_ca1;
 	bool m_u11_cb2;
-	UINT8 m_digit;
-	UINT8 m_segment[6];
-	UINT8 m_lamp_decode;
-	UINT8 m_solenoid_features[20][4];
-	UINT8 m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
+	uint8_t m_digit;
+	uint8_t m_segment[6];
+	uint8_t m_lamp_decode;
+	uint8_t m_solenoid_features[20][4];
+	uint8_t m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
 	required_device<m6800_cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -621,7 +621,7 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 
 READ8_MEMBER( by17_state::u10_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
@@ -690,7 +690,7 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 
 	if ((m_u10_ca2==0) && m_digit)
 	{
-		static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
+		static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
 
 		output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
 		output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
@@ -843,7 +843,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 DRIVER_INIT_MEMBER( by17_state, by17 )
 {
-	static const UINT8 solenoid_features_default[20][4] =
+	static const uint8_t solenoid_features_default[20][4] =
 	{
 	// This table serves two functions and is configured on a per game basis:
 	// Assign a particular sound sample corresponding to a solenoid function, and
@@ -883,7 +883,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 
 DRIVER_INIT_MEMBER( by17_state, matahari )
 {
-	static const UINT8 solenoid_features_matahari[20][4] =
+	static const uint8_t solenoid_features_matahari[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
 	/*00*/  { 0x02, 0x05,  0x03, 0x7f },        // Saucer
@@ -919,7 +919,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 
 DRIVER_INIT_MEMBER( by17_state, pwerplay )
 {
-	static const UINT8 solenoid_features_pwerplay[20][4] =
+	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
 	/*00*/  { 0x00, 0x10,  0x00, 0x00 },        // Post Down

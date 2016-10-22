@@ -314,7 +314,7 @@ void mac_state::set_scc_waitrequest(int waitrequest)
 void mac_state::v8_resize()
 {
 	offs_t memory_size;
-	UINT8 *memory_data;
+	uint8_t *memory_data;
 	int is_rom;
 
 	is_rom = (m_overlay) ? 1 : 0;
@@ -347,8 +347,8 @@ void mac_state::v8_resize()
 	else
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
-		UINT32 onboard_amt, simm_amt, simm_size;
-		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
+		uint32_t onboard_amt, simm_amt, simm_size;
+		static const uint32_t simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// re-install ROM in its normal place
 		size_t rom_mirror = 0xfffff ^ (memregion("bootrom")->bytes() - 1);
@@ -398,7 +398,7 @@ void mac_state::v8_resize()
 void mac_state::set_memory_overlay(int overlay)
 {
 	offs_t memory_size;
-	UINT8 *memory_data;
+	uint8_t *memory_data;
 	int is_rom;
 
 	/* normalize overlay */
@@ -490,7 +490,7 @@ void mac_state::set_memory_overlay(int overlay)
 READ32_MEMBER(mac_state::rom_switch_r)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
-	UINT32 *ROM_data = (UINT32 *)memregion("bootrom")->base();
+	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
 
 	// disable the overlay
 	if (m_overlay)
@@ -1167,7 +1167,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
-	UINT16 result;
+	uint16_t result;
 
 	result = scc->reg_r(space, offset);
 	return (result << 8) | result;
@@ -1201,7 +1201,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 * this driver along
 	 */
 
-	UINT16 result = 0;
+	uint16_t result = 0;
 	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
@@ -1628,7 +1628,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 
 READ16_MEMBER ( mac_state::mac_via_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1699,7 +1699,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 
 READ8_MEMBER(mac_state::mac_via2_in_a)
 {
-	UINT8 result;
+	uint8_t result;
 
 	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
 	{
@@ -2194,10 +2194,10 @@ MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
 MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
 MAC_DRIVER_INIT(maclc520, MODEL_MAC_LC_520)
 
-void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
+void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {
-	static const UINT8 masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
-	UINT8 mask = 0x3f;
+	static const uint8_t masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
+	uint8_t mask = 0x3f;
 
 	// quadra 700/900/950 use the top 2 bits of the interrupt register for ethernet and video
 	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
@@ -2364,11 +2364,11 @@ WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
  * This is debug code that will output diagnostics regarding OS traps called
  * *************************************************************************/
 
-const char *lookup_trap(UINT16 opcode)
+const char *lookup_trap(uint16_t opcode)
 {
 	static const struct
 	{
-		UINT16 trap;
+		uint16_t trap;
 		const char *name;
 	} traps[] =
 	{
@@ -3184,9 +3184,9 @@ const char *lookup_trap(UINT16 opcode)
 
 
 
-offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
-	UINT16 opcode;
+	uint16_t opcode;
 	unsigned result = 0;
 	const char *trap;
 
@@ -3266,9 +3266,9 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 	switch(trap)
 	{
 	case 0xa004:    /* _Control */
-		ioVRefNum = *((INT16*) (mem + a0 + 22));
-		ioCRefNum = *((INT16*) (mem + a0 + 24));
-		csCode = *((UINT16*) (mem + a0 + 26));
+		ioVRefNum = *((int16_t*) (mem + a0 + 22));
+		ioCRefNum = *((int16_t*) (mem + a0 + 24));
+		csCode = *((uint16_t*) (mem + a0 + 26));
 		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
 		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
@@ -3283,18 +3283,18 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		break;
 
 	case 0xa002:    /* _Read */
-		ioCompletion = (*((INT16*) (mem + a0 + 12)) << 16) + *((INT16*) (mem + a0 + 14));
-		ioVRefNum = *((INT16*) (mem + a0 + 22));
-		ioRefNum = *((INT16*) (mem + a0 + 24));
-		ioBuffer = (*((INT16*) (mem + a0 + 32)) << 16) + *((INT16*) (mem + a0 + 34));
-		ioReqCount = (*((INT16*) (mem + a0 + 36)) << 16) + *((INT16*) (mem + a0 + 38));
-		ioPosOffset = (*((INT16*) (mem + a0 + 46)) << 16) + *((INT16*) (mem + a0 + 48));
+		ioCompletion = (*((int16_t*) (mem + a0 + 12)) << 16) + *((int16_t*) (mem + a0 + 14));
+		ioVRefNum = *((int16_t*) (mem + a0 + 22));
+		ioRefNum = *((int16_t*) (mem + a0 + 24));
+		ioBuffer = (*((int16_t*) (mem + a0 + 32)) << 16) + *((int16_t*) (mem + a0 + 34));
+		ioReqCount = (*((int16_t*) (mem + a0 + 36)) << 16) + *((int16_t*) (mem + a0 + 38));
+		ioPosOffset = (*((int16_t*) (mem + a0 + 46)) << 16) + *((int16_t*) (mem + a0 + 48));
 		sprintf(s, " ioCompletion=0x%08x ioVRefNum=%i ioRefNum=%i ioBuffer=0x%08x ioReqCount=%i ioPosOffset=%i",
 			ioCompletion, ioVRefNum, ioRefNum, ioBuffer, ioReqCount, ioPosOffset);
 		break;
 
 	case 0xa04e:    /* _AddDrive */
-		sprintf(s, " drvrRefNum=%i drvNum=%i qEl=0x%08x", (int) (INT16) d0, (int) (INT16) d1, a0);
+		sprintf(s, " drvrRefNum=%i drvNum=%i qEl=0x%08x", (int) (int16_t) d0, (int) (int16_t) d1, a0);
 		break;
 
 	case 0xa9a0:    /* _GetResource */
@@ -3302,11 +3302,11 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		 * since this is just trace code it isn't much of an issue
 		 */
 		sprintf(s, " type='%c%c%c%c' id=%i", (char) mem[a7+3], (char) mem[a7+2],
-			(char) mem[a7+5], (char) mem[a7+4], *((INT16*) (mem + a7)));
+			(char) mem[a7+5], (char) mem[a7+4], *((int16_t*) (mem + a7)));
 		break;
 
 	case 0xa815:    /* _SCSIDispatch */
-		i = *((UINT16*) (mem + a7));
+		i = *((uint16_t*) (mem + a7));
 		if (i < ARRAY_LENGTH(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);

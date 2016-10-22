@@ -153,16 +153,16 @@ static inline floatx80 floatx80_abs(floatx80 fx)
 
 static inline double fx80_to_double(floatx80 fx)
 {
-	UINT64 d = floatx80_to_float64(fx);
+	uint64_t d = floatx80_to_float64(fx);
 	return *(double*)&d;
 }
 
 static inline floatx80 double_to_fx80(double in)
 {
-	return float64_to_floatx80(*(UINT64*)&in);
+	return float64_to_floatx80(*(uint64_t*)&in);
 }
 
-floatx80 i386_device::READ80(UINT32 ea)
+floatx80 i386_device::READ80(uint32_t ea)
 {
 	floatx80 t;
 
@@ -172,7 +172,7 @@ floatx80 i386_device::READ80(UINT32 ea)
 	return t;
 }
 
-void i386_device::WRITE80(UINT32 ea, floatx80 t)
+void i386_device::WRITE80(uint32_t ea, floatx80 t)
 {
 	WRITE64(ea, t.low);
 	WRITE16(ea + 8, t.high);
@@ -320,7 +320,7 @@ int i386_device::x87_check_exceptions()
 	return 1;
 }
 
-void i386_device::x87_write_cw(UINT16 cw)
+void i386_device::x87_write_cw(uint16_t cw)
 {
 	m_x87_cw = cw;
 
@@ -481,11 +481,11 @@ floatx80 i386_device::x87_div(floatx80 a, floatx80 b)
  *
  *************************************/
 
-void i386_device::x87_fadd_m32real(UINT8 modrm)
+void i386_device::x87_fadd_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -493,7 +493,7 @@ void i386_device::x87_fadd_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -516,11 +516,11 @@ void i386_device::x87_fadd_m32real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fadd_m64real(UINT8 modrm)
+void i386_device::x87_fadd_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -528,7 +528,7 @@ void i386_device::x87_fadd_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -551,7 +551,7 @@ void i386_device::x87_fadd_m64real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fadd_st_sti(UINT8 modrm)
+void i386_device::x87_fadd_st_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -584,7 +584,7 @@ void i386_device::x87_fadd_st_sti(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fadd_sti_st(UINT8 modrm)
+void i386_device::x87_fadd_sti_st(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -617,7 +617,7 @@ void i386_device::x87_fadd_sti_st(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_faddp(UINT8 modrm)
+void i386_device::x87_faddp(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -653,11 +653,11 @@ void i386_device::x87_faddp(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fiadd_m32int(UINT8 modrm)
+void i386_device::x87_fiadd_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -665,7 +665,7 @@ void i386_device::x87_fiadd_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -688,11 +688,11 @@ void i386_device::x87_fiadd_m32int(UINT8 modrm)
 	CYCLES(19);
 }
 
-void i386_device::x87_fiadd_m16int(UINT8 modrm)
+void i386_device::x87_fiadd_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -700,7 +700,7 @@ void i386_device::x87_fiadd_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -730,11 +730,11 @@ void i386_device::x87_fiadd_m16int(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fsub_m32real(UINT8 modrm)
+void i386_device::x87_fsub_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -742,7 +742,7 @@ void i386_device::x87_fsub_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -765,11 +765,11 @@ void i386_device::x87_fsub_m32real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsub_m64real(UINT8 modrm)
+void i386_device::x87_fsub_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -777,7 +777,7 @@ void i386_device::x87_fsub_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -800,7 +800,7 @@ void i386_device::x87_fsub_m64real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsub_st_sti(UINT8 modrm)
+void i386_device::x87_fsub_st_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -833,7 +833,7 @@ void i386_device::x87_fsub_st_sti(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsub_sti_st(UINT8 modrm)
+void i386_device::x87_fsub_sti_st(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -866,7 +866,7 @@ void i386_device::x87_fsub_sti_st(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsubp(UINT8 modrm)
+void i386_device::x87_fsubp(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -902,11 +902,11 @@ void i386_device::x87_fsubp(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fisub_m32int(UINT8 modrm)
+void i386_device::x87_fisub_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -914,7 +914,7 @@ void i386_device::x87_fisub_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -937,11 +937,11 @@ void i386_device::x87_fisub_m32int(UINT8 modrm)
 	CYCLES(19);
 }
 
-void i386_device::x87_fisub_m16int(UINT8 modrm)
+void i386_device::x87_fisub_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -949,7 +949,7 @@ void i386_device::x87_fisub_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -979,11 +979,11 @@ void i386_device::x87_fisub_m16int(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fsubr_m32real(UINT8 modrm)
+void i386_device::x87_fsubr_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -991,7 +991,7 @@ void i386_device::x87_fsubr_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = float32_to_floatx80(m32real);
 		floatx80 b = ST(0);
@@ -1014,11 +1014,11 @@ void i386_device::x87_fsubr_m32real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsubr_m64real(UINT8 modrm)
+void i386_device::x87_fsubr_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1026,7 +1026,7 @@ void i386_device::x87_fsubr_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = float64_to_floatx80(m64real);
 		floatx80 b = ST(0);
@@ -1049,7 +1049,7 @@ void i386_device::x87_fsubr_m64real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsubr_st_sti(UINT8 modrm)
+void i386_device::x87_fsubr_st_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1082,7 +1082,7 @@ void i386_device::x87_fsubr_st_sti(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsubr_sti_st(UINT8 modrm)
+void i386_device::x87_fsubr_sti_st(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1115,7 +1115,7 @@ void i386_device::x87_fsubr_sti_st(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fsubrp(UINT8 modrm)
+void i386_device::x87_fsubrp(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1151,11 +1151,11 @@ void i386_device::x87_fsubrp(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fisubr_m32int(UINT8 modrm)
+void i386_device::x87_fisubr_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1163,7 +1163,7 @@ void i386_device::x87_fisubr_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = int32_to_floatx80(m32int);
 		floatx80 b = ST(0);
@@ -1186,11 +1186,11 @@ void i386_device::x87_fisubr_m32int(UINT8 modrm)
 	CYCLES(19);
 }
 
-void i386_device::x87_fisubr_m16int(UINT8 modrm)
+void i386_device::x87_fisubr_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1198,7 +1198,7 @@ void i386_device::x87_fisubr_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = int32_to_floatx80(m16int);
 		floatx80 b = ST(0);
@@ -1228,11 +1228,11 @@ void i386_device::x87_fisubr_m16int(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fdiv_m32real(UINT8 modrm)
+void i386_device::x87_fdiv_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1240,7 +1240,7 @@ void i386_device::x87_fdiv_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -1263,11 +1263,11 @@ void i386_device::x87_fdiv_m32real(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdiv_m64real(UINT8 modrm)
+void i386_device::x87_fdiv_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1275,7 +1275,7 @@ void i386_device::x87_fdiv_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -1298,7 +1298,7 @@ void i386_device::x87_fdiv_m64real(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdiv_st_sti(UINT8 modrm)
+void i386_device::x87_fdiv_st_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1333,7 +1333,7 @@ void i386_device::x87_fdiv_st_sti(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdiv_sti_st(UINT8 modrm)
+void i386_device::x87_fdiv_sti_st(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1368,7 +1368,7 @@ void i386_device::x87_fdiv_sti_st(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdivp(UINT8 modrm)
+void i386_device::x87_fdivp(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1404,11 +1404,11 @@ void i386_device::x87_fdivp(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fidiv_m32int(UINT8 modrm)
+void i386_device::x87_fidiv_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1416,7 +1416,7 @@ void i386_device::x87_fidiv_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -1439,11 +1439,11 @@ void i386_device::x87_fidiv_m32int(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fidiv_m16int(UINT8 modrm)
+void i386_device::x87_fidiv_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1451,7 +1451,7 @@ void i386_device::x87_fidiv_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ32(ea);
+		int16_t m16int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -1481,11 +1481,11 @@ void i386_device::x87_fidiv_m16int(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fdivr_m32real(UINT8 modrm)
+void i386_device::x87_fdivr_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1493,7 +1493,7 @@ void i386_device::x87_fdivr_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = float32_to_floatx80(m32real);
 		floatx80 b = ST(0);
@@ -1516,11 +1516,11 @@ void i386_device::x87_fdivr_m32real(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdivr_m64real(UINT8 modrm)
+void i386_device::x87_fdivr_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1528,7 +1528,7 @@ void i386_device::x87_fdivr_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = float64_to_floatx80(m64real);
 		floatx80 b = ST(0);
@@ -1551,7 +1551,7 @@ void i386_device::x87_fdivr_m64real(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdivr_st_sti(UINT8 modrm)
+void i386_device::x87_fdivr_st_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1586,7 +1586,7 @@ void i386_device::x87_fdivr_st_sti(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdivr_sti_st(UINT8 modrm)
+void i386_device::x87_fdivr_sti_st(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1621,7 +1621,7 @@ void i386_device::x87_fdivr_sti_st(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fdivrp(UINT8 modrm)
+void i386_device::x87_fdivrp(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 result;
@@ -1658,11 +1658,11 @@ void i386_device::x87_fdivrp(UINT8 modrm)
 }
 
 
-void i386_device::x87_fidivr_m32int(UINT8 modrm)
+void i386_device::x87_fidivr_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1670,7 +1670,7 @@ void i386_device::x87_fidivr_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = int32_to_floatx80(m32int);
 		floatx80 b = ST(0);
@@ -1693,11 +1693,11 @@ void i386_device::x87_fidivr_m32int(UINT8 modrm)
 	CYCLES(73);
 }
 
-void i386_device::x87_fidivr_m16int(UINT8 modrm)
+void i386_device::x87_fidivr_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1705,7 +1705,7 @@ void i386_device::x87_fidivr_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ32(ea);
+		int16_t m16int = READ32(ea);
 
 		floatx80 a = int32_to_floatx80(m16int);
 		floatx80 b = ST(0);
@@ -1735,11 +1735,11 @@ void i386_device::x87_fidivr_m16int(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fmul_m32real(UINT8 modrm)
+void i386_device::x87_fmul_m32real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1747,7 +1747,7 @@ void i386_device::x87_fmul_m32real(UINT8 modrm)
 	}
 	else
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -1769,11 +1769,11 @@ void i386_device::x87_fmul_m32real(UINT8 modrm)
 	CYCLES(11);
 }
 
-void i386_device::x87_fmul_m64real(UINT8 modrm)
+void i386_device::x87_fmul_m64real(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1781,7 +1781,7 @@ void i386_device::x87_fmul_m64real(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -1803,7 +1803,7 @@ void i386_device::x87_fmul_m64real(UINT8 modrm)
 	CYCLES(14);
 }
 
-void i386_device::x87_fmul_st_sti(UINT8 modrm)
+void i386_device::x87_fmul_st_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1835,7 +1835,7 @@ void i386_device::x87_fmul_st_sti(UINT8 modrm)
 	CYCLES(16);
 }
 
-void i386_device::x87_fmul_sti_st(UINT8 modrm)
+void i386_device::x87_fmul_sti_st(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1867,7 +1867,7 @@ void i386_device::x87_fmul_sti_st(UINT8 modrm)
 	CYCLES(16);
 }
 
-void i386_device::x87_fmulp(UINT8 modrm)
+void i386_device::x87_fmulp(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -1902,11 +1902,11 @@ void i386_device::x87_fmulp(UINT8 modrm)
 	CYCLES(16);
 }
 
-void i386_device::x87_fimul_m32int(UINT8 modrm)
+void i386_device::x87_fimul_m32int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1914,7 +1914,7 @@ void i386_device::x87_fimul_m32int(UINT8 modrm)
 	}
 	else
 	{
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -1936,11 +1936,11 @@ void i386_device::x87_fimul_m32int(UINT8 modrm)
 	CYCLES(22);
 }
 
-void i386_device::x87_fimul_m16int(UINT8 modrm)
+void i386_device::x87_fimul_m16int(uint8_t modrm)
 {
 	floatx80 result;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -1948,7 +1948,7 @@ void i386_device::x87_fimul_m16int(UINT8 modrm)
 	}
 	else
 	{
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -1976,7 +1976,7 @@ void i386_device::x87_fimul_m16int(UINT8 modrm)
 *
 *************************************/
 
-void i386_device::x87_fcmovb_sti(UINT8 modrm)
+void i386_device::x87_fcmovb_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2000,7 +2000,7 @@ void i386_device::x87_fcmovb_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmove_sti(UINT8 modrm)
+void i386_device::x87_fcmove_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2024,7 +2024,7 @@ void i386_device::x87_fcmove_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovbe_sti(UINT8 modrm)
+void i386_device::x87_fcmovbe_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2048,7 +2048,7 @@ void i386_device::x87_fcmovbe_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovu_sti(UINT8 modrm)
+void i386_device::x87_fcmovu_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2072,7 +2072,7 @@ void i386_device::x87_fcmovu_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovnb_sti(UINT8 modrm)
+void i386_device::x87_fcmovnb_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2096,7 +2096,7 @@ void i386_device::x87_fcmovnb_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovne_sti(UINT8 modrm)
+void i386_device::x87_fcmovne_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2120,7 +2120,7 @@ void i386_device::x87_fcmovne_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovnbe_sti(UINT8 modrm)
+void i386_device::x87_fcmovnbe_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2144,7 +2144,7 @@ void i386_device::x87_fcmovnbe_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcmovnu_sti(UINT8 modrm)
+void i386_device::x87_fcmovnu_sti(uint8_t modrm)
 {
 	floatx80 result;
 	int i = modrm & 7;
@@ -2174,7 +2174,7 @@ void i386_device::x87_fcmovnu_sti(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fprem(UINT8 modrm)
+void i386_device::x87_fprem(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2228,7 +2228,7 @@ void i386_device::x87_fprem(UINT8 modrm)
 	CYCLES(84);
 }
 
-void i386_device::x87_fprem1(UINT8 modrm)
+void i386_device::x87_fprem1(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2254,7 +2254,7 @@ void i386_device::x87_fprem1(UINT8 modrm)
 	CYCLES(94);
 }
 
-void i386_device::x87_fsqrt(UINT8 modrm)
+void i386_device::x87_fsqrt(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2291,7 +2291,7 @@ void i386_device::x87_fsqrt(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_f2xm1(UINT8 modrm)
+void i386_device::x87_f2xm1(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2316,7 +2316,7 @@ void i386_device::x87_f2xm1(UINT8 modrm)
 	CYCLES(242);
 }
 
-void i386_device::x87_fyl2x(UINT8 modrm)
+void i386_device::x87_fyl2x(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2353,7 +2353,7 @@ void i386_device::x87_fyl2x(UINT8 modrm)
 	CYCLES(250);
 }
 
-void i386_device::x87_fyl2xp1(UINT8 modrm)
+void i386_device::x87_fyl2xp1(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2382,7 +2382,7 @@ void i386_device::x87_fyl2xp1(UINT8 modrm)
 	CYCLES(313);
 }
 
-void i386_device::x87_fptan(UINT8 modrm)
+void i386_device::x87_fptan(uint8_t modrm)
 {
 	floatx80 result1, result2;
 
@@ -2427,7 +2427,7 @@ void i386_device::x87_fptan(UINT8 modrm)
 	CYCLES(244);
 }
 
-void i386_device::x87_fpatan(UINT8 modrm)
+void i386_device::x87_fpatan(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2452,7 +2452,7 @@ void i386_device::x87_fpatan(UINT8 modrm)
 	CYCLES(289);
 }
 
-void i386_device::x87_fsin(UINT8 modrm)
+void i386_device::x87_fsin(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2485,7 +2485,7 @@ void i386_device::x87_fsin(UINT8 modrm)
 	CYCLES(241);
 }
 
-void i386_device::x87_fcos(UINT8 modrm)
+void i386_device::x87_fcos(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -2518,7 +2518,7 @@ void i386_device::x87_fcos(UINT8 modrm)
 	CYCLES(241);
 }
 
-void i386_device::x87_fsincos(UINT8 modrm)
+void i386_device::x87_fsincos(uint8_t modrm)
 {
 	floatx80 s_result, c_result;
 
@@ -2573,14 +2573,14 @@ void i386_device::x87_fsincos(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fld_m32real(UINT8 modrm)
+void i386_device::x87_fld_m32real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (x87_dec_stack())
 	{
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		value = float32_to_floatx80(m32real);
 
@@ -2603,14 +2603,14 @@ void i386_device::x87_fld_m32real(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fld_m64real(UINT8 modrm)
+void i386_device::x87_fld_m64real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (x87_dec_stack())
 	{
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		value = float64_to_floatx80(m64real);
 
@@ -2633,11 +2633,11 @@ void i386_device::x87_fld_m64real(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fld_m80real(UINT8 modrm)
+void i386_device::x87_fld_m80real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (x87_dec_stack())
 	{
 		m_x87_sw &= ~X87_SW_C1;
@@ -2654,7 +2654,7 @@ void i386_device::x87_fld_m80real(UINT8 modrm)
 	CYCLES(6);
 }
 
-void i386_device::x87_fld_sti(UINT8 modrm)
+void i386_device::x87_fld_sti(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -2674,11 +2674,11 @@ void i386_device::x87_fld_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fild_m16int(UINT8 modrm)
+void i386_device::x87_fild_m16int(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (!x87_dec_stack())
 	{
 		value = fx80_inan;
@@ -2687,7 +2687,7 @@ void i386_device::x87_fild_m16int(UINT8 modrm)
 	{
 		m_x87_sw &= ~X87_SW_C1;
 
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 		value = int32_to_floatx80(m16int);
 	}
 
@@ -2697,11 +2697,11 @@ void i386_device::x87_fild_m16int(UINT8 modrm)
 	CYCLES(13);
 }
 
-void i386_device::x87_fild_m32int(UINT8 modrm)
+void i386_device::x87_fild_m32int(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (!x87_dec_stack())
 	{
 		value = fx80_inan;
@@ -2710,7 +2710,7 @@ void i386_device::x87_fild_m32int(UINT8 modrm)
 	{
 		m_x87_sw &= ~X87_SW_C1;
 
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 		value = int32_to_floatx80(m32int);
 	}
 
@@ -2720,11 +2720,11 @@ void i386_device::x87_fild_m32int(UINT8 modrm)
 	CYCLES(9);
 }
 
-void i386_device::x87_fild_m64int(UINT8 modrm)
+void i386_device::x87_fild_m64int(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (!x87_dec_stack())
 	{
 		value = fx80_inan;
@@ -2733,7 +2733,7 @@ void i386_device::x87_fild_m64int(UINT8 modrm)
 	{
 		m_x87_sw &= ~X87_SW_C1;
 
-		INT64 m64int = READ64(ea);
+		int64_t m64int = READ64(ea);
 		value = int64_to_floatx80(m64int);
 	}
 
@@ -2743,11 +2743,11 @@ void i386_device::x87_fild_m64int(UINT8 modrm)
 	CYCLES(10);
 }
 
-void i386_device::x87_fbld(UINT8 modrm)
+void i386_device::x87_fbld(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (!x87_dec_stack())
 	{
 		value = fx80_inan;
@@ -2756,8 +2756,8 @@ void i386_device::x87_fbld(UINT8 modrm)
 	{
 		m_x87_sw &= ~X87_SW_C1;
 
-		UINT64 m64val = 0;
-		UINT16 sign;
+		uint64_t m64val = 0;
+		uint16_t sign;
 
 		value = READ80(ea);
 
@@ -2788,11 +2788,11 @@ void i386_device::x87_fbld(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fst_m32real(UINT8 modrm)
+void i386_device::x87_fst_m32real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -2806,18 +2806,18 @@ void i386_device::x87_fst_m32real(UINT8 modrm)
 
 	if (x87_check_exceptions())
 	{
-		UINT32 m32real = floatx80_to_float32(value);
+		uint32_t m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 	}
 
 	CYCLES(7);
 }
 
-void i386_device::x87_fst_m64real(UINT8 modrm)
+void i386_device::x87_fst_m64real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -2831,14 +2831,14 @@ void i386_device::x87_fst_m64real(UINT8 modrm)
 
 	if (x87_check_exceptions())
 	{
-		UINT64 m64real = floatx80_to_float64(value);
+		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 	}
 
 	CYCLES(8);
 }
 
-void i386_device::x87_fst_sti(UINT8 modrm)
+void i386_device::x87_fst_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 value;
@@ -2860,11 +2860,11 @@ void i386_device::x87_fst_sti(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fstp_m32real(UINT8 modrm)
+void i386_device::x87_fstp_m32real(uint8_t modrm)
 {
 	floatx80 value;
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -2878,7 +2878,7 @@ void i386_device::x87_fstp_m32real(UINT8 modrm)
 
 	if (x87_check_exceptions())
 	{
-		UINT32 m32real = floatx80_to_float32(value);
+		uint32_t m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 		x87_inc_stack();
 	}
@@ -2886,7 +2886,7 @@ void i386_device::x87_fstp_m32real(UINT8 modrm)
 	CYCLES(7);
 }
 
-void i386_device::x87_fstp_m64real(UINT8 modrm)
+void i386_device::x87_fstp_m64real(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -2902,10 +2902,10 @@ void i386_device::x87_fstp_m64real(UINT8 modrm)
 	}
 
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
-		UINT64 m64real = floatx80_to_float64(value);
+		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 		x87_inc_stack();
 	}
@@ -2913,7 +2913,7 @@ void i386_device::x87_fstp_m64real(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fstp_m80real(UINT8 modrm)
+void i386_device::x87_fstp_m80real(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -2928,7 +2928,7 @@ void i386_device::x87_fstp_m80real(UINT8 modrm)
 		value = ST(0);
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE80(ea, value);
@@ -2938,7 +2938,7 @@ void i386_device::x87_fstp_m80real(UINT8 modrm)
 	CYCLES(6);
 }
 
-void i386_device::x87_fstp_sti(UINT8 modrm)
+void i386_device::x87_fstp_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 	floatx80 value;
@@ -2963,9 +2963,9 @@ void i386_device::x87_fstp_sti(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fist_m16int(UINT8 modrm)
+void i386_device::x87_fist_m16int(uint8_t modrm)
 {
-	INT16 m16int;
+	int16_t m16int;
 
 	if (X87_IS_ST_EMPTY(0))
 	{
@@ -2987,7 +2987,7 @@ void i386_device::x87_fist_m16int(UINT8 modrm)
 			m16int = -32768;
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE16(ea, m16int);
@@ -2996,9 +2996,9 @@ void i386_device::x87_fist_m16int(UINT8 modrm)
 	CYCLES(29);
 }
 
-void i386_device::x87_fist_m32int(UINT8 modrm)
+void i386_device::x87_fist_m32int(uint8_t modrm)
 {
-	INT32 m32int;
+	int32_t m32int;
 
 	if (X87_IS_ST_EMPTY(0))
 	{
@@ -3020,7 +3020,7 @@ void i386_device::x87_fist_m32int(UINT8 modrm)
 			m32int = 0x80000000;
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE32(ea, m32int);
@@ -3029,14 +3029,14 @@ void i386_device::x87_fist_m32int(UINT8 modrm)
 	CYCLES(28);
 }
 
-void i386_device::x87_fistp_m16int(UINT8 modrm)
+void i386_device::x87_fistp_m16int(uint8_t modrm)
 {
-	INT16 m16int;
+	int16_t m16int;
 
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
-		m16int = (UINT16)0x8000;
+		m16int = (uint16_t)0x8000;
 	}
 	else
 	{
@@ -3050,10 +3050,10 @@ void i386_device::x87_fistp_m16int(UINT8 modrm)
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m16int = floatx80_to_int32(fx80);
 		else
-			m16int = (UINT16)0x8000;
+			m16int = (uint16_t)0x8000;
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE16(ea, m16int);
@@ -3063,9 +3063,9 @@ void i386_device::x87_fistp_m16int(UINT8 modrm)
 	CYCLES(29);
 }
 
-void i386_device::x87_fistp_m32int(UINT8 modrm)
+void i386_device::x87_fistp_m32int(uint8_t modrm)
 {
-	INT32 m32int;
+	int32_t m32int;
 
 	if (X87_IS_ST_EMPTY(0))
 	{
@@ -3087,7 +3087,7 @@ void i386_device::x87_fistp_m32int(UINT8 modrm)
 			m32int = 0x80000000;
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE32(ea, m32int);
@@ -3097,9 +3097,9 @@ void i386_device::x87_fistp_m32int(UINT8 modrm)
 	CYCLES(29);
 }
 
-void i386_device::x87_fistp_m64int(UINT8 modrm)
+void i386_device::x87_fistp_m64int(uint8_t modrm)
 {
-	INT64 m64int;
+	int64_t m64int;
 
 	if (X87_IS_ST_EMPTY(0))
 	{
@@ -3121,7 +3121,7 @@ void i386_device::x87_fistp_m64int(UINT8 modrm)
 			m64int = U64(0x8000000000000000);
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE64(ea, m64int);
@@ -3131,7 +3131,7 @@ void i386_device::x87_fistp_m64int(UINT8 modrm)
 	CYCLES(29);
 }
 
-void i386_device::x87_fbstp(UINT8 modrm)
+void i386_device::x87_fbstp(uint8_t modrm)
 {
 	floatx80 result;
 
@@ -3142,7 +3142,7 @@ void i386_device::x87_fbstp(UINT8 modrm)
 	}
 	else
 	{
-		UINT64 u64 = floatx80_to_int64(floatx80_abs(ST(0)));
+		uint64_t u64 = floatx80_to_int64(floatx80_abs(ST(0)));
 		result.low = 0;
 
 		for (int i = 0; i < 64; i += 4)
@@ -3156,7 +3156,7 @@ void i386_device::x87_fbstp(UINT8 modrm)
 		result.high |= ST(0).high & 0x8000;
 	}
 
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	if (x87_check_exceptions())
 	{
 		WRITE80(ea, result);
@@ -3173,7 +3173,7 @@ void i386_device::x87_fbstp(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fld1(UINT8 modrm)
+void i386_device::x87_fld1(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3199,7 +3199,7 @@ void i386_device::x87_fld1(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fldl2t(UINT8 modrm)
+void i386_device::x87_fldl2t(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3231,7 +3231,7 @@ void i386_device::x87_fldl2t(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fldl2e(UINT8 modrm)
+void i386_device::x87_fldl2e(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3264,7 +3264,7 @@ void i386_device::x87_fldl2e(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fldpi(UINT8 modrm)
+void i386_device::x87_fldpi(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3297,7 +3297,7 @@ void i386_device::x87_fldpi(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fldlg2(UINT8 modrm)
+void i386_device::x87_fldlg2(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3330,7 +3330,7 @@ void i386_device::x87_fldlg2(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fldln2(UINT8 modrm)
+void i386_device::x87_fldln2(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3363,7 +3363,7 @@ void i386_device::x87_fldln2(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_fldz(UINT8 modrm)
+void i386_device::x87_fldz(uint8_t modrm)
 {
 	floatx80 value;
 	int tag;
@@ -3396,12 +3396,12 @@ void i386_device::x87_fldz(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fnop(UINT8 modrm)
+void i386_device::x87_fnop(uint8_t modrm)
 {
 	CYCLES(3);
 }
 
-void i386_device::x87_fchs(UINT8 modrm)
+void i386_device::x87_fchs(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -3424,7 +3424,7 @@ void i386_device::x87_fchs(UINT8 modrm)
 	CYCLES(6);
 }
 
-void i386_device::x87_fabs(UINT8 modrm)
+void i386_device::x87_fabs(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -3447,7 +3447,7 @@ void i386_device::x87_fabs(UINT8 modrm)
 	CYCLES(6);
 }
 
-void i386_device::x87_fscale(UINT8 modrm)
+void i386_device::x87_fscale(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -3462,18 +3462,18 @@ void i386_device::x87_fscale(UINT8 modrm)
 		value = ST(0);
 
 		// Set the rounding mode to truncate
-		UINT16 old_cw = m_x87_cw;
-		UINT16 new_cw = (old_cw & ~(X87_CW_RC_MASK << X87_CW_RC_SHIFT)) | (X87_CW_RC_ZERO << X87_CW_RC_SHIFT);
+		uint16_t old_cw = m_x87_cw;
+		uint16_t new_cw = (old_cw & ~(X87_CW_RC_MASK << X87_CW_RC_SHIFT)) | (X87_CW_RC_ZERO << X87_CW_RC_SHIFT);
 		x87_write_cw(new_cw);
 
 		// Interpret ST(1) as an integer
-		UINT32 st1 = floatx80_to_int32(floatx80_round_to_int(ST(1)));
+		uint32_t st1 = floatx80_to_int32(floatx80_round_to_int(ST(1)));
 
 		// Restore the rounding mode
 		x87_write_cw(old_cw);
 
 		// Get the unbiased exponent of ST(0)
-		INT16 exp = (ST(0).high & 0x7fff) - 0x3fff;
+		int16_t exp = (ST(0).high & 0x7fff) - 0x3fff;
 
 		// Calculate the new exponent
 		exp = (exp + st1 + 0x3fff) & 0x7fff;
@@ -3488,7 +3488,7 @@ void i386_device::x87_fscale(UINT8 modrm)
 	CYCLES(31);
 }
 
-void i386_device::x87_frndint(UINT8 modrm)
+void i386_device::x87_frndint(uint8_t modrm)
 {
 	floatx80 value;
 
@@ -3510,7 +3510,7 @@ void i386_device::x87_frndint(UINT8 modrm)
 	CYCLES(21);
 }
 
-void i386_device::x87_fxtract(UINT8 modrm)
+void i386_device::x87_fxtract(uint8_t modrm)
 {
 	floatx80 sig80, exp80;
 
@@ -3563,7 +3563,7 @@ void i386_device::x87_fxtract(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_ftst(UINT8 modrm)
+void i386_device::x87_ftst(uint8_t modrm)
 {
 	if (X87_IS_ST_EMPTY(0))
 	{
@@ -3594,7 +3594,7 @@ void i386_device::x87_ftst(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fxam(UINT8 modrm)
+void i386_device::x87_fxam(uint8_t modrm)
 {
 	floatx80 value = ST(0);
 
@@ -3628,9 +3628,9 @@ void i386_device::x87_fxam(UINT8 modrm)
 	CYCLES(8);
 }
 
-void i386_device::x87_ficom_m16int(UINT8 modrm)
+void i386_device::x87_ficom_m16int(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3640,7 +3640,7 @@ void i386_device::x87_ficom_m16int(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -3665,9 +3665,9 @@ void i386_device::x87_ficom_m16int(UINT8 modrm)
 	CYCLES(16);
 }
 
-void i386_device::x87_ficom_m32int(UINT8 modrm)
+void i386_device::x87_ficom_m32int(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3677,7 +3677,7 @@ void i386_device::x87_ficom_m32int(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -3702,9 +3702,9 @@ void i386_device::x87_ficom_m32int(UINT8 modrm)
 	CYCLES(15);
 }
 
-void i386_device::x87_ficomp_m16int(UINT8 modrm)
+void i386_device::x87_ficomp_m16int(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3714,7 +3714,7 @@ void i386_device::x87_ficomp_m16int(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		INT16 m16int = READ16(ea);
+		int16_t m16int = READ16(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m16int);
@@ -3740,9 +3740,9 @@ void i386_device::x87_ficomp_m16int(UINT8 modrm)
 	CYCLES(16);
 }
 
-void i386_device::x87_ficomp_m32int(UINT8 modrm)
+void i386_device::x87_ficomp_m32int(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3752,7 +3752,7 @@ void i386_device::x87_ficomp_m32int(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		INT32 m32int = READ32(ea);
+		int32_t m32int = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = int32_to_floatx80(m32int);
@@ -3779,9 +3779,9 @@ void i386_device::x87_ficomp_m32int(UINT8 modrm)
 }
 
 
-void i386_device::x87_fcom_m32real(UINT8 modrm)
+void i386_device::x87_fcom_m32real(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3791,7 +3791,7 @@ void i386_device::x87_fcom_m32real(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -3816,9 +3816,9 @@ void i386_device::x87_fcom_m32real(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcom_m64real(UINT8 modrm)
+void i386_device::x87_fcom_m64real(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3828,7 +3828,7 @@ void i386_device::x87_fcom_m64real(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -3853,7 +3853,7 @@ void i386_device::x87_fcom_m64real(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcom_sti(UINT8 modrm)
+void i386_device::x87_fcom_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -3889,9 +3889,9 @@ void i386_device::x87_fcom_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcomp_m32real(UINT8 modrm)
+void i386_device::x87_fcomp_m32real(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3901,7 +3901,7 @@ void i386_device::x87_fcomp_m32real(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 m32real = READ32(ea);
+		uint32_t m32real = READ32(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float32_to_floatx80(m32real);
@@ -3927,9 +3927,9 @@ void i386_device::x87_fcomp_m32real(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcomp_m64real(UINT8 modrm)
+void i386_device::x87_fcomp_m64real(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
@@ -3939,7 +3939,7 @@ void i386_device::x87_fcomp_m64real(UINT8 modrm)
 	{
 		m_x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT64 m64real = READ64(ea);
+		uint64_t m64real = READ64(ea);
 
 		floatx80 a = ST(0);
 		floatx80 b = float64_to_floatx80(m64real);
@@ -3965,7 +3965,7 @@ void i386_device::x87_fcomp_m64real(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcomp_sti(UINT8 modrm)
+void i386_device::x87_fcomp_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4002,7 +4002,7 @@ void i386_device::x87_fcomp_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fcomi_sti(UINT8 modrm)
+void i386_device::x87_fcomi_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4046,7 +4046,7 @@ void i386_device::x87_fcomi_sti(UINT8 modrm)
 	CYCLES(4); // TODO: correct cycle count
 }
 
-void i386_device::x87_fcomip_sti(UINT8 modrm)
+void i386_device::x87_fcomip_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4091,7 +4091,7 @@ void i386_device::x87_fcomip_sti(UINT8 modrm)
 	CYCLES(4); // TODO: correct cycle count
 }
 
-void i386_device::x87_fucomi_sti(UINT8 modrm)
+void i386_device::x87_fucomi_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4141,7 +4141,7 @@ void i386_device::x87_fucomi_sti(UINT8 modrm)
 	CYCLES(4); // TODO: correct cycle count
 }
 
-void i386_device::x87_fucomip_sti(UINT8 modrm)
+void i386_device::x87_fucomip_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4192,7 +4192,7 @@ void i386_device::x87_fucomip_sti(UINT8 modrm)
 	CYCLES(4); // TODO: correct cycle count
 }
 
-void i386_device::x87_fcompp(UINT8 modrm)
+void i386_device::x87_fcompp(uint8_t modrm)
 {
 	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(1))
 	{
@@ -4237,7 +4237,7 @@ void i386_device::x87_fcompp(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fucom_sti(UINT8 modrm)
+void i386_device::x87_fucom_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4275,7 +4275,7 @@ void i386_device::x87_fucom_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fucomp_sti(UINT8 modrm)
+void i386_device::x87_fucomp_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4314,7 +4314,7 @@ void i386_device::x87_fucomp_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fucompp(UINT8 modrm)
+void i386_device::x87_fucompp(uint8_t modrm)
 {
 	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(1))
 	{
@@ -4361,7 +4361,7 @@ void i386_device::x87_fucompp(UINT8 modrm)
  *
  *************************************/
 
-void i386_device::x87_fdecstp(UINT8 modrm)
+void i386_device::x87_fdecstp(uint8_t modrm)
 {
 	m_x87_sw &= ~X87_SW_C1;
 
@@ -4371,7 +4371,7 @@ void i386_device::x87_fdecstp(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fincstp(UINT8 modrm)
+void i386_device::x87_fincstp(uint8_t modrm)
 {
 	m_x87_sw &= ~X87_SW_C1;
 
@@ -4381,31 +4381,31 @@ void i386_device::x87_fincstp(UINT8 modrm)
 	CYCLES(3);
 }
 
-void i386_device::x87_fclex(UINT8 modrm)
+void i386_device::x87_fclex(uint8_t modrm)
 {
 	m_x87_sw &= ~0x80ff;
 
 	CYCLES(7);
 }
 
-void i386_device::x87_ffree(UINT8 modrm)
+void i386_device::x87_ffree(uint8_t modrm)
 {
 	x87_set_tag(ST_TO_PHYS(modrm & 7), X87_TW_EMPTY);
 
 	CYCLES(3);
 }
 
-void i386_device::x87_finit(UINT8 modrm)
+void i386_device::x87_finit(uint8_t modrm)
 {
 	x87_reset();
 
 	CYCLES(17);
 }
 
-void i386_device::x87_fldcw(UINT8 modrm)
+void i386_device::x87_fldcw(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
-	UINT16 cw = READ16(ea);
+	uint32_t ea = GetEA(modrm, 0);
+	uint16_t cw = READ16(ea);
 
 	x87_write_cw(cw);
 
@@ -4414,18 +4414,18 @@ void i386_device::x87_fldcw(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fstcw(UINT8 modrm)
+void i386_device::x87_fstcw(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 	WRITE16(ea, m_x87_cw);
 
 	CYCLES(3);
 }
 
-void i386_device::x87_fldenv(UINT8 modrm)
+void i386_device::x87_fldenv(uint8_t modrm)
 {
 	// TODO: Pointers and selectors
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 
 	if (m_operand_size)
 	{
@@ -4447,9 +4447,9 @@ void i386_device::x87_fldenv(UINT8 modrm)
 	CYCLES((m_cr[0] & 1) ? 34 : 44);
 }
 
-void i386_device::x87_fstenv(UINT8 modrm)
+void i386_device::x87_fstenv(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 
 	// TODO: Pointers and selectors
 	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
@@ -4496,9 +4496,9 @@ void i386_device::x87_fstenv(UINT8 modrm)
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }
 
-void i386_device::x87_fsave(UINT8 modrm)
+void i386_device::x87_fsave(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 
 	// TODO: Pointers and selectors
 	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
@@ -4552,9 +4552,9 @@ void i386_device::x87_fsave(UINT8 modrm)
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }
 
-void i386_device::x87_frstor(UINT8 modrm)
+void i386_device::x87_frstor(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 0);
+	uint32_t ea = GetEA(modrm, 0);
 
 	// TODO: Pointers and selectors
 	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
@@ -4608,7 +4608,7 @@ void i386_device::x87_frstor(UINT8 modrm)
 	CYCLES((m_cr[0] & 1) ? 34 : 44);
 }
 
-void i386_device::x87_fxch(UINT8 modrm)
+void i386_device::x87_fxch(uint8_t modrm)
 {
 	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(1))
 		x87_set_stack_underflow();
@@ -4628,7 +4628,7 @@ void i386_device::x87_fxch(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fxch_sti(UINT8 modrm)
+void i386_device::x87_fxch_sti(uint8_t modrm)
 {
 	int i = modrm & 7;
 
@@ -4660,23 +4660,23 @@ void i386_device::x87_fxch_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
-void i386_device::x87_fstsw_ax(UINT8 modrm)
+void i386_device::x87_fstsw_ax(uint8_t modrm)
 {
 	REG16(AX) = m_x87_sw;
 
 	CYCLES(3);
 }
 
-void i386_device::x87_fstsw_m2byte(UINT8 modrm)
+void i386_device::x87_fstsw_m2byte(uint8_t modrm)
 {
-	UINT32 ea = GetEA(modrm, 1);
+	uint32_t ea = GetEA(modrm, 1);
 
 	WRITE16(ea, m_x87_sw);
 
 	CYCLES(3);
 }
 
-void i386_device::x87_invalid(UINT8 modrm)
+void i386_device::x87_invalid(uint8_t modrm)
 {
 	// TODO
 	fatalerror("x87 invalid instruction (PC:%.4x)\n", m_pc);
@@ -4692,49 +4692,49 @@ void i386_device::x87_invalid(UINT8 modrm)
 
 void i386_device::i386_x87_group_d8()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_d8[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_d9()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_d9[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_da()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_da[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_db()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_db[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_dc()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_dc[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_dd()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_dd[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_de()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_de[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_df()
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_df[modrm])(modrm);
 }
 

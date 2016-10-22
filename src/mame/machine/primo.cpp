@@ -77,7 +77,7 @@ void primo_state::primo_update_memory()
 
 READ8_MEMBER(primo_state::primo_be_1_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	// bit 7, 6 - not used
@@ -103,7 +103,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 
 READ8_MEMBER(primo_state::primo_be_2_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// bit 7, 6 - not used
 
@@ -268,7 +268,7 @@ MACHINE_RESET_MEMBER(primo_state,primob)
 
 *******************************************************************************/
 
-void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
+void primo_state::primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
 {
 	/* Z80 registers */
 	m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
@@ -303,7 +303,7 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 
 SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
-	std::vector<UINT8> snapshot_data(snapshot_size);
+	std::vector<uint8_t> snapshot_data(snapshot_size);
 
 	if (image.fread(&snapshot_data[0], snapshot_size) != snapshot_size)
 	{
@@ -327,10 +327,10 @@ SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 *******************************************************************************/
 
 
-void primo_state::primo_setup_pp(UINT8* quickload_data, UINT32 quickload_size)
+void primo_state::primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 {
-	UINT16 load_addr;
-	UINT16 start_addr;
+	uint16_t load_addr;
+	uint16_t start_addr;
 
 	load_addr = quickload_data[0] + quickload_data[1]*256;
 	start_addr = quickload_data[2] + quickload_data[3]*256;
@@ -345,7 +345,7 @@ void primo_state::primo_setup_pp(UINT8* quickload_data, UINT32 quickload_size)
 
 QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
-	std::vector<UINT8> quickload_data(quickload_size);
+	std::vector<uint8_t> quickload_data(quickload_size);
 
 	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
 	{

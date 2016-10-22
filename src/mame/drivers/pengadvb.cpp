@@ -44,8 +44,8 @@ public:
 
 	address_map_bank_device *m_page[4];
 	memory_bank *m_bank[4];
-	UINT8 m_primary_slot_reg;
-	UINT8 m_kb_matrix_row;
+	uint8_t m_primary_slot_reg;
+	uint8_t m_kb_matrix_row;
 
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
@@ -278,7 +278,7 @@ void pengadvb_state::machine_reset()
 
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
-	UINT8 *mem = memregion(region)->base();
+	uint8_t *mem = memregion(region)->base();
 	int memsize = memregion(region)->bytes();
 
 	// data lines swap
@@ -288,7 +288,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 	}
 
 	// address line swap
-	std::vector<UINT8> buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{
