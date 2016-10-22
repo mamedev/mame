@@ -204,7 +204,7 @@ void renegade_state::machine_start()
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
 {
-	m_mcu_sim = FALSE;
+	m_mcu_sim = false;
 
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
@@ -223,7 +223,7 @@ DRIVER_INIT_MEMBER(renegade_state,renegade)
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 {
-	m_mcu_sim = TRUE;
+	m_mcu_sim = true;
 	m_mcu_checksum = 0x85;
 	m_mcu_encrypt_table = kuniokun_xor_table;
 	m_mcu_encrypt_table_len = 0x2a;
@@ -328,7 +328,7 @@ WRITE8_MEMBER(renegade_state::_68705_ddr_c_w)
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		m_mcu_key = -1;
 		m_mcu_input_size = 0;
@@ -343,7 +343,7 @@ READ8_MEMBER(renegade_state::mcu_reset_r)
 
 WRITE8_MEMBER(renegade_state::mcu_w)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		m_mcu_output_byte = 0;
 
@@ -537,7 +537,7 @@ void renegade_state::mcu_process_command()
 
 READ8_MEMBER(renegade_state::mcu_r)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		int result = 1;
 
@@ -560,7 +560,7 @@ CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 {
 	uint8_t res = 0;
 
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		res = 1;
 	}

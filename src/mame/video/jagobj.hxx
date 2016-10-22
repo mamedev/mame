@@ -559,7 +559,7 @@ static inline uint8_t lookup_pixel(const uint32_t *src, int i, int pitch, int de
  *
  *************************************/
 
-uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, int logit)
+uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit)
 {
 	/* extract minimal data */
 	uint32_t upper = objdata[0];
@@ -737,7 +737,7 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
  *
  *************************************/
 
-uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, int logit)
+uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit)
 {
 	/* extract data */
 	uint32_t upper = objdata[0];
@@ -953,7 +953,7 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
  *
  *************************************/
 
-uint32_t *jaguar_state::process_branch(uint32_t *objdata, int vc, int logit)
+uint32_t *jaguar_state::process_branch(uint32_t *objdata, int vc, bool logit)
 {
 	uint32_t upper = objdata[0];
 	uint32_t lower = objdata[1];
@@ -1019,7 +1019,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 {
 	int done = 0, count = 0;
 	uint32_t *objdata;
-	int logit;
+	bool logit;
 	int x;
 
 	/* erase the scanline first */

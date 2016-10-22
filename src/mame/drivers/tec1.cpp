@@ -287,10 +287,10 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 	{
 		m_kbd = tec1_convert_col_to_bin(i, m_kbd_row);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-		m_key_pressed = TRUE;
+		m_key_pressed = true;
 	}
 	else
-		m_key_pressed = FALSE;
+		m_key_pressed = false;
 }
 
 

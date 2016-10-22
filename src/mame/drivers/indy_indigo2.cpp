@@ -1011,7 +1011,7 @@ void ip22_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		ip22_dma(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in ip22_state::device_timer");
+		assert_always(false, "Unknown id in ip22_state::device_timer");
 	}
 }
 

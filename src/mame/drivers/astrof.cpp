@@ -289,7 +289,7 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
 	/* this ties to the CLR pin of the shift registers */
-	m_screen_off = (data & 0x02) ? TRUE : FALSE;
+	m_screen_off = (data & 0x02) ? true : false;
 
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
@@ -304,10 +304,10 @@ void astrof_state::astrof_set_video_control_2( uint8_t data )
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 
 	/* D4-D7 - not connected */
 }
@@ -325,7 +325,7 @@ void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3-D7 - not connected */
 }
@@ -344,7 +344,7 @@ void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 	/* D2 - not connected */
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 }
 
 WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
@@ -498,7 +498,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 
 
 	/* the red background circuit is disabled */
-	m_red_on = FALSE;
+	m_red_on = false;
 
 	/* register for state saving */
 	save_item(NAME(m_flipscreen));

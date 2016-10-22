@@ -416,7 +416,7 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_crtc->assert_light_pen_input();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in peplus_state::device_timer");
+		assert_always(false, "Unknown id in peplus_state::device_timer");
 	}
 }
 
@@ -1367,27 +1367,27 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(peplus_state,nonplus)
 {
 	door_wait = 500;
-	m_doorcycle = FALSE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = false;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 }
 
 /* Normal board */
 DRIVER_INIT_MEMBER(peplus_state,peplus)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 }
 
 /* Superboard */
 DRIVER_INIT_MEMBER(peplus_state,peplussb)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = FALSE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = false;
 	peplus_load_superdata("user1");
 }
 
@@ -1395,9 +1395,9 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 {
 	door_wait = 500;
-	m_doorcycle = TRUE;
-	m_wingboard = FALSE;
-	m_jumper_e16_e17 = TRUE;
+	m_doorcycle = true;
+	m_wingboard = false;
+	m_jumper_e16_e17 = true;
 	peplus_load_superdata("user1");
 }
 
@@ -1405,9 +1405,9 @@ DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 DRIVER_INIT_MEMBER(peplus_state,peplussbw)
 {
 	door_wait = 12345;
-	m_doorcycle = TRUE;
-	m_wingboard = TRUE;
-	m_jumper_e16_e17 = TRUE;
+	m_doorcycle = true;
+	m_wingboard = true;
+	m_jumper_e16_e17 = true;
 	peplus_load_superdata("user1");
 }
 

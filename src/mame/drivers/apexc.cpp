@@ -629,7 +629,7 @@ uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &b
 
 void apexc_state::apexc_teletyper_init()
 {
-	m_letters = FALSE;
+	m_letters = false;
 	m_pos = 0;
 }
 
@@ -691,12 +691,12 @@ void apexc_state::apexc_teletyper_putchar(int character)
 
 	case 27:
 		/* Figures */
-		m_letters = FALSE;
+		m_letters = false;
 		break;
 
 	case 31:
 		/* Letters */
-		m_letters = TRUE;
+		m_letters = true;
 		break;
 
 	default:

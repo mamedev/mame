@@ -1390,13 +1390,13 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		case REG_SPR0CTL:   case REG_SPR1CTL:   case REG_SPR2CTL:   case REG_SPR3CTL:
 		case REG_SPR4CTL:   case REG_SPR5CTL:   case REG_SPR6CTL:   case REG_SPR7CTL:
 			/* disable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, FALSE);
+			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, false);
 			break;
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
 			/* enable comparitor on writes here */
-			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, TRUE);
+			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, true);
 			break;
 
 		case REG_COP1LCH:

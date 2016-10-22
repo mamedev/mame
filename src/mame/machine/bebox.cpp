@@ -752,7 +752,7 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_GET_DEVICES:
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in bebox_state::device_timer");
+		assert_always(false, "Unknown id in bebox_state::device_timer");
 	}
 }
 

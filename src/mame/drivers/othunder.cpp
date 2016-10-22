@@ -336,7 +336,7 @@ void othunder_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_irq();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in othunder_state::device_timer");
+		assert_always(false, "Unknown id in othunder_state::device_timer");
 	}
 }
 

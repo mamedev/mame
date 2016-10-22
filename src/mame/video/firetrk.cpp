@@ -358,14 +358,14 @@ uint32_t firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind1
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
-		firetrk_draw_car(m_helper2, playfield_window, 0, FALSE);
+		firetrk_draw_car(m_helper2, playfield_window, 0, false);
 		check_collision(0);
 
 		m_helper2.fill(0xff, playfield_window);
-		firetrk_draw_car(m_helper2, playfield_window, 1, FALSE);
+		firetrk_draw_car(m_helper2, playfield_window, 1, false);
 		check_collision(1);
 
-		*m_blink = FALSE;
+		*m_blink = false;
 	}
 
 	return 0;
@@ -391,10 +391,10 @@ uint32_t firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
-		superbug_draw_car(m_helper2, playfield_window, FALSE);
+		superbug_draw_car(m_helper2, playfield_window, false);
 		check_collision(0);
 
-		*m_blink = FALSE;
+		*m_blink = false;
 	}
 
 	return 0;
@@ -411,8 +411,8 @@ uint32_t firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind
 
 	bitmap.fill(0x2c, cliprect);
 	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
-	montecar_draw_car(bitmap, playfield_window, 0, FALSE);
-	montecar_draw_car(bitmap, playfield_window, 1, FALSE);
+	montecar_draw_car(bitmap, playfield_window, 0, false);
+	montecar_draw_car(bitmap, playfield_window, 1, false);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
@@ -421,11 +421,11 @@ uint32_t firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
-		montecar_draw_car(m_helper2, playfield_window, 0, TRUE);
+		montecar_draw_car(m_helper2, playfield_window, 0, true);
 		check_collision(0);
 
 		m_helper2.fill(0xff, playfield_window);
-		montecar_draw_car(m_helper2, playfield_window, 1, TRUE);
+		montecar_draw_car(m_helper2, playfield_window, 1, true);
 		check_collision(1);
 	}
 

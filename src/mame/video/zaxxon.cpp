@@ -447,7 +447,7 @@ void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -456,7 +456,7 @@ uint32_t zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 
 
 uint32_t zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x180, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -465,7 +465,7 @@ uint32_t zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 
 
 uint32_t zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, FALSE);
+	draw_background(bitmap, cliprect, false);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -474,7 +474,7 @@ uint32_t zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind1
 
 uint32_t zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect, TRUE);
+	draw_background(bitmap, cliprect, true);
 	draw_sprites(bitmap, cliprect, 0x280, 0x180);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

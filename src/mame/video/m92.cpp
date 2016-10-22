@@ -56,7 +56,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 			m92_sprite_interrupt();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in m92_state::device_timer");
+		assert_always(false, "Unknown id in m92_state::device_timer");
 	}
 }
 
@@ -220,13 +220,13 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 			/* update size (bit 2) */
 			if (m_pf_master_control[offset] & 0x04)
 			{
-				layer->tmap->enable(FALSE);
+				layer->tmap->enable(false);
 				layer->wide_tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
 			}
 			else
 			{
 				layer->tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
-				layer->wide_tmap->enable(FALSE);
+				layer->wide_tmap->enable(false);
 			}
 
 			/* mark everything dirty of the VRAM base or size changes */

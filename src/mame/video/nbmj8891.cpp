@@ -313,7 +313,7 @@ void nbmj8891_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in nbmj8891_state::device_timer");
+		assert_always(false, "Unknown id in nbmj8891_state::device_timer");
 	}
 }
 

@@ -384,7 +384,7 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		scanline_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in astrocde_state::device_timer");
+		assert_always(false, "Unknown id in astrocde_state::device_timer");
 	}
 }
 

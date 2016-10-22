@@ -51,7 +51,7 @@ void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		via_0_ca1_timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gameplan_state::device_timer");
+		assert_always(false, "Unknown id in gameplan_state::device_timer");
 	}
 }
 

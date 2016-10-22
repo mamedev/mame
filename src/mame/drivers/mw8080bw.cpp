@@ -2262,11 +2262,11 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 
 	/* timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeon", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
-	MCFG_TIMER_PARAM(TRUE)  /* indicates strobe ON */
+	MCFG_TIMER_PARAM(true)  /* indicates strobe ON */
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeoff", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(SPCENCTR_STROBE_FREQ) * (100 - SPCENCTR_STROBE_DUTY_CYCLE) / 100)
-	MCFG_TIMER_PARAM(FALSE) /* indicates strobe OFF */
+	MCFG_TIMER_PARAM(false) /* indicates strobe OFF */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

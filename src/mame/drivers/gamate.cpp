@@ -337,7 +337,7 @@ void gamate_state::machine_start()
 	card_protection.set=false;
 	bank_multi=0;
 	card_protection.unprotected=false;
-	timer2->enable(TRUE);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 #if 0
 	save_item(NAME(m_video.data));
@@ -355,15 +355,15 @@ void gamate_state::machine_start()
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	timer1->enable(FALSE);
+	timer1->enable(false);
 }
 
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	timer1->enable(TRUE);
+	timer1->enable(true);
 	timer1->reset(m_maincpu->cycles_to_attotime(10/* cycles short enought to clear irq line early enough*/));
-	timer2->enable(TRUE);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 

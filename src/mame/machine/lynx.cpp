@@ -97,7 +97,7 @@ inline void lynx_state::lynx_plot_pixel(const int mode, const int16_t x, const i
 	uint16_t screen;
 	uint16_t colbuf;
 
-	m_blitter.everon = TRUE;
+	m_blitter.everon = true;
 	screen = m_blitter.screen + y * 80 + x / 2;
 	colbuf = m_blitter.colbuf + y * 80 + x / 2;
 
@@ -491,7 +491,7 @@ void lynx_state::lynx_blit_lines()
 	int ydir = 0, xdir = 0;
 	int flip = 0;
 
-	m_blitter.everon = FALSE;
+	m_blitter.everon = false;
 
 	switch (m_blitter.spr_ctl1 & 0x03)   /* Initial drawing direction */
 	{
@@ -598,7 +598,7 @@ void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		lynx_uart_timer(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in lynx_state::device_timer");
+		assert_always(false, "Unknown id in lynx_state::device_timer");
 	}
 }
 
@@ -823,10 +823,10 @@ void lynx_state::lynx_divide()
 	left = m_suzy.data[MATH_H] | (m_suzy.data[MATH_G] << 8) | (m_suzy.data[MATH_F] << 16) | (m_suzy.data[MATH_E] << 24);
 	right = m_suzy.data[MATH_P] | (m_suzy.data[MATH_N] << 8);
 
-	m_suzy.accumulate_overflow = FALSE;
+	m_suzy.accumulate_overflow = false;
 	if (right == 0)
 	{
-		m_suzy.accumulate_overflow = TRUE;  /* during divisions, this bit is used to detect denominator = 0 */
+		m_suzy.accumulate_overflow = true;  /* during divisions, this bit is used to detect denominator = 0 */
 		res = 0xffffffff;
 		mod = 0; //?
 	}
@@ -859,7 +859,7 @@ void lynx_state::lynx_multiply()
 	            EFGH
 	Accumulate  JKLM
 	*/
-	m_suzy.accumulate_overflow = FALSE;
+	m_suzy.accumulate_overflow = false;
 
 	left = m_suzy.data[MATH_B] | (m_suzy.data[MATH_A] << 8);
 	right = m_suzy.data[MATH_D] | (m_suzy.data[MATH_C] << 8);
@@ -883,7 +883,7 @@ void lynx_state::lynx_multiply()
 		accu += res;
 
 		if (accu < res)
-			m_suzy.accumulate_overflow = TRUE;
+			m_suzy.accumulate_overflow = true;
 
 		m_suzy.data[MATH_M] = accu;
 		m_suzy.data[MATH_L] = accu >> 8;
@@ -1180,7 +1180,7 @@ WRITE8_MEMBER(lynx_state::suzy_write)
 
 		/* Writing to M (0x6c) will also clear the accumulator overflow bit */
 		case MATH_M:
-			m_suzy.accumulate_overflow = FALSE;
+			m_suzy.accumulate_overflow = false;
 			break;
 		case MATH_C:
 			/* If we are going to perform a signed multiplication, we store the sign and convert the number
@@ -1602,7 +1602,7 @@ void lynx_state::lynx_uart_reset()
 
 TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_loopback_timer)
 {
-	m_uart.received = FALSE;
+	m_uart.received = false;
 }
 
 TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
@@ -1610,13 +1610,13 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 	if (m_uart.buffer_loaded)
 	{
 		m_uart.data_to_send = m_uart.buffer;
-		m_uart.buffer_loaded = FALSE;
+		m_uart.buffer_loaded = false;
 		timer_set(attotime::from_usec(11*16), TIMER_UART);
 	}
 	else
 	{
-		m_uart.sending = FALSE;
-		m_uart.received = TRUE;
+		m_uart.sending = false;
+		m_uart.received = true;
 		m_uart.data_received = m_uart.data_to_send;
 		timer_set(attotime::from_usec(11*16), TIMER_UART_LOOPBACK);
 		if (m_uart.serctl & 0x40)
@@ -1670,11 +1670,11 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 			if (m_uart.sending)
 			{
 				m_uart.buffer = data;
-				m_uart.buffer_loaded = TRUE;
+				m_uart.buffer_loaded = true;
 			}
 			else
 			{
-				m_uart.sending = TRUE;
+				m_uart.sending = true;
 				m_uart.data_to_send = data;
 				// timing not accurate, baude rate should be calculated from timer 4 backup value and clock rate
 				timer_set(attotime::from_usec(11*16), TIMER_UART);

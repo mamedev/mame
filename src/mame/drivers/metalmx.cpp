@@ -695,7 +695,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 
 	MCFG_CPU_ADD("gsp", TMS34020, 40000000)         /* Unverified */
 	MCFG_CPU_PROGRAM_MAP(gsp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE("maincpu", 4))

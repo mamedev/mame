@@ -106,7 +106,7 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -146,7 +146,7 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -158,7 +158,7 @@ READ32_MEMBER(midzeus_state::cmos_r)
 
 WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 {
-	cmos_protected = FALSE;
+	cmos_protected = false;
 }
 
 
@@ -181,7 +181,7 @@ WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 		m_m48t35->write(space, offset, data, 0xff);
 	else
 		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 

@@ -119,7 +119,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	else
 		mem = nullptr;
 
-	samcoupe_update_bank(space, 3, mem, FALSE);
+	samcoupe_update_bank(space, 3, mem, false);
 
 	/* bank 4 */
 	if (m_hext >> 6 < m_ram->size() >> 20)
@@ -127,7 +127,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	else
 		mem = nullptr;
 
-	samcoupe_update_bank(space, 4, mem, FALSE);
+	samcoupe_update_bank(space, 4, mem, false);
 }
 
 
@@ -145,12 +145,12 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 			memory = &m_ram->pointer()[(m_lmpr & page_mask) * 0x4000];
 		else
 			memory = nullptr;  /* Attempt to page in non existant ram region */
-		is_readonly = FALSE;
+		is_readonly = false;
 	}
 	else
 	{
 		memory = rom;   /* Rom0 paged in */
-		is_readonly = TRUE;
+		is_readonly = true;
 	}
 	samcoupe_update_bank(space, 1, memory, is_readonly);
 
@@ -160,7 +160,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 		memory = &m_ram->pointer()[((m_lmpr + 1) & page_mask) * 0x4000];
 	else
 		memory = nullptr;  /* Attempt to page in non existant ram region */
-	samcoupe_update_bank(space, 2, memory, FALSE);
+	samcoupe_update_bank(space, 2, memory, false);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
 	if (m_hmpr & HMPR_MCNTRL)
@@ -174,14 +174,14 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 			memory = &m_ram->pointer()[(m_hmpr & page_mask)*0x4000];
 		else
 			memory = nullptr;  /* Attempt to page in non existant ram region */
-		samcoupe_update_bank(space, 3, memory, FALSE);
+		samcoupe_update_bank(space, 3, memory, false);
 
 
 		/* BANK4 */
 		if (m_lmpr & LMPR_ROM1)  /* Is Rom1 paged in at bank 4 */
 		{
 			memory = rom + 0x4000;
-			is_readonly = TRUE;
+			is_readonly = true;
 		}
 		else
 		{
@@ -189,9 +189,9 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 				memory = &m_ram->pointer()[((m_hmpr + 1) & page_mask) * 0x4000];
 			else
 				memory = nullptr;  /* Attempt to page in non existant ram region */
-			is_readonly = FALSE;
+			is_readonly = false;
 		}
-		samcoupe_update_bank(space, 4, memory, FALSE);
+		samcoupe_update_bank(space, 4, memory, false);
 	}
 
 	/* video memory location */

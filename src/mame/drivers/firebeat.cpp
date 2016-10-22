@@ -1039,7 +1039,7 @@ MACHINE_START_MEMBER(firebeat_state,firebeat)
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )

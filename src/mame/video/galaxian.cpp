@@ -782,7 +782,7 @@ void galaxian_state::stars_init()
 	int i;
 
 	/* reset the blink and enabled states */
-	m_stars_enabled = FALSE;
+	m_stars_enabled = false;
 	m_stars_blink_state = 0;
 
 	/* precalculate the RNG */

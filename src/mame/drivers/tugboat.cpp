@@ -184,8 +184,8 @@ uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(bitmap,cliprect,startaddr0,0,1,false);
+	draw_tilemap(bitmap,cliprect,startaddr1,2,3,true);
 	return 0;
 }
 
@@ -219,7 +219,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tugboat_state::device_timer");
+		assert_always(false, "Unknown id in tugboat_state::device_timer");
 	}
 }
 

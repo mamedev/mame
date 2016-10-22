@@ -43,7 +43,7 @@ public:
 	uint8_t m_omegaf_io_protection_input;
 	int m_omegaf_io_protection_tic;
 	int m_next_sprite_overdraw_enabled;
-	int (*m_stencil_compare_function) (uint16_t pal);
+	bool (*m_stencil_compare_function) (uint16_t pal);
 	int m_sprites_updated;
 	bitmap_ind16 m_sprites_bitmap;
 	int m_robokid_sprites;

@@ -56,7 +56,7 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in thunderx_state::device_timer");
+		assert_always(false, "Unknown id in thunderx_state::device_timer");
 	}
 }
 

@@ -1267,7 +1267,7 @@ static void configure_fast_ram(running_machine &machine)
 	machine.device<ppc_device>("maincpu")->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	machine.device<ppc_device>("maincpu")->ppcdrc_add_fastram(0x00000000, 0x007fffff, FALSE, state->m_work_ram);
+	machine.device<ppc_device>("maincpu")->ppcdrc_add_fastram(0x00000000, 0x007fffff, false, state->m_work_ram);
 }
 
 TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)

@@ -364,7 +364,7 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_acia_rxc_txc();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
+		assert_always(false, "Unknown id in osborne1_state::device_timer");
 	}
 }
 

@@ -28,7 +28,7 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		poly88_cassette_timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in poly88_state::device_timer");
+		assert_always(false, "Unknown id in poly88_state::device_timer");
 	}
 }
 

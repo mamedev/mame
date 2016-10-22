@@ -30,7 +30,7 @@
 READ8_MEMBER(mtx_state::mtx_strobe_r)
 {
 	/* set STROBE low */
-	m_centronics->write_strobe(FALSE);
+	m_centronics->write_strobe(false);
 
 	return 0xff;
 }
@@ -180,7 +180,7 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
 	uint8_t data = 0;
 
 	/* reset STROBE to high */
-	m_centronics->write_strobe( TRUE);
+	m_centronics->write_strobe( true);
 
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_fault << 1;

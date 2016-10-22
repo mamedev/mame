@@ -67,7 +67,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				if (channel->on||channel->count)
 				{
-					int on = FALSE;
+					bool on = false;
 					switch (channel->waveform)
 					{
 						case 0:
@@ -151,8 +151,8 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			m_dma.pos += m_dma.step;
 			if (m_dma.pos >= m_dma.size)
 			{
-				m_dma.finished = TRUE;
-				m_dma.on = FALSE;
+				m_dma.finished = true;
+				m_dma.on = false;
 				m_irq_cb();
 			}
 		}

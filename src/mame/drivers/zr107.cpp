@@ -465,7 +465,7 @@ void zr107_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )

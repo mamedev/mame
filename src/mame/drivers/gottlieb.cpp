@@ -421,7 +421,7 @@ WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 {
-	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
 	   board receives notification and latches the most recent frame number */
@@ -491,7 +491,7 @@ inline void gottlieb_state::audio_end_state()
 }
 
 
-void gottlieb_state::audio_process_clock(int logit)
+void gottlieb_state::audio_process_clock(bool logit)
 {
 	/* clock the bit through the shift register */
 	m_laserdisc_audio_bits >>= 1;
@@ -532,7 +532,7 @@ void gottlieb_state::audio_process_clock(int logit)
 }
 
 
-void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int logit)
+void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, bool logit)
 {
 	/* compute time from last clock */
 	attotime deltaclock = zerotime - m_laserdisc_last_clock;
@@ -581,7 +581,7 @@ void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, int lo
 
 void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
 {
-	int logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
+	bool logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = m_laserdisc_last_time;
 	int cursamp;
@@ -703,7 +703,7 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_clear(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gottlieb_state::device_timer");
+		assert_always(false, "Unknown id in gottlieb_state::device_timer");
 	}
 }
 

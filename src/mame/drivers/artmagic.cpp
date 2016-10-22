@@ -122,7 +122,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_irq_state();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in artmagic_state::device_timer");
+		assert_always(false, "Unknown id in artmagic_state::device_timer");
 	}
 }
 
@@ -817,7 +817,7 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 
 	MCFG_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */

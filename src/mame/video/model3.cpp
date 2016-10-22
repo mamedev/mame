@@ -1530,7 +1530,7 @@ void model3_state::draw_model(uint32_t addr)
 
 	uint32_t header[7];
 	int index = 0;
-	int last_polygon = FALSE, first_polygon = TRUE, back_face = FALSE;
+	bool last_polygon = false, first_polygon = true, back_face = false;
 	int num_vertices;
 	int i, v, vi;
 	float fixed_point_fraction;
@@ -1575,13 +1575,13 @@ void model3_state::draw_model(uint32_t addr)
 
 		if (first_polygon && (header[0] & 0x0f) != 0)
 			return;
-		first_polygon = FALSE;
+		first_polygon = false;
 
 		if (header[6] == 0)
 			return;
 
 		if (header[1] & 0x4)
-			last_polygon = TRUE;
+			last_polygon = true;
 
 		if ((header[0] & 0x300) == 0x300)       // TODO: broken polygons in srally2 have these bits set
 			return;

@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */

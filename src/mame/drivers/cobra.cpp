@@ -3228,12 +3228,12 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 void cobra_state::machine_start()
 {
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_main_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_main_ram);
 
-	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_sub_ram);
+	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_sub_ram);
 
-	m_gfxcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_gfx_ram0);
-	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, 0x07ffffff, FALSE, m_gfx_ram1);
+	m_gfxcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_gfx_ram0);
+	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, 0x07ffffff, false, m_gfx_ram1);
 }
 
 void cobra_state::machine_reset()

@@ -410,7 +410,7 @@ void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 uint32_t exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* redraw the screen */
-	update_screen(screen, bitmap, cliprect, 0, TRUE);
+	update_screen(screen, bitmap, cliprect, 0, true);
 
 	/* generate an interrupt once/frame for the beam */
 	if (cliprect.max_y == screen.visible_area().max_y)
@@ -442,7 +442,7 @@ uint32_t exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_in
 uint32_t exidy440_state::screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* redraw the screen */
-	update_screen(screen, bitmap, cliprect, m_topsecex_yscroll, FALSE);
+	update_screen(screen, bitmap, cliprect, m_topsecex_yscroll, false);
 
 	return 0;
 }

@@ -267,7 +267,7 @@ void sliver_state::render_jpeg()
 
 		jpeg_mem_src(&cinfo, memregion("user2")->base()+addr, memregion("user2")->bytes()-addr);
 
-		jpeg_read_header(&cinfo, TRUE);
+		jpeg_read_header(&cinfo, true);
 		jpeg_start_decompress(&cinfo);
 
 		int row_stride = cinfo.output_width * cinfo.output_components;

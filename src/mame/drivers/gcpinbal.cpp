@@ -100,7 +100,7 @@ void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gcpinbal_state::device_timer");
+		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
 	}
 }
 

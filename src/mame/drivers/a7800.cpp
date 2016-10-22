@@ -1436,7 +1436,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	m_ispal = FALSE;
+	m_ispal = false;
 	m_lines = 263;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
@@ -1445,7 +1445,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	m_ispal = TRUE;
+	m_ispal = true;
 	m_lines = 313;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;

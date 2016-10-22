@@ -208,7 +208,7 @@ void pasogo_state::machine_start()
 	system_time systime;
 
 	memset(&m_vg230, 0, sizeof(m_vg230));
-	m_vg230.pmu.write_protected = TRUE;
+	m_vg230.pmu.write_protected = true;
 	machine().base_datetime(systime);
 
 	m_vg230.rtc.seconds = systime.local_time.second;
@@ -221,7 +221,7 @@ void pasogo_state::machine_start()
 
 READ8_MEMBER( pasogo_state::vg230_io_r )
 {
-	int log = TRUE;
+	int log = true;
 	uint8_t data = 0;
 
 	m_vg230.bios_timer.data += 0x100; //HACK
@@ -246,22 +246,22 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 			case 0x31:
 				data = m_vg230.bios_timer.data >> 8;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x70:
 				data = m_vg230.rtc.seconds;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x71:
 				data = m_vg230.rtc.minutes;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x72:
 				data = m_vg230.rtc.hours;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x73:
@@ -274,7 +274,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 			case 0x79:
 				/*rtc status*/
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x7a:
@@ -289,8 +289,8 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 				data &= ~1;
 				if (m_vg230.pmu.write_protected)
 					data |= 1;
-				m_vg230.pmu.write_protected = FALSE;
-				log = FALSE;
+				m_vg230.pmu.write_protected = false;
+				log = false;
 				break;
 		}
 
@@ -307,7 +307,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 WRITE8_MEMBER( pasogo_state::vg230_io_w )
 {
-	int log = TRUE;
+	int log = true;
 
 	if (offset & 1)
 	{
@@ -357,14 +357,14 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 			case 0x79:
 				m_vg230.rtc.onehertz_interrupt_on = data & 1;
 				m_vg230.rtc.alarm_interrupt_on = data & 2;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x7a:
 				if (data & 2)
 				{
-					m_vg230.rtc.alarm_interrupt_request = FALSE;
-					m_vg230.rtc.onehertz_interrupt_request = FALSE; /* update interrupt */
+					m_vg230.rtc.alarm_interrupt_request = false;
+					m_vg230.rtc.onehertz_interrupt_request = false; /* update interrupt */
 				}
 				break;
 		}

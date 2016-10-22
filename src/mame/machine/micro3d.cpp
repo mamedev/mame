@@ -241,7 +241,7 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		adc_done_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in micro3d_state::device_timer");
+		assert_always(false, "Unknown id in micro3d_state::device_timer");
 	}
 }
 

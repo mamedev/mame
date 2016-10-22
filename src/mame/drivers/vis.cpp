@@ -49,7 +49,7 @@ vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *ta
 void vis_audio_device::device_start()
 {
 	set_isa_device();
-	m_isa->set_dma_channel(7, this, FALSE);
+	m_isa->set_dma_channel(7, this, false);
 	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(vis_audio_device::pcm_r), this), write8_delegate(FUNC(vis_audio_device::pcm_w), this));
 	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
 	m_pcm = timer_alloc();

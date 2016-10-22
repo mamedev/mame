@@ -776,7 +776,7 @@ static MACHINE_CONFIG_DERIVED( megatech_fixedslot, megatech )
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 MACHINE_CONFIG_END
 
 

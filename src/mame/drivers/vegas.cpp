@@ -608,8 +608,8 @@ void vegas_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_nile_irq_state));
@@ -998,7 +998,8 @@ TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 READ32_MEMBER( vegas_state::nile_r )
 {
 	uint32_t result = m_nile_regs[offset];
-	int logit = 1, which;
+	bool logit = true;
+	int which;
 
 	switch (offset)
 	{
@@ -1116,7 +1117,8 @@ READ32_MEMBER( vegas_state::nile_r )
 WRITE32_MEMBER( vegas_state::nile_w )
 {
 	uint32_t olddata = m_nile_regs[offset];
-	int logit = 1, which;
+	bool logit = true;
+	int which;
 
 	COMBINE_DATA(&m_nile_regs[offset]);
 

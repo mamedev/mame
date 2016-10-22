@@ -520,7 +520,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
 	uint32_t olddata = m_midvplus_misc[offset];
-	int logit = 1;
+	bool logit = true;
 
 	COMBINE_DATA(&m_midvplus_misc[offset]);
 
@@ -531,12 +531,12 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
 				m_watchdog->reset_w(space, 0, 0);
-				logit = 0;
+				logit = false;
 			}
 			break;
 
 		case 3:
-			logit = 0;
+			logit = false;
 			break;
 	}
 

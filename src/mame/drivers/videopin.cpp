@@ -54,7 +54,7 @@ void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in videopin_state::device_timer");
+		assert_always(false, "Unknown id in videopin_state::device_timer");
 	}
 }
 

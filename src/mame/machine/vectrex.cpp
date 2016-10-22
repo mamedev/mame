@@ -74,7 +74,7 @@ void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		update_signal(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in vectrex_state::device_timer");
+		assert_always(false, "Unknown id in vectrex_state::device_timer");
 	}
 }
 

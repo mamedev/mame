@@ -1729,7 +1729,7 @@ MACHINE_CONFIG_END
 // a single cart in slot 1, with pre-defined cart type
 #define NEOGEO_CONFIG_ONE_FIXED_CARTSLOT(_default)    \
 	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, _default)    \
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 
 static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 	MCFG_DEVICE_REMOVE("edge")

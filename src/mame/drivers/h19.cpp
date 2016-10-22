@@ -95,7 +95,7 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in h19_state::device_timer");
+		assert_always(false, "Unknown id in h19_state::device_timer");
 	}
 }
 

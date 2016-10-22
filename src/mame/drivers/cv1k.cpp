@@ -842,10 +842,10 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
 
-	m_maincpu->add_fastram(0x00000000, 0x003fffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 
-	m_maincpu->add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, FALSE,  m_ram);
-	m_maincpu->add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, FALSE,  m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
+	m_maincpu->add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
 }
 
 

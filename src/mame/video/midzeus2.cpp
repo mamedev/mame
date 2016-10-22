@@ -64,7 +64,7 @@ public:
 
 	void render_poly_8bit(int32_t scanline, const extent_t& extent, const mz2_poly_extra_data& object, int threadid);
 
-	void zeus2_draw_quad(const uint32_t *databuffer, uint32_t texoffs, int logit);
+	void zeus2_draw_quad(const uint32_t *databuffer, uint32_t texoffs, bool logit);
 
 private:
 	midzeus2_state& m_state;
@@ -426,7 +426,7 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
 
 READ32_MEMBER( midzeus2_state::zeus2_r )
 {
-	int logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
+	bool logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	uint32_t result = m_zeusbase[offset];
 
 #if TRACK_REG_USAGE
@@ -475,7 +475,7 @@ READ32_MEMBER( midzeus2_state::zeus2_r )
 
 WRITE32_MEMBER( midzeus2_state::zeus2_w )
 {
-	int logit = (offset != 0x08 &&
+	bool logit = (offset != 0x08 &&
 					(offset != 0x20 || data != 0) &&
 					offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
 					offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
@@ -492,7 +492,7 @@ WRITE32_MEMBER( midzeus2_state::zeus2_w )
  *
  *************************************/
 
-void midzeus2_state::zeus2_register32_w(offs_t offset, uint32_t data, int logit)
+void midzeus2_state::zeus2_register32_w(offs_t offset, uint32_t data, bool logit)
 {
 	uint32_t oldval = m_zeusbase[offset];
 
@@ -538,7 +538,7 @@ if (regdata_count[offset] < 256)
  *
  *************************************/
 
-void midzeus2_state::zeus2_register_update(offs_t offset, uint32_t oldval, int logit)
+void midzeus2_state::zeus2_register_update(offs_t offset, uint32_t oldval, bool logit)
 {
 	/* handle the writes; only trigger on low accesses */
 	switch (offset)
@@ -792,7 +792,7 @@ if (subregdata_count[which] < 256)
  *
  *************************************/
 
-int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
+bool midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 {
 	int dataoffs = 0;
 
@@ -802,7 +802,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x05: write 32-bit value to low registers */
 		case 0x05:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- reg32");
 			if (((data[0] >> 16) & 0x7f) != 0x08)
@@ -812,13 +812,13 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x08: set matrix and point (thegrid) */
 		case 0x08:
 			if (numwords < 14)
-				return FALSE;
+				return false;
 			dataoffs = 1;
 
 		/* 0x07: set matrix and point (crusnexo) */
 		case 0x07:
 			if (numwords < 13)
-				return FALSE;
+				return false;
 
 			/* extract the matrix from the raw data */
 			zeus_matrix[0][0] = tms3203x_device::fp_to_float(data[dataoffs + 1]);
@@ -854,7 +854,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x15:
 		case 0x16:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 
 			/* extract the translation point from the raw data */
 			zeus_point[0] = tms3203x_device::fp_to_float(data[1]);
@@ -874,7 +874,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x1c: */
 		case 0x1c:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
@@ -902,7 +902,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x23:
 		case 0x24:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus2_draw_model(data[1], data[0] & 0xffff, log_fifo);
@@ -920,7 +920,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x38: direct render quad (crusnexo) */
 		case 0x38:
 			if (numwords < 12)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			break;
@@ -940,7 +940,7 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
 			}
 			break;
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -951,11 +951,11 @@ int midzeus2_state::zeus2_fifo_process(const uint32_t *data, int numwords)
  *
  *************************************/
 
-void midzeus2_state::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit)
+void midzeus2_state::zeus2_draw_model(uint32_t baseaddr, uint16_t count, bool logit)
 {
 	uint32_t databuffer[32];
 	int databufcount = 0;
-	int model_done = FALSE;
+	bool model_done = false;
 	uint32_t texoffs = 0;
 	int quadsize = zeus_quad_size;
 
@@ -1056,7 +1056,7 @@ void midzeus2_state::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int log
  *
  *************************************/
 
-void midzeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texoffs, int logit)
+void midzeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texoffs, bool logit)
 {
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];

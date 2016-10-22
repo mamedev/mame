@@ -42,7 +42,7 @@ void concept_state::machine_start()
 	m_pending_interrupts = 0;
 
 	/* initialize clock interface */
-	m_clock_enable = FALSE /*TRUE*/;
+	m_clock_enable = false /*true*/;
 
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_clock_enable));

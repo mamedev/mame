@@ -66,7 +66,7 @@ void vc4000_sound_device::soundport_w(int offset, int data)
 	{
 		case 0:
 			m_pos = 0;
-			m_level = TRUE;
+			m_level = true;
 			// frequency 7874/(data+1)
 			m_size = machine().sample_rate() * (data + 1) /7874;
 			break;

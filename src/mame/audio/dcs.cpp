@@ -906,7 +906,7 @@ void dcs_audio_device::device_start()
 	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
 	/* non-RAM based automatically acks */
-	m_auto_ack = TRUE;
+	m_auto_ack = true;
 	/* register for save states */
 	dcs_register_state();
 	/* reset the system */
@@ -994,7 +994,7 @@ void dcs2_audio_device::device_start()
 	m_sport_timer = subdevice<timer_device>("dcs_sport_timer");
 
 	/* we don't do auto-ack by default */
-	m_auto_ack = FALSE;
+	m_auto_ack = false;
 
 	/* install the speedup handler */
 	if (m_polling_offset) {
@@ -1401,7 +1401,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				}
 				dmadac_enable(&m_dmadac[0], m_channels, enable);
 				if (m_channels <= 6)
-					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, FALSE);
+					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, false);
 				recompute_sample_rate();
 			}
 			break;
@@ -1821,7 +1821,7 @@ void dcs_audio_device::reset_timer()
 			m_program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
 			m_program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
 		{
-			m_timer_ignore = TRUE;
+			m_timer_ignore = true;
 		}
 	}
 

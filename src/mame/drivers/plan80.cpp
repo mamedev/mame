@@ -158,7 +158,7 @@ void plan80_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in plan80_state::device_timer");
+		assert_always(false, "Unknown id in plan80_state::device_timer");
 	}
 }
 
