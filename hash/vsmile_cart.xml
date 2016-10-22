@@ -4,6 +4,7 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
+
 <!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
@@ -62,7 +63,7 @@ Game cartridges
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
 | Vtech ran out of UPC codes at 92999, these are wraparound and newer than 92xxx series.                  |
-| They also say 'v.link compatible' on the back though not all are v.motion compatible                    |
+| They also say 'V.Link compatible' on the back though not all are V.Motion compatible                    |
 +========+===================+============================================================================+
 |        | 80-090000(US)     | Up  <- need pic                                                            |
 |        | 80-090000-001(US) | Up                                                                         |
