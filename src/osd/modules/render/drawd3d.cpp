@@ -2246,35 +2246,15 @@ void texture_info::compute_size(int texwidth, int texheight)
 
 
 //============================================================
-//  copyline_palette16
-//============================================================
-
-static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
-{
-	int x;
-
-	assert(xborderpix == 0 || xborderpix == 1);
-	if (xborderpix)
-		*dst++ = 0xff000000 | palette[*src];
-	for (x = 0; x < width; x++)
-		*dst++ = 0xff000000 | palette[*src++];
-	if (xborderpix)
-		*dst++ = 0xff000000 | palette[*--src];
-}
-
-
-//============================================================
 //  copyline_palettea16
 //============================================================
 
 static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
-	int x;
-
 	assert(xborderpix == 0 || xborderpix == 1);
 	if (xborderpix)
 		*dst++ = palette[*src];
-	for (x = 0; x < width; x++)
+	for (int x = 0; x < width; x++)
 		*dst++ = palette[*src++];
 	if (xborderpix)
 		*dst++ = palette[*--src];
@@ -2606,9 +2586,6 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-				break;
-
 			case TEXFORMAT_PALETTEA16:
 				copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
