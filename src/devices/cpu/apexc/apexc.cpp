@@ -524,7 +524,7 @@ void apexc_cpu_device::execute()
 		case 0:
 			/* stop */
 
-			m_running = FALSE;
+			m_running = false;
 
 			/* BTW, I don't know whether stop loads y into ml or not, and whether
 			subsequent fetch is done */
@@ -835,7 +835,7 @@ void apexc_cpu_device::device_reset()
 
 	/* next two lines are just the product of my bold fantasy */
 	m_cr = 0;               /* first instruction executed will be a stop */
-	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
+	m_running = true;       /* this causes the CPU to load the instruction at 0/0,
 	                           which enables easy booting (just press run on the panel) */
 	m_a = 0;
 	m_r = 0;

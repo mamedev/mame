@@ -82,7 +82,7 @@ void hc55516_device::device_config_complete()
 
 void hc55516_device::device_start()
 {
-	start_common(0x07, TRUE);
+	start_common(0x07, true);
 }
 
 //-------------------------------------------------
@@ -107,7 +107,7 @@ mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, dev
 
 void mc3417_device::device_start()
 {
-	start_common(0x07, FALSE);
+	start_common(0x07, false);
 }
 
 
@@ -124,7 +124,7 @@ mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, dev
 
 void mc3418_device::device_start()
 {
-	start_common(0x0f, FALSE);
+	start_common(0x0f, false);
 }
 
 
@@ -220,7 +220,7 @@ void hc55516_device::process_digit()
 
 void hc55516_device::clock_w(int state)
 {
-	uint8_t clock_state = state ? TRUE : FALSE;
+	uint8_t clock_state = state ? true : false;
 
 	/* only makes sense for setups with a software driven clock */
 	assert(!is_external_oscillator());

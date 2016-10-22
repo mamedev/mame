@@ -328,7 +328,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 			// logging
 			if (LOG_VBLANK_VBI)
 			{
-				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, FALSE);
+				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
 				if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 					printf("%3d:VBI(%05d)\n", screen().vpos(), VBI_CAV_PICTURE(line1718));
 				else
@@ -340,8 +340,8 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 			m_pia.vbi2 = 0xff;
 			if (focus_on() && laser_on())
 			{
-				uint32_t line16 = get_field_code(LASERDISC_CODE_LINE16, FALSE);
-				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, FALSE);
+				uint32_t line16 = get_field_code(LASERDISC_CODE_LINE16, false);
+				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
 				if (line1718 == VBI_CODE_LEADIN)
 					m_pia.vbi1 &= ~0x01;
 				if (line1718 == VBI_CODE_LEADOUT)

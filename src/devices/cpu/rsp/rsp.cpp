@@ -106,7 +106,7 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 //  , m_drcuml(*this, m_cache, 0, 8, 32, 2)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_cache_dirty(TRUE)
+	, m_cache_dirty(true)
 	, m_numcycles(0)
 	, m_format(nullptr)
 	, m_arg2(0)
@@ -420,7 +420,7 @@ void rsp_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 
 	state_add( RSP_PC,      "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add( RSP_R0,      "R0", m_rsp_state->r[0]).formatstr("%08X");

@@ -240,7 +240,7 @@ WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
 READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
-		m_upd96050->snesdsp_read((offset & 0x01) ? FALSE : TRUE);
+		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
@@ -260,7 +260,7 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
-		m_upd96050->snesdsp_write((offset & 0x01) ? FALSE : TRUE, data);
+		m_upd96050->snesdsp_write((offset & 0x01) ? false : true, data);
 		return;
 	}
 

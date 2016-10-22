@@ -83,7 +83,7 @@ READ8_MEMBER( ccpu_cpu_device::read_jmi )
 
 void ccpu_cpu_device::wdt_timer_trigger()
 {
-	m_waiting = FALSE;
+	m_waiting = false;
 	m_watchdog++;
 	if (m_watchdog >= 3)
 		m_PC = 0;
@@ -180,7 +180,7 @@ void ccpu_cpu_device::device_reset()
 	m_miflag = m_nextmiflag = m_nextnextmiflag = 0;
 	m_drflag = 0;
 
-	m_waiting = FALSE;
+	m_waiting = false;
 	m_watchdog = 0;
 }
 
@@ -568,7 +568,7 @@ void ccpu_cpu_device::execute_run()
 			/* FRM */
 			case 0xe5:
 			case 0xf5:
-				m_waiting = TRUE;
+				m_waiting = true;
 				NEXT_ACC_A;
 				m_icount = -1;
 

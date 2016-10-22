@@ -83,7 +83,7 @@ void isa8_fdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(0x03f0, 0x03f7, *fdc, &pc_fdc_interface::map);
-	m_isa->set_dma_channel(2, this, TRUE);
+	m_isa->set_dma_channel(2, this, true);
 }
 
 void isa8_fdc_device::device_reset()

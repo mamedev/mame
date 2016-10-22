@@ -2274,7 +2274,7 @@ void sh2_device::device_reset()
 
 	m_sh2_state->internal_irq_level = -1;
 
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 
@@ -2565,7 +2565,7 @@ void sh2_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 

@@ -64,7 +64,7 @@ enum
 
 
 #define MCFG_GENERIC_MANDATORY       \
-	static_cast<generic_slot_device *>(device)->set_must_be_loaded(TRUE);
+	static_cast<generic_slot_device *>(device)->set_must_be_loaded(true);
 
 #define MCFG_GENERIC_WIDTH(_width)       \
 	static_cast<generic_slot_device *>(device)->set_width(_width);

@@ -803,7 +803,7 @@ void tms5220_device::perform_dummy_read()
 #else
 		new_int_read();
 #endif
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
 }
 
@@ -817,7 +817,7 @@ int tms5220_device::status_read()
 {
 	if (m_RDB_flag)
 	{   /* if last command was read, return data register */
-		m_RDB_flag = FALSE;
+		m_RDB_flag = false;
 		return(m_data_register);
 	}
 	else
@@ -1358,13 +1358,13 @@ void tms5220_device::process_command(unsigned char cmd)
 			{
 				if (m_schedule_dummy_read)
 				{
-					m_schedule_dummy_read = FALSE;
+					m_schedule_dummy_read = false;
 					if (m_speechrom)
 						m_speechrom->read(1);
 				}
 				if (m_speechrom)
 					m_data_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
-				m_RDB_flag = TRUE;
+				m_RDB_flag = true;
 			}
 		break;
 
@@ -1381,7 +1381,7 @@ void tms5220_device::process_command(unsigned char cmd)
 #ifdef VERBOSE
 				logerror("read and branch command received\n");
 #endif
-				m_RDB_flag = FALSE;
+				m_RDB_flag = false;
 				if (m_speechrom)
 					m_speechrom->read_and_branch();
 			}
@@ -1394,14 +1394,14 @@ void tms5220_device::process_command(unsigned char cmd)
 				   This code does not care about this. */
 				if (m_speechrom)
 					m_speechrom->load_address(cmd & 0x0f);
-				m_schedule_dummy_read = TRUE;
+				m_schedule_dummy_read = true;
 			}
 			break;
 
 		case 0x50 : /* speak */
 			if (m_schedule_dummy_read)
 			{
-				m_schedule_dummy_read = FALSE;
+				m_schedule_dummy_read = false;
 				if (m_speechrom)
 					m_speechrom->read(1);
 			}
@@ -1451,13 +1451,13 @@ void tms5220_device::process_command(unsigned char cmd)
 				m_new_frame_k_idx[i] = 0xF;
 			for (i = 7; i < m_coeff->num_k; i++)
 				m_new_frame_k_idx[i] = 0x7;
-			m_RDB_flag = FALSE;
+			m_RDB_flag = false;
 			break;
 
 		case 0x70 : /* reset */
 			if (m_schedule_dummy_read)
 			{
-				m_schedule_dummy_read = FALSE;
+				m_schedule_dummy_read = false;
 				if (m_speechrom)
 					m_speechrom->read(1);
 			}
@@ -1724,7 +1724,7 @@ void tms5220_device::device_reset()
 	update_ready_state();
 	m_buffer_empty = m_buffer_low = 1;
 
-	m_RDB_flag = FALSE;
+	m_RDB_flag = false;
 
 	/* initialize the energy/pitch/k states */
 #ifdef PERFECT_INTERPOLATION_HACK
@@ -1757,7 +1757,7 @@ void tms5220_device::device_reset()
 		// load_address, no dummy read will occur, hence the address will be
 		// falsely shifted.
 		m_speechrom->read(1);
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
 
 	// 5110 specific stuff
@@ -1765,7 +1765,7 @@ void tms5220_device::device_reset()
 	m_CTL_pins = 0;
 	m_state = 0;
 	m_address = 0;
-	m_next_is_address = FALSE;
+	m_next_is_address = false;
 	m_addr_bit = 0;
 	m_CTL_buffer = 0;
 

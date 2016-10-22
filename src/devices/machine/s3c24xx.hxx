@@ -830,7 +830,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 	m_lcd.vpos_min = (vspw + 1) + (vbpd + 1);
 	m_lcd.vpos_max = m_lcd.vpos_min + (lineval + 1) - 1;
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
-	return TRUE;
+	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
@@ -853,7 +853,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	verboselog( *this, 3, "LCD - pnrmode %d bppmode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d hclk %d\n", pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk);
 	if (clkval == 0)
 	{
-		return FALSE;
+		return false;
 	}
 	vclk = (double)(hclk / ((clkval + 0) * 2));
 	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
@@ -876,7 +876,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	m_lcd.vpos_min = 0;
 	m_lcd.vpos_max = height - 1;
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
-	return TRUE;
+	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure()

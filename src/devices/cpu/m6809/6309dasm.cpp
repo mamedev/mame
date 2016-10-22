@@ -613,7 +613,8 @@ CPU_DISASSEMBLE( hd6309 )
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
 
-	int i, p = 0, page = 0, opcode_found;
+	int i, p = 0, page = 0;
+	bool opcode_found;
 
 	do
 	{
@@ -623,7 +624,7 @@ CPU_DISASSEMBLE( hd6309 )
 				break;
 
 		if (i < hd6309_numops[page])
-			opcode_found = TRUE;
+			opcode_found = true;
 		else
 		{
 			strcpy(buffer, "Illegal Opcode");
@@ -633,7 +634,7 @@ CPU_DISASSEMBLE( hd6309 )
 		if (hd6309_pgpointers[page][i].mode >= PG1)
 		{
 			page = hd6309_pgpointers[page][i].mode - PG1 + 1;
-			opcode_found = FALSE;
+			opcode_found = false;
 		}
 	} while (!opcode_found);
 
@@ -749,7 +750,7 @@ CPU_DISASSEMBLE( hd6309 )
 
 		reg = (pb >> 5) & 3;
 		pbm = pb & 0x8f;
-		indirect = ((pb & 0x90) == 0x90 )? TRUE : FALSE;
+		indirect = ((pb & 0x90) == 0x90 )? true : false;
 
 		// open brackets if indirect
 		if (indirect && pbm != 0x82)

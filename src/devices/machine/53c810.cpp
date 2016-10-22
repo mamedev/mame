@@ -718,7 +718,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, uint32_t pc)
 		}
 
 		buf += sprintf(buf, "%s ", op_mnemonic);
-		need_cojunction = FALSE;
+		need_cojunction = false;
 
 		for (i = 0; i < ARRAY_LENGTH(flags); i++)
 		{
@@ -727,7 +727,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, uint32_t pc)
 				if (need_cojunction)
 					buf += sprintf(buf, " AND ");
 				else
-					need_cojunction = TRUE;
+					need_cojunction = true;
 				buf += sprintf(buf, "%s", flags[i].text);
 			}
 		}

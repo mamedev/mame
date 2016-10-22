@@ -711,7 +711,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 		if(m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
 
-		m_nmi_pending = FALSE;
+		m_nmi_pending = false;
 		enter_interrupt("M6800 '%s' take NMI\n",0xfffc);
 	}
 	else
@@ -1212,7 +1212,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 	{
 	case INPUT_LINE_NMI:
 		if (!m_nmi_state && state != CLEAR_LINE)
-			m_nmi_pending = TRUE;
+			m_nmi_pending = true;
 		m_nmi_state = state;
 		break;
 

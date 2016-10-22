@@ -6615,10 +6615,10 @@ void drcbe_x86::op_icopyf(x86code *&dst, const instruction &inst)
 //  dmulu - perform a double-wide unsigned multiply
 //-------------------------------------------------
 
-int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, int flags)
+int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;
@@ -6659,13 +6659,13 @@ int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 //  dmuls - perform a double-wide signed multiply
 //-------------------------------------------------
 
-int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, int flags)
+int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
 {
 	uint64_t lo, hi, prevlo;
 	uint64_t a, b, temp;
 
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;

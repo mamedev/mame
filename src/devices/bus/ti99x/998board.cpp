@@ -197,8 +197,8 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	select_groms();
 
 	// Speech select lines will always be asserted/cleared as soon as the address is available
-	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? FALSE : TRUE);
-	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? FALSE : TRUE);
+	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? false : true);
+	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? false : true);
 
 	// If it is a logical space address, tell the mapper to stay inactive
 	line_state lasreq = (line_state)m_vaquerro->lascsq_out();
@@ -746,8 +746,8 @@ WRITE_LINE_MEMBER( mainboard8_device::sound_ready )
 
 WRITE_LINE_MEMBER( mainboard8_device::speech_ready )
 {
-	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
-	m_speech_ready = (state==FALSE)? ASSERT_LINE : CLEAR_LINE;
+	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
+	m_speech_ready = (state==false)? ASSERT_LINE : CLEAR_LINE;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::pbox_ready )

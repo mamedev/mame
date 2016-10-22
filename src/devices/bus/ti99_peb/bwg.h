@@ -94,7 +94,7 @@ private:
 	// Indicates whether the clock is mapped into the address space.
 	bool m_rtc_enabled;
 
-	// Signal motor_on. When TRUE, makes all drives turning.
+	// Signal motor_on. When true, makes all drives turning.
 	int m_MOTOR_ON;
 
 	// Needed for triggering the motor monoflop

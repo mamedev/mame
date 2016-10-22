@@ -421,7 +421,7 @@ void mips3_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 
 
 	/* register for save states */
@@ -943,7 +943,7 @@ void mips3_device::device_reset()
 	vtlb_load(2 * m_tlbentries + 1, (0xc0000000 - 0xa0000000) >> MIPS3_MIN_PAGE_SHIFT, 0xa0000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 	m_interrupt_cycles = 0;
 }
 
@@ -1156,7 +1156,7 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -1190,7 +1190,7 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -1224,7 +1224,7 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -2718,7 +2718,7 @@ void mips3_device::execute_run()
 		/* reset the cache if dirty */
 		if (m_cache_dirty)
 			code_flush_cache();
-		m_cache_dirty = FALSE;
+		m_cache_dirty = false;
 
 		/* execute */
 		do

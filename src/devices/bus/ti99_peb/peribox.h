@@ -231,10 +231,10 @@ protected:
 	int m_senila;
 	int m_senilb;
 
-	// When TRUE, card is accessible. Indicated by a LED.
+	// When true, card is accessible. Indicated by a LED.
 	bool    m_selected;
 
-	// When TRUE, GenMod is selected. Modified by peribox_slot_device.
+	// When true, GenMod is selected. Modified by peribox_slot_device.
 	bool    m_genmod;
 
 	// CRU base. Used to configure the address by which a card is selected.

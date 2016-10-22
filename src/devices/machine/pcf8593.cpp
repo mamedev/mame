@@ -75,7 +75,7 @@ void pcf8593_device::device_reset()
 	_logerror( 0, ("pcf8593_reset\n"));
 	m_pin_scl = 1;
 	m_pin_sda = 1;
-	m_active  = FALSE;
+	m_active  = false;
 	m_inp     = 0;
 	m_mode    = RTC_MODE_RECV;
 	m_bits    = 0;
@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER(pcf8593_device::sda_w)
 		if ((!state) && (m_pin_sda))
 		{
 			_logerror( 1, ("pcf8593 start condition\n"));
-			m_active          = TRUE;
+			m_active          = true;
 			m_bits            = 0;
 			m_data_recv_index = 0;
 			clear_buffer_rx();
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER(pcf8593_device::sda_w)
 		if ((state) && (!m_pin_sda))
 		{
 			_logerror( 1, ("pcf8593 stop condition\n"));
-			m_active = FALSE;
+			m_active = false;
 		}
 	}
 	// save sda

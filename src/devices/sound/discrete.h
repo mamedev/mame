@@ -488,7 +488,7 @@
  *
  *     DISCRETE_COUNTER(name of node,
  *                      enable node or static value,
- *                      reset node or static value, (reset when TRUE)
+ *                      reset node or static value, (reset when true)
  *                      clock node or static value,
  *                      min count static value,
  *                      max count static value,

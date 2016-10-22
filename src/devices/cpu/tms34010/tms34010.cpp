@@ -37,7 +37,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-		, m_halt_on_reset(FALSE), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+		, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
 		, m_pixclock(0)
 	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
 		, m_output_int_cb(*this)
@@ -577,7 +577,7 @@ void tms340x0_device::device_start()
 	m_to_shiftreg_cb.bind_relative_to(*owner());
 	m_from_shiftreg_cb.bind_relative_to(*owner());
 
-	m_external_host_access = FALSE;
+	m_external_host_access = false;
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -720,12 +720,12 @@ void tms340x0_device::execute_run()
 	/* if the CPU's reset was deferred, do it now */
 	if (m_reset_deferred)
 	{
-		m_reset_deferred = FALSE;
+		m_reset_deferred = false;
 		m_pc = RLONG(0xffffffe0);
 	}
 
 	/* check interrupts first */
-	m_executing = TRUE;
+	m_executing = true;
 	check_interrupt();
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
@@ -748,7 +748,7 @@ void tms340x0_device::execute_run()
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);
 	}
-	m_executing = FALSE;
+	m_executing = false;
 }
 
 
@@ -1526,10 +1526,10 @@ WRITE16_MEMBER( tms340x0_device::host_w )
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 		{
-			m_external_host_access = TRUE;
+			m_external_host_access = true;
 			if (mem_mask&0xff00) io_register_w(*m_program, REG_HSTCTLH, data & 0xff00, 0xff00);
 			if (mem_mask&0x00ff) io_register_w(*m_program, REG_HSTCTLL, data & 0x00ff, 0x00ff);
-			m_external_host_access = FALSE;
+			m_external_host_access = false;
 			break;
 		}
 

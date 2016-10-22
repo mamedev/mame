@@ -72,9 +72,9 @@ void cdda_device::set_cdrom(void *file)
 void cdda_device::start_audio(uint32_t startlba, uint32_t numblocks)
 {
 	m_stream->update();
-	m_audio_playing = TRUE;
-	m_audio_pause = FALSE;
-	m_audio_ended_normally = FALSE;
+	m_audio_playing = true;
+	m_audio_pause = false;
+	m_audio_ended_normally = false;
 	m_audio_lba = startlba;
 	m_audio_length = numblocks;
 	m_audio_samples = 0;
@@ -89,8 +89,8 @@ void cdda_device::start_audio(uint32_t startlba, uint32_t numblocks)
 void cdda_device::stop_audio()
 {
 	m_stream->update();
-	m_audio_playing = FALSE;
-	m_audio_ended_normally = TRUE;
+	m_audio_playing = false;
+	m_audio_ended_normally = true;
 }
 
 
@@ -172,8 +172,8 @@ void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, u
 		{
 			if( m_disc && m_audio_playing && !m_audio_pause && !m_audio_length )
 			{
-				m_audio_playing = FALSE;
-				m_audio_ended_normally = TRUE;
+				m_audio_playing = false;
+				m_audio_ended_normally = true;
 			}
 
 			memset(bufL, 0, sizeof(stream_sample_t)*samples_wanted);

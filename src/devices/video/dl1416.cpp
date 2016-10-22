@@ -98,9 +98,9 @@ static const uint16_t dl1416t_segments[128] = {
 
 dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_write_enable(FALSE),
-	m_chip_enable(FALSE),
-	m_cursor_enable(FALSE),
+	m_write_enable(false),
+	m_chip_enable(false),
+	m_cursor_enable(false),
 	m_update(*this)
 {
 	for (int i = 0; i < 4; i++)
@@ -134,9 +134,9 @@ void dl1416_device::device_reset()
 	int i;
 	uint16_t pattern;
 	/* disable all lines */
-	m_chip_enable = FALSE;
-	m_write_enable = FALSE;
-	m_cursor_enable = FALSE;
+	m_chip_enable = false;
+	m_write_enable = false;
+	m_cursor_enable = false;
 
 	/* randomize digit and cursor memory */
 	for (i = 0; i < 4; i++)

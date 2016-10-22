@@ -353,7 +353,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 			LOG( ( "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr ) );
 			m_pendingAbtP = true;
 		}
-		return FALSE;
+		return false;
 	}
 	else
 	{
@@ -383,7 +383,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 					LOG( ( "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15] ) );
 					m_pendingAbtP = true;
 				}
-				return FALSE;
+				return false;
 			case COPRO_TLB_LARGE_PAGE:
 				// Large page descriptor
 				addr = ( desc_lvl2 & COPRO_TLB_LARGE_PAGE_MASK ) | ( addr & ~COPRO_TLB_LARGE_PAGE_MASK );
@@ -578,7 +578,7 @@ void arm7_cpu_device::device_reset()
 	SwitchMode(eARM7_MODE_SVC);
 	m_r[eR15] = 0;
 
-	m_impstate.cache_dirty = TRUE;
+	m_impstate.cache_dirty = true;
 }
 
 

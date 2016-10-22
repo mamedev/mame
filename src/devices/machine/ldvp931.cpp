@@ -494,7 +494,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
 {
 	// set the pending flag and stash the data
-	m_tocontroller_pending = TRUE;
+	m_tocontroller_pending = true;
 	m_tocontroller = data;
 
 	// signal to the callback if provided

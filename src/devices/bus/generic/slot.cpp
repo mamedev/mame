@@ -91,7 +91,7 @@ generic_slot_device::generic_slot_device(const machine_config &mconfig, const ch
 						m_interface(nullptr),
 						m_default_card("rom"),
 						m_extensions("bin"),
-						m_must_be_loaded(FALSE),
+						m_must_be_loaded(false),
 						m_width(GENERIC_ROM8_WIDTH),
 						m_endianness(ENDIANNESS_LITTLE), m_cart(nullptr)
 {

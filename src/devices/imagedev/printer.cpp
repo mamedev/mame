@@ -92,7 +92,7 @@ image_init_result printer_image_device::call_load()
 {
 	/* send notify that the printer is now online */
 	if (!m_online_cb.isnull())
-		m_online_cb(TRUE);
+		m_online_cb(true);
 
 	/* we don't need to do anything special */
 	return image_init_result::PASS;
@@ -106,5 +106,5 @@ void printer_image_device::call_unload()
 {
 	/* send notify that the printer is now offline */
 	if (!m_online_cb.isnull())
-		m_online_cb(FALSE);
+		m_online_cb(false);
 }

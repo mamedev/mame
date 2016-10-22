@@ -42,8 +42,8 @@ private:
 	// helpers
 	void output_parameter(drcbec_instruction **dstptr, void **immedptr, int size, const uml::parameter &param);
 	void fixup_label(void *parameter, drccodeptr labelcodeptr);
-	int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, int flags);
-	int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, int flags);
+	int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags);
+	int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags);
 	uint32_t tzcount32(uint32_t value);
 	uint64_t tzcount64(uint64_t value);
 

@@ -396,7 +396,7 @@ private:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		uint8_t               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 		uint8_t *             offset_base8;               /* base in memory where the RAM lives, 8-bit pointer, with the start offset pre-applied */
 		uint16_t *            offset_base16;              /* base in memory where the RAM lives, 16-bit pointer, with the start offset pre-applied  */
@@ -544,27 +544,27 @@ private:
 	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle **handleptr);
 
 	void generate_update_mode(drcuml_block *block);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg);
 
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-	int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
-	int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
-	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop1_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop1_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
+	bool generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
+	bool generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_get_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
 	void generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
 	void generate_set_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
 	void generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
-	int generate_cop1x_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop1x_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1x_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1x_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	void check_cop0_access(drcuml_block *block);
 	void check_cop1_access(drcuml_block *block);

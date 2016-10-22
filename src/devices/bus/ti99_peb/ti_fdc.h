@@ -68,13 +68,13 @@ private:
 	// Needed for triggering the motor monoflop
 	uint8_t   m_lastval;
 
-	// Signal DVENA. When TRUE, makes some drive turning.
+	// Signal DVENA. When true, makes some drive turning.
 	int  m_DVENA;
 
 	// Set when address is in card area
 	bool    m_inDsrArea;
 
-	// When TRUE the CPU is halted while DRQ/IRQ are true.
+	// When true the CPU is halted while DRQ/IRQ are true.
 	bool    m_WAITena;
 
 	// WD chip selected

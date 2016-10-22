@@ -334,7 +334,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		m_trap_im_copy = m_IM | 0x80;
 
 		/* reset the pending state */
-		m_trap_pending = FALSE;
+		m_trap_pending = false;
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
@@ -987,8 +987,8 @@ void i8085a_cpu_device::device_reset()
 	m_HALT = 0;
 	m_IM &= ~IM_I75;
 	m_IM |= IM_M55 | IM_M65 | IM_M75;
-	m_after_ei = FALSE;
-	m_trap_pending = FALSE;
+	m_after_ei = false;
+	m_trap_pending = false;
 	m_trap_im_copy = 0;
 	set_inte(0);
 	set_sod(0);
@@ -1076,7 +1076,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (!m_nmi_state && newstate)
-			m_trap_pending = TRUE;
+			m_trap_pending = true;
 		m_nmi_state = newstate;
 	}
 

@@ -972,14 +972,14 @@ void sns_rom_spc7110_device::spc7110_update_time(uint8_t offset)
 	machine().current_datetime(curtime);
 	int64_t diff = curtime.time - m_rtc_basetime.time - offset;
 //  printf("diff %llx\n", diff);
-	bool update = TRUE;
+	bool update = true;
 
 	// TEST: can we go beyond 24hrs of rounding?!? I doubt it will ever go beyond 3600, but I could be wrong...
 	assert(diff < 86400);
 
 	/* do not update if CR0 or CR2 timer disable flags are set */
 	if ((m_rtc_ram[13] & 0x01) || (m_rtc_ram[15] & 0x03))
-		update = FALSE;
+		update = false;
 
 	if (update && diff > 0)
 	{
@@ -1021,11 +1021,11 @@ void sns_rom_spc7110_device::spc7110_update_time(uint8_t offset)
 			// check for feb 29th
 			if (days == 28)
 			{
-				bool leap = FALSE;
+				bool leap = false;
 				if ((year % 4) == 0)
 				{
 					if(year % 100 || !(year % 400))
-						leap = TRUE;
+						leap = true;
 				}
 				if (leap)
 					days++;

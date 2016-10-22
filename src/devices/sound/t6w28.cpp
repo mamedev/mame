@@ -328,7 +328,7 @@ void t6w28_device::device_start()
 	/* values from sn76489a */
 	m_feedback_mask = 0x8000;
 	m_whitenoise_taps = 0x06;
-	m_whitenoise_invert = FALSE;
+	m_whitenoise_invert = false;
 
 	save_item(NAME(m_register));
 	save_item(NAME(m_last_register));

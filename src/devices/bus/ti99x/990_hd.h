@@ -58,8 +58,8 @@ private:
 		device_image_interface *img;                        /* image descriptor */
 		format_t format;
 		hard_disk_file *hd_handle;      /* mame hard disk descriptor - only if format == format_mame */
-		unsigned int wp : 1;                    /* TRUE if disk is write-protected */
-		unsigned int unsafe : 1;                /* TRUE when a disk has just been connected */
+		unsigned int wp : 1;                    /* true if disk is write-protected */
+		unsigned int unsafe : 1;                /* true when a disk has just been connected */
 
 		/* disk geometry */
 		unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;

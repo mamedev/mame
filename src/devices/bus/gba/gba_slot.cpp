@@ -319,7 +319,7 @@ int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 	if (gba_chip_has_conflict(chip))
 	{
 		char game_code[5] = { 0 };
-		bool resolved = FALSE;
+		bool resolved = false;
 
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
@@ -335,7 +335,7 @@ int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip |= item->chip;
-				resolved = TRUE;
+				resolved = true;
 				break;
 			}
 		}

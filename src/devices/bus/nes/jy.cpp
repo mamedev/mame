@@ -163,7 +163,7 @@ READ8_MEMBER(nes_jy_typea_device::chr_r)
 
 void nes_jy_typea_device::irq_clock(int mode, int blanked)
 {
-	bool clock = FALSE, fire = FALSE;
+	bool clock = false, fire = false;
 
 	if (m_irq_mode != mode)
 		return;
@@ -177,7 +177,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 	{
 		if ((m_irq_prescale & m_irq_prescale_mask) == 0)
 		{
-			clock = TRUE;
+			clock = true;
 			m_irq_prescale = (m_irq_prescale_mask == 7) ? ((m_irq_prescale & 0xf8) | 7) : 0xff;
 		}
 		else
@@ -188,7 +188,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 	{
 		if ((m_irq_prescale & m_irq_prescale_mask) == m_irq_prescale_mask)
 		{
-			clock = TRUE;
+			clock = true;
 			m_irq_prescale = (m_irq_prescale_mask == 7) ? (m_irq_prescale & 0xf8) : 0;
 		}
 		else
@@ -202,7 +202,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 		{
 			if (m_irq_count == 0)
 			{
-				fire = TRUE;
+				fire = true;
 				m_irq_count = 0xff;
 			}
 			else
@@ -213,7 +213,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 		{
 			if (m_irq_count == 0xff)
 			{
-				fire = TRUE;
+				fire = true;
 				m_irq_count = 0;
 			}
 			else

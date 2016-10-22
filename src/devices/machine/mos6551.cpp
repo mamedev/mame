@@ -573,7 +573,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					{
 						m_rx_counter = 0;
 
-						if (LOG) logerror("MOS6551 '%s': RX FALSE START BIT\n", tag());
+						if (LOG) logerror("MOS6551 '%s': RX false START BIT\n", tag());
 					}
 				}
 				break;

@@ -338,7 +338,7 @@ inline void sh34_base_device::WB(offs_t A, uint8_t V)
 	const offs_t _A = A & AM;
 	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 	{
-		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
 		{
 			continue;
 		}
@@ -364,7 +364,7 @@ inline void sh34_base_device::WW(offs_t A, uint16_t V)
 	const offs_t _A = A & AM;
 	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 	{
-		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
 		{
 			continue;
 		}
@@ -390,7 +390,7 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 	const offs_t _A = A & AM;
 	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 	{
-		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
 		{
 			continue;
 		}

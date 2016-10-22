@@ -1296,7 +1296,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		default:
-			assert_always(FALSE, "Unknown id in ymf271_device::device_timer");
+			assert_always(false, "Unknown id in ymf271_device::device_timer");
 			break;
 	}
 }

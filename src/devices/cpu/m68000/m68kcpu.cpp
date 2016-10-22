@@ -656,7 +656,7 @@ static void set_irq_line(m68000_base_device *m68k, int irqline, int state)
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
 	if(old_level != 0x0700 && m68k->int_level == 0x0700)
-		m68k->nmi_pending = TRUE;
+		m68k->nmi_pending = true;
 }
 
 void m68000_base_device::presave()
@@ -733,7 +733,7 @@ bool m68000_base_device::memory_translate(address_spacenum space, int intention,
 			mmu_tmp_sr = temp_mmu_tmp_sr;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -2623,7 +2623,7 @@ bool m68020hmmu_device::memory_translate(address_spacenum space, int intention, 
 			address = hmmu_translate_addr(this, address);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 

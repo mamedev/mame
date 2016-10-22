@@ -470,7 +470,7 @@ void drcuml_block::disassemble()
 			{
 				m_drcuml.log_printf("\t%-50.50s; %s\n", dasm.c_str(), get_comment_text(m_inst[firstcomment], comment));
 				firstcomment++;
-				flushcomments = TRUE;
+				flushcomments = true;
 			}
 			else
 				m_drcuml.log_printf("\t%s\n", dasm.c_str());
@@ -766,7 +766,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 			// iterate over possibilities
 			for (pindex = 0; pindex < pcount; pindex++)
 			{
-				int skip = FALSE;
+				bool skip = false;
 				int pscannum;
 
 				// for param 0, print a dot
@@ -779,7 +779,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
 					for (pscannum = 0; pscannum < pnum; pscannum++)
 						if ((opinfo->param[pscannum].output & PIO_IN) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = TRUE;
+							skip = true;
 
 				// can't duplicate multiple dest parameters
 				if (opinfo->param[pnum].output & PIO_OUT)
@@ -787,7 +787,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
 					for (pscannum = 0; pscannum < pnum; pscannum++)
 						if ((opinfo->param[pscannum].output & PIO_OUT) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = TRUE;
+							skip = true;
 
 				// iterate over the next parameter in line
 				if (!skip)

@@ -191,7 +191,7 @@ image_init_result smartmedia_image_device::smartmedia_format_1()
 
 int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 {
-	int result = FALSE;
+	int result = false;
 
 	switch (id1)
 	{
@@ -199,15 +199,15 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 		{
 			switch (id2)
 			{
-				case 0xA4 : m_page_data_size = 0x0100; m_num_pages = 0x00800; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = TRUE; break;
-				case 0x6E : m_page_data_size = 0x0100; m_num_pages = 0x01000; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = TRUE; break;
-				case 0xEA : m_page_data_size = 0x0100; m_num_pages = 0x02000; m_page_total_size = 0x0108; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0xE3 : m_page_data_size = 0x0200; m_num_pages = 0x02000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0xE6 : m_page_data_size = 0x0200; m_num_pages = 0x04000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0x73 : m_page_data_size = 0x0200; m_num_pages = 0x08000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x76 : m_page_data_size = 0x0200; m_num_pages = 0x20000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x79 : m_page_data_size = 0x0200; m_num_pages = 0x40000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
+				case 0xA4 : m_page_data_size = 0x0100; m_num_pages = 0x00800; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = true; break;
+				case 0x6E : m_page_data_size = 0x0100; m_num_pages = 0x01000; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = true; break;
+				case 0xEA : m_page_data_size = 0x0100; m_num_pages = 0x02000; m_page_total_size = 0x0108; m_log2_pages_per_block = 4; result = true; break;
+				case 0xE3 : m_page_data_size = 0x0200; m_num_pages = 0x02000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = true; break;
+				case 0xE6 : m_page_data_size = 0x0200; m_num_pages = 0x04000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = true; break;
+				case 0x73 : m_page_data_size = 0x0200; m_num_pages = 0x08000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x76 : m_page_data_size = 0x0200; m_num_pages = 0x20000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x79 : m_page_data_size = 0x0200; m_num_pages = 0x40000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 			}
 		}
 		break;
@@ -215,7 +215,7 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 		{
 			switch (id2)
 			{
-				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
+				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 			}
 		}
 		break;

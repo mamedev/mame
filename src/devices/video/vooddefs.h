@@ -138,14 +138,14 @@ static inline int32_t fast_reciplog(int64_t value, int32_t *log2)
 	uint32_t temp, recip, rlog;
 	uint32_t interp;
 	uint32_t *table;
-	int neg = FALSE;
+	int neg = false;
 	int lz, exp = 0;
 
 	/* always work with unsigned numbers */
 	if (value < 0)
 	{
 		value = -value;
-		neg = TRUE;
+		neg = true;
 	}
 
 	/* if we've spilled out of 32 bits, push it down under 32 */

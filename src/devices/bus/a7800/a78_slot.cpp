@@ -351,8 +351,8 @@ image_init_result a78_cart_slot_device::call_load()
 		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
-			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
-			bool has_nvram = get_software_region("nvram") ? TRUE : FALSE;
+			bool has_ram = get_software_region("ram") ? true : false;
+			bool has_nvram = get_software_region("nvram") ? true : false;
 			len = get_software_region_length("rom");
 
 			m_cart->rom_alloc(len, tag());
@@ -389,7 +389,7 @@ image_init_result a78_cart_slot_device::call_load()
 			}
 
 			// let's try to auto-fix some common errors in the header
-			mapper = validate_header((head[53] << 8) | head[54], TRUE);
+			mapper = validate_header((head[53] << 8) | head[54], true);
 
 			switch (mapper & 0x2e)
 			{
@@ -530,7 +530,7 @@ std::string a78_cart_slot_device::get_default_card_software()
 		m_file->read(&head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
-		mapper = validate_header((head[53] << 8) | head[54], FALSE);
+		mapper = validate_header((head[53] << 8) | head[54], false);
 
 		switch (mapper & 0x2e)
 		{

@@ -170,10 +170,10 @@ struct dsp56k_core
 	dsp56k_host_interface HI;
 
 	// IRQ line states
-	uint8_t modA_state;
-	uint8_t modB_state;
-	uint8_t modC_state;
-	uint8_t reset_state;
+	bool modA_state;
+	bool modB_state;
+	bool modC_state;
+	bool reset_state;
 
 	// HACK - Bootstrap mode state variable.
 	uint8_t bootstrap_mode;

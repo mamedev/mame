@@ -63,10 +63,10 @@ void f3853_device::device_start()
 	uint8_t reg = 0xfe;
 	for(int32_t i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
 	{
-		int32_t o7 = (reg & 0x80) ? TRUE : FALSE;
-		int32_t o5 = (reg & 0x20) ? TRUE : FALSE;
-		int32_t o4 = (reg & 0x10) ? TRUE : FALSE;
-		int32_t o3 = (reg & 0x08) ? TRUE : FALSE;
+		int32_t o7 = (reg & 0x80) ? true : false;
+		int32_t o5 = (reg & 0x20) ? true : false;
+		int32_t o4 = (reg & 0x10) ? true : false;
+		int32_t o3 = (reg & 0x08) ? true : false;
 		m_value_to_cycle[reg] = i;
 		reg <<= 1;
 		if (!((o7 != o5) != (o4 != o3)))
@@ -100,8 +100,8 @@ void f3853_device::device_reset()
 	m_external_enable = 0;
 	m_timer_enable = 0;
 	m_request_flipflop = 0;
-	m_priority_line = FALSE;
-	m_external_interrupt_line = TRUE;
+	m_priority_line = false;
+	m_external_interrupt_line = true;
 
 	m_timer->enable(false);
 }
@@ -113,11 +113,11 @@ void f3853_device::set_interrupt_request_line()
 		return;
 
 	if (m_external_enable && !m_priority_line)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(TRUE), TRUE);
+		m_interrupt_req_cb(INTERRUPT_VECTOR(true), true);
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(FALSE), TRUE);
+		m_interrupt_req_cb(INTERRUPT_VECTOR(false), true);
 	else
-		m_interrupt_req_cb(0, FALSE);
+		m_interrupt_req_cb(0, false);
 }
 
 
@@ -132,7 +132,7 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 {
 	if(m_timer_enable)
 	{
-		m_request_flipflop = TRUE;
+		m_request_flipflop = true;
 		set_interrupt_request_line();
 	}
 	timer_start(0xfe);
@@ -142,7 +142,7 @@ void f3853_device::set_external_interrupt_in_line(int level)
 {
 	if(m_external_interrupt_line && !level && m_external_enable)
 	{
-		m_request_flipflop = TRUE;
+		m_request_flipflop = true;
 	}
 	m_external_interrupt_line = level;
 	set_interrupt_request_line();
@@ -197,7 +197,7 @@ WRITE8_MEMBER(f3853_device::write)
 		break;
 
 	case 3: //timer
-		m_request_flipflop = FALSE;
+		m_request_flipflop = false;
 		set_interrupt_request_line();
 		timer_start(data);
 		break;
