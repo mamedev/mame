@@ -451,7 +451,7 @@ void abc806_state::video_start()
 uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.erase(cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!m_txoff)
 	{

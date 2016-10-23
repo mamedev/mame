@@ -920,7 +920,7 @@ void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* erase the background to black first */
-	bitmap.erase(cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	/* update the star origin to the current frame */
 	stars_update_origin();

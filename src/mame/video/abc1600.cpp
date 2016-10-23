@@ -1255,7 +1255,7 @@ uint32_t abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32
 	}
 	else
 	{
-		bitmap.erase(cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;

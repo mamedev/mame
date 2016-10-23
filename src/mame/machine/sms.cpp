@@ -1452,7 +1452,7 @@ uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitm
 				}
 			}
 		}
-		bitmap.erase(cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;

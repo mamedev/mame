@@ -284,7 +284,7 @@ uint32_t apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb3
 	if (!m_display_on)
 		m_crtc->screen_update(screen, bitmap, cliprect);
 	else
-		bitmap.erase(cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 
 	return 0;
 }

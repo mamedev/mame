@@ -388,9 +388,6 @@ public:
 
 	// getters
 	bitmap_format format() const { return k_bitmap_format; }
-
-	// operations
-	void erase(const rectangle &rect) { fill(rgb_t::black(), rect); }
 };
 
 // BITMAP_FORMAT_ARGB32 bitmaps

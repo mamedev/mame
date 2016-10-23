@@ -1399,7 +1399,7 @@ uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 MC6845_BEGIN_UPDATE( pet_state::pet_begin_update )
 {
-	bitmap.erase(cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 }
 
 MC6845_UPDATE_ROW( pet80_state::pet80_update_row )

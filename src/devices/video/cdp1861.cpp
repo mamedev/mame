@@ -247,7 +247,7 @@ uint32_t cdp1861_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	else
 	{
-		bitmap.erase(cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	return 0;
 }

@@ -183,7 +183,7 @@ uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_r
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap.erase(cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for(y=0;y<200/8;y++)
 	{

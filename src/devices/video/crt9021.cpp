@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER( crt9021_t::vsync_w )
 
 uint32_t crt9021_t::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bitmap.erase(cliprect);
+	m_bitmap.fill(rgb_t::black(), cliprect);
 
 	return 0;
 }

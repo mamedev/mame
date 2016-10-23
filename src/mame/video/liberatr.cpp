@@ -303,7 +303,7 @@ uint32_t liberatr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	pen_t pens[NUM_PENS];
 	get_pens(pens);
 
-	bitmap.erase(cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 	draw_planet(bitmap, pens);
 	draw_bitmap(bitmap, pens);
 

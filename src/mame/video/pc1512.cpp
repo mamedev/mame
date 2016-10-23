@@ -580,7 +580,7 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		bitmap.erase(cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
