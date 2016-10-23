@@ -17,42 +17,27 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-/** @brief  alignment values; 128 bytes is the largest cache line on typical architectures today. */
-const uint32_t BITMAP_OVERALL_ALIGN = 128;
-/** @brief  The bitmap rowbytes align. */
-const uint32_t BITMAP_ROWBYTES_ALIGN = 128;
-
-
-
-//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  compute_rowpixels - compute an aligned
-//  rowpixels value
+//  compute_rowpixels - compute a rowpixels value
 //-------------------------------------------------
 
 inline int32_t bitmap_t::compute_rowpixels(int width, int xslop)
 {
-	int rowpixels_align = BITMAP_ROWBYTES_ALIGN / (m_bpp / 8);
-	return ((width + 2 * xslop + (rowpixels_align - 1)) / rowpixels_align) * rowpixels_align;
+	return width + 2 * xslop;
 }
 
 
 //-------------------------------------------------
-//  compute_base - compute an aligned bitmap base
-//  address with the given slop values
+//  compute_base - compute a bitmap base address
+//  with the given slop values
 //-------------------------------------------------
 
 inline void bitmap_t::compute_base(int xslop, int yslop)
 {
 	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
-	uint64_t aligned_base = ((reinterpret_cast<uint64_t>(m_base) + (BITMAP_OVERALL_ALIGN - 1)) / BITMAP_OVERALL_ALIGN) * BITMAP_OVERALL_ALIGN;
-	m_base = reinterpret_cast<void *>(aligned_base);
 }
 
 
@@ -190,7 +175,6 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 
 	// allocate memory for the bitmap itself
 	m_allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
-	m_allocbytes += BITMAP_OVERALL_ALIGN - 1;
 	m_alloc = new uint8_t[m_allocbytes];
 
 	// clear to 0 by default
@@ -226,7 +210,6 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	// determine how much memory we need for the new bitmap
 	int new_rowpixels = compute_rowpixels(width, xslop);
 	uint32_t new_allocbytes = new_rowpixels * (height + 2 * yslop) * m_bpp / 8;
-	new_allocbytes += BITMAP_OVERALL_ALIGN - 1;
 
 	// if we need more memory, just realloc
 	if (new_allocbytes > m_allocbytes)
