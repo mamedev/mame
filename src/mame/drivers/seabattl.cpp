@@ -122,12 +122,12 @@ PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 	// scr
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(8 + 2 * i + 0, rgb_t::black);
+		palette.set_pen_color(8 + 2 * i + 0, rgb_t::black());
 		palette.set_pen_color(8 + 2 * i + 1, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// wave
-	palette.set_pen_color(24, rgb_t::black);
+	palette.set_pen_color(24, rgb_t::black());
 	palette.set_pen_color(25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 

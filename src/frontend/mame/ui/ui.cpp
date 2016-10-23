@@ -581,7 +581,7 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 	layout.add_text(
 			origs,
 			fgcolor,
-			draw == OPAQUE_ ? bgcolor : rgb_t::transparent,
+			draw == OPAQUE_ ? bgcolor : rgb_t::transparent(),
 			text_size);
 
 	// and emit it (if we are asked to do so)
@@ -938,7 +938,7 @@ void mame_ui_manager::paste()
 void mame_ui_manager::draw_fps_counter(render_container &container)
 {
 	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
+		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -950,7 +950,7 @@ void mame_ui_manager::draw_timecode_counter(render_container &container)
 {
 	std::string tempstring;
 	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black, nullptr, nullptr);
+		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -962,7 +962,7 @@ void mame_ui_manager::draw_timecode_total(render_container &container)
 {
 	std::string tempstring;
 	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black, nullptr, nullptr);
+		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -973,7 +973,7 @@ void mame_ui_manager::draw_timecode_total(render_container &container)
 void mame_ui_manager::draw_profiler(render_container &container)
 {
 	const char *text = g_profiler.text(machine());
-	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
+	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -2144,8 +2144,8 @@ int mame_ui_manager::wrap_text(render_container &container, const char *origs, f
 	// add the text
 	layout.add_text(
 			origs,
-			rgb_t::black,
-			rgb_t::black,
+			rgb_t::black(),
+			rgb_t::black(),
 			text_size);
 
 	// and get the wrapping info

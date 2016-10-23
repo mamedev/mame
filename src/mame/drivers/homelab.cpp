@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(40*8, 25*8)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)

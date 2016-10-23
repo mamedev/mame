@@ -1422,6 +1422,13 @@ static INPUT_PORTS_START( fexcel )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fdes2000 )
+	PORT_INCLUDE( fexcel )
+
+	PORT_MODIFY("IN.9")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // no low-voltage detection circuit (still works in software though)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( chesster )
 	PORT_INCLUDE( cb_buttons )
@@ -2101,12 +2108,12 @@ CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0
 CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1985, fexcel,     0,        0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version
+CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
 CONS( 1987, fexcelb,    fexcel,   0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2000,   0,        0,      fdes2000,  fexcel,    driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes2000,  driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

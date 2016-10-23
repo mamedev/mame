@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_CPU_IO_MAP(osborne1_io)
 	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10 )
 	MCFG_SCREEN_PALETTE("palette")

@@ -416,14 +416,14 @@ GFXDECODE_END
 
 static const rgb_t arcadia_colors[] =
 {
-	rgb_t::white,                  /* white */
+	rgb_t::white(),                /* white */
 	rgb_t(0xff, 0xff, 0x00), /* yellow */
 	rgb_t(0x00, 0xff, 0xff), /* cyan */
 	rgb_t(0x00, 0xff, 0x00), /* green */
 	rgb_t(0xff, 0x00, 0xff), /* magenta */
 	rgb_t(0xff, 0x00, 0x00), /* red */
 	rgb_t(0x00, 0x00, 0xff), /* blue */
-	rgb_t::black                   /* black */
+	rgb_t::black()                 /* black */
 };
 
 static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */

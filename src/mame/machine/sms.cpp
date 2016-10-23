@@ -1341,9 +1341,9 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 		uint8_t sscope_binocular_hack = m_port_scope_binocular->read();
 
 		if (sscope_binocular_hack & 0x01)
-			m_prevleft_bitmap.fill(rgb_t::black);
+			m_prevleft_bitmap.fill(rgb_t::black());
 		if (sscope_binocular_hack & 0x02)
-			m_prevright_bitmap.fill(rgb_t::black);
+			m_prevright_bitmap.fill(rgb_t::black());
 	}
 
 	m_sscope_state = 0;
@@ -1452,7 +1452,7 @@ uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitm
 				}
 			}
 		}
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -1481,12 +1481,12 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 {
 	if (m_prev_bitmap_copied)
 	{
-		m_prev_bitmap.fill(rgb_t::black);
+		m_prev_bitmap.fill(rgb_t::black());
 		m_prev_bitmap_copied = false;
 	}
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 	{
-		m_gg_sms_mode_bitmap.fill(rgb_t::black);
+		m_gg_sms_mode_bitmap.fill(rgb_t::black());
 		memset(m_line_buffer.get(), 0, 160 * 4 * sizeof(int));
 	}
 }
@@ -1648,7 +1648,7 @@ uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &
 		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
 		if (m_prev_bitmap_copied)
 		{
-			m_prev_bitmap.fill(rgb_t::black);
+			m_prev_bitmap.fill(rgb_t::black());
 			m_prev_bitmap_copied = false;
 		}
 	}

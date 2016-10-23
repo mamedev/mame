@@ -334,13 +334,13 @@ INPUT_CHANGED_MEMBER(tv990_state::color)
 	{
 		case 0:
 		default:
-			color = rgb_t::green;
+			color = rgb_t::green();
 			break;
 		case 1:
-			color = rgb_t::amber;
+			color = rgb_t::amber();
 			break;
 		case 2:
-			color = rgb_t::white;
+			color = rgb_t::white();
 			break;
 	}
 	m_screen->static_set_color(*m_screen, color);
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
 	MCFG_SCREEN_SIZE(132*16, 50*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*16)-1, 0, (50*16)-1)

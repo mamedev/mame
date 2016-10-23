@@ -24,7 +24,7 @@ uint32_t malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 
 	int sx, sy;
 	int x,y;
 
-	bitmap.fill(rgb_t::black);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	m_trom->screen_update(screen, bitmap, cliprect);
 

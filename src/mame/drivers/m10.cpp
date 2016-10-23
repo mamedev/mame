@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 		if (i & 0x01)
 			color = rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
 		else
-			color = rgb_t::black;
+			color = rgb_t::black();
 
 		palette.set_pen_color(i, color);
 	}

@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( micral, micral_state )
 	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(micral_state, screen_update)

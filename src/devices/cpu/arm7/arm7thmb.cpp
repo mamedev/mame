@@ -1539,6 +1539,7 @@ void arm7_cpu_device::tg0d_e(uint32_t pc, uint32_t op) // COND_AL:
 void arm7_cpu_device::tg0d_f(uint32_t pc, uint32_t op) // COND_NV:   // SWI (this is sort of a "hole" in the opcode encoding)
 {
 	m_pendingSwi = 1;
+	update_irq_state();
 	arm7_check_irq_state();
 }
 

@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 		  black anyway.
 		 */
 		if (((i % 64) / 8) == 0)
-			palette.set_indirect_color(i, rgb_t::black);
+			palette.set_indirect_color(i, rgb_t::black());
 		else
 		{
 			int bit0, bit1, bit2;

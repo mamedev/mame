@@ -1350,7 +1350,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_I8275_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_crtc_drq_w))
 				MCFG_I8275_VRTC_CALLBACK(WRITELINE(hp64k_state , hp64k_crtc_vrtc_w))
 
-				MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+				MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 				MCFG_SCREEN_UPDATE_DEVICE("crtc" , i8275_device , screen_update)
 				MCFG_SCREEN_REFRESH_RATE(60)
 				MCFG_SCREEN_SIZE(720 , 390)

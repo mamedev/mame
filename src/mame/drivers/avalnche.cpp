@@ -64,9 +64,9 @@ uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rg
 			pen_t pen;
 
 			if (m_avalance_video_inverted)
-				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			else
-				pen = (data & 0x80) ? rgb_t::black : rgb_t::white;
+				pen = (data & 0x80) ? rgb_t::black() : rgb_t::white();
 
 			bitmap.pix32(y, x) = pen;
 

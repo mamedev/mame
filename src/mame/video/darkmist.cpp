@@ -72,7 +72,7 @@ PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 	const uint8_t *spr_clut = memregion("spr_clut")->base();
 	const uint8_t *tx_clut = memregion("tx_clut")->base();
 
-	palette.set_indirect_color(0x100, rgb_t::black);
+	palette.set_indirect_color(0x100, rgb_t::black());
 
 	for (int i = 0; i < 0x400; i++)
 	{

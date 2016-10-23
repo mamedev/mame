@@ -417,7 +417,7 @@ MACHINE_CONFIG_START( anzterm, anzterm_state )
 	MCFG_DEVICE_ADD("acia.ic17", ACIA6850, 0)
 	MCFG_DEVICE_ADD("acia.ic18", ACIA6850, 0)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(anzterm_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_RAW_PARAMS(15974400/4, 1024, 0, 104*8, 260, 0, 24*10) // this is totally wrong, it just stops a validation error

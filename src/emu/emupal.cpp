@@ -462,7 +462,7 @@ void palette_device::device_start()
 			for (int color = 0; color < m_indirect_entries; color++)
 			{
 				// alpha = 0 ensures change is detected the first time set_indirect_color() is called
-				m_indirect_colors[color] = rgb_t::transparent;
+				m_indirect_colors[color] = rgb_t::transparent();
 			}
 
 			m_indirect_pens.resize(m_entries);
@@ -594,8 +594,8 @@ void palette_device::allocate_palette()
 
 		// 32-bit direct case
 		case BITMAP_FORMAT_RGB32:
-			m_black_pen = rgb_t::black;
-			m_white_pen = rgb_t::white;
+			m_black_pen = rgb_t::black();
+			m_white_pen = rgb_t::white();
 			break;
 
 		// screenless case
@@ -742,7 +742,7 @@ void palette_device::palette_init_all_black(palette_device &palette)
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i, rgb_t::black);
+		palette.set_pen_color(i, rgb_t::black());
 	}
 }
 
@@ -753,8 +753,8 @@ void palette_device::palette_init_all_black(palette_device &palette)
 
 void palette_device::palette_init_monochrome(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t::black);
-	palette.set_pen_color(1, rgb_t::white);
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
 }
 
 
@@ -764,8 +764,8 @@ void palette_device::palette_init_monochrome(palette_device &palette)
 
 void palette_device::palette_init_monochrome_inverted(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t::white);
-	palette.set_pen_color(1, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::white());
+	palette.set_pen_color(1, rgb_t::black());
 }
 
 
@@ -775,9 +775,9 @@ void palette_device::palette_init_monochrome_inverted(palette_device &palette)
 
 void palette_device::palette_init_monochrome_highlight(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xc0, 0xc0, 0xc0));
-	palette.set_pen_color(2, rgb_t::white);
+	palette.set_pen_color(2, rgb_t::white());
 }
 
 

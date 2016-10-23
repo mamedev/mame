@@ -98,6 +98,8 @@ public:
 	DECLARE_READ8_MEMBER( serial_r );
 	DECLARE_WRITE8_MEMBER( serial_speed_w );
 
+	DECLARE_PALETTE_INIT( ie15 );
+
 	static const device_timer_id TIMER_HBLANK = 0;
 
 	void scanline_callback();
@@ -649,6 +651,12 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
+PALETTE_INIT_MEMBER( ie15_state, ie15 )
+{
+	palette.set_pen_color(0, rgb_t::black()); // black
+	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
+}
+
 static MACHINE_CONFIG_START( ie15, ie15_state )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15, XTAL_30_8MHz/10)
@@ -656,13 +664,16 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_CPU_IO_MAP(ie15_io)
 
 	/* Video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ie15_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
