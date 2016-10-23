@@ -141,7 +141,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
         </part>
     </software>
 
-    <software name="poohhawag" supported="no">
+    <software name="poohhawag" cloneof="poohhawa" supported="no">
         <description>Puuhs Hundert-Morgen-Wald (Ger)</description>
         <year>2006?</year>
         <publisher>VTech</publisher>
@@ -152,7 +152,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
         </part>
     </software>
 
-    <software name="poohhawasw" cloneof="pooh" supported="no">
+    <software name="poohhawasw" cloneof="poohhawa" supported="no">
         <description>Nalle Puhs Äventyr i Sjumilaskogen (Swe)</description>
         <year>2007?</year>
         <publisher>VTech</publisher>
