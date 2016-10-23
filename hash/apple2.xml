@@ -350,7 +350,7 @@
 		</part>
 	</software>
 
-	<software name="prodos241" cloneof="prodos11">
+	<software name="prodos241">
 		<description>ProDOS (v2.4.1)</description>
 		<!-- Copyright by Apple, but rewritten by John Brooks in 2016 - Compatible with 6502 & some Apple II clone machines -->
 		<!-- Copyright date 16-Aug-16 (IE: 16-8-16 ;-) -->
@@ -364,7 +364,7 @@
 		</part>
 	</software>
 
-	<software name="unidos33">
+	<software name="unidos33p">
 		<description>UniDOS 3.3 Plus v2.0.1</description>
 		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
@@ -377,7 +377,7 @@
 		</part>
 	</software>
 
-	<software name="unidospl">
+	<software name="unidosplus">
 		<description>UniDOS Plus v2.1</description>
 		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
 		<year>1986</year>
@@ -4590,7 +4590,7 @@
 		</part>
 	</software>
 
-	<software name="carmntime" cloneof="carmneur">
+	<software name="carmntime">
 		<description>Where in Time is Carmen Sandiego v1.1 (clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
@@ -4617,7 +4617,7 @@
 		</part>
 	</software>
 
-	<software name="carmntime35" cloneof="carmneur">
+	<software name="carmntime35">
 		<description>Where in Time is Carmen Sandiego v1.1 800K 3.5 disc (clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
@@ -4629,7 +4629,7 @@
 		</part>
 	</software>
 
-	<software name="carmntime10" cloneof="carmneur">
+	<software name="carmntime10">
 		<description>Where in Time is Carmen Sandiego v1.0 (clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund</publisher>
@@ -4868,7 +4868,7 @@
 		</part>
 	</software>
 
-	<software name="gamemakr">
+	<software name="gamemaker">
 		<description>Gamemaker</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
@@ -5290,7 +5290,7 @@
 		</part>
 	</software>
 
-	<software name="mstrlamp">
+	<software name="masterlamp">
 		<description>Master of the Lamps (clean crack)</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
@@ -5597,7 +5597,7 @@
 		</part>
 	</software>
 
-	<software name="papermod">
+	<software name="papermodels">
 		<description>Paper Models - The Christmas Kit (clean crack)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
@@ -5633,7 +5633,7 @@
 		</part>
 	</software>
 
-	<software name="pipdream">
+	<software name="pipedream">
 		<description>Pipe Dream (clean crack)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm</publisher>

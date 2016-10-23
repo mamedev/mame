@@ -377,7 +377,7 @@
 		<part name="rom" interface="hp9845b_rom">
 			<feature name="base" value="0x0d1000"  />
 			<dataarea name="rom" size="0x2000" width="16" endianness="big">
-				<rom name="831010-15_10-reva-structured_software_systems_mass_storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000"  />
+				<rom name="831010-15_10-RevA-Structured_Software_Systems_Mass_Storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000"  />
 			</dataarea>
 		</part>
 	</software>

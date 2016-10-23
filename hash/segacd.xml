@@ -3951,7 +3951,7 @@ See: http://rawdump.net/
 	Good Deal Games released a set of reproduction discs based off a (final) prototype build. This is a dump
 	from one of those reproduction discs.
 	-->
-	<software name="bugblasta" cloneof="bugblast">
+	<software name="bugblast" cloneof="bugblastse">
 		<!-- source TOSEC-ISO
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US)(Track 1 of 2).iso" size="492976128" crc="e46108f1" md5="12938bc2a8060529dde71513ec157965" sha1="7f8e7d7f172bfb60a7c53ccce8c1bc934d6bb0bd"/>
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US)(Track 2 of 2).wav" size="39036188" crc="2514f737" md5="17abb3aba0581b8a3824133dcc7fbbb8" sha1="1fc932cb99a91c4b7b46d8cd7a5b6b558eaf632a"/>
@@ -3974,7 +3974,7 @@ See: http://rawdump.net/
 	Good Deal Games released a set of reproduction discs based off a (final) prototype build. A later
 	production run, called Special Edition, is the basis for this dump.
 	-->
-	<software name="bugblast">
+	<software name="bugblastse">
 		<!-- source TOSEC-ISO
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)(Track 1 of 2)[!][Special Edition].iso" size="492976128" crc="b075d182" md5="6355c5edff71253657a2fea615e4c1d9" sha1="3309530e9a8365a62b7644a066397907c392f7df"/>
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)(Track 2 of 2)[!][Special Edition].wav" size="39036188" crc="ac3f1d80" md5="6037ed6379d9cdc1aee4c6906832bfeb" sha1="f97c6d45c2e25da8c6a9cf386eec7f911ebd8c6a"/>

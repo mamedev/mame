@@ -161,7 +161,7 @@
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="cp 5068.bin" size="32768" crc="e9cf6b4a" sha1="7ad863525bd99f50abb3686ff8ad31eb2b3f2abc" offset="0" />
+				<rom name="CP 5068.bin" size="32768" crc="e9cf6b4a" sha1="7ad863525bd99f50abb3686ff8ad31eb2b3f2abc" offset="0" />
 			</dataarea>
 		</part>
 	</software>

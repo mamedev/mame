@@ -88,7 +88,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-		<rom name="yonnin majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
+		<rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +101,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="mahjongg(jp).bin" size="0x4000" crc="127241ec" sha1="8b9ea7fc592e673e93cfae1bfc458bfab4a52600" offset="0" />
+				<rom name="MahJongg(JP).BIN" size="0x4000" crc="127241ec" sha1="8b9ea7fc592e673e93cfae1bfc458bfab4a52600" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -127,7 +127,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="026E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="battlefighter(jp).bin" size="0x8000" crc="e507480a" sha1="acb478e71f771854827217dd95472572759cb9d8" offset="0" />
+				<rom name="Battlefighter(JP).BIN" size="0x8000" crc="e507480a" sha1="acb478e71f771854827217dd95472572759cb9d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -420,7 +420,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="023E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="superbike(jp).bin" size="0x4000" crc="d66d2bc4" sha1="1941a4746b6ed0664dde0816966bc892d99691f6" offset="0" />
+				<rom name="SuperBike(JP).BIN" size="0x4000" crc="d66d2bc4" sha1="1941a4746b6ed0664dde0816966bc892d99691f6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
