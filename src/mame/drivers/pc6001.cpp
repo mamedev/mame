@@ -248,9 +248,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pc6001);
-	DECLARE_MACHINE_RESET(pc6001m2);
+	void machine_reset_pc6001m2();
 	DECLARE_PALETTE_INIT(pc6001m2);
-	DECLARE_MACHINE_RESET(pc6001sr);
+	void machine_reset_pc6001sr();
 	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -2084,7 +2084,7 @@ void pc6001_state::machine_reset()
 	m_timer_hz_div = 3;
 }
 
-MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
+void pc6001_state::machine_reset_pc6001m2()
 {
 	m_video_ram = m_region_maincpu->base() + 0xc000 + 0x28000;
 
@@ -2123,7 +2123,7 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 	m_timer_irq_vector = 0x06;
 }
 
-MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
+void pc6001_state::machine_reset_pc6001sr()
 {
 	m_video_ram = m_region_maincpu->base() + 0x70000;
 

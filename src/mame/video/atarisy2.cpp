@@ -79,7 +79,7 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::video_start_atarisy2()
 {
 	/* initialize banked memory */
 	m_alpha_tilemap->basemem().set(&m_vram[0x0000], 0x2000, 16, ENDIANNESS_NATIVE, 2);

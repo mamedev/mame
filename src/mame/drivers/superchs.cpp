@@ -577,7 +577,7 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 	return m_ram[2]&0xffff;
 }
 
-DRIVER_INIT_MEMBER(superchs_state,superchs)
+void superchs_state::init_superchs()
 {
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));

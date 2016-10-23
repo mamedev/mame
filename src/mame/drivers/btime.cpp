@@ -1235,7 +1235,7 @@ static DISCRETE_SOUND_START( btime_sound )
 DISCRETE_SOUND_END
 
 
-MACHINE_START_MEMBER(btime_state,btime)
+void btime_state::machine_start_btime()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -1245,9 +1245,9 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_audio_nmi_state));
 }
 
-MACHINE_START_MEMBER(btime_state,mmonkey)
+void btime_state::machine_start_mmonkey()
 {
-	MACHINE_START_CALL_MEMBER(btime);
+	machine_start_btime();
 
 	save_item(NAME(m_protection_command));
 	save_item(NAME(m_protection_status));
@@ -1255,7 +1255,7 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 	save_item(NAME(m_protection_ret));
 }
 
-MACHINE_RESET_MEMBER(btime_state,btime)
+void btime_state::machine_reset_btime()
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
 	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
@@ -1270,16 +1270,16 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_audio_nmi_state = 0;
 }
 
-MACHINE_RESET_MEMBER(btime_state,lnc)
+void btime_state::machine_reset_lnc()
 {
 	*m_lnc_charbank = 1;
 
-	MACHINE_RESET_CALL_MEMBER(btime);
+	machine_reset_btime();
 }
 
-MACHINE_RESET_MEMBER(btime_state,mmonkey)
+void btime_state::machine_reset_mmonkey()
 {
-	MACHINE_RESET_CALL_MEMBER(lnc);
+	machine_reset_lnc();
 
 	m_protection_command = 0;
 	m_protection_status = 0;
@@ -1986,12 +1986,12 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 	return RAM[0xc15f];
 }
 
-DRIVER_INIT_MEMBER(btime_state,btime)
+void btime_state::init_btime()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,zoar)
+void btime_state::init_zoar()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2004,7 +2004,7 @@ DRIVER_INIT_MEMBER(btime_state,zoar)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,tisland)
+void btime_state::init_tisland()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2017,36 +2017,36 @@ DRIVER_INIT_MEMBER(btime_state,tisland)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,lnc)
+void btime_state::init_lnc()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,bnj)
+void btime_state::init_bnj()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,disco)
+void btime_state::init_disco()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,cookrace)
+void btime_state::init_cookrace()
 {
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,protennb)
+void btime_state::init_protennb()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,wtennis)
+void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
@@ -2055,7 +2055,7 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,sdtennis)
+void btime_state::init_sdtennis()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }

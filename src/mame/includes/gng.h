@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
 	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
 	DECLARE_WRITE8_MEMBER(gng_flipscreen_w);
-	DECLARE_DRIVER_INIT(diamond);
+	void init_diamond();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;

@@ -11,7 +11,7 @@ public:
 		, m_tty(*this, "teletype")
 	{ }
 
-	DECLARE_DRIVER_INIT(patinho_feio);
+	void init_patinho_feio();
 	DECLARE_READ16_MEMBER(rc_r);
 	DECLARE_READ16_MEMBER(buttons_r);
 

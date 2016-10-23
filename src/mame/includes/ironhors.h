@@ -62,7 +62,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ironhors);
-	DECLARE_VIDEO_START(farwest);
+	void video_start_farwest();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

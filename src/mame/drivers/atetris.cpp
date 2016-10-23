@@ -545,7 +545,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atetris_state,atetris)
+void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 

@@ -2791,12 +2791,12 @@ void taitosj_state::init_common()
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(taitosj_state::reset_common), this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,taitosj)
+void taitosj_state::init_taitosj()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,spacecr)
+void taitosj_state::init_spacecr()
 {
 	init_common();
 
@@ -2804,7 +2804,7 @@ DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpine)
+void taitosj_state::init_alpine()
 {
 	init_common();
 
@@ -2813,7 +2813,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpine)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpinea)
+void taitosj_state::init_alpinea()
 {
 	init_common();
 
@@ -2822,7 +2822,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
+void taitosj_state::init_junglhbr()
 {
 	init_common();
 

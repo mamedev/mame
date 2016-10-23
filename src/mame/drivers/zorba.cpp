@@ -68,8 +68,8 @@ public:
 
 public:
 	const uint8_t *m_p_chargen;
-	DECLARE_DRIVER_INIT(zorba);
-	DECLARE_MACHINE_RESET(zorba);
+	void init_zorba();
+	void machine_reset_zorba();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(rom_r);
@@ -203,7 +203,7 @@ WRITE8_MEMBER( zorba_state::intmask_w )
 static INPUT_PORTS_START( zorba )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( zorba_state, zorba )
+void zorba_state::init_zorba()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -317,7 +317,7 @@ static GFXDECODE_START( zorba )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER( zorba_state, zorba )
+void zorba_state::machine_reset_zorba()
 {
 	m_fdc_rq = 0;
 	m_p_chargen = memregion("chargen")->base();

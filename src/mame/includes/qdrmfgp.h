@@ -55,10 +55,10 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_MACHINE_START(qdrmfgp);
-	DECLARE_VIDEO_START(qdrmfgp);
-	DECLARE_MACHINE_START(qdrmfgp2);
-	DECLARE_VIDEO_START(qdrmfgp2);
+	void machine_start_qdrmfgp();
+	void video_start_qdrmfgp();
+	void machine_start_qdrmfgp2();
+	void video_start_qdrmfgp2();
 	uint32_t screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
 	TIMER_CALLBACK_MEMBER(gp2_timer_callback);

@@ -47,7 +47,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(dreambal);
+	void init_dreambal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -362,7 +362,7 @@ ROM_START( dreambal )
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dreambal_state,dreambal)
+void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }

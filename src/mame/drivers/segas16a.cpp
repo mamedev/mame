@@ -3631,7 +3631,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16a_state,generic)
+void segas16a_state::init_generic()
 {
 	// configure the NVRAM to point to our workram
 	m_nvram->set_base(m_workram, m_workram.bytes());
@@ -3656,46 +3656,46 @@ DRIVER_INIT_MEMBER(segas16a_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
+void segas16a_state::init_aceattaca()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
+void segas16a_state::init_dumpmtmt()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::dumpmtmt_i8751_sim), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,mjleague)
+void segas16a_state::init_mjleague()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::mjleague_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
+void segas16a_state::init_passsht16a()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,quartet)
+void segas16a_state::init_quartet()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
 }
 
 
-DRIVER_INIT_MEMBER(segas16a_state,sdi)
+void segas16a_state::init_sdi()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
+void segas16a_state::init_sjryukoa()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
 	m_lamp_changed_w = lamp_changed_delegate(FUNC(segas16a_state::sjryuko_lamp_changed_w), this);
 }

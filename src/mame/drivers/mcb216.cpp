@@ -51,8 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_MACHINE_RESET(mcb216);
-	DECLARE_MACHINE_RESET(cb308);
+	void machine_reset_mcb216();
+	void machine_reset_cb308();
 
 private:
 	uint8_t m_term_data;
@@ -104,12 +104,12 @@ WRITE8_MEMBER( mcb216_state::kbd_put )
 	m_term_data = data;
 }
 
-MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
+void mcb216_state::machine_reset_mcb216()
 {
 	m_term_data = 0;
 }
 
-MACHINE_RESET_MEMBER( mcb216_state, cb308 )
+void mcb216_state::machine_reset_cb308()
 {
 	m_term_data = 0;
 	m_maincpu->set_state_int(Z80_PC, 0xe000);

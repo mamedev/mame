@@ -2185,70 +2185,70 @@ void ms32_state::configure_banks()
 	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x4000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(ms32_state,ms32_common)
+void ms32_state::init_ms32_common()
 {
 	m_nvram_8 = std::make_unique<uint8_t[]>(0x2000);
 	configure_banks();
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
-DRIVER_INIT_MEMBER(ms32_state,ss91022_10)
+void ms32_state::init_ss91022_10()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
 }
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
-DRIVER_INIT_MEMBER(ms32_state,ss92046_01)
+void ms32_state::init_ss92046_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
 }
 
 /* SS92047-01: gratia, kirarast */
-DRIVER_INIT_MEMBER(ms32_state,ss92047_01)
+void ms32_state::init_ss92047_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
-DRIVER_INIT_MEMBER(ms32_state,ss92048_01)
+void ms32_state::init_ss92048_01()
 {
-	DRIVER_INIT_CALL(ms32_common);
+	init_ms32_common();
 	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
 }
 
-DRIVER_INIT_MEMBER(ms32_state,kirarast)
+void ms32_state::init_kirarast()
 {
-	DRIVER_INIT_CALL(ss92047_01);
+	init_ss92047_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,47pie2)
+void ms32_state::init_47pie2()
 {
-	DRIVER_INIT_CALL(ss92048_01);
+	init_ss92048_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,f1superb)
+void ms32_state::init_f1superb()
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
 	uint32_t *pROM = (uint32_t *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
-	DRIVER_INIT_CALL(ss92046_01);
+	init_ss92046_01();
 }
 
-DRIVER_INIT_MEMBER(ms32_state,bnstars)
+void ms32_state::init_bnstars()
 {
-	DRIVER_INIT_CALL(ss92046_01);
+	init_ss92046_01();
 }
 
 /********** GAME DRIVERS **********/

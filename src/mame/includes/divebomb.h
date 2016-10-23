@@ -54,9 +54,9 @@ public:
 	bool roz1_wrap;
 	bool roz2_wrap;
 
-	DECLARE_MACHINE_RESET(divebomb);
-	DECLARE_MACHINE_START(divebomb);
-	DECLARE_VIDEO_START(divebomb);
+	void machine_reset_divebomb();
+	void machine_start_divebomb();
+	void video_start_divebomb();
 	DECLARE_PALETTE_INIT(divebomb);
 
 	void update_irqs();

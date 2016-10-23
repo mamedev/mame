@@ -81,7 +81,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_DRIVER_INIT(suprgolf);
+	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -627,7 +627,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
+void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 

@@ -145,12 +145,12 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 	DECLARE_WRITE32_MEMBER(jclub2o_eeprom_w);
-	DECLARE_DRIVER_INIT(darkhors);
+	void init_darkhors();
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	DECLARE_VIDEO_START(darkhors);
-	DECLARE_VIDEO_START(jclub2);
-	DECLARE_VIDEO_START(jclub2o);
+	void video_start_darkhors();
+	void video_start_jclub2();
+	void video_start_jclub2o();
 	uint32_t screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -235,7 +235,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-VIDEO_START_MEMBER(darkhors_state,darkhors)
+void darkhors_state::video_start_darkhors()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
@@ -992,7 +992,7 @@ MACHINE_CONFIG_END
 
 
 
-VIDEO_START_MEMBER(darkhors_state,jclub2)
+void darkhors_state::video_start_jclub2()
 {
 }
 
@@ -1063,7 +1063,7 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 ADDRESS_MAP_END
 
 
-VIDEO_START_MEMBER(darkhors_state,jclub2o)
+void darkhors_state::video_start_jclub2o()
 {
 }
 
@@ -1295,7 +1295,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )

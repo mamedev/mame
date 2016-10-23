@@ -1166,7 +1166,7 @@ ROM_START( tgm2p )
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
 
-DRIVER_INIT_MEMBER(psikyosh_state,ps3)
+void psikyosh_state::init_ps3()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x03004000, 0x0300ffff, 0, &m_bgram[0]);
@@ -1174,7 +1174,7 @@ DRIVER_INIT_MEMBER(psikyosh_state,ps3)
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-DRIVER_INIT_MEMBER(psikyosh_state,ps5)
+void psikyosh_state::init_ps5()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x04004000, 0x0400ffff, 0, &m_bgram[0]);
@@ -1182,11 +1182,11 @@ DRIVER_INIT_MEMBER(psikyosh_state,ps5)
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
+void psikyosh_state::init_mjgtaste()
 {
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
-	DRIVER_INIT_CALL(ps5);
+	init_ps5();
 }
 
 

@@ -173,14 +173,14 @@ public:
 	DECLARE_READ8_MEMBER(snesb_coin_r);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	DECLARE_DRIVER_INIT(iron);
-	DECLARE_DRIVER_INIT(denseib);
-	DECLARE_DRIVER_INIT(kinstb);
-	DECLARE_DRIVER_INIT(sblast2b);
-	DECLARE_DRIVER_INIT(ffight2b);
-	DECLARE_DRIVER_INIT(endless);
-	DECLARE_DRIVER_INIT(mk3snes);
-	DECLARE_MACHINE_RESET(ffight2b);
+	void init_iron();
+	void init_denseib();
+	void init_kinstb();
+	void init_sblast2b();
+	void init_ffight2b();
+	void init_endless();
+	void init_mk3snes();
+	void machine_reset_ffight2b();
 };
 
 
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_DERIVED( mk3snes, kinstb )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER( snesb_state, ffight2b )
+void snesb_state::machine_reset_ffight2b()
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	snes_state::machine_reset();
@@ -734,7 +734,7 @@ static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(snesb_state,kinstb)
+void snesb_state::init_kinstb()
 {
 	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
@@ -752,15 +752,15 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,mk3snes)
+void snesb_state::init_mk3snes()
 {
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,ffight2b)
+void snesb_state::init_ffight2b()
 {
 	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
@@ -800,10 +800,10 @@ DRIVER_INIT_MEMBER(snesb_state,ffight2b)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,iron)
+void snesb_state::init_iron()
 {
 	int32_t i;
 	uint8_t *rom = memregion("user3")->base();
@@ -825,10 +825,10 @@ DRIVER_INIT_MEMBER(snesb_state,iron)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,denseib)
+void snesb_state::init_denseib()
 {
 	uint8_t *rom = memregion("user3")->base();
 	int32_t i;
@@ -856,7 +856,7 @@ DRIVER_INIT_MEMBER(snesb_state,denseib)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
 static const uint8_t data_substitution0[] = {0x88,0x02,0x2a,0x08,0x28,0xaa,0x8a,0x0a,0xa2,0x00,0x80,0xa0,0x22,0xa8,0x82,0x20,};
@@ -876,7 +876,7 @@ static const uint8_t  address_substitution_high[] =
 	0x2b,0x25,0x28,0x2f,0x26,0x22,0x23,0x2a,0x2d,0x24,0x2e,0x20,0x27,0x2c,0x21,0x29
 };
 
-DRIVER_INIT_MEMBER(snesb_state,sblast2b)
+void snesb_state::init_sblast2b()
 {
 	int i, cipherText, plainText, newAddress;
 	uint8_t *src = memregion("user7")->base();
@@ -923,10 +923,10 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes_hirom);
+	init_snes_hirom();
 }
 
-DRIVER_INIT_MEMBER(snesb_state,endless)
+void snesb_state::init_endless()
 {
 	int i;
 	uint8_t *src = memregion("user7")->base();
@@ -997,7 +997,7 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8_delegate(FUNC(snesb_state::snesb_dsw2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(FUNC(snesb_state::snesb_coin_r),this));
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
 

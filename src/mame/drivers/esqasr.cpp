@@ -61,7 +61,7 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_DRIVER_INIT(asr);
+	void init_asr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };
@@ -159,7 +159,7 @@ ROM_START( asrx )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqasr_state, asr)
+void esqasr_state::init_asr()
 {
 }
 

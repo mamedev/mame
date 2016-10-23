@@ -1477,7 +1477,7 @@ static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
 SLOT_INTERFACE_END
 
-MACHINE_RESET_MEMBER(x68k_state,x68000)
+void x68k_state::machine_reset_x68000()
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
 	   Just copying the inital stack pointer and program counter should
@@ -1541,7 +1541,7 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_maincpu->reset();
 }
 
-MACHINE_START_MEMBER(x68k_state,x68000)
+void x68k_state::machine_start_x68000()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
@@ -1570,7 +1570,7 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 	m_fdc.motor = 0;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68000)
+void x68k_state::init_x68000()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1608,16 +1608,16 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	save_item(NAME(m_spritereg));
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
+void x68k_state::init_x68kxvi()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68030)
+void x68k_state::init_x68030()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }

@@ -484,7 +484,7 @@ ROM_START( sshanghab )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sshangha_state,sshangha)
+void sshangha_state::init_sshangha()
 {
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features

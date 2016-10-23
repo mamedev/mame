@@ -101,24 +101,24 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
-	DECLARE_DRIVER_INIT(konamigx);
+	void init_konamigx();
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_alt_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac1a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac1b_tile_info);
-	DECLARE_MACHINE_START(konamigx);
-	DECLARE_MACHINE_RESET(konamigx);
-	DECLARE_VIDEO_START(konamigx_5bpp);
-	DECLARE_VIDEO_START(dragoonj);
-	DECLARE_VIDEO_START(le2);
-	DECLARE_VIDEO_START(konamigx_6bpp);
-	DECLARE_VIDEO_START(opengolf);
-	DECLARE_VIDEO_START(racinfrc);
-	DECLARE_VIDEO_START(konamigx_type3);
-	DECLARE_VIDEO_START(konamigx_type4);
-	DECLARE_VIDEO_START(konamigx_type4_vsn);
-	DECLARE_VIDEO_START(konamigx_type4_sd2);
+	void machine_start_konamigx();
+	void machine_reset_konamigx();
+	void video_start_konamigx_5bpp();
+	void video_start_dragoonj();
+	void video_start_le2();
+	void video_start_konamigx_6bpp();
+	void video_start_opengolf();
+	void video_start_racinfrc();
+	void video_start_konamigx_type3();
+	void video_start_konamigx_type4();
+	void video_start_konamigx_type4_vsn();
+	void video_start_konamigx_type4_sd2();
 	uint32_t screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -255,7 +255,7 @@ public:
 	int m_konamigx_type3_psac2_actual_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 
-	DECLARE_DRIVER_INIT(posthack);
+	void init_posthack();
 	int m_use_68020_post_clock_hack;
 };
 

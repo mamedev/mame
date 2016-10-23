@@ -1096,7 +1096,7 @@ void tx1_state::tx1_draw_objects(uint8_t *bitmap)
  *
  *************************************/
 
-VIDEO_START_MEMBER(tx1_state,tx1)
+void tx1_state::video_start_tx1()
 {
 	/* Allocate a large bitmap that covers the three screens */
 	m_bitmap = std::make_unique<bitmap_ind16>(768, 256);
@@ -2989,7 +2989,7 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 	}
 }
 
-VIDEO_START_MEMBER(tx1_state,buggyboy)
+void tx1_state::video_start_buggyboy()
 {
 	/* Allocate some bitmaps */
 	m_chr_bmp = std::make_unique<uint8_t[]>(3 * 256 * 240);
@@ -3003,7 +3003,7 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-VIDEO_START_MEMBER(tx1_state,buggybjr)
+void tx1_state::video_start_buggybjr()
 {
 	/* Allocate some bitmaps */
 	m_chr_bmp = std::make_unique<uint8_t[]>(256 * 240);

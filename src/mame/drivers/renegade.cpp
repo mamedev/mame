@@ -202,7 +202,7 @@ void renegade_state::machine_start()
 	save_item(NAME(m_adpcm_playing));
 }
 
-DRIVER_INIT_MEMBER(renegade_state,renegade)
+void renegade_state::init_renegade()
 {
 	m_mcu_sim = false;
 
@@ -221,7 +221,7 @@ DRIVER_INIT_MEMBER(renegade_state,renegade)
 	save_item(NAME(m_port_c_in));
 }
 
-DRIVER_INIT_MEMBER(renegade_state,kuniokun)
+void renegade_state::init_kuniokun()
 {
 	m_mcu_sim = true;
 	m_mcu_checksum = 0x85;
@@ -236,7 +236,7 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 	save_item(NAME(m_mcu_key));
 }
 
-DRIVER_INIT_MEMBER(renegade_state,kuniokunb)
+void renegade_state::init_kuniokunb()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

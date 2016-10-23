@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE32_MEMBER(port400_w);
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
-	DECLARE_DRIVER_INIT(pinball2k);
+	void init_pinball2k();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -626,7 +626,7 @@ void pinball2k_state::init_mediagx()
 	m_frame_width = m_frame_height = 1;
 }
 
-DRIVER_INIT_MEMBER(pinball2k_state, pinball2k)
+void pinball2k_state::init_pinball2k()
 {
 	init_mediagx();
 }

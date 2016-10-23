@@ -37,9 +37,9 @@ public:
 	required_device<palette_device> m_bgpalette;
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(missb2);
-	DECLARE_MACHINE_START(missb2);
-	DECLARE_MACHINE_RESET(missb2);
+	void init_missb2();
+	void machine_start_missb2();
+	void machine_reset_missb2();
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 };
@@ -417,7 +417,7 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 
 /* Machine Driver */
 
-MACHINE_START_MEMBER(missb2_state,missb2)
+void missb2_state::machine_start_missb2()
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
@@ -427,7 +427,7 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 	save_item(NAME(m_video_enable));
 }
 
-MACHINE_RESET_MEMBER(missb2_state,missb2)
+void missb2_state::machine_reset_missb2()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
@@ -569,7 +569,7 @@ void missb2_state::configure_banks()
 	membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
 }
 
-DRIVER_INIT_MEMBER(missb2_state,missb2)
+void missb2_state::init_missb2()
 {
 	configure_banks();
 	m_video_enable = 0;

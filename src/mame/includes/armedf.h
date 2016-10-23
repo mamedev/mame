@@ -79,14 +79,14 @@ public:
 	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
-	DECLARE_DRIVER_INIT(cclimbr2);
-	DECLARE_DRIVER_INIT(armedf);
-	DECLARE_DRIVER_INIT(legion);
-	DECLARE_DRIVER_INIT(terrafu);
-	DECLARE_DRIVER_INIT(legionjb);
-	DECLARE_DRIVER_INIT(kozure);
-	DECLARE_DRIVER_INIT(terraf);
-	DECLARE_DRIVER_INIT(terrafjb);
+	void init_cclimbr2();
+	void init_armedf();
+	void init_legion();
+	void init_terrafu();
+	void init_legionjb();
+	void init_kozure();
+	void init_terraf();
+	void init_terrafjb();
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type1);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type2);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type3);
@@ -94,10 +94,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_armedf_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(armedf);
-	DECLARE_MACHINE_RESET(armedf);
-	DECLARE_VIDEO_START(terraf);
-	DECLARE_VIDEO_START(armedf);
+	void machine_start_armedf();
+	void machine_reset_armedf();
+	void video_start_terraf();
+	void video_start_armedf();
 	uint32_t screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
@@ -122,7 +122,7 @@ public:
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_DRIVER_INIT(bigfghtr);
-	DECLARE_MACHINE_START(bigfghtr);
-	DECLARE_MACHINE_RESET(bigfghtr);
+	void init_bigfghtr();
+	void machine_start_bigfghtr();
+	void machine_reset_bigfghtr();
 };

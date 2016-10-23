@@ -54,12 +54,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
-	DECLARE_MACHINE_START(kayproii);
-	DECLARE_MACHINE_RESET(kaypro);
-	DECLARE_VIDEO_START(kaypro);
+	void machine_start_kayproii();
+	void machine_reset_kaypro();
+	void video_start_kaypro();
 	DECLARE_PALETTE_INIT(kaypro);
-	DECLARE_MACHINE_RESET(kay_kbd);
-	DECLARE_DRIVER_INIT(kaypro);
+	void machine_reset_kay_kbd();
+	void init_kaypro();
 	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
 	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

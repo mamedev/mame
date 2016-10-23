@@ -74,8 +74,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s9);
-	DECLARE_DRIVER_INIT(s9);
+	void machine_reset_s9();
+	void init_s9();
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -298,11 +298,11 @@ void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-MACHINE_RESET_MEMBER( s9_state, s9 )
+void s9_state::machine_reset_s9()
 {
 }
 
-DRIVER_INIT_MEMBER( s9_state, s9 )
+void s9_state::init_s9()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);

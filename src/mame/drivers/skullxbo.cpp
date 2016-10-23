@@ -69,7 +69,7 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 }
 
 
-MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::machine_reset_skullxbo()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -594,7 +594,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::init_skullxbo()
 {
 	memset(memregion("gfx1")->base() + 0x170000, 0, 0x20000);
 }

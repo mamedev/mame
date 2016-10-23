@@ -410,7 +410,7 @@ public:
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
-	DECLARE_DRIVER_INIT(aristmk4);
+	void init_aristmk4();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1657,7 +1657,7 @@ PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 	}
 }
 
-DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
+void aristmk4_state::init_aristmk4()
 {
 	m_shapeRomPtr = (uint8_t *)memregion("tile_gfx")->base();
 	memcpy(m_shapeRom,m_shapeRomPtr,sizeof(m_shapeRom)); // back up

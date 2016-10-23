@@ -57,9 +57,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
 	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
 
-	DECLARE_DRIVER_INIT(tokib);
-	DECLARE_DRIVER_INIT(jujuba);
-	DECLARE_DRIVER_INIT(toki);
+	void init_tokib();
+	void init_jujuba();
+	void init_toki();
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

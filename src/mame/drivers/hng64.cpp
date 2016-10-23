@@ -1385,12 +1385,12 @@ static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
+void hng64_state::init_hng64_reorder_gfx()
 {
 	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64)
+void hng64_state::init_hng64()
 {
 	/* 1 meg of virtual address space for the com cpu */
 	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
@@ -1399,46 +1399,46 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
 	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
 
-	DRIVER_INIT_CALL(hng64_reorder_gfx);
+	init_hng64_reorder_gfx();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
+void hng64_state::init_hng64_fght()
 {
 	m_no_machine_error_code = 0x01000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
+void hng64_state::init_fatfurwa()
 {
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = FIGHT_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,buriki)
+void hng64_state::init_buriki()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = BURIKI_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,ss64)
+void hng64_state::init_ss64()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = SAMSHO_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_race)
+void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02000000;
 	m_mcu_type = RACING_MCU;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
+void hng64_state::init_hng64_shoot()
 {
 	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
 void hng64_state::set_irq(uint32_t irq_vector)

@@ -222,7 +222,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gunpey_output_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
-	DECLARE_DRIVER_INIT(gunpey);
+	void init_gunpey();
 	virtual void video_start() override;
 	uint32_t screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
@@ -1485,7 +1485,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(gunpey_state,gunpey)
+void gunpey_state::init_gunpey()
 {
 	m_blit_rom = memregion("blit_data")->base();
 	m_blit_rom2 = memregion("blit_data2")->base();

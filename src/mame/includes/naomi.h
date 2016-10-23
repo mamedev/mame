@@ -55,19 +55,19 @@ class naomi_state : public dc_state
 
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_MACHINE_RESET(naomi);
-	DECLARE_DRIVER_INIT(atomiswave);
-	DECLARE_DRIVER_INIT(xtrmhnt2);
-	DECLARE_DRIVER_INIT(naomigd);
-	DECLARE_DRIVER_INIT(ggxx);
-	DECLARE_DRIVER_INIT(ggxxrl);
-	DECLARE_DRIVER_INIT(ggxxsla);
-	DECLARE_DRIVER_INIT(naomi2);
-	DECLARE_DRIVER_INIT(naomi);
-	DECLARE_DRIVER_INIT(naomigd_mp);
-	DECLARE_DRIVER_INIT(sfz3ugd);
-	DECLARE_DRIVER_INIT(hotd2);
-	DECLARE_DRIVER_INIT(naomi_mp);
+	void machine_reset_naomi();
+	void init_atomiswave();
+	void init_xtrmhnt2();
+	void init_naomigd();
+	void init_ggxx();
+	void init_ggxxrl();
+	void init_ggxxsla();
+	void init_naomi2();
+	void init_naomi();
+	void init_naomigd_mp();
+	void init_sfz3ugd();
+	void init_hotd2();
+	void init_naomi_mp();
 
 	DECLARE_READ64_MEMBER( naomi_arm_r );
 	DECLARE_WRITE64_MEMBER( naomi_arm_w );

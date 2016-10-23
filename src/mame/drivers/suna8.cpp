@@ -59,7 +59,7 @@ Notes:
                                 Hard Head
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,hardhead)
+void suna8_state::init_hardhead()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -81,7 +81,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 }
 
 /* Non encrypted bootleg */
-DRIVER_INIT_MEMBER(suna8_state,hardhedb)
+void suna8_state::init_hardhedb()
 {
 	m_bank0d->set_base(memregion("maincpu")->base() + 0x48000);
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -135,7 +135,7 @@ uint8_t *suna8_state::brickzn_decrypt()
 	return decrypt;
 }
 
-DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
+void suna8_state::init_brickzn_common()
 {
 	m_decrypt = brickzn_decrypt();
 
@@ -149,9 +149,9 @@ DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
 	m_bank1d->configure_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickzn)
+void suna8_state::init_brickzn()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -167,9 +167,9 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn)
 	m_decrypt[0x25A4] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickznv5)
+void suna8_state::init_brickznv5()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -185,9 +185,9 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv5)
 	m_decrypt[0x2593] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickznv4)
+void suna8_state::init_brickznv4()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -203,7 +203,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 	m_decrypt[0x256c] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickzn11)
+void suna8_state::init_brickzn11()
 {
 	m_bank1->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
@@ -213,7 +213,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
                                 Hard Head 2
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,hardhea2)
+void suna8_state::init_hardhea2()
 {
 	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
@@ -294,7 +294,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), uint8_t, 0x2000 * 2), 0x2000);
 }
 
-DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
+void suna8_state::init_hardhea2b()
 {
 	// no address scramble?
 	// code/data split in first ROM?
@@ -307,7 +307,7 @@ DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
                                 Star Fighter
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,starfigh)
+void suna8_state::init_starfigh()
 {
 	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
@@ -392,7 +392,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
                                 Spark Man
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,sparkman)
+void suna8_state::init_sparkman()
 {
 	uint8_t   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
@@ -1980,7 +1980,7 @@ MACHINE_CONFIG_END
 
 /* 1 x 24 MHz crystal */
 
-MACHINE_RESET_MEMBER(suna8_state,brickzn)
+void suna8_state::machine_reset_brickzn()
 {
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
 	m_paletteram_enab = 1;  // for brickzn11
@@ -2070,7 +2070,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 		if (m_nmi_enable)   m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(suna8_state,hardhea2)
+void suna8_state::machine_reset_hardhea2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
@@ -3038,7 +3038,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,suna8)
+void suna8_state::init_suna8()
 {
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }

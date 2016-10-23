@@ -127,7 +127,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-SOUND_START_MEMBER(redalert_state,redalert)
+void redalert_state::sound_start_redalert()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-SOUND_START_MEMBER( redalert_state, demoneye )
+void redalert_state::sound_start_demoneye()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));

@@ -1090,7 +1090,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_start_mitchell()
 {
 	save_item(NAME(m_sample_buffer));
 	save_item(NAME(m_sample_select));
@@ -1102,7 +1102,7 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 //  save_item(NAME(init_eeprom_count));
 }
 
-MACHINE_RESET_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_reset_mitchell()
 {
 	m_sample_buffer = 0;
 	m_sample_select = 0;
@@ -2187,111 +2187,111 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 }
 
 
-DRIVER_INIT_MEMBER(mitchell_state,dokaben)
+void mitchell_state::init_dokaben()
 {
 	m_input_type = 0;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pang)
+void mitchell_state::init_pang()
 {
 	m_input_type = 0;
 	configure_banks(pang_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pangb)
+void mitchell_state::init_pangb()
 {
 	m_input_type = 0;
 	bootleg_decode();
 	if (m_nvram != nullptr)
 		m_nvram->set_base(&m_dummy_nvram, sizeof(m_dummy_nvram));   /* for pangba */
 }
-DRIVER_INIT_MEMBER(mitchell_state,cworld)
+void mitchell_state::init_cworld()
 {
 	m_input_type = 0;
 	configure_banks(cworld_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,hatena)
+void mitchell_state::init_hatena()
 {
 	m_input_type = 0;
 	configure_banks(hatena_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,spang)
+void mitchell_state::init_spang()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(spang_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangbl)
+void mitchell_state::init_spangbl()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangj)
+void mitchell_state::init_spangj()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(spangj_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,sbbros)
+void mitchell_state::init_sbbros()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(sbbros_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qtono1)
+void mitchell_state::init_qtono1()
 {
 	m_input_type = 0;
 	configure_banks(qtono1_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
+void mitchell_state::init_qsangoku()
 {
 	m_input_type = 0;
 	configure_banks(qsangoku_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
+void mitchell_state::init_mgakuen()
 {
 	m_input_type = 1;
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
+void mitchell_state::init_mgakuen2()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladies)
+void mitchell_state::init_pkladies()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
+void mitchell_state::init_pkladiesbl()
 {
 	m_input_type = 1;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,marukin)
+void mitchell_state::init_marukin()
 {
 	m_input_type = 1;
 	configure_banks(marukin_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,block)
+void mitchell_state::init_block()
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
 	configure_banks(block_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,blockbl)
+void mitchell_state::init_blockbl()
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mstworld)
+void mitchell_state::init_mstworld()
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();

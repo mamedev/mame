@@ -1929,7 +1929,7 @@ WRITE8_MEMBER(tmnt_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-MACHINE_START_MEMBER(tmnt_state,common)
+void tmnt_state::machine_start_common()
 {
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_last));
@@ -1941,7 +1941,7 @@ MACHINE_START_MEMBER(tmnt_state,common)
 	save_item(NAME(m_irq5_mask));
 }
 
-MACHINE_RESET_MEMBER(tmnt_state,common)
+void tmnt_state::machine_reset_common()
 {
 	m_toggle = 0;
 	m_last = 0;
@@ -2060,7 +2060,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(tmnt_state,tmnt)
+void tmnt_state::machine_reset_tmnt()
 {
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
 	m_upd7759->start_w(0);
@@ -2381,9 +2381,9 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(tmnt_state,prmrsocr)
+void tmnt_state::machine_start_prmrsocr()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
@@ -4162,7 +4162,7 @@ static void chunky_to_planar(memory_region *rgn)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, mia)
+void tmnt_state::init_mia()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4187,7 +4187,7 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, tmnt)
+void tmnt_state::init_tmnt()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4249,7 +4249,7 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::init_cuebrick()
 {
 	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
 

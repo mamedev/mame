@@ -718,7 +718,7 @@ ROM_START( popeyej )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(popeye_state,skyskipr)
+void popeye_state::init_skyskipr()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -737,7 +737,7 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 	save_item(NAME(m_prot_shift));
 }
 
-DRIVER_INIT_MEMBER(popeye_state,popeye)
+void popeye_state::init_popeye()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();

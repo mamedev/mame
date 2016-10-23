@@ -48,7 +48,7 @@ public:
 	DECLARE_READ16_MEMBER(y_r);
 	DECLARE_WRITE16_MEMBER(y_w);
 	DECLARE_WRITE16_MEMBER(clk_w);
-	DECLARE_DRIVER_INIT(galaxygame);
+	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
@@ -387,7 +387,7 @@ static uint8_t read_uint8(uint8_t *pval, int pos, const uint8_t* line, int linel
 	return 1;
 }
 
-DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
+void galaxygame_state::init_galaxygame()
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	uint8_t *code = memregion("code")->base();

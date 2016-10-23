@@ -37,9 +37,9 @@ public:
 	void foodf_set_flip(int flip);
 	DECLARE_READ8_MEMBER(pot_r);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(foodf);
-	DECLARE_MACHINE_RESET(foodf);
-	DECLARE_VIDEO_START(foodf);
+	void machine_start_foodf();
+	void machine_reset_foodf();
+	void video_start_foodf();
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
 };

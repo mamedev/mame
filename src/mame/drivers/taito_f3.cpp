@@ -423,12 +423,12 @@ static const uint16_t recalh_eeprom[64] = {
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-MACHINE_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_start_f3()
 {
 	save_item(NAME(m_coin_word));
 }
 
-MACHINE_RESET_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_reset_f3()
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -3873,109 +3873,109 @@ static void tile_decode(running_machine &machine)
 	}
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ringrage)
+void taito_f3_state::init_ringrage()
 {
 	m_f3_game=RINGRAGE;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,arabianm)
+void taito_f3_state::init_arabianm()
 {
 	m_f3_game=ARABIANM;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ridingf)
+void taito_f3_state::init_ridingf()
 {
 	m_f3_game=RIDINGF;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gseeker)
+void taito_f3_state::init_gseeker()
 {
 	m_f3_game=GSEEKER;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gunlock)
+void taito_f3_state::init_gunlock()
 {
 	m_f3_game=GUNLOCK;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,elvactr)
+void taito_f3_state::init_elvactr()
 {
 	m_f3_game=EACTION2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,cupfinal)
+void taito_f3_state::init_cupfinal()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,trstaroj)
+void taito_f3_state::init_trstaroj()
 {
 	m_f3_game=TRSTAR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,scfinals)
+void taito_f3_state::init_scfinals()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,lightbr)
+void taito_f3_state::init_lightbr()
 {
 	m_f3_game=LIGHTBR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,kaiserkn)
+void taito_f3_state::init_kaiserkn()
 {
 	m_f3_game=KAISERKN;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,dariusg)
+void taito_f3_state::init_dariusg()
 {
 	m_f3_game=DARIUSG;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,spcinvdj)
+void taito_f3_state::init_spcinvdj()
 {
 	m_f3_game=SPCINVDX;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,qtheater)
+void taito_f3_state::init_qtheater()
 {
 	m_f3_game=QTHEATER;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,spcinv95)
+void taito_f3_state::init_spcinv95()
 {
 	m_f3_game=SPCINV95;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,gekirido)
+void taito_f3_state::init_gekirido()
 {
 	m_f3_game=GEKIRIDO;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,ktiger2)
+void taito_f3_state::init_ktiger2()
 {
 	m_f3_game=KTIGER2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubsymph)
+void taito_f3_state::init_bubsymph()
 {
 	m_f3_game=BUBSYMPH;
 	tile_decode(machine());
@@ -4005,7 +4005,7 @@ WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 }
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
+void taito_f3_state::init_bubsympb()
 {
 	m_f3_game=BUBSYMPH;
 	//tile_decode(machine());
@@ -4034,31 +4034,31 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 }
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,bubblem)
+void taito_f3_state::init_bubblem()
 {
 	m_f3_game=BUBBLEM;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,cleopatr)
+void taito_f3_state::init_cleopatr()
 {
 	m_f3_game=CLEOPATR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,popnpop)
+void taito_f3_state::init_popnpop()
 {
 	m_f3_game=POPNPOP;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,landmakr)
+void taito_f3_state::init_landmakr()
 {
 	m_f3_game=LANDMAKR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
+void taito_f3_state::init_landmkrp()
 {
 	uint32_t *RAM = (uint32_t *)memregion("maincpu")->base();
 
@@ -4073,31 +4073,31 @@ DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble3)
+void taito_f3_state::init_pbobble3()
 {
 	m_f3_game=PBOBBLE3;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble4)
+void taito_f3_state::init_pbobble4()
 {
 	m_f3_game=PBOBBLE4;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,quizhuhu)
+void taito_f3_state::init_quizhuhu()
 {
 	m_f3_game=QUIZHUHU;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobble2)
+void taito_f3_state::init_pbobble2()
 {
 	m_f3_game=PBOBBLE2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
+void taito_f3_state::init_pbobbl2p()
 {
 	// has 040092: beq     $30000; (2+)
 	// which eventually causes the game to crash
@@ -4115,55 +4115,55 @@ DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
 
 
 
-DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2x)
+void taito_f3_state::init_pbobbl2x()
 {
 	m_f3_game=PBOBBLE2;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,hthero95)
+void taito_f3_state::init_hthero95()
 {
 	m_f3_game=HTHERO95;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,kirameki)
+void taito_f3_state::init_kirameki()
 {
 	m_f3_game=KIRAMEKI;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,puchicar)
+void taito_f3_state::init_puchicar()
 {
 	m_f3_game=PUCHICAR;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,twinqix)
+void taito_f3_state::init_twinqix()
 {
 	m_f3_game=TWINQIX;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,arkretrn)
+void taito_f3_state::init_arkretrn()
 {
 	m_f3_game=ARKRETRN;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,intcup94)
+void taito_f3_state::init_intcup94()
 {
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,recalh)
+void taito_f3_state::init_recalh()
 {
 	m_f3_game=RECALH;
 	tile_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(taito_f3_state,commandw)
+void taito_f3_state::init_commandw()
 {
 	m_f3_game=COMMANDW;
 	tile_decode(machine());

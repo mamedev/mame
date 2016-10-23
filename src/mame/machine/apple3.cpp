@@ -659,7 +659,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
 	apple3_irq_update();
 }
 
-MACHINE_RESET_MEMBER(apple3_state,apple3)
+void apple3_state::machine_reset_apple3()
 {
 	m_indir_bank = 0;
 	m_sync = false;
@@ -705,7 +705,7 @@ uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 	return result;
 }
 
-DRIVER_INIT_MEMBER(apple3_state,apple3)
+void apple3_state::init_apple3()
 {
 	m_enable_mask = 0;
 

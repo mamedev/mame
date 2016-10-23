@@ -560,7 +560,7 @@ static GFXDECODE_START( sraider )
 	GFXDECODE_ENTRY( "gfx3", 0, gridlayout2,   4*8+4*16+32,  1 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(redclash_state,sraider)
+void redclash_state::machine_start_sraider()
 {
 	save_item(NAME(m_grid_color));
 	save_item(NAME(m_sound_low));
@@ -578,7 +578,7 @@ MACHINE_START_MEMBER(redclash_state,sraider)
 	save_item(NAME(m_stars_count));
 }
 
-MACHINE_RESET_MEMBER(redclash_state,sraider)
+void redclash_state::machine_reset_sraider()
 {
 	int i;
 
@@ -601,7 +601,7 @@ MACHINE_RESET_MEMBER(redclash_state,sraider)
 }
 
 
-MACHINE_START_MEMBER(redclash_state,redclash)
+void redclash_state::machine_start_redclash()
 {
 	save_item(NAME(m_star_speed));
 	save_item(NAME(m_gfxbank));
@@ -612,7 +612,7 @@ MACHINE_START_MEMBER(redclash_state,redclash)
 	save_item(NAME(m_stars_count));
 }
 
-MACHINE_RESET_MEMBER(redclash_state,redclash)
+void redclash_state::machine_reset_redclash()
 {
 	m_star_speed = 0;
 	m_gfxbank = 0;
@@ -926,7 +926,7 @@ ROM_START( sraider )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(redclash_state,redclash)
+void redclash_state::init_redclash()
 {
 	int i,j;
 	const uint8_t *src = memregion("gfx2")->base();

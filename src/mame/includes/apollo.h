@@ -189,18 +189,18 @@ public:
 	DECLARE_READ8_MEMBER(dn5500_11500_r);
 	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
 	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	DECLARE_DRIVER_INIT(dsp3000);
-	DECLARE_DRIVER_INIT(dsp5500);
-	DECLARE_DRIVER_INIT(dn3500);
-	DECLARE_DRIVER_INIT(dn3000);
-	DECLARE_DRIVER_INIT(dsp3500);
-	DECLARE_DRIVER_INIT(dn5500);
-	DECLARE_DRIVER_INIT(apollo);
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(apollo);
-	DECLARE_MACHINE_START(apollo);
+	void machine_reset_apollo();
+	void machine_start_apollo();
 
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);

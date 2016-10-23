@@ -854,7 +854,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(toki_state,toki)
+void toki_state::init_toki()
 {
 	uint8_t *ROM = memregion("oki")->base();
 	std::vector<uint8_t> buffer(0x20000);
@@ -868,7 +868,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 }
 
 
-DRIVER_INIT_MEMBER(toki_state,tokib)
+void toki_state::init_tokib()
 {
 	std::vector<uint8_t> temp(65536 * 2);
 	int i, offs, len;
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	save_item(NAME(m_toggle));
 }
 
-DRIVER_INIT_MEMBER(toki_state,jujuba)
+void toki_state::init_jujuba()
 {
 	/* Program ROMs are bitswapped */
 	{

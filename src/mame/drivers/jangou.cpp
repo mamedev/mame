@@ -90,16 +90,16 @@ public:
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
 	DECLARE_READ8_MEMBER(input_mux_r);
 	DECLARE_READ8_MEMBER(input_system_r);
-	DECLARE_DRIVER_INIT(jngolady);
-	DECLARE_DRIVER_INIT(luckygrl);
+	void init_jngolady();
+	void init_luckygrl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jangou);
-	DECLARE_MACHINE_START(jngolady);
-	DECLARE_MACHINE_RESET(jngolady);
-	DECLARE_MACHINE_START(common);
-	DECLARE_MACHINE_RESET(common);
+	void machine_start_jngolady();
+	void machine_reset_jngolady();
+	void machine_start_common();
+	void machine_reset_common();
 	uint32_t screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
@@ -784,14 +784,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(jangou_state,common)
+void jangou_state::machine_start_common()
 {
 	save_item(NAME(m_mux_data));
 }
 
 void jangou_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_cvsd_shiftreg));
 	save_item(NAME(m_cvsd_shift_cnt));
@@ -801,9 +801,9 @@ void jangou_state::machine_start()
 	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
-MACHINE_START_MEMBER(jangou_state,jngolady)
+void jangou_state::machine_start_jngolady()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_adpcm_byte));
 	save_item(NAME(m_msm5205_vclk_toggle));
@@ -811,22 +811,22 @@ MACHINE_START_MEMBER(jangou_state,jngolady)
 	save_item(NAME(m_z80_latch));
 }
 
-MACHINE_RESET_MEMBER(jangou_state,common)
+void jangou_state::machine_reset_common()
 {
 	m_mux_data = 0;
 }
 
 void jangou_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_cvsd_shiftreg = 0;
 	m_cvsd_shift_cnt = 0;
 }
 
-MACHINE_RESET_MEMBER(jangou_state,jngolady)
+void jangou_state::machine_reset_jngolady()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_adpcm_byte = 0;
 	m_msm5205_vclk_toggle = 0;
@@ -1210,12 +1210,12 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 	return machine().rand();
 }
 
-DRIVER_INIT_MEMBER(jangou_state,jngolady)
+void jangou_state::init_jngolady()
 {
 	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
 }
 
-DRIVER_INIT_MEMBER(jangou_state,luckygrl)
+void jangou_state::init_luckygrl()
 {
 	// this is WRONG
 	int A;

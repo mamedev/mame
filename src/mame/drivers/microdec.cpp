@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(portf7_r);
 	DECLARE_WRITE8_MEMBER(portf7_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
-	DECLARE_DRIVER_INIT(microdec);
+	void init_microdec();
 private:
 	uint8_t m_term_data;
 	uint8_t m_portf8;
@@ -192,7 +192,7 @@ static SLOT_INTERFACE_START( microdec_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-DRIVER_INIT_MEMBER( microdec_state, microdec )
+void microdec_state::init_microdec()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

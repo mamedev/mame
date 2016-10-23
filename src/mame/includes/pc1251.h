@@ -37,7 +37,7 @@ public:
 	int m_power;
 	uint8_t m_reg[0x100];
 
-	DECLARE_DRIVER_INIT(pc1251);
+	void init_pc1251();
 	uint32_t screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(pc1251_outa);
 	DECLARE_WRITE8_MEMBER(pc1251_outb);
@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1251_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1251_lcd_write);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(pc1260);
+	void machine_start_pc1260();
 	required_device<sc61860_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

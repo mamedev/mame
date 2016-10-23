@@ -408,7 +408,7 @@ ROM_START( sbaskete )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
+void sbasketb_state::init_sbasketb()
 {
 }
 

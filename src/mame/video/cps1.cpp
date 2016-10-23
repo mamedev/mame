@@ -1661,7 +1661,7 @@ CPS1 VIDEO RENDERER
 #define CPS2_OBJ_YOFFS  0x0a    /* Y offset (always 0x0010) */
 
 
-MACHINE_RESET_MEMBER(cps_state,cps)
+void cps_state::machine_reset_cps()
 {
 	const char *gamename = machine().system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
@@ -1900,7 +1900,7 @@ void cps_state::cps2_gfx_decode()
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,cps1)
+void cps_state::init_cps1()
 {
 	m_scanline1 = 0;
 	m_scanline2 = 0;
@@ -1912,7 +1912,7 @@ DRIVER_INIT_MEMBER(cps_state,cps1)
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2_video)
+void cps_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 
@@ -2221,11 +2221,11 @@ void cps_state::cps1_update_transmasks()
 	}
 }
 
-VIDEO_START_MEMBER(cps_state,cps)
+void cps_state::video_start_cps()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(cps);
+	machine_reset_cps();
 
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
@@ -2318,16 +2318,16 @@ VIDEO_START_MEMBER(cps_state,cps)
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
-VIDEO_START_MEMBER(cps_state,cps1)
+void cps_state::video_start_cps1()
 {
 	m_cps_version = 1;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
-VIDEO_START_MEMBER(cps_state,cps2)
+void cps_state::video_start_cps2()
 {
 	m_cps_version = 2;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
 /***************************************************************************

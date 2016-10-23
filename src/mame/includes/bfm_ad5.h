@@ -17,6 +17,6 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(ad5);
+	void init_ad5();
 	INTERRUPT_GEN_MEMBER(ad5_fake_timer_int);
 };

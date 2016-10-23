@@ -53,7 +53,7 @@ public:
 
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	DECLARE_DRIVER_INIT(gizmondo);
+	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 *******************************************************************************/
 
-DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
+void gizmondo_state::init_gizmondo()
 {
 	// do nothing
 }

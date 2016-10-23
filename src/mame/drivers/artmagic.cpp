@@ -1135,7 +1135,7 @@ void artmagic_state::decrypt_cheesech()
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,ultennis)
+void artmagic_state::init_ultennis()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1146,7 +1146,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,cheesech)
+void artmagic_state::init_cheesech()
 {
 	decrypt_cheesech();
 	m_is_stoneball = 0;
@@ -1154,14 +1154,14 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,stonebal)
+void artmagic_state::init_stonebal()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-DRIVER_INIT_MEMBER(artmagic_state,shtstar)
+void artmagic_state::init_shtstar()
 {
 	/* wrong */
 	decrypt_ultennis();

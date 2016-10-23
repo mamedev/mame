@@ -543,7 +543,7 @@ WRITE8_MEMBER(lsasquad_state::unk)
 {
 }
 
-MACHINE_START_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_start_lsasquad()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -567,7 +567,7 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 	save_item(NAME(m_sound_result));
 }
 
-MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_reset_lsasquad()
 {
 	m_sound_pending = 0;
 	m_sound_nmi_enable = 0;

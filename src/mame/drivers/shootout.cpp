@@ -390,7 +390,7 @@ ROM_START( shootoutb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(shootout_state,shootout)
+void shootout_state::init_shootout()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }

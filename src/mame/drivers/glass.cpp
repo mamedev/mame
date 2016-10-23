@@ -423,7 +423,7 @@ WRITE16_MEMBER( glass_state::mainram_w )
 
 }
 
-DRIVER_INIT_MEMBER(glass_state, glass)
+void glass_state::init_glass()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -446,9 +446,9 @@ DRIVER_INIT_MEMBER(glass_state, glass)
 }
 
 
-DRIVER_INIT_MEMBER(glass_state,glassp)
+void glass_state::init_glassp()
 {
-	DRIVER_INIT_CALL(glass);
+	init_glass();
 
 	/* install custom handler over RAM for protection */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::mainram_r), this), write16_delegate(FUNC(glass_state::mainram_w),this));

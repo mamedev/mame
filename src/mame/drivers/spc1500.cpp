@@ -280,7 +280,7 @@ public:
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_PALETTE_INIT(spc);
-	DECLARE_VIDEO_START(spc);
+	void video_start_spc();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
@@ -504,7 +504,7 @@ PALETTE_INIT_MEMBER(spc1500_state,spc)
 	palette.set_pen_color(7,rgb_t(0xff,0xff,0xff));
 }
 
-VIDEO_START_MEMBER(spc1500_state, spc)
+void spc1500_state::video_start_spc()
 {
 }
 

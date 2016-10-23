@@ -2836,14 +2836,14 @@ WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
                       MACHINE DRIVERS
 ***********************************************************/
 
-MACHINE_START_MEMBER(taitof2_state,common)
+void taitof2_state::machine_start_common()
 {
 	m_int6_timer = timer_alloc(TIMER_TAITOF2_INTERRUPT6);
 }
 
-MACHINE_START_MEMBER(taitof2_state,f2)
+void taitof2_state::machine_start_f2()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank2")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -5501,7 +5501,7 @@ ROM_START( driveout )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitof2_state,finalb)
+void taitof2_state::init_finalb()
 {
 	int i;
 	uint8_t data;
@@ -5528,7 +5528,7 @@ DRIVER_INIT_MEMBER(taitof2_state,finalb)
 	}
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,cameltry)
+void taitof2_state::init_cameltry()
 {
 	m_last[0] = 0;
 	m_last[1] = 0;
@@ -5537,7 +5537,7 @@ DRIVER_INIT_MEMBER(taitof2_state,cameltry)
 }
 
 
-DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
+void taitof2_state::init_mjnquest()
 {
 	int i, len = memregion("gfx2")->bytes();
 	uint8_t *gfx = memregion("gfx2")->base();
@@ -5558,7 +5558,7 @@ DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 	save_item(NAME(m_mjnquest_input));
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,driveout)
+void taitof2_state::init_driveout()
 {
 	m_driveout_sound_latch = 0;
 	m_oki_bank = 0;

@@ -688,16 +688,16 @@ private:
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst);
 	uint16_t egc_shift(int plane, uint16_t val);
 public:
-	DECLARE_MACHINE_START(pc9801_common);
-	DECLARE_MACHINE_START(pc9801f);
-	DECLARE_MACHINE_START(pc9801rs);
-	DECLARE_MACHINE_START(pc9801bx2);
-	DECLARE_MACHINE_START(pc9821);
-	DECLARE_MACHINE_START(pc9821ap2);
-	DECLARE_MACHINE_RESET(pc9801_common);
-	DECLARE_MACHINE_RESET(pc9801f);
-	DECLARE_MACHINE_RESET(pc9801rs);
-	DECLARE_MACHINE_RESET(pc9821);
+	void machine_start_pc9801_common();
+	void machine_start_pc9801f();
+	void machine_start_pc9801rs();
+	void machine_start_pc9801bx2();
+	void machine_start_pc9821();
+	void machine_start_pc9821ap2();
+	void machine_reset_pc9801_common();
+	void machine_reset_pc9801f();
+	void machine_reset_pc9801rs();
+	void machine_reset_pc9821();
 
 	DECLARE_PALETTE_INIT(pc9801);
 	INTERRUPT_GEN_MEMBER(vrtc_irq);
@@ -730,7 +730,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
 	inline void set_dma_channel(int channel, int state);
 	virtual void device_reset_after_children() override;
 };
@@ -2957,7 +2957,7 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801_common)
+void pc9801_state::machine_start_pc9801_common()
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -2977,45 +2977,45 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	save_pointer(NAME(m_egc.regs), 8);
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801f)
+void pc9801_state::machine_start_pc9801f()
 {
-	MACHINE_START_CALL_MEMBER(pc9801_common);
+	machine_start_pc9801_common();
 
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
 	m_sys_type = 0x00 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801rs)
+void pc9801_state::machine_start_pc9801rs()
 {
-	MACHINE_START_CALL_MEMBER(pc9801_common);
+	machine_start_pc9801_common();
 
 	m_sys_type = 0x80 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801bx2)
+void pc9801_state::machine_start_pc9801bx2()
 {
-	MACHINE_START_CALL_MEMBER(pc9801rs);
+	machine_start_pc9801rs();
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
 
-MACHINE_START_MEMBER(pc9801_state,pc9821)
+void pc9801_state::machine_start_pc9821()
 {
-	MACHINE_START_CALL_MEMBER(pc9801rs);
+	machine_start_pc9801rs();
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
+void pc9801_state::machine_start_pc9821ap2()
 {
-	MACHINE_START_CALL_MEMBER(pc9821);
+	machine_start_pc9821();
 
 	// ...
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
+void pc9801_state::machine_reset_pc9801_common()
 {
 	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
@@ -3041,9 +3041,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
+void pc9801_state::machine_reset_pc9801f()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801_common);
+	machine_reset_pc9801_common();
 
 	uint8_t op_mode;
 	uint8_t *ROM;
@@ -3063,9 +3063,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
+void pc9801_state::machine_reset_pc9801rs()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801_common);
+	machine_reset_pc9801_common();
 
 	m_gate_a20 = 0;
 	m_fdc_ctrl = 3;
@@ -3083,9 +3083,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	}
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9821)
+void pc9801_state::machine_reset_pc9821()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801rs);
+	machine_reset_pc9801rs();
 
 	m_pc9821_window_bank = 0x08;
 }
@@ -3783,7 +3783,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
+void pc9801_state::init_pc9801_kanji()
 {
 	#define copy_kanji_strip(_dst,_src,_fill_type) \
 	for(i=_dst,k=_src;i<_dst+0x20;i++,k++) \

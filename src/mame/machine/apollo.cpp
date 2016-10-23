@@ -1205,12 +1205,12 @@ MACHINE_CONFIG_FRAGMENT( apollo_terminal )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(apollo_state,apollo)
+void apollo_state::init_apollo()
 {
 	MLOG1(("driver_init_apollo"));
 }
 
-MACHINE_START_MEMBER(apollo_state,apollo)
+void apollo_state::machine_start_apollo()
 {
 	MLOG1(("machine_start_apollo"));
 
@@ -1225,7 +1225,7 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 	m_cur_eop = false;
 }
 
-MACHINE_RESET_MEMBER(apollo_state,apollo)
+void apollo_state::machine_reset_apollo()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t year = apollo_rtc_r(space, 9);

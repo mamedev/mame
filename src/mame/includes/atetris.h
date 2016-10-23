@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_WRITE8_MEMBER(nvram_enable_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_DRIVER_INIT(atetris);
+	void init_atetris();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

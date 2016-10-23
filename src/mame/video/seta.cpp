@@ -441,9 +441,9 @@ WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 
 
 /* 2 layers */
-VIDEO_START_MEMBER(seta_state,seta_2_layers)
+void seta_state::video_start_seta_2_layers()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -476,9 +476,9 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	m_tilemap_3->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
+void seta_state::video_start_oisipuzl_2_layers()
 {
-	VIDEO_START_CALL_MEMBER(seta_2_layers);
+	video_start_seta_2_layers();
 	m_tilemaps_flip = 1;
 
 	// position kludges
@@ -487,9 +487,9 @@ VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
 
 
 /* 1 layer */
-VIDEO_START_MEMBER(seta_state,seta_1_layer)
+void seta_state::video_start_seta_1_layer()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -509,18 +509,18 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	m_tilemap_1->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(seta_state,setaroul_1_layer)
+void seta_state::video_start_setaroul_1_layer()
 {
-	VIDEO_START_CALL_MEMBER(seta_1_layer);
+	video_start_seta_1_layer();
 
 	// position kludges
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
-VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
+void seta_state::video_start_twineagl_1_layer()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -547,7 +547,7 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 }
 
 /* NO layers, only sprites */
-VIDEO_START_MEMBER(seta_state,seta_no_layers)
+void seta_state::video_start_seta_no_layers()
 {
 	m_tilemap_0 = nullptr;
 	m_tilemap_1 = nullptr;
@@ -567,9 +567,9 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
-VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
+void seta_state::video_start_kyustrkr_no_layers()
 {
-	VIDEO_START_CALL_MEMBER(seta_no_layers);
+	video_start_seta_no_layers();
 
 	// position kludges
 	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );

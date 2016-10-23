@@ -156,14 +156,14 @@ void deco32_state::video_start()
 	save_item(NAME(m_pf4_rowscroll));
 }
 
-VIDEO_START_MEMBER(deco32_state,captaven)
+void deco32_state::video_start_captaven()
 {
 	m_has_ace_ram=0;
 
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER(deco32_state,fghthist)
+void deco32_state::video_start_fghthist()
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_sprgen->alloc_sprite_bitmap();
@@ -173,7 +173,7 @@ VIDEO_START_MEMBER(deco32_state,fghthist)
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER(deco32_state,nslasher)
+void deco32_state::video_start_nslasher()
 {
 	int width, height;
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
@@ -201,7 +201,7 @@ void dragngun_state::video_start()
 	save_item(NAME(m_pf4_rowscroll));
 }
 
-VIDEO_START_MEMBER(dragngun_state,dragngun)
+void dragngun_state::video_start_dragngun()
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
@@ -214,7 +214,7 @@ VIDEO_START_MEMBER(dragngun_state,dragngun)
 	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 
-VIDEO_START_MEMBER(dragngun_state,lockload)
+void dragngun_state::video_start_lockload()
 {
 	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);

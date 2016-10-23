@@ -1096,7 +1096,7 @@ ROM_START( cbombersp )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(undrfire_state,undrfire)
+void undrfire_state::init_undrfire()
 {
 	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();
@@ -1125,7 +1125,7 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 }
 
 
-DRIVER_INIT_MEMBER(undrfire_state,cbombers)
+void undrfire_state::init_cbombers()
 {
 	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();

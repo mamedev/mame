@@ -251,7 +251,7 @@ public:
 	DECLARE_WRITE64_MEMBER(cde_w);
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
-	DECLARE_DRIVER_INIT(m2);
+	void init_m2();
 	virtual void video_start() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
@@ -1327,7 +1327,7 @@ ROM_START(3do_m2)
 	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(1) )
 ROM_END
 
-DRIVER_INIT_MEMBER(konamim2_state,m2)
+void konamim2_state::init_m2()
 {
 	m_unk3 = U64(0xffffffffffffffff);
 	m_unk20004 = 0;

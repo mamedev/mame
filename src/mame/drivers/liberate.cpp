@@ -702,7 +702,7 @@ INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(liberate_state,liberate)
+void liberate_state::machine_start_liberate()
 {
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));
@@ -713,7 +713,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 	save_item(NAME(m_io_ram));
 }
 
-MACHINE_RESET_MEMBER(liberate_state,liberate)
+void liberate_state::machine_reset_liberate()
 {
 	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 
@@ -1263,7 +1263,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(liberate_state,prosport)
+void liberate_state::init_prosport()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	int i;
@@ -1274,14 +1274,14 @@ DRIVER_INIT_MEMBER(liberate_state,prosport)
 
 }
 
-DRIVER_INIT_MEMBER(liberate_state,yellowcb)
+void liberate_state::init_yellowcb()
 {
-	DRIVER_INIT_CALL(prosport);
+	init_prosport();
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
-DRIVER_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::init_liberate()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

@@ -10,7 +10,7 @@
 
 #include "includes/zx.h"
 
-DRIVER_INIT_MEMBER(zx_state,zx)
+void zx_state::init_zx()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_tape_input = timer_alloc(TIMER_TAPE_INPUT);

@@ -61,8 +61,8 @@ public:
 	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
 	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
-	DECLARE_DRIVER_INIT(crshrace2);
-	DECLARE_DRIVER_INIT(crshrace);
+	void init_crshrace2();
+	void init_crshrace();
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_start() override;

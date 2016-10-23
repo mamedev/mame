@@ -370,7 +370,7 @@ void popeye_state::video_start()
 	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
 }
 
-VIDEO_START_MEMBER(popeye_state,popeye)
+void popeye_state::video_start_popeye()
 {
 	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
 	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);

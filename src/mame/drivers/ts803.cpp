@@ -86,7 +86,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	DECLARE_DRIVER_INIT(ts803);
+	void init_ts803();
 	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
 
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -457,7 +457,7 @@ void ts803_state::machine_reset()
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER( ts803_state, ts803 )
+void ts803_state::init_ts803()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);

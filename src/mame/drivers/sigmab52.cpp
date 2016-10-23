@@ -160,7 +160,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(tower_lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_enable_w);
-	DECLARE_DRIVER_INIT(jwildb52);
+	void init_jwildb52();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
 	void audiocpu_irq_update();
@@ -715,7 +715,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
+void sigmab52_state::init_jwildb52()
 {
 }
 

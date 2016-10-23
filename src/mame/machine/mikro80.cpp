@@ -14,7 +14,7 @@
 #include "includes/mikro80.h"
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(mikro80_state,mikro80)
+void mikro80_state::init_mikro80()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -24,9 +24,9 @@ DRIVER_INIT_MEMBER(mikro80_state,mikro80)
 	m_key_mask = 0x7f;
 }
 
-DRIVER_INIT_MEMBER(mikro80_state,radio99)
+void mikro80_state::init_radio99()
 {
-	DRIVER_INIT_CALL(mikro80);
+	init_mikro80();
 	m_key_mask = 0xff;
 }
 

@@ -775,7 +775,7 @@ ROM_START( ringkingw )
 	ROM_LOAD( "prom1.bin",    0x0800, 0x0400, CRC(913f5975) SHA1(3d1e40eeb4d5a3a4bd42ec73d05bfca13b2f1805) ) /* blue component */
 ROM_END
 
-DRIVER_INIT_MEMBER(kingofb_state,ringking3)
+void kingofb_state::init_ringking3()
 {
 	int i;
 	uint8_t *RAM = memregion("proms")->base();
@@ -786,7 +786,7 @@ DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
+void kingofb_state::init_ringkingw()
 {
 	int i,j,k;
 	uint8_t *PROMS = memregion("proms")->base();

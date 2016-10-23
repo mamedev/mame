@@ -452,26 +452,26 @@ void mbee_state::machine_reset_common()
 		m_telcom->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee )
+void mbee_state::machine_reset_mbee()
 {
 	machine_reset_common();
 	m_maincpu->set_pc(0x8000);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee56 )
+void mbee_state::machine_reset_mbee56()
 {
 	machine_reset_common();
 	m_maincpu->set_pc(0xE000);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee128 )
+void mbee_state::machine_reset_mbee128()
 {
 	machine_reset_common();
 	setup_banks(0, 1, 3); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee256 )
+void mbee_state::machine_reset_mbee256()
 {
 	m_mbee256_q_pos = 0;
 	machine_reset_common();
@@ -479,20 +479,20 @@ MACHINE_RESET_MEMBER( mbee_state, mbee256 )
 	m_maincpu->set_pc(0x8000);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbeett )
+void mbee_state::machine_reset_mbeett()
 {
 	m_mbee256_q_pos = 0;
 	machine_reset_common();
 	m_maincpu->set_pc(0x8000);
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee )
+void mbee_state::init_mbee()
 {
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeeic )
+void mbee_state::init_mbeeic()
 {
 	uint8_t *RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
@@ -502,7 +502,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeepc )
+void mbee_state::init_mbeepc()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
@@ -515,7 +515,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
+void mbee_state::init_mbeepc85()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
@@ -528,7 +528,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
+void mbee_state::init_mbeeppc()
 {
 	uint8_t *RAM = memregion("basicrom")->base();
 	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
@@ -544,7 +544,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee56 )
+void mbee_state::init_mbee56()
 {
 	m_size = 0xe000;
 	m_has_oldkb = 1;
@@ -552,7 +552,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 
 // 128k uses 32 RAM banks.
 // PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
-DRIVER_INIT_MEMBER( mbee_state, mbee128 )
+void mbee_state::init_mbee128()
 {
 	uint8_t *RAM = memregion("rams")->base();
 	uint8_t *ROM = memregion("roms")->base();
@@ -573,7 +573,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee256 )
+void mbee_state::init_mbee256()
 {
 	uint8_t *RAM = memregion("rams")->base();
 	uint8_t *ROM = memregion("roms")->base();
@@ -596,7 +596,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 	m_has_oldkb = 0;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeett )
+void mbee_state::init_mbeett()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);

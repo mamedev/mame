@@ -71,11 +71,11 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(igs_m036);
+	void init_igs_m036();
 
-	DECLARE_DRIVER_INIT(cjdh2);
-	DECLARE_DRIVER_INIT(cjddzsp);
-	DECLARE_DRIVER_INIT(igsm312);
+	void init_cjdh2();
+	void init_cjddzsp();
+	void init_igsm312();
 
 	required_device<cpu_device> m_maincpu;
 
@@ -283,30 +283,30 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(igs_m036_state,igs_m036)
+void igs_m036_state::init_igs_m036()
 {
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m036_state, cjdh2)
+void igs_m036_state::init_cjdh2()
 {
-	DRIVER_INIT_CALL(igs_m036);
+	init_igs_m036();
 
 	igs036_decryptor decrypter(cjdh2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 }
 
-DRIVER_INIT_MEMBER(igs_m036_state, cjddzsp)
+void igs_m036_state::init_cjddzsp()
 {
-	DRIVER_INIT_CALL(igs_m036);
+	init_igs_m036();
 
 	igs036_decryptor decrypter(cjddzsp_key);
 	decrypter.decrypter_rom(memregion("user1"));
 }
 
-DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
+void igs_m036_state::init_igsm312()
 {
-	DRIVER_INIT_CALL(igs_m036);
+	init_igs_m036();
 
 	igs036_decryptor decrypter(m312cn_key);
 	decrypter.decrypter_rom(memregion("user1"));

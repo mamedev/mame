@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(kyugo_flipscreen_w);
-	DECLARE_DRIVER_INIT(srdmissn);
+	void init_srdmissn();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;

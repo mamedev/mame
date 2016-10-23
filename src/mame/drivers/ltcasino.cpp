@@ -35,7 +35,7 @@ public:
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
-	DECLARE_DRIVER_INIT(mv4in1);
+	void init_mv4in1();
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -716,7 +716,7 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19",   0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
+void ltcasino_state::init_mv4in1()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();

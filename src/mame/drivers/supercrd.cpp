@@ -188,7 +188,7 @@ public:
 	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(supercrd);
-	DECLARE_VIDEO_START(supercrd);
+	void video_start_supercrd();
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -266,7 +266,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(supercrd_state, supercrd)
+void supercrd_state::video_start_supercrd()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supercrd_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }

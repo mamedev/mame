@@ -60,7 +60,7 @@ public:
 	int strobe_amount;
 
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
-	DECLARE_DRIVER_INIT(ecoinf2);
+	void init_ecoinf2();
 
 		void update_lamps(void)
 	{
@@ -224,7 +224,7 @@ public:
 		return data;
 	}
 
-	DECLARE_MACHINE_START(ecoinf2);
+	void machine_start_ecoinf2();
 
 };
 
@@ -785,7 +785,7 @@ ROM_START( ec_sumnc )
 	ROM_LOAD( "smn94.bin", 0x0000, 0x010000, CRC(9ade016a) SHA1(1c75dc46436253c4e6730f40523d016098c20683) )
 	ROM_LOAD( "smncscst", 0x0000, 0x010000, CRC(1147531a) SHA1(c303187452afdcb79e0f182d26d2c27693f69d76) )
 ROM_END
-DRIVER_INIT_MEMBER(ecoinf2_state,ecoinf2)
+void ecoinf2_state::init_ecoinf2()
 {
 }
 

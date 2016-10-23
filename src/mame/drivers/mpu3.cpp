@@ -248,7 +248,7 @@ public:
 	DECLARE_READ8_MEMBER(pia_ic6_portb_r);
 	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
 	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
-	DECLARE_DRIVER_INIT(m3hprvpr);
+	void init_m3hprvpr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(ic21_timeout);
@@ -923,7 +923,7 @@ static const mpu3_chr_table hprvpr_data[64] = {
 {0x0d, 0x04},{0x1f, 0xc0},{0x16, 0xc8},{0x05, 0x78},{0x13, 0xd4},{0x1c, 0x0c},{0x02, 0x74},{0x00, 0x00},
 };
 
-DRIVER_INIT_MEMBER(mpu3_state,m3hprvpr)
+void mpu3_state::init_m3hprvpr()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

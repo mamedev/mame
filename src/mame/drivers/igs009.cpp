@@ -106,13 +106,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void decrypt_jingbell();
-	DECLARE_DRIVER_INIT(jingbell);
-	DECLARE_DRIVER_INIT(jingbelli);
+	void init_jingbell();
+	void init_jingbelli();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(gp98);
+	void video_start_gp98();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -278,7 +278,7 @@ void igs009_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(igs009_state,gp98)
+void igs009_state::video_start_gp98()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1079,7 +1079,7 @@ void igs009_state::decrypt_jingbell()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbelli)
+void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
@@ -1088,7 +1088,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	rom[0x01f19] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbell)
+void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 

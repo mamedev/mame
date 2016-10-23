@@ -137,14 +137,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
-MACHINE_START_MEMBER(foodf_state,foodf)
+void foodf_state::machine_start_foodf()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_whichport));
 }
 
 
-MACHINE_RESET_MEMBER(foodf_state,foodf)
+void foodf_state::machine_reset_foodf()
 {
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
 	scan_timer->adjust(m_screen->time_until_pos(0));

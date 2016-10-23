@@ -132,7 +132,7 @@ void pc1401_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-DRIVER_INIT_MEMBER(pc1401_state,pc1401)
+void pc1401_state::init_pc1401()
 {
 	int i;
 	uint8_t *gfx=memregion("gfx1")->base();

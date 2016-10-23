@@ -628,7 +628,7 @@ void hyprduel_state::machine_reset()
 	*m_irq_enable = 0xff;
 }
 
-MACHINE_START_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::machine_start_hyprduel()
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
@@ -636,9 +636,9 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	save_item(NAME(m_cpu_trigger));
 }
 
-MACHINE_START_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::machine_start_magerror()
 {
-	MACHINE_START_CALL_MEMBER(hyprduel);
+	machine_start_hyprduel();
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 
@@ -772,7 +772,7 @@ ROM_START( magerror )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::init_hyprduel()
 {
 	m_int_num = 0x02;
 
@@ -783,7 +783,7 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-DRIVER_INIT_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));

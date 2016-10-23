@@ -97,9 +97,9 @@ public:
 		, m_timer_s_freq(*this, "timer_s_freq")
 	{ }
 
-	DECLARE_DRIVER_INIT(by35_6);
-	DECLARE_DRIVER_INIT(by35_7);
-	DECLARE_DRIVER_INIT(playboy);
+	void init_by35_6();
+	void init_by35_7();
+	void init_playboy();
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -124,8 +124,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
-	DECLARE_MACHINE_START(as2888);
-	DECLARE_MACHINE_RESET(by35);
+	void machine_start_as2888();
+	void machine_reset_by35();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
@@ -894,7 +894,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_6 )
+void by35_state::init_by35_6()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -937,7 +937,7 @@ DRIVER_INIT_MEMBER( by35_state, by35_6 )
 	m_7d = 0;
 }
 
-DRIVER_INIT_MEMBER( by35_state, playboy )
+void by35_state::init_playboy()
 {
 	static const uint8_t solenoid_features_playboy[20][4] =
 	{
@@ -966,7 +966,7 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 	};
 
 
-	DRIVER_INIT_CALL( by35_6 );
+	init_by35_6();
 
 	for (int i=0; i<20; i++)
 	{
@@ -979,15 +979,15 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 }
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_7 )
+void by35_state::init_by35_7()
 {
-	DRIVER_INIT_CALL(by35_6);
+	init_by35_6();
 
 	m_7d = 1;
 }
 
 
-MACHINE_RESET_MEMBER( by35_state, by35 )
+void by35_state::machine_reset_by35()
 {
 	render_target *target = machine().render().first_target();
 
@@ -1002,9 +1002,9 @@ MACHINE_RESET_MEMBER( by35_state, by35 )
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
 
-MACHINE_START_MEMBER( by35_state, as2888 )
+void by35_state::machine_start_as2888()
 {
-	MACHINE_RESET_CALL_MEMBER( by35 );
+	machine_reset_by35();
 	m_snd_prom = memregion("sound1")->base();
 }
 

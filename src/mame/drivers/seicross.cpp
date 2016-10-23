@@ -592,7 +592,7 @@ ROM_START( sectrzon )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seicross_state,friskytb)
+void seicross_state::init_friskytb()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx

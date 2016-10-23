@@ -95,12 +95,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dipswbitsel_w);
 	DECLARE_WRITE8_MEMBER(mscoutm_inputportsel_w);
 
-	DECLARE_DRIVER_INIT(nbmj9195);
+	void init_nbmj9195();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(_1layer);
-	DECLARE_VIDEO_START(nb22090);
+	void video_start__1layer();
+	void video_start_nb22090();
 
 	INTERRUPT_GEN_MEMBER(ctc0_trg1);
 

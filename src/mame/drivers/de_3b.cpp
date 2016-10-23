@@ -46,7 +46,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(de_3b);
+	void init_de_3b();
 
 	uint8_t m_strobe;
 	uint8_t m_kbdrow;
@@ -235,7 +235,7 @@ void de_3b_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(de_3b_state,de_3b)
+void de_3b_state::init_de_3b()
 {
 }
 

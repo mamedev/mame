@@ -65,9 +65,9 @@ public:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	DECLARE_DRIVER_INIT(rockduck);
-	DECLARE_MACHINE_START(scregg);
-	DECLARE_MACHINE_RESET(scregg);
+	void init_rockduck();
+	void machine_start_scregg();
+	void machine_reset_scregg();
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
 };
 
@@ -235,7 +235,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(scregg_state,scregg)
+void scregg_state::machine_start_scregg()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -243,7 +243,7 @@ MACHINE_START_MEMBER(scregg_state,scregg)
 	save_item(NAME(m_btime_tilemap));
 }
 
-MACHINE_RESET_MEMBER(scregg_state,scregg)
+void scregg_state::machine_reset_scregg()
 {
 	m_btime_palette = 0;
 	m_bnj_scroll1 = 0;
@@ -407,7 +407,7 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;

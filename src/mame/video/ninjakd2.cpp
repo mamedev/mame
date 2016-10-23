@@ -154,7 +154,7 @@ void ninjakd2_state::video_start()
 	m_stencil_compare_function = stencil_ninjakd2;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,mnight)
+void ninjakd2_state::video_start_mnight()
 {
 	video_init_common(0);
 
@@ -163,7 +163,7 @@ VIDEO_START_MEMBER(ninjakd2_state,mnight)
 	m_stencil_compare_function = stencil_mnight;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,arkarea)
+void ninjakd2_state::video_start_arkarea()
 {
 	video_init_common(0);
 
@@ -172,7 +172,7 @@ VIDEO_START_MEMBER(ninjakd2_state,arkarea)
 	m_stencil_compare_function = stencil_arkarea;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,robokid)
+void ninjakd2_state::video_start_robokid()
 {
 	video_init_common(0x0800);
 	m_vram_bank_mask = 1;
@@ -188,7 +188,7 @@ VIDEO_START_MEMBER(ninjakd2_state,robokid)
 	m_stencil_compare_function = stencil_robokid;
 }
 
-VIDEO_START_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::video_start_omegaf()
 {
 	video_init_common(0x2000);
 	m_vram_bank_mask = 7;

@@ -48,13 +48,13 @@ void eprom_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_START_MEMBER(eprom_state,eprom)
+void eprom_state::machine_start_eprom()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sync_data));
 }
 
-MACHINE_RESET_MEMBER(eprom_state,eprom)
+void eprom_state::machine_reset_eprom()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -733,17 +733,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(eprom_state,eprom)
+void eprom_state::init_eprom()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,klaxp)
+void eprom_state::init_klaxp()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,guts)
+void eprom_state::init_guts()
 {
 }
 

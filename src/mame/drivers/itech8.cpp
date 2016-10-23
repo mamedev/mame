@@ -591,7 +591,7 @@ WRITE8_MEMBER(itech8_state::nmi_ack_w)
 
 
 
-MACHINE_START_MEMBER(itech8_state,sstrike)
+void itech8_state::machine_start_sstrike()
 {
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
@@ -2642,7 +2642,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(itech8_state,grmatch)
+void itech8_state::init_grmatch()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
@@ -2654,7 +2654,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,slikshot)
+void itech8_state::init_slikshot()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2681,7 +2681,7 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,sstrike)
+void itech8_state::init_sstrike()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2689,31 +2689,31 @@ DRIVER_INIT_MEMBER(itech8_state,sstrike)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,hstennis)
+void itech8_state::init_hstennis()
 {
 	m_visarea.set(0, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,arligntn)
+void itech8_state::init_arligntn()
 {
 	m_visarea.set(16, 389, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,peggle)
+void itech8_state::init_peggle()
 {
 	m_visarea.set(18, 367, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,neckneck)
+void itech8_state::init_neckneck()
 {
 	m_visarea.set(8, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,rimrockn)
+void itech8_state::init_rimrockn()
 {
 	/* additional input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");

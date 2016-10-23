@@ -280,7 +280,7 @@ static const uint8_t keyboard[8][10][8] = {
 	},
 };
 
-MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
+void kaypro_state::machine_reset_kay_kbd()
 {
 	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), <kay_kbd_t>());
 

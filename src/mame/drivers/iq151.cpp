@@ -95,7 +95,7 @@ public:
 	uint8_t m_cassette_clk;
 	uint8_t m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
-	DECLARE_DRIVER_INIT(iq151);
+	void init_iq151();
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
@@ -329,7 +329,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 	m_cassette->output((m_cassette_data & 1) ^ (m_cassette_clk & 1) ? +1 : -1);
 }
 
-DRIVER_INIT_MEMBER(iq151_state,iq151)
+void iq151_state::init_iq151()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entry(0, RAM + 0xf800);

@@ -101,8 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
 	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
 	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
-	DECLARE_DRIVER_INIT(ti99_2_24);
-	DECLARE_DRIVER_INIT(ti99_2_32);
+	void init_ti99_2_24();
+	void init_ti99_2_32();
 	virtual void machine_reset() override;
 	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
@@ -113,13 +113,13 @@ public:
 
 
 
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_24)
+void ti99_2_state::init_ti99_2_24()
 {
 	/* no ROM paging */
 	m_ROM_paged = 0;
 }
 
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
+void ti99_2_state::init_ti99_2_32()
 {
 	/* ROM paging enabled */
 	m_ROM_paged = 1;

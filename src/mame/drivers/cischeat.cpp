@@ -2395,7 +2395,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,bigrun)
+void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2514,7 +2514,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,cischeat)
+void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2728,7 +2728,7 @@ ROM_START( f1gpstar )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
+void cischeat_state::init_f1gpstar()
 {
 	cischeat_untangle_sprites("sprites");
 }
@@ -3501,7 +3501,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state, captflag)
+void cischeat_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);

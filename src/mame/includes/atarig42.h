@@ -63,13 +63,13 @@ public:
 	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
 	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
-	DECLARE_DRIVER_INIT(roadriot);
-	DECLARE_DRIVER_INIT(guardian);
+	void init_roadriot();
+	void init_guardian();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
-	DECLARE_MACHINE_START(atarig42);
-	DECLARE_MACHINE_RESET(atarig42);
-	DECLARE_VIDEO_START(atarig42);
+	void machine_start_atarig42();
+	void machine_reset_atarig42();
+	void video_start_atarig42();
 	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

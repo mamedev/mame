@@ -231,19 +231,19 @@ public:
 	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
 	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
 
-	DECLARE_DRIVER_INIT(dodghero);
-	DECLARE_DRIVER_INIT(b3rinsya);
-	DECLARE_DRIVER_INIT(tbeastw2);
-	DECLARE_DRIVER_INIT(dashhero);
-	DECLARE_DRIVER_INIT(gegege);
-	DECLARE_DRIVER_INIT(pepsiman);
-	DECLARE_DRIVER_INIT(itazuram);
-	DECLARE_DRIVER_INIT(animalc);
-	DECLARE_DRIVER_INIT(ucytokyu);
-	DECLARE_DRIVER_INIT(haekaka);
+	void init_dodghero();
+	void init_b3rinsya();
+	void init_tbeastw2();
+	void init_dashhero();
+	void init_gegege();
+	void init_pepsiman();
+	void init_itazuram();
+	void init_animalc();
+	void init_ucytokyu();
+	void init_haekaka();
 
-	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl);
+	void machine_reset_sigmab98();
+	void machine_reset_sammymdl();
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -2131,7 +2131,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
+void sigmab98_state::machine_reset_sigmab98()
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -2207,7 +2207,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
+void sigmab98_state::machine_reset_sammymdl()
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
@@ -2329,7 +2329,7 @@ ROM_START( dodghero )
 	ROM_LOAD( "b9802-6.ic26", 0x80000, 0x80000, CRC(d83d8537) SHA1(9a5afdc68417db828a09188d653552452930b136) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,dodghero)
+void sigmab98_state::init_dodghero()
 {
 	// ROM banks
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2406,7 +2406,7 @@ ROM_START( gegege )
 	ROM_LOAD( "b9804-5.ic16", 0x00000, 0x80000, CRC(ddd7984c) SHA1(3558c495776671ffd3cd5c665b87827b3959b360) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,gegege)
+void sigmab98_state::init_gegege()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2454,7 +2454,7 @@ ROM_START( b3rinsya )
 	ROM_LOAD( "b9805-5.ic16", 0x00000, 0x80000, CRC(f686f886) SHA1(ab68d12c5cb3a9fbc8a178739f39a2ff3104a0a1) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,b3rinsya)
+void sigmab98_state::init_b3rinsya()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2493,7 +2493,7 @@ ROM_START( pepsiman )
 	ROM_LOAD( "b9806-5.ic16", 0x00000, 0x80000, CRC(6d405dfb) SHA1(e65ffe1279680097894754e379d7ad638657eb49) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
+void sigmab98_state::init_pepsiman()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2543,7 +2543,7 @@ ROM_START( tbeastw2 )
 	ROM_LOAD( "b9808-6.ic26.bin", 0x80000, 0x80000, CRC(9ed759c9) SHA1(963db80b8a107ce9292bbc776ba91bc76ad82d5b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,tbeastw2)
+void sigmab98_state::init_tbeastw2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2584,7 +2584,7 @@ ROM_START( ucytokyu )
 	ROM_LOAD( "b9809-6.ic26", 0x80000, 0x80000, CRC(4e2d5fdf) SHA1(af1357b0f6a407890ecad26a18d2b4e223802693) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
+void sigmab98_state::init_ucytokyu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2633,7 +2633,7 @@ ROM_START( dashhero )
 	ROM_LOAD( "b098112-0100.ic16", 0x00000, 0x80000, CRC(26e5d6f5) SHA1(6fe6a26e51097886db58a6619b12a73cd21e7130) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,dashhero)
+void sigmab98_state::init_dashhero()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2735,7 +2735,7 @@ ROM_START( animalc )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )   // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,animalc)
+void sigmab98_state::init_animalc()
 {
 	// RAM banks
 	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x1000 * 5);
@@ -2775,7 +2775,7 @@ ROM_START( itazuram )
 	ROM_LOAD( "vx2001l01.u016", 0x00000, 0x200000, CRC(9ee95222) SHA1(7154d43ef312a48a882207ca37e1c61e8b215a9b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
+void sigmab98_state::init_itazuram()
 {
 	// ROM banks
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2894,7 +2894,7 @@ ROM_START( haekaka )
 	ROM_LOAD( "em4207l01.u016.bin", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
+void sigmab98_state::init_haekaka()
 {
 	// RAM banks
 	m_paletteram.resize(0x200);

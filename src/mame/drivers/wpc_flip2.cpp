@@ -178,7 +178,7 @@ INPUT_PORTS_START( wpc_dw )
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNKNOWN )  // playfield glass - so we don't annoyed by constant warnings about it.
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(wpc_flip2_state,wpc_flip2)
+void wpc_flip2_state::init_wpc_flip2()
 {
 	wpc_flip1_state::init_wpc_flip1();
 }

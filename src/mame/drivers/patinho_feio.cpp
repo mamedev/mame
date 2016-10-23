@@ -15,7 +15,7 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
+void patinho_feio_state::init_patinho_feio()
 {
 	m_out = &output();
 	m_prev_ACC = 0;

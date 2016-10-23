@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
-	DECLARE_DRIVER_INIT(quizshow);
+	void init_quizshow();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -431,7 +431,7 @@ ROM_START( quizshow )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizshow_state,quizshow)
+void quizshow_state::init_quizshow()
 {
 	uint8_t *gfxdata = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();

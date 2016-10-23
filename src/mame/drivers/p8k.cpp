@@ -82,9 +82,9 @@ public:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_DRIVER_INIT(p8k);
-	DECLARE_MACHINE_RESET(p8k);
-	DECLARE_MACHINE_RESET(p8k_16);
+	void init_p8k();
+	void machine_reset_p8k();
+	void machine_reset_p8k_16();
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( p8k )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(p8k_state,p8k)
+void p8k_state::machine_reset_p8k()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -312,7 +312,7 @@ MACHINE_RESET_MEMBER(p8k_state,p8k)
 	membank("bank15")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(p8k_state,p8k)
+void p8k_state::init_p8k()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
@@ -352,7 +352,7 @@ WRITE8_MEMBER( p8k_state::kbd_put_16 )
 	mem.write_byte(0x43a0, 1);
 }
 
-MACHINE_RESET_MEMBER(p8k_state,p8k_16)
+void p8k_state::machine_reset_p8k_16()
 {
 }
 

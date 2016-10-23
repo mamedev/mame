@@ -506,7 +506,7 @@ static GFXDECODE_START( ladybug )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::machine_start_ladybug()
 {
 }
 
@@ -720,7 +720,7 @@ ROM_START( dorodon2 )
 	ROM_LOAD( "dorodon.bp2", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* timing?? */
 ROM_END
 
-DRIVER_INIT_MEMBER(ladybug_state,dorodon)
+void ladybug_state::init_dorodon()
 {
 	/* decode the opcodes */
 

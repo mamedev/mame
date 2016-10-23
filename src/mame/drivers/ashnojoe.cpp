@@ -430,7 +430,7 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
+void ashnojoe_state::init_ashnojoe()
 {
 	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);

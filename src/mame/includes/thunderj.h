@@ -27,13 +27,13 @@ public:
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(thunderj);
+	void init_thunderj();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
-	DECLARE_MACHINE_START(thunderj);
-	DECLARE_MACHINE_RESET(thunderj);
-	DECLARE_VIDEO_START(thunderj);
+	void machine_start_thunderj();
+	void machine_reset_thunderj();
+	void video_start_thunderj();
 	uint32_t screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

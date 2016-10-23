@@ -770,13 +770,13 @@ GFXDECODE_END
 /**************************************************************************/
 
 
-MACHINE_START_MEMBER(taitox_state,taitox)
+void taitox_state::machine_start_taitox()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 }
 
-MACHINE_START_MEMBER(taitox_state,superman)
+void taitox_state::machine_start_superman()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
@@ -1241,7 +1241,7 @@ ROM_START( ballbros )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
+void taitox_state::init_kyustrkr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),this));
 }

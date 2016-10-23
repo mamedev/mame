@@ -276,9 +276,9 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-MACHINE_START_MEMBER(quasar_state,quasar)
+void quasar_state::machine_start_quasar()
 {
-	MACHINE_START_CALL_MEMBER(cvs);
+	machine_start_cvs();
 
 	/* register state save */
 	save_item(NAME(m_effectcontrol));
@@ -286,9 +286,9 @@ MACHINE_START_MEMBER(quasar_state,quasar)
 	save_item(NAME(m_io_page));
 }
 
-MACHINE_RESET_MEMBER(quasar_state,quasar)
+void quasar_state::machine_reset_quasar()
 {
-	MACHINE_RESET_CALL_MEMBER(cvs);
+	machine_reset_cvs();
 
 	m_effectcontrol = 0;
 	m_page = 0;

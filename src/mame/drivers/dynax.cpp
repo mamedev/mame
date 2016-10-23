@@ -425,7 +425,7 @@ WRITE8_MEMBER(dynax_state::adpcm_reset_w)
 	m_msm->reset_w(~data & 1);
 }
 
-MACHINE_RESET_MEMBER(dynax_state,adpcm)
+void dynax_state::machine_reset_adpcm()
 {
 	/* start with the MSM5205 reset */
 	m_resetkludge = 0;
@@ -4282,7 +4282,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(dynax_state,dynax)
+void dynax_state::machine_start_dynax()
 {
 	save_item(NAME(m_sound_irq));
 	save_item(NAME(m_vblank_irq));
@@ -4315,10 +4315,10 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 	save_item(NAME(m_gekisha_rom_enable));
 }
 
-MACHINE_RESET_MEMBER(dynax_state,dynax)
+void dynax_state::machine_reset_dynax()
 {
 	if (m_msm != nullptr)
-		MACHINE_RESET_CALL_MEMBER(adpcm);
+		machine_reset_adpcm();
 
 	m_sound_irq = 0;
 	m_vblank_irq = 0;
@@ -4353,15 +4353,15 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 }
 
-MACHINE_START_MEMBER(dynax_state,hanamai)
+void dynax_state::machine_start_hanamai()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 }
 
-MACHINE_START_MEMBER(dynax_state,hnoridur)
+void dynax_state::machine_start_hnoridur()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
@@ -4371,7 +4371,7 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 
 	membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 }
 
 /***************************************************************************
@@ -4732,7 +4732,7 @@ MACHINE_CONFIG_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-MACHINE_START_MEMBER(dynax_state,jantouki)
+void dynax_state::machine_start_jantouki()
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SOUND = memregion("soundcpu")->base();
@@ -4740,7 +4740,7 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 	membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
 	membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 }
 
 
@@ -4931,9 +4931,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(dynax_state,tenkai)
+void dynax_state::machine_start_tenkai()
 {
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::tenkai_update_rombank), this));
 }
@@ -5001,16 +5001,16 @@ void dynax_state::gekisha_bank_postload()
 	gekisha_set_rombank(m_rombank);
 }
 
-MACHINE_START_MEMBER(dynax_state,gekisha)
+void dynax_state::machine_start_gekisha()
 {
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::gekisha_bank_postload), this));
 }
 
-MACHINE_RESET_MEMBER(dynax_state,gekisha)
+void dynax_state::machine_reset_gekisha()
 {
-	MACHINE_RESET_CALL_MEMBER(dynax);
+	machine_reset_dynax();
 
 	gekisha_set_rombank(0);
 }
@@ -5469,7 +5469,7 @@ ROM_START( blktouch )
 	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,blktouch)
+void dynax_state::init_blktouch()
 {
 	// fearsome encryption ;-)
 	uint8_t   *src = (uint8_t *)memregion("maincpu")->base();
@@ -5491,7 +5491,7 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state, maya_common)
+void dynax_state::init_maya_common()
 {
 	/* Address lines scrambling on 1 z80 rom */
 	uint8_t   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
@@ -5507,9 +5507,9 @@ DRIVER_INIT_MEMBER(dynax_state, maya_common)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+void dynax_state::init_maya()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
 	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
@@ -5524,9 +5524,9 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,mayac)
+void dynax_state::init_mayac()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
 	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
@@ -6447,7 +6447,7 @@ ROM_START( intrgirl )
 ROM_END
 
 // Decrypted by yong
-DRIVER_INIT_MEMBER(dynax_state,mjelct3)
+void dynax_state::init_mjelct3()
 {
 	int i;
 	uint8_t   *rom = memregion("maincpu")->base();
@@ -6459,7 +6459,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
 }
 
-DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
+void dynax_state::init_mjelct3a()
 {
 	int i, j;
 	uint8_t   *rom = memregion("maincpu")->base();
@@ -6495,7 +6495,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		rom[j] = rom1[i];
 	}
 
-	DRIVER_INIT_CALL(mjelct3);
+	init_mjelct3();
 }
 
 
@@ -6837,7 +6837,7 @@ ROM_START( mjreach )
 	ROM_RELOAD(          0x80000, 0x80000 )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,mjreach)
+void dynax_state::init_mjreach()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x10060, 0x10060, write8_delegate(FUNC(dynax_state::yarunara_flipscreen_w),this));
 }

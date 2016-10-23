@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start_ddragon()
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -143,7 +143,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset_ddragon()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -2079,7 +2079,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon)
+void ddragon_state::init_ddragon()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = M6809_IRQ_LINE;
@@ -2088,7 +2088,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
+void ddragon_state::init_ddragon2()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = INPUT_LINE_NMI;
@@ -2097,7 +2097,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,darktowr)
+void ddragon_state::init_darktowr()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = M6809_IRQ_LINE;
@@ -2107,7 +2107,7 @@ DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,toffy)
+void ddragon_state::init_toffy()
 {
 	int i, length;
 	uint8_t *rom;
@@ -2147,7 +2147,7 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 	/* should the sound rom be bitswapped too? */
 }
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
+void ddragon_state::init_ddragon6809()
 {
 	int i;
 	uint8_t *dst,*src;

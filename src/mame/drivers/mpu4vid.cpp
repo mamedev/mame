@@ -255,30 +255,30 @@ public:
 	int8_t m_cur[2];
 
 
-	DECLARE_DRIVER_INIT(crmazea);
-	DECLARE_DRIVER_INIT(v4barqst2);
-	DECLARE_DRIVER_INIT(quidgrid);
-	DECLARE_DRIVER_INIT(v4barqst);
-	DECLARE_DRIVER_INIT(timemchn);
-	DECLARE_DRIVER_INIT(crmaze2a);
-	DECLARE_DRIVER_INIT(v4opt3);
-	DECLARE_DRIVER_INIT(eyesdown);
-	DECLARE_DRIVER_INIT(v4cmazeb);
-	DECLARE_DRIVER_INIT(crmaze2);
-	DECLARE_DRIVER_INIT(crmaze);
-	DECLARE_DRIVER_INIT(prizeinv);
-	DECLARE_DRIVER_INIT(strikeit);
-	DECLARE_DRIVER_INIT(v4wize);
-	DECLARE_DRIVER_INIT(turnover);
-	DECLARE_DRIVER_INIT(adders);
-	DECLARE_DRIVER_INIT(mating);
-	DECLARE_DRIVER_INIT(crmaze3a);
-	DECLARE_DRIVER_INIT(skiltrek);
-	DECLARE_DRIVER_INIT(crmaze3);
-	DECLARE_DRIVER_INIT(cybcas);
-	DECLARE_MACHINE_START(mpu4_vid);
-	DECLARE_MACHINE_RESET(mpu4_vid);
-	DECLARE_VIDEO_START(mpu4_vid);
+	void init_crmazea();
+	void init_v4barqst2();
+	void init_quidgrid();
+	void init_v4barqst();
+	void init_timemchn();
+	void init_crmaze2a();
+	void init_v4opt3();
+	void init_eyesdown();
+	void init_v4cmazeb();
+	void init_crmaze2();
+	void init_crmaze();
+	void init_prizeinv();
+	void init_strikeit();
+	void init_v4wize();
+	void init_turnover();
+	void init_adders();
+	void init_mating();
+	void init_crmaze3a();
+	void init_skiltrek();
+	void init_crmaze3();
+	void init_cybcas();
+	void machine_start_mpu4_vid();
+	void machine_reset_mpu4_vid();
+	void video_start_mpu4_vid();
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -427,7 +427,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::video_start_mpu4_vid()
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -1208,7 +1208,7 @@ WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 }
 
 /* machine start (called only once) */
-MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_start_mpu4_vid()
 {
 	mpu4_config_common();
 
@@ -1220,7 +1220,7 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_reset_mpu4_vid()
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -1678,93 +1678,93 @@ static mpu4_chr_table prizeinv_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,adders)
+void mpu4vid_state::init_adders()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = adders_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze)
+void mpu4vid_state::init_crmaze()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmazea)
+void mpu4vid_state::init_crmazea()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmazea_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2)
+void mpu4vid_state::init_crmaze2()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze2_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2a)
+void mpu4vid_state::init_crmaze2a()
 {
 	m_reels = 0;//currently no hybrid games
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3)
+void mpu4vid_state::init_crmaze3()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3a)
+void mpu4vid_state::init_crmaze3a()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3a_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,mating)
+void mpu4vid_state::init_mating()
 {
 	m_reels = 0;//currently no hybrid games
 
 	m_current_chr_table = mating_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,skiltrek)
+void mpu4vid_state::init_skiltrek()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = skiltrek_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,timemchn)
+void mpu4vid_state::init_timemchn()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = timemchn_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,strikeit)
+void mpu4vid_state::init_strikeit()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = strikeit_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,turnover)
+void mpu4vid_state::init_turnover()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = turnover_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,eyesdown)
+void mpu4vid_state::init_eyesdown()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = eyesdown_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,quidgrid)
+void mpu4vid_state::init_quidgrid()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = quidgrid_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
+void mpu4vid_state::init_prizeinv()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = prizeinv_data;
@@ -1785,7 +1785,7 @@ static mpu4_chr_table cybcas_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,cybcas)
+void mpu4vid_state::init_cybcas()
 {
 	//no idea what this should be, use blues boys table for now
 	m_bwb_chr_table1 = cybcas_data1;
@@ -1804,27 +1804,27 @@ void mpu4vid_state::mpu4vid_char_cheat( int address)
 	}
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst)
+void mpu4vid_state::init_v4barqst()
 {
 	mpu4vid_char_cheat(0x154);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst2)
+void mpu4vid_state::init_v4barqst2()
 {
 	mpu4vid_char_cheat(0x15c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4wize)
+void mpu4vid_state::init_v4wize()
 {
 	mpu4vid_char_cheat(0x16c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4cmazeb)
+void mpu4vid_state::init_v4cmazeb()
 {
 	mpu4vid_char_cheat(0x4c6);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4opt3)
+void mpu4vid_state::init_v4opt3()
 {
 	mpu4vid_char_cheat(0x164);
 }

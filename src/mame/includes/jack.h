@@ -59,21 +59,21 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_READ8_MEMBER(timer_r);
 
-	DECLARE_DRIVER_INIT(zzyzzyxx);
-	DECLARE_DRIVER_INIT(striv);
-	DECLARE_DRIVER_INIT(treahunt);
-	DECLARE_DRIVER_INIT(loverboy);
-	DECLARE_DRIVER_INIT(jack);
+	void init_zzyzzyxx();
+	void init_striv();
+	void init_treahunt();
+	void init_loverboy();
+	void init_jack();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
-	DECLARE_VIDEO_START(joinem);
+	void video_start_joinem();
 	DECLARE_PALETTE_INIT(joinem);
-	DECLARE_MACHINE_START(striv);
-	DECLARE_MACHINE_RESET(striv);
-	DECLARE_MACHINE_START(joinem);
-	DECLARE_MACHINE_RESET(joinem);
+	void machine_start_striv();
+	void machine_reset_striv();
+	void machine_start_joinem();
+	void machine_reset_joinem();
 
 	uint32_t screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

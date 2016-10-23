@@ -47,9 +47,9 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
-	DECLARE_DRIVER_INIT(matahari);
-	DECLARE_DRIVER_INIT(pwerplay);
+	void init_by17();
+	void init_matahari();
+	void init_pwerplay();
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -72,7 +72,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(saucer_x3);
 	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x2);
-	DECLARE_MACHINE_RESET(by17);
+	void machine_reset_by17();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
@@ -841,7 +841,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
+void by17_state::init_by17()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -881,7 +881,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, matahari )
+void by17_state::init_matahari()
 {
 	static const uint8_t solenoid_features_matahari[20][4] =
 	{
@@ -917,7 +917,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, pwerplay )
+void by17_state::init_pwerplay()
 {
 	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
@@ -955,7 +955,7 @@ DRIVER_INIT_MEMBER( by17_state, pwerplay )
 
 
 
-MACHINE_RESET_MEMBER( by17_state, by17 )
+void by17_state::machine_reset_by17()
 {
 	render_target *target = machine().render().first_target();
 

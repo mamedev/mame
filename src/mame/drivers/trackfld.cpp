@@ -867,7 +867,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_start_trackfld()
 {
 	/* video */
 	save_item(NAME(m_bg_bank));
@@ -876,7 +876,7 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 	save_item(NAME(m_old_gfx_bank));
 }
 
-MACHINE_RESET_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_reset_trackfld()
 {
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;
@@ -1540,11 +1540,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(trackfld_state,trackfld)
+void trackfld_state::init_trackfld()
 {
 }
 
-DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
+void trackfld_state::init_trackfldnz()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -1554,7 +1554,7 @@ DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 		ROM[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,atlantol)
+void trackfld_state::init_atlantol()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1575,7 +1575,7 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 	membank("bank13")->set_base(&rom[0x4000]);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,mastkin)
+void trackfld_state::init_mastkin()
 {
 	uint8_t *prom = memregion("proms")->base();
 	int i;
@@ -1597,7 +1597,7 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
+void trackfld_state::init_wizzquiz()
 {
 	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
 	int i;

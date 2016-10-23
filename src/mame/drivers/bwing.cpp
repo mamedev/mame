@@ -548,7 +548,7 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-DRIVER_INIT_MEMBER(bwing_state,bwing)
+void bwing_state::init_bwing()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();

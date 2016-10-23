@@ -23,7 +23,7 @@ void radio86_state::radio86_init_keyboard()
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(radio86_state,radio86)
+void radio86_state::init_radio86()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -33,9 +33,9 @@ DRIVER_INIT_MEMBER(radio86_state,radio86)
 	radio86_init_keyboard();
 }
 
-DRIVER_INIT_MEMBER(radio86_state,radioram)
+void radio86_state::init_radioram()
 {
-	DRIVER_INIT_CALL(radio86);
+	init_radio86();
 	m_radio_ram_disk = std::make_unique<uint8_t[]>(0x20000);
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
@@ -142,7 +142,7 @@ WRITE8_MEMBER(radio86_state::radio_io_w)
 	m_maincpu->space(AS_PROGRAM).write_byte((offset << 8) + offset,data);
 }
 
-MACHINE_RESET_MEMBER(radio86_state,radio86)
+void radio86_state::machine_reset_radio86()
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);

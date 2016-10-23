@@ -35,7 +35,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(jpmsru);
+	void init_jpmsru();
 };
 
 // blind guess
@@ -71,7 +71,7 @@ static MACHINE_CONFIG_START( jpmsru_4, jpmsru_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(jpmsru_state,jpmsru)
+void jpmsru_state::init_jpmsru()
 {
 }
 

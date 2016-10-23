@@ -116,7 +116,7 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-VIDEO_START_MEMBER(madalien_state,madalien)
+void madalien_state::video_start_madalien()
 {
 	int i;
 

@@ -1663,7 +1663,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(namcos86_state,namco86)
+void namcos86_state::init_namco86()
 {
 	int size;
 	uint8_t *gfx;

@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(tile_bank_w);
-	DECLARE_DRIVER_INIT(poker72);
+	void init_poker72();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poker72);
@@ -407,7 +407,7 @@ ROM_START( poker72 )
 	ROM_LOAD( "270138.bin", 0x60000, 0x20000, CRC(d689313d) SHA1(8b9661b3af0e2ced7fe9fa487641e445ce7835b8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(poker72_state,poker72)
+void poker72_state::init_poker72()
 {
 	uint8_t *rom = memregion("roms")->base();
 

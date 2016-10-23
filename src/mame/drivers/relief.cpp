@@ -47,7 +47,7 @@ void relief_state::update_interrupts()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(relief_state,relief)
+void relief_state::machine_reset_relief()
 {
 	atarigen_state::machine_reset();
 
@@ -427,7 +427,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(relief_state,relief)
+void relief_state::init_relief()
 {
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(0);

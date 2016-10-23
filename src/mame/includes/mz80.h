@@ -52,7 +52,7 @@ public:
 	required_shared_ptr<uint8_t> m_p_ram;
 	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_DRIVER_INIT(mz80k);
+	void init_mz80k();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

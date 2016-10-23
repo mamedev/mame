@@ -162,7 +162,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
  *
  *************************************/
 
-VIDEO_START_MEMBER(redalert_state,redalert)
+void redalert_state::video_start_redalert()
 {
 	m_bitmap_colorram = std::make_unique<uint8_t[]>(0x0400);
 
@@ -171,9 +171,9 @@ VIDEO_START_MEMBER(redalert_state,redalert)
 	m_control_xor = 0x00;
 }
 
-VIDEO_START_MEMBER(redalert_state,ww3)
+void redalert_state::video_start_ww3()
 {
-	VIDEO_START_CALL_MEMBER( redalert );
+	video_start_redalert();
 
 	m_control_xor = 0x04;
 }

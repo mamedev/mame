@@ -73,8 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
 
 	DECLARE_PALETTE_INIT(nc);
-	DECLARE_MACHINE_START(nc200);
-	DECLARE_MACHINE_RESET(nc200);
+	void machine_start_nc200();
+	void machine_reset_nc200();
 	uint32_t screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
 
-	DECLARE_DRIVER_INIT( nc );
+	void init_nc();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 

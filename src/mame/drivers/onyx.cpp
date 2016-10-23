@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	DECLARE_MACHINE_RESET(c8002);
+	void machine_reset_c8002();
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(portff05_r);
 
@@ -74,7 +74,7 @@ static INPUT_PORTS_START( c8002 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(onyx_state, c8002)
+void onyx_state::machine_reset_c8002()
 {
 }
 

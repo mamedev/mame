@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_MACHINE_RESET(ravens2);
+	void machine_reset_ravens2();
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
@@ -191,7 +191,7 @@ WRITE8_MEMBER( ravens_state::port1c_w )
 	m_term_char = data;
 }
 
-MACHINE_RESET_MEMBER( ravens_state, ravens2 )
+void ravens_state::machine_reset_ravens2()
 {
 	m_term_data = 0x80;
 	output().set_digit_value(6, 0);

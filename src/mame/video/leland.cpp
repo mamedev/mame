@@ -55,7 +55,7 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
  *
  *************************************/
 
-VIDEO_START_MEMBER(leland_state,leland)
+void leland_state::video_start_leland()
 {
 	/* allocate memory */
 	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
@@ -65,7 +65,7 @@ VIDEO_START_MEMBER(leland_state,leland)
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
-VIDEO_START_MEMBER(leland_state,ataxx)
+void leland_state::video_start_ataxx()
 {
 	/* first do the standard stuff */
 	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);

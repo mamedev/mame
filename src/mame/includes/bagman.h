@@ -63,12 +63,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(bagman);
-	DECLARE_MACHINE_START(squaitsa);
+	void machine_start_bagman();
+	void machine_start_squaitsa();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bagman);
-	DECLARE_DRIVER_INIT(bagman);
+	void init_bagman();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 

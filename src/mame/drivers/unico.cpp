@@ -558,7 +558,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(unico_state,unico)
+void unico_state::machine_reset_unico()
 {
 }
 
@@ -608,9 +608,9 @@ MACHINE_CONFIG_END
                                 Zero Point
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(unico_state,zeropt)
+void unico_state::machine_reset_zeropt()
 {
-	MACHINE_RESET_CALL_MEMBER(unico);
+	machine_reset_unico();
 }
 
 static MACHINE_CONFIG_START( zeropnt, unico_state )

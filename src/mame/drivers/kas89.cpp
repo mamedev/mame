@@ -250,7 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	DECLARE_DRIVER_INIT(kas89);
+	void init_kas89();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
@@ -829,7 +829,7 @@ ROM_END
    A13-> A06
    A14-> A14
 */
-DRIVER_INIT_MEMBER(kas89_state,kas89)
+void kas89_state::init_kas89()
 {
 	int i;
 	uint8_t *mem = memregion("maincpu")->base();

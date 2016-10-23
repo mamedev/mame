@@ -181,16 +181,16 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	DECLARE_DRIVER_INIT(multigmt);
-	DECLARE_DRIVER_INIT(multigam);
-	DECLARE_DRIVER_INIT(multigm3);
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(multigam);
-	DECLARE_MACHINE_START(multigm3);
-	DECLARE_MACHINE_RESET(multigm3);
-	DECLARE_MACHINE_START(supergm3);
+	void machine_start_multigm3();
+	void machine_reset_multigm3();
+	void machine_start_supergm3();
 	uint32_t screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
@@ -1154,7 +1154,7 @@ void multigam_state::machine_reset()
 {
 }
 
-MACHINE_RESET_MEMBER(multigam_state,multigm3)
+void multigam_state::machine_reset_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* reset the ppu */
@@ -1174,7 +1174,7 @@ void multigam_state::machine_start()
 	membank("bank1")->set_base(memregion("gfx1")->base());
 }
 
-MACHINE_START_MEMBER(multigam_state,multigm3)
+void multigam_state::machine_start_multigm3()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
@@ -1196,7 +1196,7 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 	set_videorom_bank(0, 8, 0, 8);
 }
 
-MACHINE_START_MEMBER(multigam_state,supergm3)
+void multigam_state::machine_start_supergm3()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
@@ -1387,7 +1387,7 @@ ROM_START( supergm3 )
 	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
 ROM_END
 
-DRIVER_INIT_MEMBER(multigam_state,multigam)
+void multigam_state::init_multigam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
@@ -1402,7 +1402,7 @@ void multigam_state::multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* 
 	}
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigm3)
+void multigam_state::init_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1416,7 +1416,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigmt)
+void multigam_state::init_multigmt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

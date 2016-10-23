@@ -193,8 +193,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	DECLARE_DRIVER_INIT(gstream);
-	DECLARE_DRIVER_INIT(x2222);
+	void init_gstream();
+	void init_x2222();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1129,7 +1129,7 @@ READ32_MEMBER(gstream_state::x2222_speedup2_r)
 }
 
 
-DRIVER_INIT_MEMBER(gstream_state,gstream)
+void gstream_state::init_gstream()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 
@@ -1157,7 +1157,7 @@ void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t*
 	}
 }
 
-DRIVER_INIT_MEMBER(gstream_state,x2222)
+void gstream_state::init_x2222()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer

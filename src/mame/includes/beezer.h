@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);
-	DECLARE_DRIVER_INIT(beezer);
+	void init_beezer();
 	virtual void machine_start() override;
 	uint32_t screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);

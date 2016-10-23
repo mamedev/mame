@@ -75,7 +75,7 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
-	DECLARE_DRIVER_INIT(tmc1800);
+	void init_tmc1800();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

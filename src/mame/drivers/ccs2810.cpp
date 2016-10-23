@@ -80,9 +80,9 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(ccs2810);
-	DECLARE_DRIVER_INIT(ccs2422);
-	DECLARE_MACHINE_RESET(ccs);
+	void init_ccs2810();
+	void init_ccs2422();
+	void machine_reset_ccs();
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(port20_r);
 	DECLARE_READ8_MEMBER(port25_r);
@@ -287,7 +287,7 @@ WRITE8_MEMBER( ccs_state::port40_w )
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-MACHINE_RESET_MEMBER( ccs_state, ccs )
+void ccs_state::machine_reset_ccs()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -295,7 +295,7 @@ MACHINE_RESET_MEMBER( ccs_state, ccs )
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
+void ccs_state::init_ccs2810()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -304,7 +304,7 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
+void ccs_state::init_ccs2422()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

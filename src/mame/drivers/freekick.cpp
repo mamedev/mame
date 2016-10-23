@@ -577,7 +577,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(freekick_state,freekick)
+void freekick_state::machine_start_freekick()
 {
 	save_item(NAME(m_romaddr));
 	save_item(NAME(m_spinner));
@@ -585,7 +585,7 @@ MACHINE_START_MEMBER(freekick_state,freekick)
 	save_item(NAME(m_ff_data));
 }
 
-MACHINE_RESET_MEMBER(freekick_state,freekick)
+void freekick_state::machine_reset_freekick()
 {
 	m_romaddr = 0;
 	m_spinner = 0;
@@ -593,25 +593,25 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 	m_ff_data = 0;
 }
 
-MACHINE_START_MEMBER(freekick_state,pbillrd)
+void freekick_state::machine_start_pbillrd()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000);
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_START_MEMBER(freekick_state,oigas)
+void freekick_state::machine_start_oigas()
 {
 	save_item(NAME(m_inval));
 	save_item(NAME(m_outval));
 	save_item(NAME(m_cnt));
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_RESET_MEMBER(freekick_state,oigas)
+void freekick_state::machine_reset_oigas()
 {
-	MACHINE_RESET_CALL_MEMBER(freekick);
+	machine_reset_freekick();
 
 	m_inval = 0;
 	m_outval = 0;
@@ -1185,14 +1185,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(freekick_state,gigasb)
+void freekick_state::init_gigasb()
 {
 	membank("bank0d")->set_base(memregion("maincpu")->base() + 0xc000);
 	m_bank1d->set_base(memregion("maincpu")->base() + 0x14000);
 }
 
 
-DRIVER_INIT_MEMBER(freekick_state,pbillrds)
+void freekick_state::init_pbillrds()
 {
 	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0x10000);
 	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0x10000);
@@ -1200,7 +1200,7 @@ DRIVER_INIT_MEMBER(freekick_state,pbillrds)
 	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(freekick_state,gigas)
+void freekick_state::init_gigas()
 {
 	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0xc000);
 	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0xc000);

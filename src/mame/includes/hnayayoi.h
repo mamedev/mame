@@ -36,11 +36,11 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_vclk_w);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_inv_w);
-	DECLARE_DRIVER_INIT(hnfubuki);
+	void init_hnfubuki();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(untoucha);
+	void video_start_untoucha();
 	uint32_t screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void common_vh_start( int num_pixmaps );
 	void copy_pixel( int x, int y, int pen );

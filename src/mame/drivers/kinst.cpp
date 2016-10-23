@@ -170,8 +170,8 @@ public:
 	DECLARE_WRITE32_MEMBER(kinst_ide_w);
 	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
 	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
-	DECLARE_DRIVER_INIT(kinst);
-	DECLARE_DRIVER_INIT(kinst2);
+	void init_kinst();
+	void init_kinst2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -895,7 +895,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(kinst_state,kinst)
+void kinst_state::init_kinst()
 {
 	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
@@ -904,7 +904,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 }
 
 
-DRIVER_INIT_MEMBER(kinst_state,kinst2)
+void kinst_state::init_kinst2()
 {
 	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 

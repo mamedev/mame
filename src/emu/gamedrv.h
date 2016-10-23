@@ -89,11 +89,6 @@ struct game_driver
 //  MACROS
 //**************************************************************************
 
-// wrappers for the DRIVER_INIT callback
-#define DRIVER_INIT_NAME(name)      init_##name
-#define DECLARE_DRIVER_INIT(name)   void DRIVER_INIT_NAME(name)() ATTR_COLD
-#define DRIVER_INIT_MEMBER(cls,name) void cls::DRIVER_INIT_NAME(name)()
-#define DRIVER_INIT_CALL(name)      DRIVER_INIT_NAME(name)()
 
 // wrappers for declaring and defining game drivers
 #define GAME_NAME(name) driver_##name

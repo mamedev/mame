@@ -835,7 +835,7 @@ void exprraid_state::exprraid_gfx_expand()
 	}
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
+void exprraid_state::init_wexpressb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -852,18 +852,18 @@ DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,exprraid)
+void exprraid_state::init_exprraid()
 {
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
+void exprraid_state::init_wexpressb2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
+void exprraid_state::init_wexpressb3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();

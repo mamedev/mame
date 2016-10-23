@@ -92,7 +92,7 @@ public:
 	int m_trap_int;
 	int m_trap_stop;
 	int m_trap_aux;
-	DECLARE_DRIVER_INIT(mpz80);
+	void init_mpz80();
 };
 
 #endif

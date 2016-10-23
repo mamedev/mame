@@ -24,7 +24,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(whitestar_mod);
+	void init_whitestar_mod();
 };
 
 
@@ -39,7 +39,7 @@ void whitestar_mod_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(whitestar_mod_state,whitestar_mod)
+void whitestar_mod_state::init_whitestar_mod()
 {
 }
 

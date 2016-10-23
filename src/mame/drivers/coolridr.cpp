@@ -418,8 +418,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	DECLARE_DRIVER_INIT(coolridr);
-	DECLARE_DRIVER_INIT(aquastge);
+	void init_coolridr();
+	void init_aquastge();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -3907,7 +3907,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 }
 
 
-DRIVER_INIT_MEMBER(coolridr_state,coolridr)
+void coolridr_state::init_coolridr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
@@ -3923,7 +3923,7 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
-DRIVER_INIT_MEMBER(coolridr_state, aquastge)
+void coolridr_state::init_aquastge()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
 

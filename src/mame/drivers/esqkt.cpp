@@ -124,7 +124,7 @@ public:
 	bool  m_bCalibSecondByte;
 
 public:
-	DECLARE_DRIVER_INIT(kt);
+	void init_kt();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };
@@ -260,7 +260,7 @@ ROM_START( kt76 )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqkt_state, kt)
+void esqkt_state::init_kt()
 {
 	m_duart_io = 0;
 }

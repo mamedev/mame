@@ -59,7 +59,7 @@ static const char *const mwa_bank_hard[4] =
 	"bank4"   /* mapped in c000-ffff */
 };
 
-DRIVER_INIT_MEMBER(vtech2_state,laser)
+void vtech2_state::init_laser()
 {
 	uint8_t *gfx = memregion("gfx2")->base();
 	int i;
@@ -101,13 +101,13 @@ void vtech2_state::machine_reset()
 	laser_machine_init(0x00f, 3);
 }
 
-MACHINE_RESET_MEMBER(vtech2_state,laser500)
+void vtech2_state::machine_reset_laser500()
 {
 	/* banks 0 to 2, and 4-7 only, optional ROM extension */
 	laser_machine_init(0x0f7, 7);
 }
 
-MACHINE_RESET_MEMBER(vtech2_state,laser700)
+void vtech2_state::machine_reset_laser700()
 {
 	/* all banks except #3 */
 	laser_machine_init(0xff7, 7);

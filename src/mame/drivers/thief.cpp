@@ -617,7 +617,7 @@ ROM_START( natodefa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thief_state,thief)
+void thief_state::init_thief()
 {
 	uint8_t *dest = memregion( "maincpu" )->base();
 	const uint8_t *source = memregion( "cpu1" )->base();

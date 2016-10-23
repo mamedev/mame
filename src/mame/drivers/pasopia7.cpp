@@ -77,9 +77,9 @@ public:
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	DECLARE_DRIVER_INIT(p7_lcd);
-	DECLARE_DRIVER_INIT(p7_raster);
-	DECLARE_VIDEO_START(pasopia7);
+	void init_p7_lcd();
+	void init_p7_raster();
+	void video_start_pasopia7();
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -139,7 +139,7 @@ TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
 
-VIDEO_START_MEMBER(pasopia7_state,pasopia7)
+void pasopia7_state::video_start_pasopia7()
 {
 	m_p7_pal = std::make_unique<uint8_t[]>(0x10);
 }
@@ -1040,13 +1040,13 @@ ROM_START( pasopia7lcd )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
+void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
 	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
+void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
 	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));

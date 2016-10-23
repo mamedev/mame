@@ -385,7 +385,7 @@ void ::tumblep_patch_code(uint16_t offset)
 }
 #endif
 
-DRIVER_INIT_MEMBER(tumblep_state,tumblep)
+void tumblep_state::init_tumblep()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 

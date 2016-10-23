@@ -141,27 +141,27 @@ public:
 	DECLARE_READ8_MEMBER(suna8_banked_spriteram_r);
 	DECLARE_WRITE8_MEMBER(suna8_spriteram_w);
 	DECLARE_WRITE8_MEMBER(suna8_banked_spriteram_w);
-	DECLARE_DRIVER_INIT(brickzn_common);
-	DECLARE_DRIVER_INIT(brickznv5);
-	DECLARE_DRIVER_INIT(brickznv4);
-	DECLARE_DRIVER_INIT(starfigh);
-	DECLARE_DRIVER_INIT(hardhea2);
-	DECLARE_DRIVER_INIT(hardhea2b);
-	DECLARE_DRIVER_INIT(hardhedb);
-	DECLARE_DRIVER_INIT(sparkman);
-	DECLARE_DRIVER_INIT(brickzn);
-	DECLARE_DRIVER_INIT(brickzn11);
-	DECLARE_DRIVER_INIT(hardhead);
-	DECLARE_DRIVER_INIT(suna8);
+	void init_brickzn_common();
+	void init_brickznv5();
+	void init_brickznv4();
+	void init_starfigh();
+	void init_hardhea2();
+	void init_hardhea2b();
+	void init_hardhedb();
+	void init_sparkman();
+	void init_brickzn();
+	void init_brickzn11();
+	void init_hardhead();
+	void init_suna8();
 
 	void suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_type);
-	DECLARE_VIDEO_START(suna8_text);
-	DECLARE_VIDEO_START(suna8_sparkman);
-	DECLARE_VIDEO_START(suna8_brickzn);
-	DECLARE_VIDEO_START(suna8_starfigh);
+	void video_start_suna8_text();
+	void video_start_suna8_sparkman();
+	void video_start_suna8_brickzn();
+	void video_start_suna8_starfigh();
 
-	DECLARE_MACHINE_RESET(brickzn);
-	DECLARE_MACHINE_RESET(hardhea2);
+	void machine_reset_brickzn();
+	void machine_reset_hardhea2();
 	uint32_t screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 

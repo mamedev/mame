@@ -187,7 +187,7 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
-	DECLARE_DRIVER_INIT(aleck64);
+	void init_aleck64();
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(aleck64_state,aleck64)
+void aleck64_state::init_aleck64()
 {
 	uint8_t *rom = memregion("user2")->base();
 

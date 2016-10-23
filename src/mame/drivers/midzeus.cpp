@@ -83,7 +83,7 @@ private:
  *
  *************************************/
 
-MACHINE_START_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_start_midzeus()
 {
 	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -100,7 +100,7 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 }
 
 
-MACHINE_RESET_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_reset_midzeus()
 {
 	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
@@ -1514,18 +1514,18 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midzeus_state,mk4)
+void midzeus_state::init_mk4()
 {
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,invasn)
+void midzeus_state::init_invasn()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
+void midzeus_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
@@ -1533,7 +1533,7 @@ DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 }
 
 
-DRIVER_INIT_MEMBER(midzeus_state,thegrid)
+void midzeus_state::init_thegrid()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
 }

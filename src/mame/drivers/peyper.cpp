@@ -58,9 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p2a_w) { }; // more lamps
 	DECLARE_WRITE8_MEMBER(p2b_w) { }; // more lamps
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
-	DECLARE_DRIVER_INIT(peyper);
-	DECLARE_DRIVER_INIT(odin);
-	DECLARE_DRIVER_INIT(wolfman);
+	void init_peyper();
+	void init_odin();
+	void init_wolfman();
 private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess
-DRIVER_INIT_MEMBER( peyper_state, peyper )
+void peyper_state::init_peyper()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -645,7 +645,7 @@ DRIVER_INIT_MEMBER( peyper_state, peyper )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, odin )
+void peyper_state::init_odin()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -685,7 +685,7 @@ DRIVER_INIT_MEMBER( peyper_state, odin )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, wolfman )
+void peyper_state::init_wolfman()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;

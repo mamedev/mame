@@ -55,11 +55,11 @@ public:
 	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_DRIVER_INIT(jumping);
-	DECLARE_DRIVER_INIT(rbislande);
-	DECLARE_DRIVER_INIT(rbisland);
+	void init_jumping();
+	void init_rbislande();
+	void init_rbisland();
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(jumping);
+	void video_start_jumping();
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cchip_timer);

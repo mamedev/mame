@@ -89,7 +89,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(ta7630);
+	void machine_reset_ta7630();
 	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

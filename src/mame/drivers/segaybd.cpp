@@ -2731,7 +2731,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaybd_state,generic)
+void segaybd_state::init_generic()
 {
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_IRQ2_GEN);
@@ -2751,17 +2751,17 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaybd_state,gforce2)
+void segaybd_state::init_gforce2()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,gloc)
+void segaybd_state::init_gloc()
 {
 	// because some of the output data isn't fully understood we need to "center" the rams
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(FUNC(segaybd_state::gloc_output_cb1), this);
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::gloc_output_cb2), this);
 
@@ -2769,23 +2769,23 @@ DRIVER_INIT_MEMBER(segaybd_state,gloc)
 	output().set_value("right_motor_position_nor", 16);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,r360)
+void segaybd_state::init_r360()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::r360_output_cb2), this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,pdrift)
+void segaybd_state::init_pdrift()
 {
 	// because some of the output data isn't fully understood we need to "center" the motor
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(FUNC(segaybd_state::pdrift_output_cb1), this);
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::pdrift_output_cb2), this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,rchase)
+void segaybd_state::init_rchase()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::rchase_output_cb2), this);
 }
 

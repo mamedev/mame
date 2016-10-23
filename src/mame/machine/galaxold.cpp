@@ -70,17 +70,17 @@ void galaxold_state::machine_reset_common(int line)
 	int_timer->adjust(m_screen->time_until_pos(0));
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,galaxold)
+void galaxold_state::machine_reset_galaxold()
 {
 	machine_reset_common(INPUT_LINE_NMI);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
+void galaxold_state::machine_reset_devilfsg()
 {
 	machine_reset_common(0);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
+void galaxold_state::machine_reset_hunchbkg()
 {
 	machine_reset_common(0);
 }
@@ -151,7 +151,7 @@ CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,4in1)
+void galaxold_state::init_4in1()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
@@ -174,13 +174,13 @@ INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,ladybugg)
+void galaxold_state::init_ladybugg()
 {
 	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
+void galaxold_state::init_bullsdrtg()
 {
 	int i;
 

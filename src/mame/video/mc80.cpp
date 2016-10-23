@@ -94,7 +94,7 @@ static const uint8_t prom[] = {
 
 
 
-VIDEO_START_MEMBER(mc80_state,mc8020)
+void mc80_state::video_start_mc8020()
 {
 }
 
@@ -138,7 +138,7 @@ uint32_t mc80_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 &b
 /*****************************************************************************/
 
 
-VIDEO_START_MEMBER(mc80_state,mc8030)
+void mc80_state::video_start_mc8030()
 {
 	m_p_videoram.set_target(memregion("vram")->base(),m_p_videoram.bytes());
 }

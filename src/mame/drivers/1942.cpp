@@ -946,7 +946,7 @@ ROM_START( 1942p )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(_1942_state,1942)
+void _1942_state::init_1942()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);

@@ -2406,7 +2406,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2414,7 +2414,7 @@ DRIVER_INIT_MEMBER(segas24_state,qgh)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
 	io_r = &segas24_state::dcclub_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2422,7 +2422,7 @@ DRIVER_INIT_MEMBER(segas24_state,dcclub)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2430,7 +2430,7 @@ DRIVER_INIT_MEMBER(segas24_state,qrouka)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2438,7 +2438,7 @@ DRIVER_INIT_MEMBER(segas24_state,quizmeku)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
 	io_r = &segas24_state::mahmajn_io_r;
 	io_w = &segas24_state::mahmajn_io_w;
@@ -2447,7 +2447,7 @@ DRIVER_INIT_MEMBER(segas24_state,mahmajn)
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
 	io_r = &segas24_state::mahmajn_io_r;
 	io_w = &segas24_state::mahmajn_io_w;
@@ -2456,7 +2456,7 @@ DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2473,7 +2473,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2491,7 +2491,7 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2499,7 +2499,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspirits)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2507,7 +2507,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspiritj)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
 	io_r = &segas24_state::dcclub_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2516,7 +2516,7 @@ DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2524,7 +2524,7 @@ DRIVER_INIT_MEMBER(segas24_state,sgmast)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2532,7 +2532,7 @@ DRIVER_INIT_MEMBER(segas24_state,qsww)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2542,7 +2542,7 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2550,7 +2550,7 @@ DRIVER_INIT_MEMBER(segas24_state,crkdown)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;

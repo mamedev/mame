@@ -15,7 +15,7 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(tx0_state,tx0)
+void tx0_state::init_tx0()
 {
 	uint8_t *dst;
 

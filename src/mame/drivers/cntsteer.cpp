@@ -101,15 +101,15 @@ public:
 	DECLARE_READ8_MEMBER(cntsteer_adx_r);
 	DECLARE_WRITE8_MEMBER(nmimask_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(zerotrgt);
+	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_MACHINE_START(cntsteer);
-	DECLARE_MACHINE_RESET(cntsteer);
-	DECLARE_VIDEO_START(cntsteer);
-	DECLARE_MACHINE_START(zerotrgt);
-	DECLARE_MACHINE_RESET(zerotrgt);
-	DECLARE_VIDEO_START(zerotrgt);
+	void machine_start_cntsteer();
+	void machine_reset_cntsteer();
+	void video_start_cntsteer();
+	void machine_start_zerotrgt();
+	void machine_reset_zerotrgt();
+	void video_start_zerotrgt();
 	DECLARE_PALETTE_INIT(zerotrgt);
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
-VIDEO_START_MEMBER(cntsteer_state,cntsteer)
+void cntsteer_state::video_start_cntsteer()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
@@ -176,7 +176,7 @@ VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 	//m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
-VIDEO_START_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::video_start_zerotrgt()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
@@ -857,7 +857,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_START_MEMBER(cntsteer_state,cntsteer)
+void cntsteer_state::machine_start_cntsteer()
 {
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bg_bank));
@@ -872,14 +872,14 @@ MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 	save_item(NAME(m_disable_roz));
 }
 
-MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::machine_start_zerotrgt()
 {
 	save_item(NAME(m_nmimask));
-	MACHINE_START_CALL_MEMBER(cntsteer);
+	machine_start_cntsteer();
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::machine_reset_zerotrgt()
 {
 	m_flipscreen = 0;
 	m_bg_bank = 0;
@@ -896,10 +896,10 @@ MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 }
 
 
-MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
+void cntsteer_state::machine_reset_cntsteer()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	MACHINE_RESET_CALL_MEMBER(zerotrgt);
+	machine_reset_zerotrgt();
 }
 
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
@@ -1198,7 +1198,7 @@ void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 }
 
 #if 0
-DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
+void cntsteer_state::init_cntsteer()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 
@@ -1211,7 +1211,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 }
 #endif
 
-DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::init_zerotrgt()
 {
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }

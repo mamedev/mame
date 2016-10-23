@@ -157,7 +157,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ddealer_vregs_w);
 	DECLARE_WRITE16_MEMBER(ddealer_mcu_shared_w);
 	DECLARE_READ16_MEMBER(ddealer_mcu_r);
-	DECLARE_DRIVER_INIT(ddealer);
+	void init_ddealer();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -672,7 +672,7 @@ READ16_MEMBER(ddealer_state::ddealer_mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(ddealer_state,ddealer)
+void ddealer_state::init_ddealer()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::ddealer_mcu_r), this));
 }

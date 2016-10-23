@@ -156,14 +156,14 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
 
-	DECLARE_DRIVER_INIT(driveyes);
-	DECLARE_DRIVER_INIT(winrun);
-	DECLARE_DRIVER_INIT(starblad);
-	DECLARE_DRIVER_INIT(solvalou);
-	DECLARE_DRIVER_INIT(cybsled);
-	DECLARE_DRIVER_INIT(aircomb);
-	DECLARE_MACHINE_START(namcos21);
-	DECLARE_VIDEO_START(namcos21);
+	void init_driveyes();
+	void init_winrun();
+	void init_starblad();
+	void init_solvalou();
+	void init_cybsled();
+	void init_aircomb();
+	void machine_start_namcos21();
+	void video_start_namcos21();
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();

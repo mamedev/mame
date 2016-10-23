@@ -373,7 +373,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(goindol_state,goindol)
+void goindol_state::init_goindol()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

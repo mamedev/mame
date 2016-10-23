@@ -39,7 +39,7 @@ public:
 	DECLARE_READ8_MEMBER(adpcm_reset_r);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	DECLARE_DRIVER_INIT(pcktgal);
+	void init_pcktgal();
 	DECLARE_PALETTE_INIT(pcktgal);
 	virtual void machine_start() override;
 

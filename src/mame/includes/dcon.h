@@ -47,7 +47,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	DECLARE_DRIVER_INIT(sdgndmps);
+	void init_sdgndmps();
 	virtual void video_start() override;
 
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -4840,23 +4840,23 @@ void nmk16_state::decode_ssmissin()
 }
 
 
-DRIVER_INIT_MEMBER(nmk16_state,nmk)
+void nmk16_state::init_nmk()
 {
 	decode_gfx();
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,banked_audiocpu)
+void nmk16_state::init_banked_audiocpu()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tharrier)
+void nmk16_state::init_tharrier()
 {
 	membank("okibank1")->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 	membank("okibank2")->configure_entries(0, 4, memregion("oki2")->base() + 0x20000, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,hachamf_prot)
+void nmk16_state::init_hachamf_prot()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -4869,12 +4869,12 @@ DRIVER_INIT_MEMBER(nmk16_state,hachamf_prot)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0f0000, 0x0fffff, write16_delegate(FUNC(nmk16_state::hachamf_mainram_w),this));
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
+void nmk16_state::init_tdragonb()
 {
 	decode_tdragonb();
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
+void nmk16_state::init_tdragon_prot()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -4888,14 +4888,14 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0b0000, 0x0bffff, write16_delegate(FUNC(nmk16_state::tdragon_mainram_w),this));
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,ssmissin)
+void nmk16_state::init_ssmissin()
 {
 	decode_ssmissin();
 
 	membank("okibank1")->configure_entries(0, 4, memregion("oki1")->base() + 0x80000, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
+void nmk16_state::init_bjtwin()
 {
 	/* Patch rom to enable test mode */
 
@@ -4918,13 +4918,13 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 	rom[0x08f74/2] = 0x4e71;
 #endif
 
-	DRIVER_INIT_CALL(nmk);
+	init_nmk();
 
 }
 
 /* NO NMK004, it has a PIC instead */
 READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
-DRIVER_INIT_MEMBER(nmk16_state,vandykeb)
+void nmk16_state::init_vandykeb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
@@ -6896,7 +6896,7 @@ Other: Lattice pLSI 1032 x 2
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,redhawk)
+void nmk16_state::init_redhawk()
 {
 	decryptcode( machine(), 23, 22, 21, 20,  19, 18, 16, 15,  14, 17, 13, 12,  11, 10, 9, 8,  7, 6, 5, 4,  3, 2, 1, 0 );
 }
@@ -7092,7 +7092,7 @@ AF1-B1.UC3   MASK ROM read as 27C160  - Backgrounds
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,grdnstrm)
+void nmk16_state::init_grdnstrm()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
@@ -7185,7 +7185,7 @@ ROM_START( grdnstrmv ) /* Apples Industries license - Vertical version */
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nmk16_state,grdnstrmg)
+void nmk16_state::init_grdnstrmg()
 {
 	// todo collapse to one bitswap
 	decryptcode( machine(),23, 22, 21, 20,   19,  18, 13,17,   16,15, 14, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
@@ -7246,7 +7246,7 @@ ROM_START( redfoxwp2 )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
+void nmk16_state::init_redfoxwp2a()
 {
 	// todo collapse to one bitswap
 	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
@@ -7395,7 +7395,7 @@ rom11.107   27C040   /
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,bubl2000)
+void nmk16_state::init_bubl2000()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
@@ -7723,7 +7723,7 @@ UC1, UC2 & UC3 have solder pads for both MX29F1610 Flash & 27C160 EPROMs
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,spec2k)
+void nmk16_state::init_spec2k()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9,  8, 7,  6,  5,  4, 3,  2,  1,  0 );
 }

@@ -69,27 +69,27 @@ public:
 	DECLARE_READ8_MEMBER(williams_video_counter_r);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
-	DECLARE_DRIVER_INIT(sinistar);
-	DECLARE_DRIVER_INIT(stargate);
-	DECLARE_DRIVER_INIT(playball);
-	DECLARE_DRIVER_INIT(defender);
-	DECLARE_DRIVER_INIT(mayday);
-	DECLARE_DRIVER_INIT(lottofun);
-	DECLARE_DRIVER_INIT(alienaru);
-	DECLARE_DRIVER_INIT(defndjeu);
-	DECLARE_DRIVER_INIT(spdball);
-	DECLARE_DRIVER_INIT(splat);
-	DECLARE_DRIVER_INIT(joust);
-	DECLARE_DRIVER_INIT(alienar);
-	DECLARE_DRIVER_INIT(robotron);
-	DECLARE_DRIVER_INIT(bubbles);
-	DECLARE_MACHINE_START(defender);
-	DECLARE_MACHINE_RESET(defender);
-	DECLARE_VIDEO_START(williams);
-	DECLARE_MACHINE_START(williams);
-	DECLARE_MACHINE_RESET(williams);
-	DECLARE_MACHINE_START(williams_common);
-	DECLARE_MACHINE_RESET(williams_common);
+	void init_sinistar();
+	void init_stargate();
+	void init_playball();
+	void init_defender();
+	void init_mayday();
+	void init_lottofun();
+	void init_alienaru();
+	void init_defndjeu();
+	void init_spdball();
+	void init_splat();
+	void init_joust();
+	void init_alienar();
+	void init_robotron();
+	void init_bubbles();
+	void machine_start_defender();
+	void machine_reset_defender();
+	void video_start_williams();
+	void machine_start_williams();
+	void machine_reset_williams();
+	void machine_start_williams_common();
+	void machine_reset_williams_common();
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
@@ -148,10 +148,10 @@ public:
 	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(williams_snd_irq_b);
 
-	DECLARE_DRIVER_INIT(blaster);
-	DECLARE_MACHINE_START(blaster);
-	DECLARE_MACHINE_RESET(blaster);
-	DECLARE_VIDEO_START(blaster);
+	void init_blaster();
+	void machine_start_blaster();
+	void machine_reset_blaster();
+	void video_start_blaster();
 	uint32_t screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	inline void update_blaster_banking();
@@ -198,12 +198,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tshoot_maxvol_w);
 	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
 
-	DECLARE_DRIVER_INIT(mysticm);
-	DECLARE_DRIVER_INIT(tshoot);
-	DECLARE_DRIVER_INIT(inferno);
-	DECLARE_MACHINE_START(williams2);
-	DECLARE_MACHINE_RESET(williams2);
-	DECLARE_VIDEO_START(williams2);
+	void init_mysticm();
+	void init_tshoot();
+	void init_inferno();
+	void machine_start_williams2();
+	void machine_reset_williams2();
+	void video_start_williams2();
 	uint32_t screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -218,9 +218,9 @@ public:
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
 	uint16_t m_joust2_current_sound_data;
 
-	DECLARE_DRIVER_INIT(joust2);
-	DECLARE_MACHINE_START(joust2);
-	DECLARE_MACHINE_RESET(joust2);
+	void init_joust2();
+	void machine_start_joust2();
+	void machine_reset_joust2();
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);

@@ -87,8 +87,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
-	DECLARE_MACHINE_START(neocd);
-	DECLARE_MACHINE_RESET(neocd);
+	void machine_start_neocd();
+	void machine_reset_neocd();
 
 	// neoCD
 
@@ -126,8 +126,8 @@ public:
 
 	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(neocdz);
-	DECLARE_DRIVER_INIT(neocdzj);
+	void init_neocdz();
+	void init_neocdzj();
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
@@ -823,7 +823,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
  *
  *************************************/
 
-MACHINE_START_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_start_neocd()
 {
 	m_type = NEOGEO_CD;
 	common_machine_start();
@@ -860,7 +860,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_reset_neocd()
 {
 	neogeo_state::machine_reset();
 
@@ -1128,12 +1128,12 @@ ROM_END
 
 #define rom_neocdzj    rom_neocdz
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdz)
+void ngcd_state::init_neocdz()
 {
 	NeoSystem = NEOCD_REGION_US;
 }
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
+void ngcd_state::init_neocdzj()
 {
 	NeoSystem = NEOCD_REGION_JAPAN;
 }

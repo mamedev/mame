@@ -120,7 +120,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
-	DECLARE_DRIVER_INIT(c1p);
+	void init_c1p();
 };
 
 class c1pmf_state : public c1p_state

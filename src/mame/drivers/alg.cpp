@@ -48,14 +48,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
 
-	DECLARE_DRIVER_INIT(aplatoon);
-	DECLARE_DRIVER_INIT(palr3);
-	DECLARE_DRIVER_INIT(palr1);
-	DECLARE_DRIVER_INIT(palr6);
-	DECLARE_DRIVER_INIT(ntsc);
-	DECLARE_DRIVER_INIT(pal);
+	void init_aplatoon();
+	void init_palr3();
+	void init_palr1();
+	void init_palr6();
+	void init_ntsc();
+	void init_pal();
 
-	DECLARE_VIDEO_START(alg);
+	void video_start_alg();
 
 protected:
 	// amiga_state overrides
@@ -107,10 +107,10 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
  *
  *************************************/
 
-VIDEO_START_MEMBER(alg_state,alg)
+void alg_state::video_start_alg()
 {
 	/* standard video start */
-	VIDEO_START_CALL_MEMBER(amiga);
+	video_start_amiga();
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
@@ -680,21 +680,21 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( alg_state, ntsc )
+void alg_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;
 	m_denise_id = DENISE;
 }
 
-DRIVER_INIT_MEMBER( alg_state, pal )
+void alg_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;
 	m_denise_id = DENISE;
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr1)
+void alg_state::init_palr1()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
@@ -711,9 +711,9 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr3)
+void alg_state::init_palr3()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
@@ -729,9 +729,9 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr6)
+void alg_state::init_palr6()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
@@ -749,9 +749,9 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,aplatoon)
+void alg_state::init_aplatoon()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	uint8_t *rom = memregion("user2")->base();

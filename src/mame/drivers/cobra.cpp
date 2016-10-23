@@ -784,9 +784,9 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 
-	DECLARE_DRIVER_INIT(racjamdx);
-	DECLARE_DRIVER_INIT(bujutsu);
-	DECLARE_DRIVER_INIT(cobra);
+	void init_racjamdx();
+	void init_bujutsu();
+	void init_cobra();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -3324,7 +3324,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(cobra_state, cobra)
+void cobra_state::init_cobra()
 {
 	m_gfxfifo_in  = auto_alloc(machine(),
 								cobra_fifo(machine(),
@@ -3379,9 +3379,9 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);        // should this map to 0x1e000000?
 }
 
-DRIVER_INIT_MEMBER(cobra_state,bujutsu)
+void cobra_state::init_bujutsu()
 {
-	DRIVER_INIT_CALL(cobra);
+	init_cobra();
 
 	// rom hacks for sub board...
 	{
@@ -3461,9 +3461,9 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	m_has_psac = false;
 }
 
-DRIVER_INIT_MEMBER(cobra_state,racjamdx)
+void cobra_state::init_racjamdx()
 {
-	DRIVER_INIT_CALL(cobra);
+	init_cobra();
 
 	// rom hacks for sub board...
 	{

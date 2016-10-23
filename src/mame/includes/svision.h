@@ -57,14 +57,14 @@ public:
 	DECLARE_WRITE8_MEMBER(svision_w);
 	DECLARE_READ8_MEMBER(tvlink_r);
 	DECLARE_WRITE8_MEMBER(tvlink_w);
-	DECLARE_DRIVER_INIT(svisions);
-	DECLARE_DRIVER_INIT(svision);
+	void init_svisions();
+	void init_svision();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(svision);
 	DECLARE_PALETTE_INIT(svisionp);
 	DECLARE_PALETTE_INIT(svisionn);
-	DECLARE_MACHINE_RESET(tvlink);
+	void machine_reset_tvlink();
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(svision_frame_int);

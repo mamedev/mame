@@ -697,7 +697,7 @@ ROM_START( xexexj ) /* Japan, Version AA */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(xexex_state,xexex)
+void xexex_state::init_xexex()
 {
 	m_strip_0x1a = 0;
 

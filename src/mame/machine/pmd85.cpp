@@ -754,35 +754,35 @@ void pmd85_state::pmd85_common_driver_init()
 	m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,pmd851)
+void pmd85_state::init_pmd851()
 {
 	m_model = PMD85_1;
 	update_memory = &pmd85_state::pmd851_update_memory;
 	pmd85_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,pmd852a)
+void pmd85_state::init_pmd852a()
 {
 	m_model = PMD85_2A;
 	update_memory = &pmd85_state::pmd852a_update_memory;
 	pmd85_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,pmd853)
+void pmd85_state::init_pmd853()
 {
 	m_model = PMD85_3;
 	update_memory = &pmd85_state::pmd853_update_memory;
 	pmd85_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,alfa)
+void pmd85_state::init_alfa()
 {
 	m_model = ALFA;
 	update_memory = &pmd85_state::alfa_update_memory;
 	pmd85_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,mato)
+void pmd85_state::init_mato()
 {
 	m_model = MATO;
 	update_memory = &pmd85_state::mato_update_memory;
@@ -801,7 +801,7 @@ DRIVER_INIT_MEMBER(pmd85_state,mato)
 	}
 }
 
-DRIVER_INIT_MEMBER(pmd85_state,c2717)
+void pmd85_state::init_c2717()
 {
 	m_model = C2717;
 	update_memory = &pmd85_state::c2717_update_memory;

@@ -54,17 +54,17 @@ public:
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
 
-	DECLARE_DRIVER_INIT(pzlbreak);
-	DECLARE_DRIVER_INIT(snowbro3);
-	DECLARE_DRIVER_INIT(cookbib3);
-	DECLARE_DRIVER_INIT(4in1boot);
-	DECLARE_DRIVER_INIT(3in1semi);
-	DECLARE_DRIVER_INIT(cookbib2);
-	DECLARE_DRIVER_INIT(toto);
-	DECLARE_DRIVER_INIT(hyperpac);
-	DECLARE_DRIVER_INIT(yutnori);
-	DECLARE_MACHINE_RESET(semiprot);
-	DECLARE_MACHINE_RESET(finalttr);
+	void init_pzlbreak();
+	void init_snowbro3();
+	void init_cookbib3();
+	void init_4in1boot();
+	void init_3in1semi();
+	void init_cookbib2();
+	void init_toto();
+	void init_hyperpac();
+	void init_yutnori();
+	void machine_reset_semiprot();
+	void machine_reset_finalttr();
 
 	uint32_t screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

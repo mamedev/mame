@@ -372,7 +372,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(epos_state,epos)
+void epos_state::machine_start_epos()
 {
 	save_item(NAME(m_palette));
 	save_item(NAME(m_counter));
@@ -385,7 +385,7 @@ void epos_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(epos_state,dealer)
+void epos_state::machine_start_dealer()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
@@ -394,7 +394,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 
-	MACHINE_START_CALL_MEMBER(epos);
+	machine_start_epos();
 }
 
 static MACHINE_CONFIG_START( epos, epos_state )
@@ -626,7 +626,7 @@ ROM_START( beastf )
 	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) ) // not dumped, taken from suprglob
 ROM_END
 
-DRIVER_INIT_MEMBER(epos_state,dealer)
+void epos_state::init_dealer()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int A;

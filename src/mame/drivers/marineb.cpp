@@ -52,7 +52,7 @@ void marineb_state::machine_reset()
 	m_marineb_active_low_flipscreen = 0;
 }
 
-MACHINE_RESET_MEMBER(marineb_state,springer)
+void marineb_state::machine_reset_springer()
 {
 	marineb_state::machine_reset();
 

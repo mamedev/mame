@@ -573,7 +573,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(cbuster_state,twocrude)
+void cbuster_state::init_twocrude()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	uint8_t *PTR;

@@ -3513,7 +3513,7 @@ ROM_END
 //  ROM[0x0b0b] = 0x00;
 //}
 
-DRIVER_INIT_MEMBER(norautp_state,enc)
+void norautp_state::init_enc()
 {
 /* Attempt to decrypt the program ROM */
 
@@ -3552,7 +3552,7 @@ DRIVER_INIT_MEMBER(norautp_state,enc)
 //  free(buffer);
 }
 
-DRIVER_INIT_MEMBER(norautp_state,deb)
+void norautp_state::init_deb()
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
@@ -3562,7 +3562,7 @@ DRIVER_INIT_MEMBER(norautp_state,deb)
 	ROM[0x206c] = 0xff;
 }
 
-DRIVER_INIT_MEMBER(norautp_state,ssa)
+void norautp_state::init_ssa()
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {

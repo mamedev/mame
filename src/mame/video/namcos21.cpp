@@ -103,7 +103,7 @@ void namcos21_state::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const r
 	}
 }
 
-VIDEO_START_MEMBER(namcos21_state,namcos21)
+void namcos21_state::video_start_namcos21()
 {
 	if( m_gametype == NAMCOS21_WINRUN91 )
 	{

@@ -41,7 +41,7 @@ void hnayayoi_state::video_start()
 	save_pointer(NAME(m_pixmap[3]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(hnayayoi_state,untoucha)
+void hnayayoi_state::video_start_untoucha()
 {
 	common_vh_start(8);  /* 8 bitmaps -> 4 layers */
 

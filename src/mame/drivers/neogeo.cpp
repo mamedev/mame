@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_START_MEMBER(aes_state, aes)
+void aes_state::machine_start_aes()
 {
 	m_type = NEOGEO_AES;
 	common_machine_start();
@@ -2024,7 +2024,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(neogeo_state, neogeo)
+void neogeo_state::init_neogeo()
 {
 	// install controllers
 	if (m_ctrl1)

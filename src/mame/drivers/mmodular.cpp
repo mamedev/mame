@@ -182,18 +182,18 @@ public:
 	DECLARE_READ16_MEMBER(read_unknown3);
 	DECLARE_READ32_MEMBER(read_1800000);
 	DECLARE_WRITE32_MEMBER(write_1000000);
-	DECLARE_DRIVER_INIT(polgar);
-	DECLARE_MACHINE_START(polgar);
-	DECLARE_MACHINE_RESET(polgar);
-	DECLARE_MACHINE_START(sfortea);
-	DECLARE_MACHINE_RESET(sfortea);
-	DECLARE_MACHINE_START(van32);
-	DECLARE_MACHINE_RESET(van16);
-	DECLARE_MACHINE_RESET(monteciv);
-	DECLARE_MACHINE_START(diablo68);
-	DECLARE_MACHINE_START(van16);
-	DECLARE_MACHINE_START(risc);
-	DECLARE_MACHINE_RESET(academy);
+	void init_polgar();
+	void machine_start_polgar();
+	void machine_reset_polgar();
+	void machine_start_sfortea();
+	void machine_reset_sfortea();
+	void machine_start_van32();
+	void machine_reset_van16();
+	void machine_reset_monteciv();
+	void machine_start_diablo68();
+	void machine_start_van16();
+	void machine_start_risc();
+	void machine_reset_academy();
 	DECLARE_PALETTE_INIT(chess_lcd);
 	TIMER_DEVICE_CALLBACK_MEMBER(cause_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(cause_M6502_irq);
@@ -987,7 +987,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq_academy)
 }
 
 
-MACHINE_START_MEMBER(polgar_state,van32)
+void polgar_state::machine_start_van32()
 {
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
 // patches gen32 gen32_41 lond030
@@ -1000,7 +1000,7 @@ MACHINE_START_MEMBER(polgar_state,van32)
 }
 
 
-MACHINE_START_MEMBER(polgar_state,risc)
+void polgar_state::machine_start_risc()
 {
 }
 
@@ -1009,41 +1009,41 @@ void polgar_state::common_chess_start()
 {
 }
 
-MACHINE_START_MEMBER(polgar_state,polgar)
+void polgar_state::machine_start_polgar()
 {
 	common_chess_start();
 }
 
-MACHINE_START_MEMBER(polgar_state,sfortea)
+void polgar_state::machine_start_sfortea()
 {
 	common_chess_start();
 }
 
-MACHINE_START_MEMBER(polgar_state,diablo68)
+void polgar_state::machine_start_diablo68()
 {
 	common_chess_start();
 }
 
-MACHINE_START_MEMBER(polgar_state,van16)
+void polgar_state::machine_start_van16()
 {
 }
 
-MACHINE_RESET_MEMBER(polgar_state,van16)
-{
-	common_chess_start();
-}
-
-MACHINE_RESET_MEMBER(polgar_state,polgar)
+void polgar_state::machine_reset_van16()
 {
 	common_chess_start();
 }
 
-MACHINE_RESET_MEMBER(polgar_state,sfortea)
+void polgar_state::machine_reset_polgar()
 {
 	common_chess_start();
 }
 
-MACHINE_RESET_MEMBER(polgar_state,monteciv)
+void polgar_state::machine_reset_sfortea()
+{
+	common_chess_start();
+}
+
+void polgar_state::machine_reset_monteciv()
 {
 	montecivtop = 0;
 	montecivbot = 0;
@@ -1054,7 +1054,7 @@ MACHINE_RESET_MEMBER(polgar_state,monteciv)
 }
 
 
-MACHINE_RESET_MEMBER(polgar_state,academy)
+void polgar_state::machine_reset_academy()
 {
 	academyallowNMI = 0;
 	common_chess_start();
@@ -1834,7 +1834,7 @@ ROM_START( lond030 )
 	ROM_LOAD("lond030.bin", 0x00000, 0x40000,CRC(853BAA4E) SHA1(946951081D4E91E5BDD9E93D0769568A7FE79BAD))
 ROM_END
 
-DRIVER_INIT_MEMBER(polgar_state,polgar)
+void polgar_state::init_polgar()
 {
 	led_status=0;
 }

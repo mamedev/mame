@@ -241,7 +241,7 @@ public:
 	DECLARE_WRITE8_MEMBER(strobe_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_DRIVER_INIT(screenpl);
+	void init_screenpl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1244,7 +1244,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
+void maygayv1_state::init_screenpl()
 {
 	m_p1 = m_p3 = 0xff;
 }

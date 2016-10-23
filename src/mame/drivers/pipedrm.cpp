@@ -176,10 +176,10 @@ public:
 		: fromance_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_START(pipedrm);
-	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
+	void machine_start_pipedrm();
+	void machine_reset_pipedrm();
+	void init_pipedrm();
+	void init_hatris();
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
@@ -575,7 +575,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_start_pipedrm()
 {
 	/* initialize main Z80 bank */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
@@ -592,7 +592,7 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_reset_pipedrm()
 {
 	int i;
 
@@ -901,7 +901,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
@@ -910,7 +910,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 }
 
 
-DRIVER_INIT_MEMBER(pipedrm_state,hatris)
+void pipedrm_state::init_hatris()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, write8_delegate(FUNC(pipedrm_state::sound_command_nonmi_w),this));
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));

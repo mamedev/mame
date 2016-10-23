@@ -198,8 +198,8 @@ public:
 	DECLARE_READ16_MEMBER( nevada_sec_r );
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
 
-	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
+	void machine_start_nevada();
+	void init_nevada();
 };
 
 /*
@@ -579,7 +579,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start_nevada()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -673,7 +673,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 

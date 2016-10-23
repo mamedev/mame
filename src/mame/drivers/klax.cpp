@@ -62,7 +62,7 @@ WRITE16_MEMBER(klax_state::interrupt_ack_w)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(klax_state,klax)
+void klax_state::machine_reset_klax()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);

@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(phunsy);
+	void init_phunsy();
 	DECLARE_READ8_MEMBER( phunsy_data_r );
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
@@ -316,7 +316,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	return result;
 }
 
-DRIVER_INIT_MEMBER( phunsy_state, phunsy )
+void phunsy_state::init_phunsy()
 {
 	uint8_t *main = memregion("maincpu")->base();
 	uint8_t *roms = memregion("roms")->base();

@@ -49,7 +49,7 @@ public:
 	uint8_t *m_p_chargen;
 	uint8_t m_xor_display;
 	uint8_t m_key_mux;
-	DECLARE_DRIVER_INIT(bmjr);
+	void init_bmjr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -376,7 +376,7 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-DRIVER_INIT_MEMBER(bmjr_state,bmjr)
+void bmjr_state::init_bmjr()
 {
 }
 

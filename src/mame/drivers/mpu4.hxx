@@ -1517,12 +1517,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4aao)
+void mpu4_state::init_m4aao()
 {
 	//Derived from Against_All_Odds_(Eurotek)_[C01_800_15jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_duart_a);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_duart_a();
+	init_m4default_reels();
 	//PCKEY =9
 	//STKEY =0
 	//JPKEY =0

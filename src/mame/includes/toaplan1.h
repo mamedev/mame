@@ -121,18 +121,18 @@ public:
 	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
 
-	DECLARE_DRIVER_INIT(toaplan1);
-	DECLARE_DRIVER_INIT(demonwld);
-	DECLARE_DRIVER_INIT(vimana);
+	void init_toaplan1();
+	void init_demonwld();
+	void init_vimana();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
-	DECLARE_MACHINE_RESET(toaplan1);
-	DECLARE_VIDEO_START(toaplan1);
-	DECLARE_MACHINE_RESET(zerowing);
-	DECLARE_MACHINE_RESET(demonwld);
-	DECLARE_MACHINE_RESET(vimana);
+	void machine_reset_toaplan1();
+	void video_start_toaplan1();
+	void machine_reset_zerowing();
+	void machine_reset_demonwld();
+	void machine_reset_vimana();
 	uint32_t screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void screen_eof_toaplan1(screen_device &screen, bool state);
@@ -172,7 +172,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
 	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
-	DECLARE_VIDEO_START(rallybik);
+	void video_start_rallybik();
 	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_rallybik(screen_device &screen, bool state);
 

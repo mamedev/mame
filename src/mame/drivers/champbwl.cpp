@@ -179,9 +179,9 @@ public:
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
-	DECLARE_MACHINE_START(champbwl);
-	DECLARE_MACHINE_RESET(champbwl);
-	DECLARE_MACHINE_START(doraemon);
+	void machine_start_champbwl();
+	void machine_reset_champbwl();
+	void machine_start_doraemon();
 	DECLARE_PALETTE_INIT(champbwl);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -452,7 +452,7 @@ static GFXDECODE_START( champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(champbwl_state,champbwl)
+void champbwl_state::machine_start_champbwl()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -462,7 +462,7 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 	save_item(NAME(m_last_trackball_val));
 }
 
-MACHINE_RESET_MEMBER(champbwl_state,champbwl)
+void champbwl_state::machine_reset_champbwl()
 {
 	m_screenflip = 0;
 	m_last_trackball_val[0] = 0;
@@ -548,7 +548,7 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 		m_seta001->setac_eof();
 }
 
-MACHINE_START_MEMBER(champbwl_state,doraemon)
+void champbwl_state::machine_start_doraemon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);

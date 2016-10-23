@@ -706,7 +706,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(mappy_state,superpac)
+void mappy_state::machine_reset_superpac()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -715,7 +715,7 @@ MACHINE_RESET_MEMBER(mappy_state,superpac)
 		superpac_latch_w(space, i, 0);
 }
 
-MACHINE_RESET_MEMBER(mappy_state,phozon)
+void mappy_state::machine_reset_phozon()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -724,7 +724,7 @@ MACHINE_RESET_MEMBER(mappy_state,phozon)
 		phozon_latch_w(space, i, 0);
 }
 
-MACHINE_RESET_MEMBER(mappy_state,mappy)
+void mappy_state::machine_reset_mappy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1631,7 +1631,7 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-MACHINE_START_MEMBER(mappy_state,mappy)
+void mappy_state::machine_start_mappy()
 {
 	switch (m_type)
 	{
@@ -2398,17 +2398,17 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mappy_state,superpac)
+void mappy_state::init_superpac()
 {
 	m_type = GAME_SUPERPAC;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,pacnpal)
+void mappy_state::init_pacnpal()
 {
 	m_type = GAME_PACNPAL;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,grobda)
+void mappy_state::init_grobda()
 {
 	m_type = GAME_GROBDA;
 
@@ -2423,23 +2423,23 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
 
-DRIVER_INIT_MEMBER(mappy_state,phozon)
+void mappy_state::init_phozon()
 {
 	m_type = GAME_PHOZON;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,mappy)
+void mappy_state::init_mappy()
 {
 	m_type = GAME_MAPPY;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,druaga)
+void mappy_state::init_druaga()
 {
 	m_type = GAME_DRUAGA;
 }
 
 
-DRIVER_INIT_MEMBER(mappy_state,digdug2)
+void mappy_state::init_digdug2()
 {
 	m_type = GAME_DIGDUG2;
 
@@ -2447,7 +2447,7 @@ DRIVER_INIT_MEMBER(mappy_state,digdug2)
 	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(mappy_state,motos)
+void mappy_state::init_motos()
 {
 	m_type = GAME_MOTOS;
 }

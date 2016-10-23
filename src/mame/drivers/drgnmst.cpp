@@ -467,7 +467,7 @@ uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 }
 
 
-DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
+void drgnmst_state::init_drgnmst()
 {
 	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
 	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();

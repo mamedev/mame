@@ -70,7 +70,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
 
-	DECLARE_DRIVER_INIT(namco86);
+	void init_namco86();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(namcos86);

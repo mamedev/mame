@@ -670,7 +670,7 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(welltris_state,welltris)
+void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */

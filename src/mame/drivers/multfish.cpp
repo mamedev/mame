@@ -404,7 +404,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
 	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,customl)
+void igrosoft_gamble_state::init_customl()
 {
 /*
 rom 1
@@ -558,130 +558,130 @@ static void ent_decode(running_machine &machine, uint8_t xor12, uint8_t xor34, u
 	roment_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,island2l)
+void igrosoft_gamble_state::init_island2l()
 {
 	m_xor_palette = 0x8bf7;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0xff, 0x11, 0x77, 0xee, 0x44c40);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,keksl)
+void igrosoft_gamble_state::init_keksl()
 {
 	m_xor_palette = 0x41f3;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,pirate2l)
+void igrosoft_gamble_state::init_pirate2l()
 {
 	m_xor_palette = 0x8bfb;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0xaa, 0x11, 0x22, 0xee, 0x48480);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,fcockt2l)
+void igrosoft_gamble_state::init_fcockt2l()
 {
 	m_xor_palette = 0xedfb;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0x55, 0x11, 0xff, 0xee, 0x78780);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,sweetl2l)
+void igrosoft_gamble_state::init_sweetl2l()
 {
 	m_xor_palette = 0x4bf7;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0xdd, 0x33, 0x33, 0x77, 0x00800);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,gnomel)
+void igrosoft_gamble_state::init_gnomel()
 {
 	m_xor_palette = 0x49ff;
 	m_xor_paltype = 1;
 	lottery_decode(machine(), 0xcc, 0x22, 0x33, 0x66, 0x14940);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,crzmonent)
+void igrosoft_gamble_state::init_crzmonent()
 {
 	m_xor_palette = 0x1cdb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0xaa, 0x44, 0x55, 0x55, 0x1c9c0);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,fcocktent)
+void igrosoft_gamble_state::init_fcocktent()
 {
 	m_xor_palette = 0x2cdb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x77, 0x55, 0x22, 0x44, 0x18180);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,garageent)
+void igrosoft_gamble_state::init_garageent()
 {
 	m_xor_palette = 0x7adb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x88, 0x66, 0x66, 0x99, 0x28280);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,rclimbent)
+void igrosoft_gamble_state::init_rclimbent()
 {
 	m_xor_palette = 0x5edb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x55, 0xaa, 0x44, 0xff, 0x74740);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,sweetl2ent)
+void igrosoft_gamble_state::init_sweetl2ent()
 {
 	m_xor_palette = 0xdcdb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0xee, 0x77, 0x88, 0x11, 0x5c5c0);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,resdntent)
+void igrosoft_gamble_state::init_resdntent()
 {
 	m_xor_palette = 0x6edb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0xaa, 0xcc, 0xaa, 0xaa, 0x78780);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,island2ent)
+void igrosoft_gamble_state::init_island2ent()
 {
 	m_xor_palette = 0xecdb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x88, 0x55, 0xff, 0x99, 0x58d80);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,pirate2ent)
+void igrosoft_gamble_state::init_pirate2ent()
 {
 	m_xor_palette = 0xbadb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x33, 0xbb, 0x77, 0x55, 0x68e80);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,keksent)
+void igrosoft_gamble_state::init_keksent()
 {
 	m_xor_palette = 0xaedb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x55, 0xff, 0xaa, 0x22, 0x38b80);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,gnomeent)
+void igrosoft_gamble_state::init_gnomeent()
 {
 	m_xor_palette = 0x9edb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x22, 0x77, 0x11, 0xbb, 0x34b40);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,lhauntent)
+void igrosoft_gamble_state::init_lhauntent()
 {
 	m_xor_palette = 0x1adb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x22, 0x44, 0x44, 0xbb, 0x24240);
 }
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,fcockt2ent)
+void igrosoft_gamble_state::init_fcockt2ent()
 {
 	m_xor_palette = 0x7cdb;
 	m_xor_paltype = 2;
 	ent_decode(machine(), 0x33, 0xcc, 0xaa, 0x88, 0x14140);
 }
 
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,crzmon2)
+void igrosoft_gamble_state::init_crzmon2()
 {
 	m_xor_paltype = 3;
 	m_xor_palette = 0xaff7;
 	// needs gfx (and palette) descrambles
 }
 
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,crzmon2lot)
+void igrosoft_gamble_state::init_crzmon2lot()
 {
 	m_xor_paltype = 3;
 	m_xor_palette = 0xddf7;
 	// needs gfx (and palette) descrambles
 }
 
-DRIVER_INIT_MEMBER(igrosoft_gamble_state,crzmon2ent)
+void igrosoft_gamble_state::init_crzmon2ent()
 {
 	m_xor_paltype = 3;
 	m_xor_palette = 0x4df7;

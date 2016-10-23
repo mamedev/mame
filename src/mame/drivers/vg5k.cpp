@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
+	void init_vg5k();
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
@@ -329,7 +329,7 @@ static GFXDECODE_START( vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
 	uint16_t a,b,c,d,dest=0x2000;

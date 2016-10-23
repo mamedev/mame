@@ -161,7 +161,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ad1847_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
-	DECLARE_DRIVER_INIT(a51site4);
+	void init_a51site4();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -993,7 +993,7 @@ static const speedup_entry a51site4_speedups[] =
 
 #endif
 
-DRIVER_INIT_MEMBER(mediagx_state,a51site4)
+void mediagx_state::init_a51site4()
 {
 	init_mediagx();
 

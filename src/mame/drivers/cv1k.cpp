@@ -219,13 +219,13 @@ public:
 
 	/* game specific */
 	DECLARE_READ64_MEMBER(speedup_r);
-	DECLARE_DRIVER_INIT(mushisam);
-	DECLARE_DRIVER_INIT(ibara);
-	DECLARE_DRIVER_INIT(espgal2);
-	DECLARE_DRIVER_INIT(mushitam);
-	DECLARE_DRIVER_INIT(pinkswts);
-	DECLARE_DRIVER_INIT(deathsml);
-	DECLARE_DRIVER_INIT(dpddfk);
+	void init_mushisam();
+	void init_ibara();
+	void init_espgal2();
+	void init_mushitam();
+	void init_pinkswts();
+	void init_deathsml();
+	void init_dpddfk();
 
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
@@ -849,37 +849,37 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 }
 
 
-DRIVER_INIT_MEMBER(cv1k_state,mushisam)
+void cv1k_state::init_mushisam()
 {
 	install_speedups(0x024d8, 0xc04a2aa, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,ibara)
+void cv1k_state::init_ibara()
 {
 	install_speedups(0x022f0, 0xc04a0aa, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,espgal2)
+void cv1k_state::init_espgal2()
 {
 	install_speedups(0x02310, 0xc05177a, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,mushitam)
+void cv1k_state::init_mushitam()
 {
 	install_speedups(0x0022f0, 0xc04a0da, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,pinkswts)
+void cv1k_state::init_pinkswts()
 {
 	install_speedups(0x02310, 0xc05176a, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,deathsml)
+void cv1k_state::init_deathsml()
 {
 	install_speedups(0x02310, 0xc0519a2, false);
 }
 
-DRIVER_INIT_MEMBER(cv1k_state,dpddfk)
+void cv1k_state::init_dpddfk()
 {
 	install_speedups(0x02310, 0xc1d1346, true);
 

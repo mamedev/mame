@@ -153,7 +153,7 @@ void psikyo_state::psikyo_switch_banks( int tmap, int bank )
 }
 
 
-VIDEO_START_MEMBER(psikyo_state,psikyo)
+void psikyo_state::video_start_psikyo()
 {
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
 	   the various sized tilemaps now as opposed to later */
@@ -199,9 +199,9 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	save_pointer(NAME(m_spritebuf2.get()), 0x2000 / 4);
 }
 
-VIDEO_START_MEMBER(psikyo_state,sngkace)
+void psikyo_state::video_start_sngkace()
 {
-	VIDEO_START_CALL_MEMBER( psikyo );
+	video_start_psikyo();
 
 	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
 	psikyo_switch_banks(1, 1); // They share "gfx2" to save memory on other boards

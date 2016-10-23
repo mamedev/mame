@@ -330,7 +330,7 @@ public:
 	DECLARE_READ16_MEMBER(spc_infifo_data_r);
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
-	DECLARE_DRIVER_INIT(dectalk);
+	void init_dectalk();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	void dectalk_outfifo_check ();
@@ -855,7 +855,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(dectalk_state,dectalk)
+void dectalk_state::init_dectalk()
 {
 	dectalk_clear_all_fifos();
 	m_simulate_outfifo_error = 0;

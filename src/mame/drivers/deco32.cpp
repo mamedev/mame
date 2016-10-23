@@ -1765,7 +1765,7 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-MACHINE_RESET_MEMBER(deco32_state,deco32)
+void deco32_state::machine_reset_deco32()
 {
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
@@ -3944,7 +3944,7 @@ ROM_START( nslasheru ) /* DE-0395-1 PCB */
 	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
-DRIVER_INIT_MEMBER(deco32_state,captaven)
+void deco32_state::init_captaven()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
@@ -3996,7 +3996,7 @@ void dragngun_state::dragngun_init_common()
 //  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,dragngun)
+void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
@@ -4004,7 +4004,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
+void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
@@ -4012,13 +4012,13 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(deco32_state,fghthist)
+void deco32_state::init_fghthist()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,lockload)
+void dragngun_state::init_lockload()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 //  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
@@ -4039,7 +4039,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 //  ROM[0x3fe40c/4]=0xe1a00000;//  NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(deco32_state,tattass)
+void deco32_state::init_tattass()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
@@ -4066,7 +4066,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	save_item(NAME(m_byteAddr));
 }
 
-DRIVER_INIT_MEMBER(deco32_state,nslasher)
+void deco32_state::init_nslasher()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);

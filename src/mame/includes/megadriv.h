@@ -71,10 +71,10 @@ public:
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;
 
-	DECLARE_DRIVER_INIT(megadriv_c2);
-	DECLARE_DRIVER_INIT(megadrie);
-	DECLARE_DRIVER_INIT(megadriv);
-	DECLARE_DRIVER_INIT(megadrij);
+	void init_megadriv_c2();
+	void init_megadrie();
+	void init_megadriv();
+	void init_megadrij();
 
 	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
 	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
@@ -129,9 +129,9 @@ public:
 
 	void megadriv_stop_scanline_timer();
 
-	DECLARE_MACHINE_START( megadriv );
-	DECLARE_MACHINE_RESET( megadriv );
-	DECLARE_VIDEO_START( megadriv );
+	void machine_start_megadriv();
+	void machine_reset_megadriv();
+	void video_start_megadriv();
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megadriv(screen_device &screen, bool state);
 
@@ -158,18 +158,18 @@ public:
 	optional_device<md_cart_slot_device> m_cart;
 	optional_region_ptr<uint16_t> m_tmss;
 
-	DECLARE_DRIVER_INIT(mess_md_common);
-	DECLARE_DRIVER_INIT(genesis);
-	DECLARE_DRIVER_INIT(md_eur);
-	DECLARE_DRIVER_INIT(md_jpn);
+	void init_mess_md_common();
+	void init_genesis();
+	void init_md_eur();
+	void init_md_jpn();
 
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
 
-	DECLARE_MACHINE_START( md_common );     // setup ioport_port
-	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
-	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
-	DECLARE_MACHINE_RESET( ms_megadriv );
+	void machine_start_md_common();     // setup ioport_port
+	void machine_start_ms_megadriv();   // setup ioport_port + install cartslot handlers
+	void machine_start_ms_megacd();     // setup ioport_port + dma delay for cd
+	void machine_reset_ms_megadriv();
 
 	void screen_eof_console(screen_device &screen, bool state);
 

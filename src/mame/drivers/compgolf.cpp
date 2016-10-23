@@ -329,7 +329,7 @@ void compgolf_state::compgolf_expand_bg()
 	}
 }
 
-DRIVER_INIT_MEMBER(compgolf_state,compgolf)
+void compgolf_state::init_compgolf()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 	compgolf_expand_bg();

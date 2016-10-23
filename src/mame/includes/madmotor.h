@@ -40,7 +40,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(madmotor_sound_w);
-	DECLARE_DRIVER_INIT(madmotor);
+	void init_madmotor();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

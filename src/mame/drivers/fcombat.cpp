@@ -325,7 +325,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(fcombat_state,fcombat)
+void fcombat_state::init_fcombat()
 {
 	uint32_t oldaddr, newaddr, length;
 	uint8_t *src, *dst;

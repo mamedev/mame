@@ -317,7 +317,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(citycon_state,citycon)
+void citycon_state::init_citycon()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int i;

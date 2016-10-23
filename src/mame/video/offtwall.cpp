@@ -69,7 +69,7 @@ const atari_motion_objects_config offtwall_state::s_mob_config =
 };
 
 
-VIDEO_START_MEMBER(offtwall_state,offtwall)
+void offtwall_state::video_start_offtwall()
 {
 }
 

@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER( zexall_output_ack_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_req_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_data_w );
-	DECLARE_DRIVER_INIT(zexall);
+	void init_zexall();
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -55,7 +55,7 @@ private:
 	virtual void machine_reset() override;
 };
 
-DRIVER_INIT_MEMBER(zexall_state,zexall)
+void zexall_state::init_zexall()
 {
 	m_out_ack = 0;
 	m_out_req = 0;

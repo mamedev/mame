@@ -71,8 +71,8 @@ public:
 			m_videoram(*this, "videoram") { }
 
 	required_shared_ptr<uint8_t> m_videoram;
-	DECLARE_MACHINE_START(interact);
-	DECLARE_MACHINE_RESET(interact);
+	void machine_start_interact();
+	void machine_reset_interact();
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -100,12 +100,12 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(interact_state,interact)
+void interact_state::machine_reset_interact()
 {
 	hector_reset(0, 0);
 }
 
-MACHINE_START_MEMBER(interact_state,interact)
+void interact_state::machine_start_interact()
 {
 	hector_init();
 }

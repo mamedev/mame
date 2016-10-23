@@ -283,7 +283,7 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mouser_state,mouser)
+void mouser_state::init_mouser()
 {
 	/* Decode the opcodes */
 

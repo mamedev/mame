@@ -6385,7 +6385,7 @@ ROM_END
 
 /***********************************************************************/
 
-DRIVER_INIT_MEMBER(snk_state,countryc)
+void snk_state::init_countryc()
 {
 	// replace coin counter with trackball select
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));

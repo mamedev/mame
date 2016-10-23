@@ -133,16 +133,16 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "includes/megasys1.h"
 
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1)
+void megasys1_state::machine_reset_megasys1()
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
 	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 }
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
+void megasys1_state::machine_reset_megasys1_hachoo()
 {
-	MACHINE_RESET_CALL_MEMBER(megasys1);
+	machine_reset_megasys1();
 	m_ignore_oki_status = 0;    /* strangely hachoo need real oki status */
 }
 
@@ -4185,7 +4185,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 		m_mcu_hs_ram[4/2] == _3_ && \
 		m_mcu_hs_ram[6/2] == _4_)
 
-DRIVER_INIT_MEMBER(megasys1_state,64street)
+void megasys1_state::init_64street()
 {
 //  uint16_t *ROM = (uint16_t *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
@@ -4240,7 +4240,7 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,astyanax)
+void megasys1_state::init_astyanax()
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
@@ -4253,7 +4253,7 @@ DRIVER_INIT_MEMBER(megasys1_state,astyanax)
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,avspirit)
+void megasys1_state::init_avspirit()
 {
 	m_ip_select_values[0] = 0x37;
 	m_ip_select_values[1] = 0x35;
@@ -4272,7 +4272,7 @@ DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 	save_item(NAME(m_ip_latched));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
+void megasys1_state::init_bigstrik()
 {
 	m_ip_select_values[0] = 0x58;
 	m_ip_select_values[1] = 0x54;
@@ -4287,7 +4287,7 @@ DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
 	save_item(NAME(m_sprite_bank));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,chimerab)
+void megasys1_state::init_chimerab()
 {
 	/* same as cybattlr */
 	m_ip_select_values[0] = 0x56;
@@ -4303,7 +4303,7 @@ DRIVER_INIT_MEMBER(megasys1_state,chimerab)
 	save_item(NAME(m_sprite_bank));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
+void megasys1_state::init_cybattlr()
 {
 	m_ip_select_values[0] = 0x56;
 	m_ip_select_values[1] = 0x52;
@@ -4318,7 +4318,7 @@ DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
 	save_item(NAME(m_sprite_bank));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,edf)
+void megasys1_state::init_edf()
 {
 	m_ip_select_values[0] = 0x20;
 	m_ip_select_values[1] = 0x21;
@@ -4332,12 +4332,12 @@ DRIVER_INIT_MEMBER(megasys1_state,edf)
 	save_item(NAME(m_ip_latched));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,edfp)
+void megasys1_state::init_edfp()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
+void megasys1_state::init_hayaosi1()
 {
 	m_ip_select_values[0] = 0x51;
 	m_ip_select_values[1] = 0x52;
@@ -4384,7 +4384,7 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,iganinju)
+void megasys1_state::init_iganinju()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 
@@ -4411,7 +4411,7 @@ WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 	m_oki2->write_command(data & 0xff);
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
+void megasys1_state::init_jitsupro()
 {
 	astyanax_rom_decode(machine(), "maincpu");      // Code
 
@@ -4430,7 +4430,7 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
+void megasys1_state::init_peekaboo()
 {
 	uint8_t *ROM = memregion("oki1")->base();
 	memory_bank *okibank = membank("okibank");
@@ -4443,12 +4443,12 @@ DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 	save_item(NAME(m_protection_val));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,phantasm)
+void megasys1_state::init_phantasm()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,rodland)
+void megasys1_state::init_rodland()
 {
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
@@ -4456,7 +4456,7 @@ DRIVER_INIT_MEMBER(megasys1_state,rodland)
 	rodland_rom_decode(machine(), "maincpu");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,rodlandj)
+void megasys1_state::init_rodlandj()
 {
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
@@ -4464,13 +4464,13 @@ DRIVER_INIT_MEMBER(megasys1_state,rodlandj)
 	astyanax_rom_decode(machine(), "maincpu");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,rodlandjb)
+void megasys1_state::init_rodlandjb()
 {
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,rittam)
+void megasys1_state::init_rittam()
 {
 	astyanax_rom_decode(machine(), "maincpu");
 }
@@ -4485,14 +4485,14 @@ WRITE16_MEMBER(megasys1_state::soldamj_spriteram16_w)
 	if (offset < 0x800/2)   COMBINE_DATA(&m_spriteram[offset]);
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,soldamj)
+void megasys1_state::init_soldamj()
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,soldam)
+void megasys1_state::init_soldam()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
@@ -4527,7 +4527,7 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 }
 
 
-DRIVER_INIT_MEMBER(megasys1_state,stdragon)
+void megasys1_state::init_stdragon()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
@@ -4540,7 +4540,7 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragon)
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,stdragona)
+void megasys1_state::init_stdragona()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 
@@ -4557,15 +4557,15 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,stdragonb)
+void megasys1_state::init_stdragonb()
 {
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 }
 
-DRIVER_INIT_MEMBER(megasys1_state,monkelf)
+void megasys1_state::init_monkelf()
 {
-	DRIVER_INIT_CALL(avspirit);
+	init_avspirit();
 
 	m_rom_maincpu[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 

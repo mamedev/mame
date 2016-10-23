@@ -911,7 +911,7 @@ ROM_START( powerbals )
 	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(sslam_state,sslam)
+void sslam_state::init_sslam()
 {
 	m_track = 0;
 	m_melody = 0;
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(sslam_state,sslam)
 	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
 }
 
-DRIVER_INIT_MEMBER(sslam_state,powerbls)
+void sslam_state::init_powerbls()
 {
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));

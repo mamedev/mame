@@ -148,10 +148,10 @@ public:
 	void switch_bank(uint32_t bank);
 	void do_i2c();
 	void spg_do_dma(uint32_t len);
-	DECLARE_DRIVER_INIT(vsmile);
-	DECLARE_DRIVER_INIT(walle);
-	DECLARE_DRIVER_INIT(vii);
-	DECLARE_DRIVER_INIT(batman);
+	void init_vsmile();
+	void init_walle();
+	void init_vii();
+	void init_batman();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1174,25 +1174,25 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(vii_state,vii)
+void vii_state::init_vii()
 {
 	m_spg243_mode = SPG243_VII;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,batman)
+void vii_state::init_batman()
 {
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,vsmile)
+void vii_state::init_vsmile()
 {
 	m_spg243_mode = SPG243_VSMILE;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,walle)
+void vii_state::init_walle()
 {
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 0;

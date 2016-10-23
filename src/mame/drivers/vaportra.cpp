@@ -835,7 +835,7 @@ C3D54*
 */
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(vaportra_state,vaportra)
+void vaportra_state::init_vaportra()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	int i;

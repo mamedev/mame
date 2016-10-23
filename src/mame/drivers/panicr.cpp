@@ -112,7 +112,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
-	DECLARE_DRIVER_INIT(panicr);
+	void init_panicr();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(panicr);
 
@@ -712,7 +712,7 @@ ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(panicr_state,panicr)
+void panicr_state::init_panicr()
 {
 	std::vector<uint8_t> buf(0x80000);
 	uint8_t *rom;

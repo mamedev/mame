@@ -62,14 +62,14 @@ public:
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE8_MEMBER(kchamp_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(kchampvs);
-	DECLARE_DRIVER_INIT(kchampvs2);
+	void init_kchampvs();
+	void init_kchampvs2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kchamp);
-	DECLARE_MACHINE_START(kchampvs);
-	DECLARE_MACHINE_START(kchamp);
+	void machine_start_kchampvs();
+	void machine_start_kchamp();
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kc_interrupt);

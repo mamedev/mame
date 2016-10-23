@@ -313,24 +313,24 @@ static const uint8_t dw3_source_data[0x08][0xec] =
 	}
 };
 
-MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
+void pgm_022_025_state::machine_reset_killbld()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region - 0x16;
 	m_igs025->m_kb_game_id = 0x89911400 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 }
 
-MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
+void pgm_022_025_state::machine_reset_dw3()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00060000 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 }
 
 
@@ -344,7 +344,7 @@ void pgm_022_025_state::igs025_to_igs022_callback( void )
 
 
 
-DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
+void pgm_022_025_state::init_killbld()
 {
 	pgm_basic_init();
 	pgm_killbld_decrypt();
@@ -355,7 +355,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
-DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
+void pgm_022_025_state::init_drgw3()
 {
 	pgm_basic_init();
 	pgm_dw3_decrypt();

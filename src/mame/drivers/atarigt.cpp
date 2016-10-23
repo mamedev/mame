@@ -77,7 +77,7 @@ void atarigt_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_reset_atarigt()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -1303,7 +1303,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 }
 
-DRIVER_INIT_MEMBER(atarigt_state,tmek)
+void atarigt_state::init_tmek()
 {
 	m_is_primrage = 0;
 
@@ -1316,7 +1316,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 }
 
 
-DRIVER_INIT_MEMBER(atarigt_state,primrage)
+void atarigt_state::init_primrage()
 {
 	m_is_primrage = 1;
 

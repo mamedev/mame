@@ -68,10 +68,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(kov2nl);
-	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojh);
-	DECLARE_DRIVER_INIT(kov3);
+	void init_kov2nl();
+	void init_orleg2();
+	void init_ddpdojh();
+	void init_kov3();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -493,7 +493,7 @@ static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 	}
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+void pgm2_state::init_orleg2()
 {
 	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
@@ -506,7 +506,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	pgm_create_dummy_internal_arm_region(0x80003c9);
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
+void pgm2_state::init_kov2nl()
 {
 	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
@@ -519,7 +519,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	pgm_create_dummy_internal_arm_region(0x8000069);
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
+void pgm2_state::init_ddpdojh()
 {
 	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
@@ -532,7 +532,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	pgm_create_dummy_internal_arm_region(0x80003c9);
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kov3)
+void pgm2_state::init_kov3()
 {
 	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 

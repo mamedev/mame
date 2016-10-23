@@ -1169,42 +1169,42 @@ ROM_START(nextctc)
 	ROM_NEXT_V3
 ROM_END
 
-DRIVER_INIT_MEMBER(next_state,next)
+void next_state::init_next()
 {
 	setup(0x00010002, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nexts)
+void next_state::init_nexts()
 {
 	setup(0x00011002, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nexts2)
+void next_state::init_nexts2()
 {
 	setup(0x00012102, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextsc)
+void next_state::init_nextsc()
 {
 	setup(0x00013102, 1120, 832, 16, true);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextst)
+void next_state::init_nextst()
 {
 	setup(0x00014103, 1120, 832, 2, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextstc)
+void next_state::init_nextstc()
 {
 	setup(0x00015103,  832, 624, 0, true);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextct)
+void next_state::init_nextct()
 {
 	setup(0x00018103, 1120, 832, 0, false);
 }
 
-DRIVER_INIT_MEMBER(next_state,nextctc)
+void next_state::init_nextctc()
 {
 	setup(0x00019103,  832, 624, 0, true);
 }

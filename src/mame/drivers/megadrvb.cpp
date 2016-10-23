@@ -683,9 +683,9 @@ static MACHINE_CONFIG_START( megadrvb, md_boot_state )
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(md_boot_state, md_6button)
+void md_boot_state::machine_start_md_6button()
 {
-	MACHINE_START_CALL_MEMBER(md_bootleg);
+	machine_start_md_bootleg();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
 	m_io_pad_6b[1] = ioport("EXTRA2");
@@ -784,7 +784,7 @@ ROM_END
 
 #define ENERGY_CONSOLE_MODE 0
 
-DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
+void md_boot_state::init_aladmdb()
 {
 	/*
 	 * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
@@ -798,12 +798,12 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16_delegate(FUNC(md_boot_state::aladmdb_r),this));
 
-	DRIVER_INIT_CALL(megadrij);
+	init_megadrij();
 }
 
 // this should be correct, the areas of the ROM that differ to the original
 // after this decode look like intentional changes
-DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
+void md_boot_state::init_mk3mdb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -846,13 +846,13 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::mk3mdb_dsw_r),this));
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
-DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
+void md_boot_state::init_ssf2mdb()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xA130F0, 0xA130FF); // custom banking is disabled (!)
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x400000, 0x5fffff, "bank5");
@@ -862,13 +862,13 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::ssf2mdb_dsw_r),this));
 
-	DRIVER_INIT_CALL(megadrij);
+	init_megadrij();
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
-DRIVER_INIT_MEMBER(md_boot_state,srmdb)
+void md_boot_state::init_srmdb()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 
@@ -893,10 +893,10 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::srmdb_dsw_r),this));
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 }
 
-DRIVER_INIT_MEMBER(md_boot_state,topshoot)
+void md_boot_state::init_topshoot()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16_delegate(FUNC(md_boot_state::topshoot_200051_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
@@ -904,7 +904,7 @@ DRIVER_INIT_MEMBER(md_boot_state,topshoot)
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 }
 
 /*************************************

@@ -899,7 +899,7 @@ void apollo_state::machine_reset()
 {
 	MLOG1(("machine_reset"));
 
-	MACHINE_RESET_CALL_MEMBER(apollo);
+	machine_reset_apollo();
 
 #ifdef APOLLO_XXL
 	// set configuration
@@ -921,7 +921,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 	MLOG1(("apollo_reset_instr_callback"));
 
 	// reset the CPU board devices
-	MACHINE_RESET_CALL_MEMBER(apollo);
+	machine_reset_apollo();
 
 	// reset the ISA bus devices
 	m_isa->reset();
@@ -947,7 +947,7 @@ void apollo_state::machine_start(){
 	// clear ram
 	memset(messram->ptr(), 0x55, messram->bytes());
 
-	MACHINE_START_CALL_MEMBER(apollo);
+	machine_start_apollo();
 
 	// install nop handlers for unmapped ISA bus addresses
 	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
@@ -958,7 +958,7 @@ void apollo_state::machine_start(){
  Driver Init
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(apollo_state,dn3500)
+void apollo_state::init_dn3500()
 {
 //  MLOG1(("driver_init_dn3500"));
 
@@ -971,19 +971,19 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 	node_type=  NODE_TYPE_DN3500;
 	ram_config_byte= DN3500_RAM_CONFIG_BYTE;
 
-	DRIVER_INIT_CALL(apollo);
+	init_apollo();
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp3500)
+void apollo_state::init_dsp3500()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dsp3500"));
 	node_type = NODE_TYPE_DSP3500;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dn3000)
+void apollo_state::init_dn3000()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dn3000"));
 
 	ram_base_address = DN3000_RAM_BASE;
@@ -993,16 +993,16 @@ DRIVER_INIT_MEMBER(apollo_state,dn3000)
 	ram_config_byte= DN3000_RAM_CONFIG_8MB;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp3000)
+void apollo_state::init_dsp3000()
 {
-	DRIVER_INIT_CALL( dn3000 );
+	init_dn3000();
 //  MLOG1(("driver_init_dsp3000"));
 	node_type = NODE_TYPE_DSP3000;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dn5500)
+void apollo_state::init_dn5500()
 {
-	DRIVER_INIT_CALL( dn3500 );
+	init_dn3500();
 //  MLOG1(("driver_init_dn5500"));
 
 	ram_base_address = DN5500_RAM_BASE;
@@ -1012,9 +1012,9 @@ DRIVER_INIT_MEMBER(apollo_state,dn5500)
 	ram_config_byte= DN5500_RAM_CONFIG_BYTE;
 }
 
-DRIVER_INIT_MEMBER(apollo_state,dsp5500)
+void apollo_state::init_dsp5500()
 {
-	DRIVER_INIT_CALL( dn5500 );
+	init_dn5500();
 //  MLOG1(("driver_init_dsp5500"));
 	node_type = NODE_TYPE_DSP5500;
 }

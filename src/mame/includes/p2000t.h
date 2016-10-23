@@ -50,7 +50,7 @@ public:
 	uint8_t m_port_303f;
 	uint8_t m_port_707f;
 	int8_t m_frame_count;
-	DECLARE_VIDEO_START(p2000m);
+	void video_start_p2000m();
 	DECLARE_PALETTE_INIT(p2000m);
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);

@@ -46,8 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
 	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
 	DECLARE_WRITE8_MEMBER(commando_c804_w);
-	DECLARE_DRIVER_INIT(spaceinv);
-	DECLARE_DRIVER_INIT(commando);
+	void init_spaceinv();
+	void init_commando();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

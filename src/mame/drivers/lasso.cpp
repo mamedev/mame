@@ -459,7 +459,7 @@ void lasso_state::machine_start()
 	save_item(NAME(m_gfxbank));
 }
 
-MACHINE_START_MEMBER(lasso_state,wwjgtin)
+void lasso_state::machine_start_wwjgtin()
 {
 	lasso_state::machine_start();
 
@@ -471,7 +471,7 @@ void lasso_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
+void lasso_state::machine_reset_wwjgtin()
 {
 	lasso_state::machine_reset();
 

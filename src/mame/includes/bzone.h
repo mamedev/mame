@@ -37,9 +37,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
-	DECLARE_DRIVER_INIT(bradley);
+	void init_bradley();
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(redbaron);
+	void machine_start_redbaron();
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
 };

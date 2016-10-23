@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_1)
 
 /********************************************************************/
 
-VIDEO_START_MEMBER(tatsumi_state,apache3)
+void tatsumi_state::video_start_apache3()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
@@ -134,7 +134,7 @@ VIDEO_START_MEMBER(tatsumi_state,apache3)
 	m_tx_layer->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(tatsumi_state,roundup5)
+void tatsumi_state::video_start_roundup5()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
@@ -145,7 +145,7 @@ VIDEO_START_MEMBER(tatsumi_state,roundup5)
 	m_gfxdecode->gfx(1)->set_source((uint8_t *)m_roundup5_vram.get());
 }
 
-VIDEO_START_MEMBER(tatsumi_state,cyclwarr)
+void tatsumi_state::video_start_cyclwarr()
 {
 	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,64,512);
 	//m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,64,512);
@@ -156,7 +156,7 @@ VIDEO_START_MEMBER(tatsumi_state,cyclwarr)
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 }
 
-VIDEO_START_MEMBER(tatsumi_state,bigfight)
+void tatsumi_state::video_start_bigfight()
 {
 	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,128,256);
 	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,128,256);

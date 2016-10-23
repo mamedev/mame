@@ -89,8 +89,8 @@ public:
 	DECLARE_READ8_MEMBER(pb_ivg_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(ds_w);
-	DECLARE_MACHINE_RESET(cpu09);
-	DECLARE_MACHINE_RESET(ivg09);
+	void machine_reset_cpu09();
+	void machine_reset_ivg09();
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -171,12 +171,12 @@ static INPUT_PORTS_START( ivg09 )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( tavernie_state, cpu09)
+void tavernie_state::machine_reset_cpu09()
 {
 	m_term_data = 0;
 }
 
-MACHINE_RESET_MEMBER( tavernie_state, ivg09)
+void tavernie_state::machine_reset_ivg09()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_beep->set_state(1);

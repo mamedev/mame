@@ -1120,7 +1120,7 @@ ROM_START( scionc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wiz_state,stinger)
+void wiz_state::init_stinger()
 {
 	static const uint8_t swap_xor_table[4][4] =
 	{

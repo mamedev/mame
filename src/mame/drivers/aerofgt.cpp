@@ -1313,28 +1313,28 @@ static GFXDECODE_START( wbbc97 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(aerofgt_state,common)
+void aerofgt_state::machine_start_common()
 {
 	save_item(NAME(m_pending_command));
 }
 
-MACHINE_START_MEMBER(aerofgt_state,aerofgt)
+void aerofgt_state::machine_start_aerofgt()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_RESET_MEMBER(aerofgt_state,common)
+void aerofgt_state::machine_reset_common()
 {
 	m_pending_command = 0;
 }
 
-MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
+void aerofgt_state::machine_reset_aerofgt()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	membank("bank1")->set_entry(0); /* needed by spinlbrk */
 }
@@ -2803,7 +2803,7 @@ ROM_START( wbbc97 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
+void aerofgt_state::init_banked_oki()
 {
 	membank("okibank")->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }

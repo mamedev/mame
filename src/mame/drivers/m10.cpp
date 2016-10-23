@@ -166,14 +166,14 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 	}
 }
 
-MACHINE_START_MEMBER(m10_state,m10)
+void m10_state::machine_start_m10()
 {
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
 
-MACHINE_RESET_MEMBER(m10_state,m10)
+void m10_state::machine_reset_m10()
 {
 	m_bottomline = 0;
 	m_flip = 0;
@@ -917,7 +917,7 @@ MACHINE_CONFIG_END
  * Hacks to work around missing roms to get at least some
  * video output
  */
-DRIVER_INIT_MEMBER(m10_state,andromed)
+void m10_state::init_andromed()
 {
 	int i;
 
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(m10_state,andromed)
 		m_rom[i] = 0x60;
 }
 
-DRIVER_INIT_MEMBER(m10_state,ipminva1)
+void m10_state::init_ipminva1()
 {
 	int i;
 

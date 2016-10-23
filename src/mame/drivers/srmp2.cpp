@@ -82,7 +82,7 @@ void srmp2_state::machine_start()
 	save_item(NAME(m_iox.data));
 }
 
-MACHINE_START_MEMBER(srmp2_state,srmp2)
+void srmp2_state::machine_start_srmp2()
 {
 	machine_start();
 
@@ -98,7 +98,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp2)
 	save_item(NAME(m_color_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,srmp3)
+void srmp2_state::machine_start_srmp3()
 {
 	machine_start();
 
@@ -115,7 +115,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
+void srmp2_state::machine_start_rmgoldyh()
 {
 	machine_start();
 
@@ -132,7 +132,7 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,mjyuugi)
+void srmp2_state::machine_start_mjyuugi()
 {
 	machine_start();
 

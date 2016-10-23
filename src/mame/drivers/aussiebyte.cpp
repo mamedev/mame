@@ -421,7 +421,7 @@ SLOT_INTERFACE_END
     Machine Driver
 
 ************************************************************/
-MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
+void aussiebyte_state::machine_reset_aussiebyte()
 {
 	m_port15 = false;
 	m_port17 = 0;
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER( aussiebyte_state, aussiebyte )
+void aussiebyte_state::init_aussiebyte()
 {
 	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
 	// For convenience, bank 0 is permanently assigned to C000-FFFF

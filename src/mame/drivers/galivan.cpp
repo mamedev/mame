@@ -368,7 +368,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(galivan_state,galivan)
+void galivan_state::machine_start_galivan()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -382,7 +382,7 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	save_item(NAME(m_layers));
 }
 
-MACHINE_START_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_start_ninjemak()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -395,7 +395,7 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 	save_item(NAME(m_ninjemak_dispdisable));
 }
 
-MACHINE_RESET_MEMBER(galivan_state,galivan)
+void galivan_state::machine_reset_galivan()
 {
 	m_maincpu->reset();
 
@@ -406,7 +406,7 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
 }
 
-MACHINE_RESET_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_reset_ninjemak()
 {
 	m_maincpu->reset();
 
@@ -1156,7 +1156,7 @@ WRITE8_MEMBER(galivan_state::youmab_86_w)
 	m_shift_scroll = 0;
 }
 
-DRIVER_INIT_MEMBER(galivan_state,youmab)
+void galivan_state::init_youmab()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),this)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");

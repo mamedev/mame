@@ -232,7 +232,7 @@ READ8_MEMBER(pacman_state::theglobp_decrypt_rom )
 }
 
 
-MACHINE_START_MEMBER(pacman_state,theglobp)
+void pacman_state::machine_start_theglobp()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -250,7 +250,7 @@ MACHINE_START_MEMBER(pacman_state,theglobp)
 }
 
 
-MACHINE_RESET_MEMBER(pacman_state,theglobp)
+void pacman_state::machine_reset_theglobp()
 {
 	/* The initial state of the counter is 0x0A */
 	m_counter = 0x0A;

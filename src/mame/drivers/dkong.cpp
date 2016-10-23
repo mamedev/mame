@@ -460,7 +460,7 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(dkong_state,dkong2b)
+void dkong_state::machine_start_dkong2b()
 {
 	m_hardware_type = HARDWARE_TKG04;
 
@@ -468,13 +468,13 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 	save_item(NAME(m_dma_latch));
 }
 
-MACHINE_START_MEMBER(dkong_state,s2650)
+void dkong_state::machine_start_s2650()
 {
 	uint8_t   *p = memregion("user1")->base();
 	const char *game_name = machine().system().name;
 	int i;
 
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 
 	for (i = 0; i < 0x200; i++)
 		m_rev_map[i] = -1;
@@ -501,35 +501,35 @@ MACHINE_START_MEMBER(dkong_state,s2650)
 		fatalerror("Unknown game <%s> in S2650 start.\n", game_name);
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp)
+void dkong_state::machine_start_radarscp()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS02;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp1)
+void dkong_state::machine_start_radarscp1()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS01;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,dkong3)
+void dkong_state::machine_start_dkong3()
 {
 	m_hardware_type = HARDWARE_TKG04;
 }
 
-MACHINE_RESET_MEMBER(dkong_state,dkong)
+void dkong_state::machine_reset_dkong()
 {
 	/* nothing */
 }
 
-MACHINE_RESET_MEMBER(dkong_state,strtheat)
+void dkong_state::machine_reset_strtheat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x08 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -537,11 +537,11 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(dkong_state,drakton)
+void dkong_state::machine_reset_drakton()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x09 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -3226,7 +3226,7 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dkong_state,herodk)
+void dkong_state::init_herodk()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -3245,7 +3245,7 @@ DRIVER_INIT_MEMBER(dkong_state,herodk)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,drakton)
+void dkong_state::init_drakton()
 {
 	int bs[4][8] = {
 			{7,6,1,3,0,4,2,5},
@@ -3267,7 +3267,7 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,strtheat)
+void dkong_state::init_strtheat()
 {
 	int bs[4][8] = {
 			{0,6,1,7,3,4,2,5},
@@ -3292,7 +3292,7 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,dkongx)
+void dkong_state::init_dkongx()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3314,7 +3314,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	membank("bank2")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(dkong_state,dkingjr)
+void dkong_state::init_dkingjr()
 {
 	uint8_t *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)

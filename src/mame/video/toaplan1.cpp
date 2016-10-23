@@ -286,7 +286,7 @@ void toaplan1_state::register_common()
 }
 
 
-VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
+void toaplan1_rallybik_state::video_start_rallybik()
 {
 	m_spritegen->alloc_sprite_bitmap(*m_screen);
 	m_spritegen->gfx(0)->set_colorbase(64*16);
@@ -312,7 +312,7 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 	register_common();
 }
 
-VIDEO_START_MEMBER(toaplan1_state,toaplan1)
+void toaplan1_state::video_start_toaplan1()
 {
 	toaplan1_create_tilemaps();
 	toaplan1_vram_alloc();

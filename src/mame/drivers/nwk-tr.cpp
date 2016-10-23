@@ -322,7 +322,7 @@ public:
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(nwktr);
+	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -836,7 +836,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(nwktr_state, nwktr)
+void nwktr_state::init_nwktr()
 {
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 

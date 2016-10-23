@@ -455,19 +455,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
 	m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
 }
 
-MACHINE_START_MEMBER(lastduel_state,lastduel)
+void lastduel_state::machine_start_lastduel()
 {
 	save_item(NAME(m_tilemap_priority));
 	save_item(NAME(m_scroll));
 }
 
-MACHINE_START_MEMBER(lastduel_state,madgear)
+void lastduel_state::machine_start_madgear()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(lastduel);
+	machine_start_lastduel();
 }
 
 void lastduel_state::machine_reset()

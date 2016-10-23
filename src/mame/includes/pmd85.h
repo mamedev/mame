@@ -69,12 +69,12 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_io_w);
 	DECLARE_READ8_MEMBER(mato_io_r);
 	DECLARE_WRITE8_MEMBER(mato_io_w);
-	DECLARE_DRIVER_INIT(mato);
-	DECLARE_DRIVER_INIT(pmd852a);
-	DECLARE_DRIVER_INIT(pmd851);
-	DECLARE_DRIVER_INIT(pmd853);
-	DECLARE_DRIVER_INIT(alfa);
-	DECLARE_DRIVER_INIT(c2717);
+	void init_mato();
+	void init_pmd852a();
+	void init_pmd851();
+	void init_pmd853();
+	void init_alfa();
+	void init_c2717();
 	virtual void machine_reset() override;
 	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);

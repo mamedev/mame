@@ -88,7 +88,7 @@ public:
 		m_ckon_state(0) { }
 
 	device_t *m_terminal;
-	DECLARE_DRIVER_INIT(ti990_10);
+	void init_ti990_10();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -375,7 +375,7 @@ ROM_START(ti990_10)
 
 ROM_END
 
-DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
+void ti990_10_state::init_ti990_10()
 {
 #if 0
 	/* load specific ti990/12 rom page */

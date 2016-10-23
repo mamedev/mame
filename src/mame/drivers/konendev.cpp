@@ -58,8 +58,8 @@ protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 public:
-	DECLARE_DRIVER_INIT(konendev);
-	DECLARE_DRIVER_INIT(enchlamp);
+	void init_konendev();
+	void init_enchlamp();
 
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
@@ -475,11 +475,11 @@ ROM_START( konzero )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 
-DRIVER_INIT_MEMBER(konendev_state,konendev)
+void konendev_state::init_konendev()
 {
 }
 
-DRIVER_INIT_MEMBER(konendev_state,enchlamp)
+void konendev_state::init_enchlamp()
 {
 	uint32_t *rom = (uint32_t*)memregion("program")->base();
 	rom[0x24/4] = 0x00002743;       // patch flash checksum for now

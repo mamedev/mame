@@ -139,7 +139,7 @@ public:
 	DECLARE_READ64_MEMBER ( unk1_r );
 	DECLARE_READ64_MEMBER ( unk2_r );
 
-	DECLARE_DRIVER_INIT(pippin);
+	void init_pippin();
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;

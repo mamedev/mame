@@ -763,7 +763,7 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(snk6502_state,sasuke)
+void snk6502_state::machine_reset_sasuke()
 {
 	m_sound->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
@@ -773,7 +773,7 @@ MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 	sasuke_start_counter();
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,satansat)
+void snk6502_state::machine_reset_satansat()
 {
 	// same as sasuke (assumption?)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
@@ -782,13 +782,13 @@ MACHINE_RESET_MEMBER(snk6502_state,satansat)
 	sasuke_start_counter();
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,vanguard)
+void snk6502_state::machine_reset_vanguard()
 {
 	// 41.6 Hz update (measured)
 	m_sound->set_music_clock(1 / 41.6);
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,pballoon)
+void snk6502_state::machine_reset_pballoon()
 {
 	// 40.3 Hz update (measured)
 	m_sound->set_music_clock(1 / 40.3);

@@ -212,7 +212,7 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 	m_via6522_0->write_pb7((d >> 7) & 1);
 }
 
-DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
+void ssystem3_state::init_ssystem3()
 {
 	ssystem3_playfield_reset();
 	ssystem3_lcd_reset();

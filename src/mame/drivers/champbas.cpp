@@ -1190,7 +1190,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::init_champbas()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1206,7 +1206,7 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-DRIVER_INIT_MEMBER(champbas_state,exctsccr)
+void champbas_state::init_exctsccr()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();

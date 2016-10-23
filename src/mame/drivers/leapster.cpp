@@ -227,7 +227,7 @@ public:
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	DECLARE_DRIVER_INIT(leapster);
+	void init_leapster();
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -332,7 +332,7 @@ ROM_START(leapstertv)
 	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
-DRIVER_INIT_MEMBER(leapster_state,leapster)
+void leapster_state::init_leapster()
 {
 }
 

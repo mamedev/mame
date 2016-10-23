@@ -343,7 +343,7 @@ void hyprduel_state::expand_gfx1(hyprduel_state &state)
 	}
 }
 
-VIDEO_START_MEMBER(hyprduel_state,common_14220)
+void hyprduel_state::video_start_common_14220()
 {
 	expand_gfx1(*this);
 	alloc_empty_tiles();
@@ -376,18 +376,18 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::hyprduel_postload), this));
 }
 
-VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
+void hyprduel_state::video_start_hyprduel_14220()
 {
 	m_sprite_yoffs_sub = 2;
 
-	VIDEO_START_CALL_MEMBER(common_14220);
+	video_start_common_14220();
 }
 
-VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
+void hyprduel_state::video_start_magerror_14220()
 {
 	m_sprite_yoffs_sub = 0;
 
-	VIDEO_START_CALL_MEMBER(common_14220);
+	video_start_common_14220();
 }
 
 /***************************************************************************

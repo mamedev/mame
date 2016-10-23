@@ -28,7 +28,7 @@ public:
 		, m_r1_sound(*this, "r1sound")
 	{ }
 
-	DECLARE_DRIVER_INIT(gts80b);
+	void init_gts80b();
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -364,7 +364,7 @@ void gts80b_state::machine_reset()
 	m_in_cmd_mode[1] = false;
 }
 
-DRIVER_INIT_MEMBER( gts80b_state, gts80b )
+void gts80b_state::init_gts80b()
 {
 }
 

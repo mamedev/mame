@@ -791,7 +791,7 @@ DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(mpz80_state,mpz80)
+void mpz80_state::init_mpz80()
 {
 	address_space &program = machine().device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
 	program.set_direct_update_handler(direct_update_delegate(FUNC(mpz80_state::mpz80_direct_update_handler), this));

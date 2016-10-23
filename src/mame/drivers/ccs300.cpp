@@ -35,8 +35,8 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(ccs300);
-	DECLARE_MACHINE_RESET(ccs300);
+	void init_ccs300();
+	void machine_reset_ccs300();
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_READ8_MEMBER(port11_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
@@ -103,13 +103,13 @@ WRITE8_MEMBER( ccs300_state::port40_w )
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-MACHINE_RESET_MEMBER( ccs300_state, ccs300 )
+void ccs300_state::machine_reset_ccs300()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ccs300_state, ccs300 )
+void ccs300_state::init_ccs300()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

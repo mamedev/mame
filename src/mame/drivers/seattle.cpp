@@ -507,18 +507,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);
-	DECLARE_DRIVER_INIT(sfrush);
-	DECLARE_DRIVER_INIT(blitz2k);
-	DECLARE_DRIVER_INIT(carnevil);
-	DECLARE_DRIVER_INIT(biofreak);
-	DECLARE_DRIVER_INIT(calspeed);
-	DECLARE_DRIVER_INIT(sfrushrk);
-	DECLARE_DRIVER_INIT(vaportrx);
-	DECLARE_DRIVER_INIT(hyprdriv);
-	DECLARE_DRIVER_INIT(blitz);
-	DECLARE_DRIVER_INIT(wg3dh);
-	DECLARE_DRIVER_INIT(mace);
-	DECLARE_DRIVER_INIT(blitz99);
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -3169,7 +3169,7 @@ void seattle_state::init_common(int config)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,wg3dh)
+void seattle_state::init_wg3dh()
 {
 	init_common(PHOENIX_CONFIG);
 
@@ -3180,7 +3180,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,mace)
+void seattle_state::init_mace()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3189,7 +3189,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrush)
+void seattle_state::init_sfrush()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -3200,7 +3200,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
+void seattle_state::init_sfrushrk()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -3212,7 +3212,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,calspeed)
+void seattle_state::init_calspeed()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -3222,7 +3222,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,vaportrx)
+void seattle_state::init_vaportrx()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -3233,13 +3233,13 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,biofreak)
+void seattle_state::init_biofreak()
 {
 	init_common(SEATTLE_CONFIG);
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz)
+void seattle_state::init_blitz()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3252,7 +3252,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz99)
+void seattle_state::init_blitz99()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3262,7 +3262,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz2k)
+void seattle_state::init_blitz2k()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3272,7 +3272,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,carnevil)
+void seattle_state::init_carnevil()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3285,7 +3285,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
+void seattle_state::init_hyprdriv()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 

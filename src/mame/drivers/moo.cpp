@@ -486,7 +486,7 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(moo_state,moo)
+void moo_state::machine_start_moo()
 {
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
@@ -498,7 +498,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
 }
 
-MACHINE_RESET_MEMBER(moo_state,moo)
+void moo_state::machine_reset_moo()
 {
 	int i;
 

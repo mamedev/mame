@@ -28,7 +28,7 @@ public:
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
-	DECLARE_MACHINE_START(astrocde);
+	void machine_start_astrocde();
 };
 
 /*********************************************************************************
@@ -245,12 +245,12 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrocde_state,astrocde)
+void astrocde_state::init_astrocde()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
 
-MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
+void astrocde_mess_state::machine_start_astrocde()
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));

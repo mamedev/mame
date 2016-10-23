@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s6a);
-	DECLARE_DRIVER_INIT(s6a);
+	void machine_reset_s6a();
+	void init_s6a();
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -366,11 +366,11 @@ void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s6a_state, s6a )
+void s6a_state::machine_reset_s6a()
 {
 }
 
-DRIVER_INIT_MEMBER( s6a_state, s6a )
+void s6a_state::init_s6a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);

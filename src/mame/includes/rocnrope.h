@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rocnrope_videoram_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_colorram_w);
 	DECLARE_WRITE8_MEMBER(rocnrope_flipscreen_w);
-	DECLARE_DRIVER_INIT(rocnrope);
+	void init_rocnrope();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

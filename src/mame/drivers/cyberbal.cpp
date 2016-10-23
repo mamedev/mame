@@ -50,7 +50,7 @@ void cyberbal_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::machine_start_cyberbal2p()
 {
 	atarigen_state::machine_start();
 
@@ -62,15 +62,15 @@ MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
 	save_item(NAME(m_sound_data_from_6502_ready));
 }
 
-MACHINE_START_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::machine_start_cyberbal()
 {
-	MACHINE_START_CALL_MEMBER(cyberbal2p);
+	machine_start_cyberbal2p();
 
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x1000);
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::machine_reset_cyberbal()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_lscreen, 8);
@@ -82,7 +82,7 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::machine_reset_cyberbal2p()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -1001,7 +1001,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
+void cyberbal_state::init_cyberbalt()
 {
 	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }

@@ -109,8 +109,8 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_DRIVER_INIT(amust);
-	DECLARE_MACHINE_RESET(amust);
+	void init_amust();
+	void machine_reset_amust();
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
@@ -363,7 +363,7 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 	}
 }
 
-MACHINE_RESET_MEMBER( amust_state, amust )
+void amust_state::machine_reset_amust()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("videoram")->base();
@@ -379,7 +379,7 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
-DRIVER_INIT_MEMBER( amust_state, amust )
+void amust_state::init_amust()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

@@ -421,9 +421,9 @@ public:
 	DECLARE_READ64_MEMBER(unk_serial_r);
 	DECLARE_WRITE64_MEMBER(unk_serial_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
-	DECLARE_DRIVER_INIT(viper);
-	DECLARE_DRIVER_INIT(vipercf);
-	DECLARE_DRIVER_INIT(viperhd);
+	void init_viper();
+	void init_vipercf();
+	void init_viperhd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2210,21 +2210,21 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(viper_state,viper)
+void viper_state::init_viper()
 {
 //  m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0xff200000, 0xff207fff, FUNC(hdd_r), FUNC(hdd_w) ); //TODO
 }
 
-DRIVER_INIT_MEMBER(viper_state,viperhd)
+void viper_state::init_viperhd()
 {
-	DRIVER_INIT_CALL(viper);
+	init_viper();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::ata_r), this), write64_delegate(FUNC(viper_state::ata_w), this));
 }
 
-DRIVER_INIT_MEMBER(viper_state,vipercf)
+void viper_state::init_vipercf()
 {
-	DRIVER_INIT_CALL(viper);
+	init_viper();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );

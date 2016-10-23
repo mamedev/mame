@@ -841,7 +841,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-MACHINE_START_MEMBER(galaga_state,galaga)
+void galaga_state::machine_start_galaga()
 {
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
@@ -862,7 +862,7 @@ void galaga_state::bosco_latch_reset()
 		bosco_latch_w(space,i,0);
 }
 
-MACHINE_RESET_MEMBER(galaga_state,galaga)
+void galaga_state::machine_reset_galaga()
 {
 	/* Reset all latches */
 	bosco_latch_reset();
@@ -870,9 +870,9 @@ MACHINE_RESET_MEMBER(galaga_state,galaga)
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
-MACHINE_RESET_MEMBER(xevious_state,battles)
+void xevious_state::machine_reset_battles()
 {
-	MACHINE_RESET_CALL_MEMBER(galaga);
+	machine_reset_galaga();
 	battles_customio_init();
 }
 
@@ -3358,7 +3358,7 @@ ROM_START( digsid )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 ROM_END
 
-DRIVER_INIT_MEMBER(galaga_state,galaga)
+void galaga_state::init_galaga()
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
 	uint8_t *rom = memregion("gfx1")->base();
@@ -3375,16 +3375,16 @@ DRIVER_INIT_MEMBER(galaga_state,galaga)
 	}
 }
 
-DRIVER_INIT_MEMBER(galaga_state,gatsbee)
+void galaga_state::init_gatsbee()
 {
-	DRIVER_INIT_CALL(galaga);
+	init_galaga();
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(xevious_state,xevious)
+void xevious_state::init_xevious()
 {
 	uint8_t *rom;
 	int i;
@@ -3394,7 +3394,7 @@ DRIVER_INIT_MEMBER(xevious_state,xevious)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
 
-DRIVER_INIT_MEMBER(xevious_state,xevios)
+void xevious_state::init_xevios()
 {
 	int A;
 	uint8_t *rom;
@@ -3414,17 +3414,17 @@ DRIVER_INIT_MEMBER(xevious_state,xevios)
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);
 	}
 
-	DRIVER_INIT_CALL(xevious);
+	init_xevious();
 }
 
 
-DRIVER_INIT_MEMBER(xevious_state,battles)
+void xevious_state::init_battles()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(xevious_state::battles_customio_data0_r),this), write8_delegate(FUNC(xevious_state::battles_customio_data0_w),this) );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(xevious_state::battles_customio0_r),this), write8_delegate(FUNC(xevious_state::battles_customio0_w),this) );
 
-	DRIVER_INIT_CALL(xevious);
+	init_xevious();
 }
 
 

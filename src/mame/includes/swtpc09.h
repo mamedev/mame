@@ -100,10 +100,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(dat_w);
 
-	DECLARE_DRIVER_INIT( swtpc09 );
-	DECLARE_DRIVER_INIT( swtpc09i );
-	DECLARE_DRIVER_INIT( swtpc09u );
-	DECLARE_DRIVER_INIT( swtpc09d3 );
+	void init_swtpc09();
+	void init_swtpc09i();
+	void init_swtpc09u();
+	void init_swtpc09d3();
 
 	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);

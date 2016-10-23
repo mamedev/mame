@@ -147,7 +147,7 @@ public:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
+	void init_wardner();
 
 protected:
 	virtual void driver_start() override;
@@ -352,7 +352,7 @@ void wardner_state::driver_start()
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	machine_reset_twincobr();
 
 	m_toaplan_main_cpu = 1;     /* Z80 */
 	twincobr_display(1);

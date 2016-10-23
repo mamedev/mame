@@ -63,7 +63,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_DRIVER_INIT(fphantom);
+	void init_fphantom();
 
 protected:
 	virtual void machine_start() override;
@@ -73,7 +73,7 @@ protected:
 
 // machine start/reset
 
-DRIVER_INIT_MEMBER(phantom_state, fphantom)
+void phantom_state::init_fphantom()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);

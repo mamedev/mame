@@ -377,7 +377,7 @@ void midtunit_state::init_tunit_generic(int sound)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mktunit)
+void midtunit_state::init_mktunit()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM);
@@ -389,12 +389,12 @@ DRIVER_INIT_MEMBER(midtunit_state,mktunit)
 	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,mkturbo)
+void midtunit_state::init_mkturbo()
 {
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midtunit_state::mkturbo_prot_r),this));
 
-	DRIVER_INIT_CALL(mktunit);
+	init_mktunit();
 }
 
 
@@ -422,17 +422,17 @@ void midtunit_state::init_nbajam_common(int te_protection)
 		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajam)
+void midtunit_state::init_nbajam()
 {
 	init_nbajam_common(0);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajamte)
+void midtunit_state::init_nbajamte()
 {
 	init_nbajam_common(1);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
+void midtunit_state::init_jdreddp()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM_LARGE);
@@ -459,7 +459,7 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mk2)
+void midtunit_state::init_mk2()
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
@@ -483,7 +483,7 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midtunit_state,midtunit)
+void midtunit_state::machine_reset_midtunit()
 {
 	/* reset sound */
 	switch (m_chip_type)

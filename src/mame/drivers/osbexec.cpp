@@ -111,7 +111,7 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
-	DECLARE_DRIVER_INIT(osbexec);
+	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
@@ -490,7 +490,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 }
 
 
-DRIVER_INIT_MEMBER(osbexec_state,osbexec)
+void osbexec_state::init_osbexec()
 {
 	m_fontram_region = machine().memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
 	m_vram_region = machine().memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );

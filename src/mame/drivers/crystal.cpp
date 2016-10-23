@@ -259,12 +259,12 @@ public:
 	DECLARE_WRITE32_MEMBER(DMA0_w);
 	DECLARE_READ32_MEMBER(DMA1_r);
 	DECLARE_WRITE32_MEMBER(DMA1_w);
-	DECLARE_DRIVER_INIT(topbladv);
-	DECLARE_DRIVER_INIT(officeye);
-	DECLARE_DRIVER_INIT(crysking);
-	DECLARE_DRIVER_INIT(evosocc);
-	DECLARE_DRIVER_INIT(donghaer);
-	DECLARE_DRIVER_INIT(psattack);
+	void init_topbladv();
+	void init_officeye();
+	void init_crysking();
+	void init_evosocc();
+	void init_donghaer();
+	void init_psattack();
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
@@ -1400,7 +1400,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(crystal_state,crysking)
+void crystal_state::init_crysking()
 {
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
@@ -1419,7 +1419,7 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 	Rom[WORD_XOR_LE(0x8a54/2)] = 0x403c;    //NOP
 }
 
-DRIVER_INIT_MEMBER(crystal_state,evosocc)
+void crystal_state::init_evosocc()
 {
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
@@ -1446,7 +1446,7 @@ also it seems that bit 0x40000000 is the PIC reset.
 
 */
 
-DRIVER_INIT_MEMBER(crystal_state,topbladv)
+void crystal_state::init_topbladv()
 {
 	// patches based on analysis of PIC dump
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
@@ -1473,7 +1473,7 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 
 }
 
-DRIVER_INIT_MEMBER(crystal_state,officeye)
+void crystal_state::init_officeye()
 {
 	// patches based on analysis of PIC dump
 	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
@@ -1500,7 +1500,7 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;  //PUSH R0
 }
 
-DRIVER_INIT_MEMBER(crystal_state, donghaer)
+void crystal_state::init_donghaer()
 {
 	uint16_t *Rom = (uint16_t*)memregion("user1")->base();
 
@@ -1517,7 +1517,7 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
-DRIVER_INIT_MEMBER(crystal_state,psattack)
+void crystal_state::init_psattack()
 {
 }
 

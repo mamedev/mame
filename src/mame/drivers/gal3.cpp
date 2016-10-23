@@ -161,13 +161,13 @@ public:
 	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
-	DECLARE_VIDEO_START(gal3);
+	void video_start_gal3();
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
 };
 
 
-VIDEO_START_MEMBER(gal3_state,gal3)
+void gal3_state::video_start_gal3()
 {
 	m_generic_paletteram_16.allocate(0x10000);
 

@@ -76,8 +76,8 @@ public:
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-	DECLARE_DRIVER_INIT(spyhuntertec);
-//  DECLARE_VIDEO_START(spyhuntertec);
+	void init_spyhuntertec();
+//  void video_start_spyhuntertec();
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
@@ -805,7 +805,7 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
 ROM_END
 
-DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
+void spyhuntertec_state::init_spyhuntertec()
 {
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;

@@ -458,8 +458,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 
-	DECLARE_MACHINE_START(saturn);
-	DECLARE_MACHINE_RESET(saturn);
+	void machine_start_saturn();
+	void machine_reset_saturn();
 
 	DECLARE_READ8_MEMBER(saturn_cart_type_r);
 	DECLARE_READ32_MEMBER(abus_dummy_r);
@@ -468,9 +468,9 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
 	void saturn_init_driver(int rgn);
-	DECLARE_DRIVER_INIT(saturnus);
-	DECLARE_DRIVER_INIT(saturneu);
-	DECLARE_DRIVER_INIT(saturnjp);
+	void init_saturnus();
+	void init_saturneu();
+	void init_saturnjp();
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
@@ -640,7 +640,7 @@ void saturn_state::debug_commands(int ref, int params, const char **param)
 }
 
 
-MACHINE_START_MEMBER(sat_console_state, saturn)
+void sat_console_state::machine_start_saturn()
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -752,7 +752,7 @@ WRITE32_MEMBER(sat_console_state::saturn_null_ram_w)
 {
 }
 
-MACHINE_RESET_MEMBER(sat_console_state,saturn)
+void sat_console_state::machine_reset_saturn()
 {
 	m_scsp_last_line = 0;
 
@@ -918,17 +918,17 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnus)
+void sat_console_state::init_saturnus()
 {
 	saturn_init_driver(4);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturneu)
+void sat_console_state::init_saturneu()
 {
 	saturn_init_driver(12);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
+void sat_console_state::init_saturnjp()
 {
 	saturn_init_driver(1);
 }

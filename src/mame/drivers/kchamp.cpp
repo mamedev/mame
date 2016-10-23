@@ -376,15 +376,15 @@ INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 }
 
 
-MACHINE_START_MEMBER(kchamp_state,kchamp)
+void kchamp_state::machine_start_kchamp()
 {
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-MACHINE_START_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::machine_start_kchampvs()
 {
-	MACHINE_START_CALL_MEMBER(kchamp);
+	machine_start_kchamp();
 
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_play_lo_nibble));
@@ -718,7 +718,7 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_counter = 0;

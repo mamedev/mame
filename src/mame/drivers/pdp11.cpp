@@ -113,8 +113,8 @@ public:
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(pdp11ub2);
-	DECLARE_MACHINE_RESET(pdp11qb);
+	void machine_reset_pdp11ub2();
+	void machine_reset_pdp11qb();
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
 };
 
@@ -303,7 +303,7 @@ void pdp11_state::load9312prom(uint8_t *desc, uint8_t *src, int size)
 	}
 }
 
-MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
+void pdp11_state::machine_reset_pdp11ub2()
 {
 	// Load M9312
 	uint8_t* user1 = memregion("consproms")->base() + ioport("CONSPROM")->read() * 0x0400;
@@ -334,7 +334,7 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 
 }
 
-MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
+void pdp11_state::machine_reset_pdp11qb()
 {
 	m_maincpu->set_state_int(T11_PC, 0xea00);
 }

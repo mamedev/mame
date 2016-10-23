@@ -211,7 +211,7 @@ public:
 	floppy_image_device *m_floppy;
 
 	mc6845_device *m_mc6845;
-	DECLARE_DRIVER_INIT(z100);
+	void init_z100();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -714,7 +714,7 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(z100_state,z100)
+void z100_state::init_z100()
 {
 	uint8_t *ROM = memregion("ipl")->base();
 

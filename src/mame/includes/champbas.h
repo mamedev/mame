@@ -62,13 +62,13 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(exctsccr);
-	DECLARE_DRIVER_INIT(champbas);
+	void init_exctsccr();
+	void init_champbas();
 
 	DECLARE_PALETTE_INIT(champbas);
 	DECLARE_PALETTE_INIT(exctsccr);
-	DECLARE_VIDEO_START(champbas);
-	DECLARE_VIDEO_START(exctsccr);
+	void video_start_champbas();
+	void video_start_exctsccr();
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 

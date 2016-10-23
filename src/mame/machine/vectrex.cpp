@@ -299,7 +299,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(vectrex_state,vectrex)
+void vectrex_state::init_vectrex()
 {
 	m_imager_angles = unknown_game_angles;
 	m_beam_color = rgb_t::white();

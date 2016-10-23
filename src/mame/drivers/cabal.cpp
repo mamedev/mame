@@ -51,18 +51,18 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "sound/msm5205.h"
 #include "includes/cabal.h"
 
-MACHINE_START_MEMBER(cabal_state,cabal)
+void cabal_state::machine_start_cabal()
 {
 	save_item(NAME(m_last));
 }
 
-MACHINE_START_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_start_cabalbl()
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 }
 
-MACHINE_RESET_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_reset_cabalbl()
 {
 	m_sound_command1 = m_sound_command2 = 0xff;
 }
@@ -874,13 +874,13 @@ ROM_START( cabalbl2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cabal_state,cabal)
+void cabal_state::init_cabal()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
+void cabal_state::init_cabalbl2()
 {
 	uint8_t *decrypt = m_seibu_sound->get_custom_decrypt();
 	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);

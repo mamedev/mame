@@ -72,7 +72,7 @@ public:
 
 	//DECLARE_WRITE8_MEMBER(henry_io_w);
 	DECLARE_READ8_MEMBER(henry_io_r);
-	DECLARE_DRIVER_INIT(hprot1);
+	void init_hprot1();
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 private:
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, hprot1_state)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
+void hprot1_state::init_hprot1()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();

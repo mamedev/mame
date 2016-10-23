@@ -45,12 +45,12 @@ public:
 	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
 	DECLARE_WRITE8_MEMBER(popeye_portB_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
-	DECLARE_DRIVER_INIT(skyskipr);
-	DECLARE_DRIVER_INIT(popeye);
+	void init_skyskipr();
+	void init_popeye();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(popeye);
-	DECLARE_VIDEO_START(popeye);
+	void video_start_popeye();
 	DECLARE_PALETTE_INIT(popeyebl);
 	DECLARE_PALETTE_INIT(skyskipr);
 	uint32_t screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

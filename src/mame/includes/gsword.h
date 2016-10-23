@@ -71,8 +71,8 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);
+	void init_gsword();
+	void init_gsword2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

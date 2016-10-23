@@ -230,7 +230,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_DRIVER_INIT(bus);
+	void init_bus();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -600,7 +600,7 @@ ROM_END
 *       Driver Init        *
 ***************************/
 
-DRIVER_INIT_MEMBER(tmspoker_state,bus)
+void tmspoker_state::init_bus()
 {
 	/* decode the TMS9980 ROMs */
 

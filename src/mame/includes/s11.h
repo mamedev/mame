@@ -78,8 +78,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s11);
-	DECLARE_DRIVER_INIT(s11);
+	void machine_reset_s11();
+	void init_s11();
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;

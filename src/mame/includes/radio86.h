@@ -68,9 +68,9 @@ public:
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);
 	DECLARE_WRITE8_MEMBER(radio86_pagesel);
-	DECLARE_DRIVER_INIT(radioram);
-	DECLARE_DRIVER_INIT(radio86);
-	DECLARE_MACHINE_RESET(radio86);
+	void init_radioram();
+	void init_radio86();
+	void machine_reset_radio86();
 	DECLARE_PALETTE_INIT(radio86);
 	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
 	DECLARE_READ8_MEMBER(radio86_8255_portc_r2);

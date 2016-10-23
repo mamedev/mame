@@ -322,12 +322,12 @@ static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
+void spectrum_state::machine_reset_spectrum_plus3()
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
@@ -335,12 +335,12 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 	spectrum_plus3_update_memory();
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus3)
+void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus2)
+void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
 }

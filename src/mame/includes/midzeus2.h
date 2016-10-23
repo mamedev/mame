@@ -15,7 +15,7 @@ public:
 	required_device<zeus2_device> m_zeus;
 
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
-	DECLARE_VIDEO_START(midzeus2);
+	void video_start_midzeus2();
 	uint32_t screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER( zeus2_r );
 	DECLARE_WRITE32_MEMBER( zeus2_w );

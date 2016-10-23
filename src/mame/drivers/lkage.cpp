@@ -940,12 +940,12 @@ READ8_MEMBER(lkage_state::fake_status_r)
 	return m_mcu_ready;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,lkage)
+void lkage_state::init_lkage()
 {
 	m_sprite_dx=0;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,lkageb)
+void lkage_state::init_lkageb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf062, 0xf062, read8_delegate(FUNC(lkage_state::fake_mcu_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf087, 0xf087, read8_delegate(FUNC(lkage_state::fake_status_r),this));
@@ -953,7 +953,7 @@ DRIVER_INIT_MEMBER(lkage_state,lkageb)
 	m_sprite_dx=0;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,bygone)
+void lkage_state::init_bygone()
 {
 	m_sprite_dx=1;
 }

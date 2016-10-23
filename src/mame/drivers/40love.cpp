@@ -570,7 +570,7 @@ READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(fortyl_state,undoukai)
+void fortyl_state::init_undoukai()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
@@ -581,7 +581,7 @@ DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 	m_pix_color[3] = 0x1ec;
 }
 
-DRIVER_INIT_MEMBER(fortyl_state,40love)
+void fortyl_state::init_40love()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
@@ -676,7 +676,7 @@ static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(fortyl_state,ta7630)
+void fortyl_state::machine_reset_ta7630()
 {
 	int i;
 
@@ -956,7 +956,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-MACHINE_START_MEMBER(fortyl_state,40love)
+void fortyl_state::machine_start_40love()
 {
 	/* video */
 	save_item(NAME(m_pix1));
@@ -975,9 +975,9 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	save_item(NAME(m_snd_ctrl3));
 }
 
-MACHINE_START_MEMBER(fortyl_state,undoukai)
+void fortyl_state::machine_start_undoukai()
 {
-	MACHINE_START_CALL_MEMBER(40love);
+	machine_start_40love();
 
 	/* fake mcu */
 	save_item(NAME(m_from_mcu));
@@ -988,9 +988,9 @@ MACHINE_START_MEMBER(fortyl_state,undoukai)
 	save_item(NAME(m_mcu_out[1]));
 }
 
-MACHINE_RESET_MEMBER(fortyl_state,common)
+void fortyl_state::machine_reset_common()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	machine_reset_ta7630();
 
 	/* video */
 	m_pix1 = 0;
@@ -1009,18 +1009,18 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 	m_snd_ctrl3 = 0;
 }
 
-MACHINE_RESET_MEMBER(fortyl_state,40love)
+void fortyl_state::machine_reset_40love()
 {
 	m_mcu->set_input_line(0, CLEAR_LINE);
 
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 }
 
-MACHINE_RESET_MEMBER(fortyl_state,undoukai)
+void fortyl_state::machine_reset_undoukai()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	/* fake mcu */
 	m_from_mcu = 0xff;

@@ -1419,7 +1419,7 @@ static INPUT_PORTS_START( sgyxz )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(cps_state,fcrash)
+void cps_state::machine_start_fcrash()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1443,16 +1443,16 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state,sgyxz)
+void cps_state::machine_start_sgyxz()
 {
-	MACHINE_START_CALL_MEMBER(kodb);
+	machine_start_kodb();
 	m_layer_scroll1x_offset = 0x40;
 	m_layer_scroll2x_offset = 0x40;
 	m_layer_scroll3x_offset = 0x40;
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(cps_state,kodb)
+void cps_state::machine_start_kodb()
 {
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -1467,9 +1467,9 @@ MACHINE_START_MEMBER(cps_state,kodb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, cawingbl)
+void cps_state::machine_start_cawingbl()
 {
-	MACHINE_START_CALL_MEMBER(fcrash);
+	machine_start_fcrash();
 
 	m_layer_enable_reg = 0x0c;
 	m_layer_mask_reg[0] = 0x0a;
@@ -1482,7 +1482,7 @@ MACHINE_START_MEMBER(cps_state, cawingbl)
 	m_sprite_base = 0x1000;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2mdt)
+void cps_state::machine_start_sf2mdt()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1506,7 +1506,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state, knightsb)
+void cps_state::machine_start_knightsb()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1525,7 +1525,7 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2m1)
+void cps_state::machine_start_sf2m1()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1544,7 +1544,7 @@ MACHINE_START_MEMBER(cps_state, sf2m1)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_RESET_MEMBER(cps_state,fcrash)
+void cps_state::machine_reset_fcrash()
 {
 	m_sample_buffer1 = 0;
 	m_sample_buffer2 = 0;
@@ -1928,7 +1928,7 @@ ROM_START( kodb )
 	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, kodb)
+void cps_state::init_kodb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x800000, 0x800007, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
@@ -1941,7 +1941,7 @@ DRIVER_INIT_MEMBER(cps_state, kodb)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x900000, 0x903fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x904000, 0x907fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped */
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 
@@ -2066,20 +2066,20 @@ ROM_START( cawingb2 )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, cawingbl)
+void cps_state::init_cawingbl()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x882000, 0x882001, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 
 
 // ************************************************************************* DINOPIC, DINOPIC2
 
-MACHINE_START_MEMBER(cps_state, dinopic)
+void cps_state::machine_start_dinopic()
 {
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
@@ -2239,11 +2239,11 @@ ROM_START( dinopic2 )
 	ROM_LOAD( "palce16v8h-2.bin",    0xa00, 0x117,  CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, dinopic)
+void cps_state::init_dinopic()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 
@@ -2333,7 +2333,7 @@ ROM_END
 
 // ************************************************************************* PUNIPIC, PUNIPIC2, PUNIPIC3
 
-MACHINE_START_MEMBER(cps_state, punipic)
+void cps_state::machine_start_punipic()
 {
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
@@ -2516,7 +2516,7 @@ ROM_START( punipic3 )
 	//ROM_LOAD( "sound.bin",      0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, punipic)
+void cps_state::init_punipic()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x5A8/2] = 0x4E71; // set data pointers
@@ -2526,16 +2526,16 @@ DRIVER_INIT_MEMBER(cps_state, punipic)
 	mem16[0x4DF6/2] = 0x0152;
 	mem16[0x4DF8/2] = 0x4E75;
 
-	DRIVER_INIT_CALL(dinopic);
+	init_dinopic();
 }
 
-DRIVER_INIT_MEMBER(cps_state, punipic3)
+void cps_state::init_punipic3()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x5A6/2] = 0x4E71; // set data pointers
 	mem16[0x5A8/2] = 0x4E71;
 
-	DRIVER_INIT_CALL(dinopic);
+	init_dinopic();
 }
 
 
@@ -2606,12 +2606,12 @@ ROM_START( sf2m1 )
 	ROM_LOAD( "s92_19.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, sf2m1)
+void cps_state::init_sf2m1()
 {
 	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 	mem16[0x64E/2] = 0x6046; // fix priorities
 
-	DRIVER_INIT_CALL(dinopic);
+	init_dinopic();
 
 }
 
@@ -2786,7 +2786,7 @@ ROM_START( sf2m9 )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(cps_state, sf2mdt)
+void cps_state::init_sf2mdt()
 {
 	int i;
 	uint32_t gfx_size = memregion( "gfx" )->bytes();
@@ -2804,12 +2804,12 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 	}
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x708100, 0x7081ff, write16_delegate(FUNC(cps_state::sf2mdt_layer_w),this));
-	DRIVER_INIT_CALL(sf2mdta);
+	init_sf2mdta();
 }
 
 
 
-DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
+void cps_state::init_sf2mdtb()
 {
 	int i;
 	uint32_t gfx_size = memregion( "gfx" )->bytes();
@@ -2831,11 +2831,11 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped  */
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 
-DRIVER_INIT_MEMBER(cps_state, sf2mdta)
+void cps_state::init_sf2mdta()
 {
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
@@ -2845,22 +2845,22 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x8000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff, m_bootleg_work_ram.get()); /* this has moved */
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state, sf2b)
+void cps_state::init_sf2b()
 {
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get());
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 // ************************************************************************* SLAMPIC
 
-MACHINE_START_MEMBER(cps_state, slampic)
+void cps_state::machine_start_slampic()
 {
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[0] = 0x00;

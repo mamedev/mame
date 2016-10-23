@@ -380,7 +380,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 ***************************************************************************/
 
 
-MACHINE_START_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_start_toaplan2()
 {
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_old_p1_paddle_h));
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_reset_toaplan2()
 {
 	m_mcu_data = 0x00;
 
@@ -407,27 +407,27 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,ghox)
+void toaplan2_state::machine_reset_ghox()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	machine_reset_toaplan2();
 	m_old_p1_paddle_h = 0;
 	m_old_p2_paddle_h = 0;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,dogyuun)
+void toaplan2_state::init_dogyuun()
 {
 	m_v25_reset_line = 0x20;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
+void toaplan2_state::init_fixeight()
 {
 	m_v25_reset_line = 0x08;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
+void toaplan2_state::init_fixeightbl()
 {
 	uint8_t *ROM = memregion("oki")->base();
 
@@ -435,13 +435,13 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,vfive)
+void toaplan2_state::init_vfive()
 {
 	m_v25_reset_line = 0x10;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
+void toaplan2_state::init_pipibibsbl()
 {
 	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
@@ -455,7 +455,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
+void toaplan2_state::init_bgaregga()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -464,7 +464,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,batrider)
+void toaplan2_state::init_batrider()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -473,7 +473,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
+void toaplan2_state::init_bbakraid()
 {
 	m_sndirq_line = 2;
 }

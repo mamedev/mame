@@ -66,7 +66,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_VIDEO_START(wyvernf0);
+	void video_start_wyvernf0();
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -81,8 +81,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_MACHINE_START(wyvernf0);
-	DECLARE_MACHINE_RESET(wyvernf0);
+	void machine_start_wyvernf0();
+	void machine_reset_wyvernf0();
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	// MCU
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::video_start_wyvernf0()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -600,7 +600,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_start_wyvernf0()
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
@@ -618,7 +618,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	save_item(NAME(m_mcu_ready));
 }
 
-MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_reset_wyvernf0()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;

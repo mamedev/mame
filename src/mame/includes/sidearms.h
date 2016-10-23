@@ -62,10 +62,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(dyger);
-	DECLARE_DRIVER_INIT(sidearms);
-	DECLARE_DRIVER_INIT(whizz);
-	DECLARE_DRIVER_INIT(turtship);
+	void init_dyger();
+	void init_sidearms();
+	void init_whizz();
+	void init_turtship();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

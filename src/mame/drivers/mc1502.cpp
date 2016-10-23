@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
 	membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
-MACHINE_START_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::machine_start_mc1502()
 {
 	DBG_LOG(0,"init",("machine_start()\n"));
 
@@ -202,7 +202,7 @@ MACHINE_START_MEMBER( mc1502_state, mc1502 )
 	m_kbd.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
 }
 
-MACHINE_RESET_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::machine_reset_mc1502()
 {
 	DBG_LOG(0,"init",("machine_reset()\n"));
 

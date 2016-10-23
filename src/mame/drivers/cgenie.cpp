@@ -49,8 +49,8 @@ public:
 		m_rs232_dcd(1)
 	{}
 
-	DECLARE_DRIVER_INIT(cgenie_eu);
-	DECLARE_DRIVER_INIT(cgenie_nz);
+	void init_cgenie_eu();
+	void init_cgenie_nz();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -284,12 +284,12 @@ WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_eu )
+void cgenie_state::init_cgenie_eu()
 {
 	m_palette = &m_palette_eu[0];
 }
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_nz )
+void cgenie_state::init_cgenie_nz()
 {
 	m_palette = &m_palette_nz[0];
 }

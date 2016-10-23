@@ -578,7 +578,7 @@ void tigeroad_state::machine_start()
 	save_item(NAME(m_new_latch));
 }
 
-MACHINE_RESET_MEMBER(tigeroad_state,pushman)
+void tigeroad_state::machine_reset_pushman()
 {
 	// todo, move to an MCU sim reset function in machine/tigeroad.c
 	m_latch = 0;
@@ -706,9 +706,9 @@ static MACHINE_CONFIG_DERIVED( pushman, f1dream_comad )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(tigeroad_state,bballs)
+void tigeroad_state::machine_reset_bballs()
 {
-	MACHINE_RESET_CALL_MEMBER(pushman);
+	machine_reset_pushman();
 
 	m_latch = 0x400;
 }
@@ -1179,18 +1179,18 @@ ROM_START( bballsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tigeroad_state,f1dream)
+void tigeroad_state::init_f1dream()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),this));
 }
 
-DRIVER_INIT_MEMBER(tigeroad_state,pushman)
+void tigeroad_state::init_pushman()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::pushman_68705_r),this), write16_delegate(FUNC(tigeroad_state::pushman_68705_w),this)   );
 	m_has_coinlock = 0;
 }
 
-DRIVER_INIT_MEMBER(tigeroad_state,bballs)
+void tigeroad_state::init_bballs()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::bballs_68705_r),this), write16_delegate(FUNC(tigeroad_state::bballs_68705_w),this)   );
 	m_has_coinlock = 0;

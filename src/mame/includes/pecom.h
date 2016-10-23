@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(pecom);
+	void video_start_pecom();
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
 	TIMER_CALLBACK_MEMBER(reset_tick);
 	DECLARE_READ_LINE_MEMBER(clear_r);

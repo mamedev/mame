@@ -1024,7 +1024,7 @@ void hp48_port_image_device::device_config_complete()
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp48_state,hp48)
+void hp48_state::init_hp48()
 {
 	int i;
 	LOG(( "hp48: driver init called\n" ));
@@ -1141,34 +1141,34 @@ void hp48_state::hp48_machine_start( hp48_models model )
 }
 
 
-MACHINE_START_MEMBER(hp48_state,hp48s)
+void hp48_state::machine_start_hp48s()
 {
 	hp48_machine_start( HP48_S );
 }
 
 
-MACHINE_START_MEMBER(hp48_state,hp48sx)
+void hp48_state::machine_start_hp48sx()
 {
 	hp48_machine_start( HP48_SX );
 }
 
 
-MACHINE_START_MEMBER(hp48_state,hp48g)
+void hp48_state::machine_start_hp48g()
 {
 	hp48_machine_start( HP48_G );
 }
 
-MACHINE_START_MEMBER(hp48_state,hp48gx)
+void hp48_state::machine_start_hp48gx()
 {
 	hp48_machine_start( HP48_GX );
 }
 
-MACHINE_START_MEMBER(hp48_state,hp48gp)
+void hp48_state::machine_start_hp48gp()
 {
 	hp48_machine_start( HP48_GP );
 }
 
-MACHINE_START_MEMBER(hp48_state,hp49g)
+void hp48_state::machine_start_hp49g()
 {
 	hp48_machine_start( HP49_G );
 }

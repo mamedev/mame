@@ -42,12 +42,12 @@ public:
 	DECLARE_WRITE8_MEMBER(switches_w);
 
 	void init();
-	DECLARE_DRIVER_INIT(dm);
-	DECLARE_DRIVER_INIT(ij);
-	DECLARE_DRIVER_INIT(jd);
-	DECLARE_DRIVER_INIT(pop);
-	DECLARE_DRIVER_INIT(sttng);
-	DECLARE_DRIVER_INIT(afv);
+	void init_dm();
+	void init_ij();
+	void init_jd();
+	void init_pop();
+	void init_sttng();
+	void init_afv();
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -251,42 +251,42 @@ void wpc_dcs_state::init()
 	// survive reload some days after unscathed.
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, dm)
+void wpc_dcs_state::init_dm()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, ij)
+void wpc_dcs_state::init_ij()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, jd)
+void wpc_dcs_state::init_jd()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, pop)
+void wpc_dcs_state::init_pop()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, sttng)
+void wpc_dcs_state::init_sttng()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, afv)
+void wpc_dcs_state::init_afv()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);

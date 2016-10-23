@@ -375,7 +375,7 @@ ROM sockets U63 & U64 empty
 
 ****************************************************************************/
 
-DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
+void md_boot_state::init_puckpkmn()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
@@ -384,7 +384,7 @@ DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */

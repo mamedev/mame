@@ -1741,7 +1741,7 @@ static GFXDECODE_START( hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER(snowbros_state,semiprot)
+void snowbros_state::machine_reset_semiprot()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1750,7 +1750,7 @@ MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-MACHINE_RESET_MEMBER(snowbros_state,finalttr)
+void snowbros_state::machine_reset_finalttr()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -2771,7 +2771,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
+void snowbros_state::init_cookbib2()
 {
 }
 
@@ -2781,7 +2781,7 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 	return 0x0202;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
+void snowbros_state::init_4in1boot()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2811,7 +2811,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
+void snowbros_state::init_snowbro3()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2834,7 +2834,7 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 	return 0x000a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
+void snowbros_state::init_3in1semi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
@@ -2845,19 +2845,19 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 	return 0x2a2a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
+void snowbros_state::init_cookbib3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
+void snowbros_state::init_pzlbreak()
 {
 	m_pandora->set_bg_pen(0xc0);
 }
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,toto)
+void snowbros_state::init_toto()
 {
 	// every single rom has bits 0x10 and 0x08 swapped
 	uint8_t *src = memregion("maincpu")->base();
@@ -2888,13 +2888,13 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
+void snowbros_state::init_hyperpac()
 {
 	save_item(NAME(m_semicom_prot_offset));
 }
 
 
-DRIVER_INIT_MEMBER(snowbros_state, yutnori)
+void snowbros_state::init_yutnori()
 {
 	// presumably related to the PIC protection
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();

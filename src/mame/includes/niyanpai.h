@@ -85,9 +85,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 
-	DECLARE_DRIVER_INIT(niyanpai);
+	void init_niyanpai();
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(musobana);
+	void machine_start_musobana();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int vram, int offset);

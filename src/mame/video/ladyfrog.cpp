@@ -124,7 +124,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
+void ladyfrog_state::video_start_ladyfrog_common()
 {
 	m_spriteram = std::make_unique<uint8_t[]>(160);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -146,13 +146,13 @@ void ladyfrog_state::video_start()
 {
 	// weird, there are sprite tiles at 0x000 and 0x400, but they don't contain all the sprites!
 	m_spritetilebase = 0x800;
-	VIDEO_START_CALL_MEMBER(ladyfrog_common);
+	video_start_ladyfrog_common();
 }
 
-VIDEO_START_MEMBER(ladyfrog_state,toucheme)
+void ladyfrog_state::video_start_toucheme()
 {
 	m_spritetilebase = 0x000;
-	VIDEO_START_CALL_MEMBER(ladyfrog_common);
+	video_start_ladyfrog_common();
 }
 
 

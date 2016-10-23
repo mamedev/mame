@@ -43,7 +43,7 @@ void toobin_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(toobin_state,toobin)
+void toobin_state::machine_reset_toobin()
 {
 	atarigen_state::machine_reset();
 }

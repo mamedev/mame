@@ -75,7 +75,7 @@ public:
 	m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4 );
+	void init_px4();
 
 	DECLARE_PALETTE_INIT( px4 );
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -252,7 +252,7 @@ public:
 	m_ramdisk(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4p );
+	void init_px4p();
 
 	DECLARE_PALETTE_INIT( px4p );
 
@@ -1203,16 +1203,16 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( px4_state, px4 )
+void px4_state::init_px4()
 {
 	// map os rom and last half of memory
 	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::init_px4p()
 {
-	DRIVER_INIT_CALL(px4);
+	init_px4();
 
 	// reserve memory for external ram-disk
 	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);

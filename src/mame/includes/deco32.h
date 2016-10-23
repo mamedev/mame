@@ -155,14 +155,14 @@ public:
 	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
-	DECLARE_DRIVER_INIT(captaven);
-	DECLARE_DRIVER_INIT(fghthist);
-	DECLARE_MACHINE_RESET(deco32);
-	DECLARE_VIDEO_START(captaven);
-	DECLARE_VIDEO_START(fghthist);
-	DECLARE_VIDEO_START(nslasher);
+	void init_tattass();
+	void init_nslasher();
+	void init_captaven();
+	void init_fghthist();
+	void machine_reset_deco32();
+	void video_start_captaven();
+	void video_start_fghthist();
+	void video_start_nslasher();
 
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
@@ -220,11 +220,11 @@ public:
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
-	DECLARE_VIDEO_START(dragngun);
-	DECLARE_VIDEO_START(lockload);
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
+	void video_start_dragngun();
+	void video_start_lockload();
 	void dragngun_init_common();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);

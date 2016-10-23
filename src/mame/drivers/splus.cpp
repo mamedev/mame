@@ -113,7 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(splus_registers_r);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
-	DECLARE_DRIVER_INIT(splus);
+	void init_splus();
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 };
@@ -573,7 +573,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(splus_state,splus)
+void splus_state::init_splus()
 {
 	uint8_t *reel_data = memregion( "reeldata" )->base();
 

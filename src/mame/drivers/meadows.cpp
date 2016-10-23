@@ -829,7 +829,7 @@ ROM_END
  *************************************/
 
 /* A fake for the missing ball sprites #3 and #4 */
-DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
+void meadows_state::init_gypsyjug()
 {
 	static const uint8_t ball[16*2] =
 	{
@@ -857,7 +857,7 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 
 /* A fake for inverting the data bus */
-DRIVER_INIT_MEMBER(meadows_state,minferno)
+void meadows_state::init_minferno()
 {
 	int i, length;
 	uint8_t *mem;

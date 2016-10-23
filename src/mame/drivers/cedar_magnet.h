@@ -122,9 +122,9 @@ public:
 	required_device<cedar_magnet_plane_device> m_cedplane1;
 	required_device<cedar_magnet_sprite_device> m_cedsprite;
 
-	DECLARE_DRIVER_INIT(mag_time);
-	DECLARE_DRIVER_INIT(mag_xain);
-	DECLARE_DRIVER_INIT(mag_exzi);
+	void init_mag_time();
+	void init_mag_xain();
+	void init_mag_exzi();
 
 };
 

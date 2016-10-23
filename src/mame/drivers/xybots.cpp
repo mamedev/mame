@@ -40,7 +40,7 @@ void xybots_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(xybots_state,xybots)
+void xybots_state::machine_reset_xybots()
 {
 	atarigen_state::machine_reset();
 }
@@ -390,7 +390,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(xybots_state,xybots)
+void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
 	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);

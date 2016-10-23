@@ -132,7 +132,7 @@ public:
 	int m_efx;
 	int m_video_on;
 
-	DECLARE_DRIVER_INIT(cosmicos);
+	void init_cosmicos();
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
 };

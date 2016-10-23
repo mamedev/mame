@@ -98,9 +98,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
-	DECLARE_DRIVER_INIT(opwolf);
-	DECLARE_DRIVER_INIT(opwolfb);
-	DECLARE_DRIVER_INIT(opwolfp);
+	void init_opwolf();
+	void init_opwolfb();
+	void init_opwolfp();
 
 
 	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
@@ -108,7 +108,7 @@ public:
 
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(opwolf);
+	void machine_reset_opwolf();
 	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
 	TIMER_CALLBACK_MEMBER(cchip_timer);

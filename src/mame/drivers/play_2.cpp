@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(psg_r);
 	DECLARE_WRITE8_MEMBER(psg_w);
 	DECLARE_READ8_MEMBER(sound_in_r);
-	DECLARE_DRIVER_INIT(zira);
+	void init_zira();
 
 private:
 	uint16_t m_clockcnt;
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_DERIVED( zira, play_2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( play_2_state, zira )
+void play_2_state::init_zira()
 {
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion("cop402")->base(), 0x400);

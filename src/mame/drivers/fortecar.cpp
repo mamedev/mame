@@ -347,7 +347,7 @@ public:
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
-	DECLARE_DRIVER_INIT(fortecar);
+	void init_fortecar();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortecar);
@@ -769,7 +769,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }

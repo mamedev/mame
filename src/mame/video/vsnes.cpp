@@ -26,11 +26,11 @@ void vsnes_state::ppu_irq_2(int *ppu_regs)
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-VIDEO_START_MEMBER(vsnes_state,vsnes )
+void vsnes_state::video_start_vsnes()
 {
 }
 
-VIDEO_START_MEMBER(vsnes_state,vsdual )
+void vsnes_state::video_start_vsdual()
 {
 }
 

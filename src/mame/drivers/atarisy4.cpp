@@ -93,12 +93,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
 	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
 	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_DRIVER_INIT(airrace);
-	DECLARE_DRIVER_INIT(laststar);
+	void init_airrace();
+	void init_laststar();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_MACHINE_RESET(airrace);
+	void machine_reset_airrace();
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void image_mem_to_screen( bool clip);
@@ -992,7 +992,7 @@ next_line:
 	}
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,laststar)
+void atarisy4_state::init_laststar()
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 
@@ -1009,7 +1009,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,airrace)
+void atarisy4_state::init_airrace()
 {
 	/* Allocate two sets of 32kB shared RAM */
 	m_shared_ram[0] = make_unique_clear<uint16_t[]>(0x4000);
@@ -1034,7 +1034,7 @@ void atarisy4_state::machine_reset()
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(atarisy4_state,airrace)
+void atarisy4_state::machine_reset_airrace()
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

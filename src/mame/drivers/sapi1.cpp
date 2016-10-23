@@ -68,11 +68,11 @@ public:
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_DRIVER_INIT(sapizps3);
-	DECLARE_DRIVER_INIT(sapizps3a);
-	DECLARE_DRIVER_INIT(sapizps3b);
-	DECLARE_MACHINE_RESET(sapi1);
-	DECLARE_MACHINE_RESET(sapizps3);
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
+	void machine_reset_sapi1();
+	void machine_reset_sapizps3();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -502,31 +502,31 @@ WRITE8_MEMBER( sapi1_state::sapi3_25_w )
 	m_zps3_25 = data & 0xfc; //??
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapi1 )
+void sapi1_state::machine_reset_sapi1()
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::machine_reset_sapizps3()
 {
 	m_keyboard_mask = 0;
 	m_bank1->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
+void sapi1_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
+void sapi1_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);

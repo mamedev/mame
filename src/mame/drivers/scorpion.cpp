@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
-	DECLARE_MACHINE_START(scorpion);
-	DECLARE_MACHINE_RESET(scorpion);
+	void machine_start_scorpion();
+	void machine_reset_scorpion();
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 protected:
 	required_memory_bank m_bank1;
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(scorpion_state,scorpion)
+void scorpion_state::machine_reset_scorpion()
 {
 	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -210,7 +210,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	m_port_1ffd_data = 0;
 	scorpion_update_memory();
 }
-MACHINE_START_MEMBER(scorpion_state,scorpion)
+void scorpion_state::machine_start_scorpion()
 {
 }
 

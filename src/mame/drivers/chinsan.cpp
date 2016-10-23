@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ym_port_w1);
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void init_chinsan();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -675,7 +675,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(chinsan_state,chinsan)
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), memregion("user1")->base(), 0x18000);

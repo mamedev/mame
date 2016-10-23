@@ -440,7 +440,7 @@ void pirates_state::decrypt_oki()
 }
 
 
-DRIVER_INIT_MEMBER(pirates_state,pirates)
+void pirates_state::init_pirates()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -455,7 +455,7 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 
 READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else return 0x0000; }
 
-DRIVER_INIT_MEMBER(pirates_state,genix)
+void pirates_state::init_genix()
 {
 	decrypt_68k();
 	decrypt_p();

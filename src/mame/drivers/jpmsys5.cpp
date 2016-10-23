@@ -591,13 +591,13 @@ WRITE_LINE_MEMBER(jpmsys5_state::write_acia_clock)
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmsys5_state,jpmsys5v)
+void jpmsys5_state::machine_start_jpmsys5v()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
 	m_touch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jpmsys5_state::touch_cb),this));
 }
 
-MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
+void jpmsys5_state::machine_reset_jpmsys5v()
 {
 	m_touch_timer->reset();
 	m_touch_state = IDLE;
@@ -811,12 +811,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
+void jpmsys5_state::machine_start_jpmsys5()
 {
 //  membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
 }
 
-MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
+void jpmsys5_state::machine_reset_jpmsys5()
 {
 	m_acia6850_2->write_rxd(1);
 	m_acia6850_2->write_dcd(0);

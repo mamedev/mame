@@ -137,8 +137,8 @@ public:
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
 	DECLARE_READ8_MEMBER(tia_r);
 	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_DRIVER_INIT(a7800_pal);
-	DECLARE_DRIVER_INIT(a7800_ntsc);
+	void init_a7800_pal();
+	void init_a7800_ntsc();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(a7800);
@@ -1434,7 +1434,7 @@ ROM_END
  DRIVER INIT
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
+void a7800_state::init_a7800_ntsc()
 {
 	m_ispal = false;
 	m_lines = 263;
@@ -1443,7 +1443,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 }
 
 
-DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
+void a7800_state::init_a7800_pal()
 {
 	m_ispal = true;
 	m_lines = 313;

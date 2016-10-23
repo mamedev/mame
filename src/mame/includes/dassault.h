@@ -70,8 +70,8 @@ public:
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(thndzone);
-	DECLARE_DRIVER_INIT(dassault);
+	void init_thndzone();
+	void init_dassault();
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);

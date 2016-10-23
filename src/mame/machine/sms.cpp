@@ -1016,7 +1016,7 @@ void sms_state::setup_bios()
 	}
 }
 
-MACHINE_START_MEMBER(sms_state,sms)
+void sms_state::machine_start_sms()
 {
 	char str[7];
 
@@ -1110,7 +1110,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		m_cartslot->save_ram();
 }
 
-MACHINE_RESET_MEMBER(sms_state,sms)
+void sms_state::machine_reset_sms()
 {
 	if (m_is_smsj)
 	{
@@ -1240,7 +1240,7 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	}
 }
 
-DRIVER_INIT_MEMBER(sms_state,sg1000m3)
+void sms_state::init_sg1000m3()
 {
 	m_is_mark_iii = 1;
 	m_has_jpn_sms_cart_slot = 1;
@@ -1249,13 +1249,13 @@ DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms)
+void sms_state::init_sms()
 {
 	m_has_bios_full = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms1)
+void sms_state::init_sms1()
 {
 	m_has_bios_full = 1;
 	// turn on the Power LED
@@ -1263,7 +1263,7 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,smsj)
+void sms_state::init_smsj()
 {
 	m_is_smsj = 1;
 	m_has_bios_2000 = 1;
@@ -1274,7 +1274,7 @@ DRIVER_INIT_MEMBER(sms_state,smsj)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms1kr)
+void sms_state::init_sms1kr()
 {
 	m_has_bios_2000 = 1;
 	m_ioctrl_region_is_japan = 1;
@@ -1284,7 +1284,7 @@ DRIVER_INIT_MEMBER(sms_state,sms1kr)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,smskr)
+void sms_state::init_smskr()
 {
 	m_has_bios_full = 1;
 	// Despite having a Japanese cartridge slot, this version is detected as Export region.
@@ -1292,13 +1292,13 @@ DRIVER_INIT_MEMBER(sms_state,smskr)
 }
 
 
-DRIVER_INIT_MEMBER(smssdisp_state,smssdisp)
+void smssdisp_state::init_smssdisp()
 {
 	m_is_sdisp = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,gamegear)
+void sms_state::init_gamegear()
 {
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
@@ -1307,7 +1307,7 @@ DRIVER_INIT_MEMBER(sms_state,gamegear)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,gamegeaj)
+void sms_state::init_gamegeaj()
 {
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
@@ -1317,7 +1317,7 @@ DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 }
 
 
-VIDEO_START_MEMBER(sms_state,sms1)
+void sms_state::video_start_sms1()
 {
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
@@ -1334,7 +1334,7 @@ VIDEO_START_MEMBER(sms_state,sms1)
 }
 
 
-VIDEO_RESET_MEMBER(sms_state,sms1)
+void sms_state::video_reset_sms1()
 {
 	if (m_port_scope->read())
 	{
@@ -1464,7 +1464,7 @@ uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-VIDEO_START_MEMBER(sms_state,gamegear)
+void sms_state::video_start_gamegear()
 {
 	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
@@ -1477,7 +1477,7 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_pointer(NAME(m_line_buffer.get()), 160 * 4);
 }
 
-VIDEO_RESET_MEMBER(sms_state,gamegear)
+void sms_state::video_reset_gamegear()
 {
 	if (m_prev_bitmap_copied)
 	{

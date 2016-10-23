@@ -514,12 +514,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(_20pacgal_state,20pacgal)
+void _20pacgal_state::init_20pacgal()
 {
 	m_sprite_pal_base = 0x00<<2;
 }
 
-DRIVER_INIT_MEMBER(_20pacgal_state,25pacman)
+void _20pacgal_state::init_25pacman()
 
 {
 	m_sprite_pal_base = 0x20<<2;

@@ -62,10 +62,10 @@ public:
 
 
 
-	DECLARE_DRIVER_INIT(mlc);
-	DECLARE_DRIVER_INIT(avengrgs);
-	DECLARE_MACHINE_RESET(mlc);
-	DECLARE_VIDEO_START(mlc);
+	void init_mlc();
+	void init_avengrgs();
+	void machine_reset_mlc();
+	void video_start_mlc();
 	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);

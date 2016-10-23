@@ -72,8 +72,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
-	DECLARE_DRIVER_INIT(razmataz);
-	DECLARE_DRIVER_INIT(zaxxonj);
+	void init_razmataz();
+	void init_zaxxonj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
@@ -81,8 +81,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaxxon);
-	DECLARE_VIDEO_START(razmataz);
-	DECLARE_VIDEO_START(congo);
+	void video_start_razmataz();
+	void video_start_congo();
 	uint32_t screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

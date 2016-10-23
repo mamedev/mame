@@ -37,7 +37,7 @@ public:
 
 	uint32_t m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(voyager);
+	void init_voyager();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(voyager_state,voyager)
+void voyager_state::init_voyager()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 

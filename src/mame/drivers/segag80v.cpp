@@ -1269,7 +1269,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80v_state,elim2)
+void segag80v_state::init_elim2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1282,7 +1282,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,elim4)
+void segag80v_state::init_elim4()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1299,7 +1299,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim4)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,spacfury)
+void segag80v_state::init_spacfury()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1314,7 +1314,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,zektor)
+void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
@@ -1335,7 +1335,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,tacscan)
+void segag80v_state::init_tacscan()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1354,7 +1354,7 @@ DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,startrek)
+void segag80v_state::init_startrek()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);

@@ -464,13 +464,13 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(deadang_state,deadang)
+void deadang_state::init_deadang()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(deadang_state,ghunter)
+void deadang_state::init_ghunter()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();

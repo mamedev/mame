@@ -141,7 +141,7 @@ void jpmimpct_state::update_irqs()
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
+void jpmimpct_state::machine_start_jpmimpct()
 {
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_duart_1_irq));
@@ -155,7 +155,7 @@ MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 }
 
 
-MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
+void jpmimpct_state::machine_reset_jpmimpct()
 {
 	memset(&m_duart_1, 0, sizeof(m_duart_1));
 
@@ -957,7 +957,7 @@ WRITE8_MEMBER(jpmimpct_state::display_c_w)
 	m_vfd->sclk(data & 0x01);
 }
 
-MACHINE_START_MEMBER(jpmimpct_state,impctawp)
+void jpmimpct_state::machine_start_impctawp()
 {
 	save_item(NAME(m_duart_1_irq));
 	save_item(NAME(m_touch_cnt));
@@ -969,7 +969,7 @@ MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 	save_item(NAME(m_duart_1.CT));
 }
 
-MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
+void jpmimpct_state::machine_reset_impctawp()
 {
 	memset(&m_duart_1, 0, sizeof(m_duart_1));
 

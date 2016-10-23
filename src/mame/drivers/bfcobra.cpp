@@ -274,7 +274,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(bfcobra);
+	void init_bfcobra();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1557,7 +1557,7 @@ WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
 
 
 /* TODO: Driver vs Machine Init */
-DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
+void bfcobra_state::init_bfcobra()
 {
 	/*
 	    6809 ROM address and data lines are scrambled.

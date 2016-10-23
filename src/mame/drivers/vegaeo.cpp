@@ -43,8 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	DECLARE_DRIVER_INIT(vegaeo);
-	DECLARE_VIDEO_START(vega);
+	void init_vegaeo();
+	void video_start_vega();
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-VIDEO_START_MEMBER(vegaeo_state,vega)
+void vegaeo_state::video_start_vega()
 {
 	m_vega_vram = std::make_unique<uint32_t[]>(0x14000*2/4);
 	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);
@@ -328,7 +328,7 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
+void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");

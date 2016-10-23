@@ -83,19 +83,19 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
 
-	DECLARE_DRIVER_INIT(fax);
-	DECLARE_DRIVER_INIT(sidetrac);
-	DECLARE_DRIVER_INIT(pepper2);
-	DECLARE_DRIVER_INIT(targ);
-	DECLARE_DRIVER_INIT(rallys);
-	DECLARE_DRIVER_INIT(mtrap);
-	DECLARE_DRIVER_INIT(teetert);
-	DECLARE_DRIVER_INIT(venture);
-	DECLARE_DRIVER_INIT(spectar);
-	DECLARE_DRIVER_INIT(phantoma);
+	void init_fax();
+	void init_sidetrac();
+	void init_pepper2();
+	void init_targ();
+	void init_rallys();
+	void init_mtrap();
+	void init_teetert();
+	void init_venture();
+	void init_spectar();
+	void init_phantoma();
 
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(teetert);
+	void machine_start_teetert();
 
 	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

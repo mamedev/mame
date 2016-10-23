@@ -177,12 +177,12 @@ public:
 	DECLARE_READ16_MEMBER(dummy_read_01);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
-	DECLARE_DRIVER_INIT(galgames);
-	DECLARE_DRIVER_INIT(galgame2);
-	DECLARE_MACHINE_RESET(tmaster);
-	DECLARE_VIDEO_START(tmaster);
-	DECLARE_MACHINE_RESET(galgames);
-	DECLARE_VIDEO_START(galgames);
+	void init_galgames();
+	void init_galgame2();
+	void machine_reset_tmaster();
+	void video_start_tmaster();
+	void machine_reset_galgames();
+	void video_start_galgames();
 	uint32_t screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
 	uint8_t binary_to_BCD(uint8_t data);
@@ -327,7 +327,7 @@ int tmaster_state::galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uin
 	return reg_low | (reg_mid << 16);
 }
 
-VIDEO_START_MEMBER(tmaster_state,tmaster)
+void tmaster_state::video_start_tmaster()
 {
 	int layer, buffer;
 	for (layer = 0; layer < 2; layer++)
@@ -342,9 +342,9 @@ VIDEO_START_MEMBER(tmaster_state,tmaster)
 	m_compute_addr = &tmaster_state::tmaster_compute_addr;
 }
 
-VIDEO_START_MEMBER(tmaster_state,galgames)
+void tmaster_state::video_start_galgames()
 {
-	VIDEO_START_CALL_MEMBER( tmaster );
+	video_start_tmaster();
 	m_compute_addr = &tmaster_state::galgames_compute_addr;
 }
 
@@ -879,7 +879,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(tmaster_state,tmaster)
+void tmaster_state::machine_reset_tmaster()
 {
 	m_gfx_offs = 0;
 	m_gfx_size = memregion("blitter")->bytes();
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_DERIVED( tmds1204, tm )
 	MCFG_DS1204_ADD("ds1204")
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(tmaster_state,galgames)
+void tmaster_state::machine_reset_galgames()
 {
 	m_gfx_offs = 0;
 	m_gfx_size = 0x200000;
@@ -1785,7 +1785,7 @@ ROM_START( galgame2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tmaster_state,galgames)
+void tmaster_state::init_galgames()
 {
 	uint8_t *ROM  =   memregion("maincpu")->base();
 	int cart;
@@ -1819,7 +1819,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmaster_state,galgame2)
+void tmaster_state::init_galgame2()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -1836,7 +1836,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 	// Cartdridge check on game selection screen
 	ROM[0x12da0/2] = 0x4e71;
 
-	DRIVER_INIT_CALL(galgames);
+	init_galgames();
 }
 
 GAME( 1996, tm,       0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )

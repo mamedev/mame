@@ -34,11 +34,11 @@ public:
 	bitmap_ind16 m_bitmap;
 	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
-	DECLARE_DRIVER_INIT(galaxy);
-	DECLARE_DRIVER_INIT(galaxyp);
+	void init_galaxy();
+	void init_galaxyp();
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(galaxy);
-	DECLARE_MACHINE_RESET(galaxyp);
+	void machine_reset_galaxy();
+	void machine_reset_galaxyp();
 	uint32_t screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
 	TIMER_CALLBACK_MEMBER(gal_video);

@@ -29,9 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 
-	DECLARE_MACHINE_RESET(s11b);
-	DECLARE_DRIVER_INIT(s11b);
-	DECLARE_DRIVER_INIT(s11b_invert);
+	void machine_reset_s11b();
+	void init_s11b();
+	void init_s11b_invert();
 
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;

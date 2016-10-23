@@ -26,13 +26,13 @@ public:
 
 	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(batman);
+	void init_batman();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
-	DECLARE_MACHINE_START(batman);
-	DECLARE_MACHINE_RESET(batman);
-	DECLARE_VIDEO_START(batman);
+	void machine_start_batman();
+	void machine_reset_batman();
+	void video_start_batman();
 	uint32_t screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

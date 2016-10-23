@@ -1498,7 +1498,7 @@ READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
 
 }
 
-DRIVER_INIT_MEMBER(gaelco2_state,maniacsqa)
+void gaelco2_state::init_maniacsqa()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfedaa2, 0xfedaa3, read16_delegate(FUNC(gaelco2_state::maniacsqa_prot_r), this) );
 }
@@ -1510,9 +1510,9 @@ READ16_MEMBER(gaelco2_state::dallas_kludge_r)
 	return 0x0200;
 }
 
-DRIVER_INIT_MEMBER(gaelco2_state,touchgop)
+void gaelco2_state::init_touchgop()
 {
-	DRIVER_INIT_CALL(touchgo);
+	init_touchgo();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfefffa, 0xfefffb, read16_delegate(FUNC(gaelco2_state::dallas_kludge_r), this) );
 }
 

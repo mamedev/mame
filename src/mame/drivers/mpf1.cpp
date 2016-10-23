@@ -473,7 +473,7 @@ DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), this));
 }

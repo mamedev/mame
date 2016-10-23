@@ -476,9 +476,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 public:
-	DECLARE_MACHINE_RESET(pc8801_clock_speed);
-	DECLARE_MACHINE_RESET(pc8801_dic);
-	DECLARE_MACHINE_RESET(pc8801_cdrom);
+	void machine_reset_pc8801_clock_speed();
+	void machine_reset_pc8801_dic();
+	void machine_reset_pc8801_cdrom();
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
@@ -2493,7 +2493,7 @@ void pc8801_state::machine_reset()
 	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
+void pc8801_state::machine_reset_pc8801_clock_speed()
 {
 	pc8801_state::machine_reset();
 	m_has_clock_speed = 1;
@@ -2504,17 +2504,17 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_baudrate_val = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_dic)
+void pc8801_state::machine_reset_pc8801_dic()
 {
-	MACHINE_RESET_CALL_MEMBER( pc8801_clock_speed );
+	machine_reset_pc8801_clock_speed();
 	m_has_dictionary = 1;
 	m_dic_bank = 0;
 	m_dic_ctrl = 0;
 }
 
-MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
+void pc8801_state::machine_reset_pc8801_cdrom()
 {
-	MACHINE_RESET_CALL_MEMBER( pc8801_dic );
+	machine_reset_pc8801_dic();
 	m_has_cdrom = 1;
 
 	{

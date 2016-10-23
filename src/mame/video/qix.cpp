@@ -19,7 +19,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(qix_state,qix)
+void qix_state::video_start_qix()
 {
 	/* allocate memory for the full video RAM */
 	m_videoram.allocate(256 * 256);

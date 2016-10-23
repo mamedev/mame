@@ -100,7 +100,7 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	DECLARE_DRIVER_INIT(vt240);
+	void init_vt240();
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
 	void irq_encoder(int irq, int state);

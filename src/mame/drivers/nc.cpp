@@ -1117,7 +1117,7 @@ void nc_state::nc200_floppy_drive_index_callback(int drive_id)
 }
 #endif
 
-MACHINE_RESET_MEMBER(nc_state, nc200)
+void nc_state::machine_reset_nc200()
 {
 	/* 512k of rom */
 	m_membank_rom_mask = 0x1f;
@@ -1136,7 +1136,7 @@ MACHINE_RESET_MEMBER(nc_state, nc200)
 	nc200_video_set_backlight(0);
 }
 
-MACHINE_START_MEMBER(nc_state, nc200)
+void nc_state::machine_start_nc200()
 {
 	m_type = NC_TYPE_200;
 

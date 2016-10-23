@@ -265,9 +265,9 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	DECLARE_DRIVER_INIT(halley87);
-	DECLARE_DRIVER_INIT(benberob);
-	DECLARE_DRIVER_INIT(halleys);
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
@@ -2189,7 +2189,7 @@ void halleys_state::init_common()
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,benberob)
+void halleys_state::init_benberob()
 {
 	m_game_id = GAME_BENBEROB;
 
@@ -2199,7 +2199,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,halleys)
+void halleys_state::init_halleys()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
@@ -2207,7 +2207,7 @@ DRIVER_INIT_MEMBER(halleys_state,halleys)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(halleys_state,halley87)
+void halleys_state::init_halley87()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb10d;

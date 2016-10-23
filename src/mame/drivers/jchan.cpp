@@ -213,7 +213,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_2_w);
 	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
 
-	DECLARE_DRIVER_INIT(jchan);
+	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -703,7 +703,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER( jchan_state, jchan )
+void jchan_state::init_jchan()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));

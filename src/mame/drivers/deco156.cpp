@@ -60,8 +60,8 @@ public:
 	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
-	DECLARE_DRIVER_INIT(hvysmsh);
-	DECLARE_DRIVER_INIT(wcvol95);
+	void init_hvysmsh();
+	void init_wcvol95();
 	virtual void video_start() override;
 	uint32_t screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
@@ -678,14 +678,14 @@ void deco156_state::descramble_sound( const char *tag )
 	memcpy(rom,&buf1[0],length);
 }
 
-DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
+void deco156_state::init_hvysmsh()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
 	descramble_sound("oki2");
 }
 
-DRIVER_INIT_MEMBER(deco156_state,wcvol95)
+void deco156_state::init_wcvol95()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());

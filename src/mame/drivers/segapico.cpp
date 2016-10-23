@@ -152,9 +152,9 @@ public:
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
-	DECLARE_DRIVER_INIT(pico);
-	DECLARE_DRIVER_INIT(picou);
-	DECLARE_DRIVER_INIT(picoj);
+	void init_pico();
+	void init_picou();
+	void init_picoj();
 };
 
 class pico_state : public pico_base_state
@@ -165,7 +165,7 @@ public:
 	m_picocart(*this, "picoslot") { }
 
 	required_device<pico_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(pico);
+	void machine_start_pico();
 };
 
 
@@ -374,7 +374,7 @@ static SLOT_INTERFACE_START(pico_cart)
 	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
 SLOT_INTERFACE_END
 
-MACHINE_START_MEMBER(pico_state,pico)
+void pico_state::machine_start_pico()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
@@ -444,26 +444,26 @@ ROM_START( picoj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pico_base_state, pico)
+void pico_base_state::init_pico()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x60; // Export PAL
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picou)
+void pico_base_state::init_picou()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x40; // Export NTSC
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picoj)
+void pico_base_state::init_picoj()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x00; // JPN NTSC
 }
@@ -559,7 +559,7 @@ public:
 	m_picocart(*this, "coperaslot") { }
 
 	required_device<copera_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(copera);
+	void machine_start_copera();
 };
 
 
@@ -582,7 +582,7 @@ static SLOT_INTERFACE_START(copera_cart)
 	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
 SLOT_INTERFACE_END
 
-MACHINE_START_MEMBER(copera_state,copera)
+void copera_state::machine_start_copera()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));

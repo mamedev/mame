@@ -2135,44 +2135,44 @@ ROM_START( horizon )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(m62_state,battroad)
+void m62_state::init_battroad()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,ldrun2)
+void m62_state::init_ldrun2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,ldrun4)
+void m62_state::init_ldrun4()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,kidniki)
+void m62_state::init_kidniki()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,spelunkr)
+void m62_state::init_spelunkr()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,spelunk2)
+void m62_state::init_spelunk2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0,  4, memregion("maincpu")->base() + 0x20000, 0x1000);
 	membank("bank2")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,youjyudn)
+void m62_state::init_youjyudn()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);

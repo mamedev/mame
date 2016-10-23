@@ -51,20 +51,20 @@ void tsamurai_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, tsamurai)
+void tsamurai_state::machine_start_tsamurai()
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 	machine_start();
 }
 
-MACHINE_START_MEMBER(tsamurai_state, m660)
+void tsamurai_state::machine_start_m660()
 {
-	MACHINE_START_CALL_MEMBER(tsamurai);
+	machine_start_tsamurai();
 	save_item(NAME(m_sound_command3));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, vsgongf)
+void tsamurai_state::machine_start_vsgongf()
 {
 	save_item(NAME(m_vsgongf_sound_nmi_enabled));
 	machine_start();

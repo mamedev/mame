@@ -558,7 +558,7 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
-DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
+void pingpong_state::init_merlinmm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -568,7 +568,7 @@ DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
+void pingpong_state::init_cashquiz()
 {
 	uint8_t *ROM;
 	int i;

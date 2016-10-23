@@ -521,7 +521,7 @@ ROM_START( metrocrsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(baraduke_state,baraduke)
+void baraduke_state::init_baraduke()
 {
 	uint8_t *rom;
 	int i;

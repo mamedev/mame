@@ -5429,22 +5429,22 @@ ROM_START( luckywldj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(namcos2_state,assault)
+void namcos2_state::init_assault()
 {
 	m_gametype = NAMCOS2_ASSAULT;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,assaultj)
+void namcos2_state::init_assaultj()
 {
 	m_gametype = NAMCOS2_ASSAULT_JP;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,assaultp)
+void namcos2_state::init_assaultp()
 {
 	m_gametype = NAMCOS2_ASSAULT_PLUS;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,assaultp_hack)
+void namcos2_state::init_assaultp_hack()
 {
 	// HACK!
 	// boost the MCU speed to avoid a race condition which causes
@@ -5455,75 +5455,75 @@ DRIVER_INIT_MEMBER(namcos2_state,assaultp_hack)
 	// MACHINE_DRIVER
 	m_mcu->set_clock_scale(4.0f);
 
-	DRIVER_INIT_CALL(assaultp);
+	init_assaultp();
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,burnforc)
+void namcos2_state::init_burnforc()
 {
 	m_gametype = NAMCOS2_BURNING_FORCE;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,cosmogng)
+void namcos2_state::init_cosmogng()
 {
 	m_gametype = NAMCOS2_COSMO_GANG;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,dsaber)
+void namcos2_state::init_dsaber()
 {
 	m_gametype = NAMCOS2_DRAGON_SABER;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,dsaberj)
+void namcos2_state::init_dsaberj()
 {
 	m_gametype = NAMCOS2_DRAGON_SABER;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,dirtfoxj)
+void namcos2_state::init_dirtfoxj()
 {
 	m_gametype = NAMCOS2_DIRT_FOX_JP;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,finallap)
+void namcos2_state::init_finallap()
 {
 	m_gametype = NAMCOS2_FINAL_LAP;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,finalap2)
+void namcos2_state::init_finalap2()
 {
 	m_gametype = NAMCOS2_FINAL_LAP_2;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,finalap3)
+void namcos2_state::init_finalap3()
 {
 	m_gametype = NAMCOS2_FINAL_LAP_3;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,finehour)
+void namcos2_state::init_finehour()
 {
 	m_gametype = NAMCOS2_FINEST_HOUR;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,fourtrax)
+void namcos2_state::init_fourtrax()
 {
 	m_gametype = NAMCOS2_FOUR_TRAX;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,kyukaidk)
+void namcos2_state::init_kyukaidk()
 {
 	m_gametype = NAMCOS2_KYUUKAI_DOUCHUUKI;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,marvlanj)
+void namcos2_state::init_marvlanj()
 {
 	m_gametype = NAMCOS2_MARVEL_LAND;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,marvland)
+void namcos2_state::init_marvland()
 {
 	m_gametype = NAMCOS2_MARVEL_LAND;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
+void namcos2_state::init_metlhawk()
 {
 	/* unscramble sprites */
 	uint8_t *data = memregion("gfx1")->base();
@@ -5583,84 +5583,84 @@ DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
 	m_gametype = NAMCOS2_METAL_HAWK;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,mirninja)
+void namcos2_state::init_mirninja()
 {
 	m_gametype = NAMCOS2_MIRAI_NINJA;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,ordyne)
+void namcos2_state::init_ordyne()
 {
 	m_gametype = NAMCOS2_ORDYNE;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,phelios)
+void namcos2_state::init_phelios()
 {
 	m_gametype = NAMCOS2_PHELIOS;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,rthun2)
+void namcos2_state::init_rthun2()
 {
 	m_gametype = NAMCOS2_ROLLING_THUNDER_2;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,rthun2j)
+void namcos2_state::init_rthun2j()
 {
 	m_gametype = NAMCOS2_ROLLING_THUNDER_2;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,sgunner2)
+void namcos2_state::init_sgunner2()
 {
 	m_gametype = NAMCOS2_STEEL_GUNNER_2;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,sws)
+void namcos2_state::init_sws()
 {
 	m_gametype = NAMCOS2_SUPER_WSTADIUM;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,sws92)
+void namcos2_state::init_sws92()
 {
 	m_gametype = NAMCOS2_SUPER_WSTADIUM_92;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,sws92g)
+void namcos2_state::init_sws92g()
 {
 	m_gametype = NAMCOS2_SUPER_WSTADIUM_92T;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,sws93)
+void namcos2_state::init_sws93()
 {
 	m_gametype = NAMCOS2_SUPER_WSTADIUM_93;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,suzuka8h)
+void namcos2_state::init_suzuka8h()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,suzuk8h2)
+void namcos2_state::init_suzuk8h2()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS_2;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,valkyrie)
+void namcos2_state::init_valkyrie()
 {
 	m_gametype = NAMCOS2_VALKYRIE;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,gollygho)
+void namcos2_state::init_gollygho()
 {
 	m_gametype = NAMCOS2_GOLLY_GHOST;
 }
 
-DRIVER_INIT_MEMBER(namcos2_state,bubbletr)
+void namcos2_state::init_bubbletr()
 {
 	m_gametype = NAMCOS2_BUBBLE_TROUBLE;
 }
 
 
 
-DRIVER_INIT_MEMBER(namcos2_state,luckywld)
+void namcos2_state::init_luckywld()
 {
 	uint8_t *pData = (uint8_t *)memregion( "gfx5" )->base();
 	int i;

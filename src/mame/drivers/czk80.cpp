@@ -62,8 +62,8 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(czk80);
-	DECLARE_MACHINE_RESET(czk80);
+	void init_czk80();
+	void machine_reset_czk80();
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
 	DECLARE_READ8_MEMBER(port81_r);
@@ -157,7 +157,7 @@ TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
 	membank("bankr0")->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( czk80_state, czk80 )
+void czk80_state::machine_reset_czk80()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(czk80_state::czk80_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -166,7 +166,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( czk80_state, czk80 )
+void czk80_state::init_czk80()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

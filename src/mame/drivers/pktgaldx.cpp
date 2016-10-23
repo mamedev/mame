@@ -475,7 +475,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
+void pktgaldx_state::init_pktgaldx()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);

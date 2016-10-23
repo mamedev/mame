@@ -61,7 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(triplhnt_input_port_4_r);
 	DECLARE_READ8_MEMBER(triplhnt_misc_r);
 	DECLARE_READ8_MEMBER(triplhnt_da_latch_r);
-	DECLARE_DRIVER_INIT(triplhnt);
+	void init_triplhnt();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(triplhnt);

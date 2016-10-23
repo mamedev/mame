@@ -79,7 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(io_expander_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_DRIVER_INIT(pve500);
+	void init_pve500();
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
 	AM_RANGE (0xC000, 0xC7FF) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( pve500_state, pve500 )
+void pve500_state::init_pve500()
 {
 }
 

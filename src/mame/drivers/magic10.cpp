@@ -132,12 +132,12 @@ public:
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
 	DECLARE_WRITE16_MEMBER(magic10_out_w);
-	DECLARE_DRIVER_INIT(sgsafari);
-	DECLARE_DRIVER_INIT(suprpool);
-	DECLARE_DRIVER_INIT(magic102);
-	DECLARE_DRIVER_INIT(magic10);
-	DECLARE_DRIVER_INIT(hotslot);
-	DECLARE_DRIVER_INIT(altaten);
+	void init_sgsafari();
+	void init_suprpool();
+	void init_magic102();
+	void init_magic10();
+	void init_hotslot();
+	void init_altaten();
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
@@ -1438,25 +1438,25 @@ ROM_END
 *       Driver Init         *
 ****************************/
 
-DRIVER_INIT_MEMBER(magic10_state, magic10)
+void magic10_state::init_magic10()
 {
 	m_layer2_offset[0] = 32;
 	m_layer2_offset[1] = 2;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, magic102)
+void magic10_state::init_magic102()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, suprpool)
+void magic10_state::init_suprpool()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, hotslot)
+void magic10_state::init_hotslot()
 {
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
@@ -1465,13 +1465,13 @@ DRIVER_INIT_MEMBER(magic10_state, hotslot)
 	m_layer2_offset[1] = 0; // Y offset.
 }
 
-DRIVER_INIT_MEMBER(magic10_state, sgsafari)
+void magic10_state::init_sgsafari()
 {
 	m_layer2_offset[0] = 16;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, altaten)
+void magic10_state::init_altaten()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;

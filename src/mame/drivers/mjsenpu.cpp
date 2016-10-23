@@ -91,7 +91,7 @@ public:
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
 
-	DECLARE_DRIVER_INIT(mjsenpu);
+	void init_mjsenpu();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -515,7 +515,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 
 
-DRIVER_INIT_MEMBER(mjsenpu_state,mjsenpu)
+void mjsenpu_state::init_mjsenpu()
 {
 /*
 0000ADAE: LDHU.D L42, L38, $0

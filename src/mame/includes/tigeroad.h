@@ -42,9 +42,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
 	DECLARE_WRITE8_MEMBER(msm5205_w);
-	DECLARE_DRIVER_INIT(f1dream);
-	DECLARE_DRIVER_INIT(pushman);
-	DECLARE_DRIVER_INIT(bballs);
+	void init_f1dream();
+	void init_pushman();
+	void init_bballs();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
@@ -75,8 +75,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bballs_68705_w);
 	DECLARE_READ8_MEMBER(pushman_68000_r);
 	DECLARE_WRITE8_MEMBER(pushman_68000_w);
-	DECLARE_MACHINE_RESET(pushman);
-	DECLARE_MACHINE_RESET(bballs);
+	void machine_reset_pushman();
+	void machine_reset_bballs();
 
 	virtual void machine_start() override;
 

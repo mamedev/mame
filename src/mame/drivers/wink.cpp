@@ -52,7 +52,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(wink);
+	void init_wink();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -424,7 +424,7 @@ ROM_START( winka )
 	ROM_LOAD( "wink4.bin",    0x4000, 0x2000, CRC(06dd229b) SHA1(9057cf10e9ec4119297c2d40b26f0ce0c1d7b86a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wink_state,wink)
+void wink_state::init_wink()
 {
 	uint32_t i;
 	uint8_t *ROM = memregion("maincpu")->base();

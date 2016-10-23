@@ -412,7 +412,7 @@ void darkmist_state::decrypt_snd()
 		ROM[i] = BITSWAP8(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
 }
 
-DRIVER_INIT_MEMBER(darkmist_state,darkmist)
+void darkmist_state::init_darkmist()
 {
 	int i, len;
 	uint8_t *ROM = memregion("maincpu")->base();

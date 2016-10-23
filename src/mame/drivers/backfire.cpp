@@ -89,7 +89,7 @@ public:
 	DECLARE_READ32_MEMBER(backfire_speedup_r);
 	DECLARE_READ32_MEMBER(backfire_eeprom_r);
 	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
-	DECLARE_DRIVER_INIT(backfire);
+	void init_backfire();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -709,7 +709,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(backfire_state,backfire)
+void backfire_state::init_backfire()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */

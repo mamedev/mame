@@ -32,8 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tutankhm_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_y_w);
-	DECLARE_MACHINE_START(tutankhm);
-	DECLARE_MACHINE_RESET(tutankhm);
+	void machine_start_tutankhm();
+	void machine_reset_tutankhm();
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tutankhm_interrupt);
 };

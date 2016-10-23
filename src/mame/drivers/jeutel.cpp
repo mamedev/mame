@@ -32,7 +32,7 @@ public:
 		, m_tms(*this, "tms")
 	{ }
 
-	DECLARE_DRIVER_INIT(jeutel);
+	void init_jeutel();
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
@@ -175,7 +175,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER( jeutel_state, jeutel )
+void jeutel_state::init_jeutel()
 {
 }
 

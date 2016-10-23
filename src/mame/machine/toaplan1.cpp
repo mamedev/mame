@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER(toaplan1_state::toaplan1_reset_callback)
 	toaplan1_reset_sound();
 }
 
-MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
+void toaplan1_state::machine_reset_toaplan1()
 {
 	m_intenable = 0;
 	m_coin_count = 0;
@@ -381,23 +381,23 @@ MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 }
 
 /* zerowing, fireshrk, outzone */
-MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
+void toaplan1_state::machine_reset_zerowing()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	machine_reset_toaplan1();
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
 }
 
-MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
+void toaplan1_state::machine_reset_demonwld()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	machine_reset_toaplan1();
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
 }
 
-MACHINE_RESET_MEMBER(toaplan1_state,vimana)
+void toaplan1_state::machine_reset_vimana()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	machine_reset_toaplan1();
 	m_vimana_coins[0] = m_vimana_coins[1] = 0;
 	m_vimana_credits = 0;
 	m_vimana_latch = 0;

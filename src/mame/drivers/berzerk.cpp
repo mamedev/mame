@@ -73,7 +73,7 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
-	DECLARE_DRIVER_INIT(moonwarp);
+	void init_moonwarp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_reset() override;
@@ -1300,7 +1300,7 @@ ROM_START( moonwarp )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
+void berzerk_state::init_moonwarp()
 {
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));

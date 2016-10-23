@@ -2377,7 +2377,7 @@ ROM_END
 // debugging features.
 #define CUPSOC_DEBUG_MODE 0
 
-DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
+void legionna_state::init_cupsoc_debug()
 {
 #if CUPSOC_DEBUG_MODE
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2386,30 +2386,30 @@ DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
 #endif
 }
 
-DRIVER_INIT_MEMBER(legionna_state, olysoc92)
+void legionna_state::init_olysoc92()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffe/2] ^= 0x0003; // show Olympic Soccer '92 title
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state, cupsocs)
+void legionna_state::init_cupsocs()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffa/2] = 0x00ff; // disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state,cupsoc)
+void legionna_state::init_cupsoc()
 {
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
 
 
-DRIVER_INIT_MEMBER(legionna_state,legiongfx)
+void legionna_state::init_legiongfx()
 {
 	descramble_legionnaire_gfx(memregion("gfx5")->base() );
 }

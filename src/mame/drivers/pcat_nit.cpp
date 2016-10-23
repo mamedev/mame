@@ -105,7 +105,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
-	DECLARE_DRIVER_INIT(pcat_nit);
+	void init_pcat_nit();
 	virtual void machine_start() override;
 };
 
@@ -411,7 +411,7 @@ ROM_START(streetg2r5)
 	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
 ROM_END
 
-DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
+void pcat_nit_state::init_pcat_nit()
 {
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);

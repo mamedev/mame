@@ -72,16 +72,16 @@ public:
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
 
-	DECLARE_DRIVER_INIT(mjmania);
-	DECLARE_DRIVER_INIT(csplayh5);
-	DECLARE_DRIVER_INIT(fuudol);
-	DECLARE_DRIVER_INIT(bikiniko);
-	DECLARE_DRIVER_INIT(thenanpa);
-	DECLARE_DRIVER_INIT(junai);
-	DECLARE_DRIVER_INIT(csplayh1);
-	DECLARE_DRIVER_INIT(renaimj);
-	DECLARE_DRIVER_INIT(csplayh7);
-	DECLARE_DRIVER_INIT(junai2);
+	void init_mjmania();
+	void init_csplayh5();
+	void init_fuudol();
+	void init_bikiniko();
+	void init_thenanpa();
+	void init_junai();
+	void init_csplayh1();
+	void init_renaimj();
+	void init_csplayh7();
+	void init_junai2();
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
@@ -500,16 +500,16 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 
 }
 
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
+void csplayh5_state::init_csplayh1()  { general_init(0x6880/2, 0x6020); }
 
-DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
+void csplayh5_state::init_junai()     { general_init(0x679c/2, 0x6018); }
+void csplayh5_state::init_mjmania()   { general_init(0x6b96/2, 0x6018); }
+void csplayh5_state::init_junai2()    { general_init(0x6588/2, 0x6018); }
+void csplayh5_state::init_csplayh5()  { general_init(0x4cb4/2, 0x6018); }
+void csplayh5_state::init_bikiniko()  { general_init(0x585c/2, 0x6018); }
+void csplayh5_state::init_thenanpa()  { general_init(0x69ec/2, 0x6018); }
+void csplayh5_state::init_csplayh7()  { general_init(0x7a20/2, 0x6018); }
+void csplayh5_state::init_fuudol()    { general_init(0x9166/2, 0x6018); }
 
 /* TODO: correct rom labels*/
 ROM_START( csplayh1 )

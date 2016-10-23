@@ -325,7 +325,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::machine_start_blmbycar()
 {
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
@@ -333,7 +333,7 @@ MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::machine_reset_blmbycar()
 {
 	m_pot_wheel = 0;
 	m_old_val = 0;
@@ -374,14 +374,14 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(blmbycar_state,watrball)
+void blmbycar_state::machine_start_watrball()
 {
 	save_item(NAME(m_retvalue));
 
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-MACHINE_RESET_MEMBER(blmbycar_state,watrball)
+void blmbycar_state::machine_reset_watrball()
 {
 	m_retvalue = 0;
 }
@@ -488,7 +488,7 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::init_blmbycar()
 {
 	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;

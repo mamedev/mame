@@ -71,8 +71,8 @@ public:
 	DECLARE_WRITE16_MEMBER( spbatnp_90124_w );
 	DECLARE_WRITE16_MEMBER( spbatnp_9012c_w );
 
-	DECLARE_VIDEO_START(spbactn);
-	DECLARE_VIDEO_START(spbactnp);
+	void video_start_spbactn();
+	void video_start_spbactnp();
 
 
 	//virtual void video_start();

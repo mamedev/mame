@@ -872,7 +872,7 @@ ROM_START( josvolly )
 	ROM_LOAD( "005.3h",       0x0440, 0x0020, CRC(e8d6dec0) SHA1(d15cba9a4b24255d41046b15c2409391ab13ce95) )    /* address decoder? not used */
 ROM_END
 
-DRIVER_INIT_MEMBER(gsword_state,gsword)
+void gsword_state::init_gsword()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
@@ -887,7 +887,7 @@ DRIVER_INIT_MEMBER(gsword_state,gsword)
 #endif
 }
 
-DRIVER_INIT_MEMBER(gsword_state,gsword2)
+void gsword_state::init_gsword2()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();

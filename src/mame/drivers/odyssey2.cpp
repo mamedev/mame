@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_read);
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(t1_read);
-	DECLARE_DRIVER_INIT(odyssey2);
+	void init_odyssey2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
@@ -275,7 +275,7 @@ PALETTE_INIT_MEMBER(g7400_state, g7400)
 	}
 }
 
-DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
+void odyssey2_state::init_odyssey2()
 {
 	uint8_t *gfx = memregion("gfx1")->base();
 

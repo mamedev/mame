@@ -850,7 +850,7 @@ WRITE_LINE_MEMBER(tatsumi_state::apache3_68000_reset)
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(tatsumi_state,apache3)
+void tatsumi_state::machine_reset_apache3()
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
@@ -1342,7 +1342,7 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(tatsumi_state,apache3)
+void tatsumi_state::init_apache3()
 {
 	uint8_t *dst = memregion("gfx1")->base();
 	uint8_t *src1 = memregion("gfx2")->base();
@@ -1369,7 +1369,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
 
-DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
+void tatsumi_state::init_roundup5()
 {
 	uint8_t *dst = memregion("gfx1")->base();
 	uint8_t *src1 = memregion("gfx2")->base();
@@ -1394,7 +1394,7 @@ DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 	tatsumi_reset();
 }
 
-DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
+void tatsumi_state::init_cyclwarr()
 {
 	uint8_t *dst = memregion("gfx1")->base();
 	uint8_t *src1 = memregion("gfx2")->base();

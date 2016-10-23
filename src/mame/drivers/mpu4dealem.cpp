@@ -30,7 +30,7 @@ public:
 	}
 
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
-	DECLARE_MACHINE_RESET(dealem_vid);
+	void machine_reset_dealem_vid();
 	DECLARE_PALETTE_INIT(dealem);
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4dealem_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
+void mpu4dealem_state::machine_reset_dealem_vid()
 {
 	m_vfd->reset(); //for debug ports only
 

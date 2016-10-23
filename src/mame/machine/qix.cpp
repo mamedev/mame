@@ -27,7 +27,7 @@ void qix_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(qix_state,qixmcu)
+void qix_state::machine_start_qixmcu()
 {
 	/* set up save states */
 	save_item(NAME(m_68705_port_in));

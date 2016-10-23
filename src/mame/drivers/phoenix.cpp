@@ -409,7 +409,7 @@ static GFXDECODE_START( pleiads )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(phoenix_state,phoenix)
+void phoenix_state::machine_reset_phoenix()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
@@ -1412,13 +1412,13 @@ ROM_START( survival )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(phoenix_state,condor)
+void phoenix_state::init_condor()
 {
 	/* additional inputs for coinage */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
-DRIVER_INIT_MEMBER(phoenix_state,vautourza)
+void phoenix_state::init_vautourza()
 {
 	uint8_t *rgn          =   memregion("proms")->base();
 

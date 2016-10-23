@@ -89,7 +89,7 @@ public:
 	required_memory_bank m_rambank;
 
 	virtual void machine_reset() override;
-	DECLARE_DRIVER_INIT(digel804);
+	void init_digel804();
 	DECLARE_WRITE8_MEMBER( op00 );
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
@@ -136,7 +136,7 @@ public:
 enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 
-DRIVER_INIT_MEMBER(digel804_state,digel804)
+void digel804_state::init_digel804()
 {
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;

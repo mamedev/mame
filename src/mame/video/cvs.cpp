@@ -117,7 +117,7 @@ WRITE8_MEMBER(cvs_state::cvs_scroll_w)
 }
 
 
-VIDEO_START_MEMBER(cvs_state,cvs)
+void cvs_state::video_start_cvs()
 {
 	cvs_init_stars();
 

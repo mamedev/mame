@@ -777,7 +777,7 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
+void lazercmd_state::init_lazercmd()
 {
 	int i, y;
 	uint8_t *gfx = memregion("gfx1")->base();

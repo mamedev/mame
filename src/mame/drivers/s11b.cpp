@@ -136,7 +136,7 @@ static INPUT_PORTS_START( s11b )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s11b_state, s11b )
+void s11b_state::machine_reset_s11b()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -233,13 +233,13 @@ WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
 		m_ym->reset();
 }
 
-DRIVER_INIT_MEMBER( s11b_state, s11b )
+void s11b_state::init_s11b()
 {
 	s11a_state::init_s11a();
 	m_invert = false;
 }
 
-DRIVER_INIT_MEMBER( s11b_state, s11b_invert )
+void s11b_state::init_s11b_invert()
 {
 	s11a_state::init_s11a();
 	m_invert = true;

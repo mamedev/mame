@@ -66,8 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	DECLARE_DRIVER_INIT(kingtut);
-	DECLARE_VIDEO_START(kongambl);
+	void init_kingtut();
+	void video_start_kongambl();
 	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
@@ -80,7 +80,7 @@ public:
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start_kongambl()
 {
 	#if CUSTOM_DRAW
 
@@ -804,7 +804,7 @@ ROM_START( vikingt )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(kongambl_state,kingtut)
+void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 

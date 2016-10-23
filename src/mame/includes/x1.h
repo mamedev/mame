@@ -263,12 +263,12 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_porta_w);
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
-	DECLARE_DRIVER_INIT(x1_kanji);
-	DECLARE_MACHINE_START(x1);
-	DECLARE_MACHINE_RESET(x1);
-	DECLARE_VIDEO_START(x1);
+	void init_x1_kanji();
+	void machine_start_x1();
+	void machine_reset_x1();
+	void video_start_x1();
 	DECLARE_PALETTE_INIT(x1);
-	DECLARE_MACHINE_RESET(x1turbo);
+	void machine_reset_x1turbo();
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);

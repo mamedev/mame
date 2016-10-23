@@ -50,8 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	DECLARE_MACHINE_START(cchance);
-	DECLARE_MACHINE_RESET(cchance);
+	void machine_start_cchance();
+	void machine_reset_cchance();
 };
 
 
@@ -191,13 +191,13 @@ static GFXDECODE_START( cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(cchance_state,cchance)
+void cchance_state::machine_start_cchance()
 {
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));
 }
 
-MACHINE_RESET_MEMBER(cchance_state,cchance)
+void cchance_state::machine_reset_cchance()
 {
 	m_mcu_type = -1;
 	m_hop_io = 0;

@@ -2928,7 +2928,7 @@ Contcirc road glitchiness in attract?
                    SAVE STATES
 ***********************************************************/
 
-MACHINE_START_MEMBER(taitoz_state,bshark)
+void taitoz_state::machine_start_bshark()
 {
 	save_item(NAME(m_cpua_ctrl));
 
@@ -2937,16 +2937,16 @@ MACHINE_START_MEMBER(taitoz_state,bshark)
 	save_item(NAME(m_ioc220_port));
 }
 
-MACHINE_START_MEMBER(taitoz_state,taitoz)
+void taitoz_state::machine_start_taitoz()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 
-	MACHINE_START_CALL_MEMBER(bshark);
+	machine_start_bshark();
 }
 
-MACHINE_RESET_MEMBER(taitoz_state,taitoz)
+void taitoz_state::machine_reset_taitoz()
 {
 	m_cpua_ctrl = 0xff;
 	m_sci_int6 = 0;
@@ -5353,14 +5353,14 @@ ROM_START( racingbj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitoz_state,taitoz)
+void taitoz_state::init_taitoz()
 {
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::parse_cpu_control), this));
 }
 
-DRIVER_INIT_MEMBER(taitoz_state,bshark)
+void taitoz_state::init_bshark()
 {
-	DRIVER_INIT_CALL(taitoz);
+	init_taitoz();
 
 	m_eep_latch = 0;
 

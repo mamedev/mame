@@ -221,7 +221,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_ioport_array<8> m_io_ports;
 
-	DECLARE_DRIVER_INIT(aces1);
+	void init_aces1();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
@@ -828,7 +828,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(aces1_state,aces1)
+void aces1_state::init_aces1()
 {
 }
 

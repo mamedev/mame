@@ -25,7 +25,7 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(ut88_state,ut88)
+void ut88_state::init_ut88()
 {
 	/* set initially ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -87,7 +87,7 @@ WRITE8_MEMBER( ut88_state::ut88_8255_porta_w )
 	m_keyboard_mask = data ^ 0xff;
 }
 
-MACHINE_RESET_MEMBER(ut88_state,ut88)
+void ut88_state::machine_reset_ut88()
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
@@ -161,16 +161,16 @@ WRITE8_MEMBER( ut88_state::ut88mini_write_led )
 		}
 }
 
-DRIVER_INIT_MEMBER(ut88_state,ut88mini)
+void ut88_state::init_ut88mini()
 {
 }
 
-MACHINE_START_MEMBER(ut88_state,ut88mini)
+void ut88_state::machine_start_ut88mini()
 {
 	timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 }
 
-MACHINE_RESET_MEMBER(ut88_state,ut88mini)
+void ut88_state::machine_reset_ut88mini()
 {
 	m_lcd_digit[0] = m_lcd_digit[1] = m_lcd_digit[2] = 0;
 	m_lcd_digit[3] = m_lcd_digit[4] = m_lcd_digit[5] = 0;

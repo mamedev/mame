@@ -480,22 +480,22 @@ WRITE8_MEMBER(tnzs_state::tnzs_sync_kludge_w)
 
 
 
-DRIVER_INIT_MEMBER(tnzs_state,plumpop)
+void tnzs_state::init_plumpop()
 {
 	m_mcu_type = MCU_PLUMPOP;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,extrmatn)
+void tnzs_state::init_extrmatn()
 {
 	m_mcu_type = MCU_EXTRMATN;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,arknoid2)
+void tnzs_state::init_arknoid2()
 {
 	m_mcu_type = MCU_ARKANOID;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
+void tnzs_state::init_drtoppel()
 {
 	m_mcu_type = MCU_DRTOPPEL;
 
@@ -503,19 +503,19 @@ DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
 	m_maincpu->space(AS_PROGRAM).nop_write(0xf800, 0xfbff);
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,chukatai)
+void tnzs_state::init_chukatai()
 {
 	m_mcu_type = MCU_CHUKATAI;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,tnzs)
+void tnzs_state::init_tnzs()
 {
 	m_mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
+void tnzs_state::init_tnzsb()
 {
 	m_mcu_type = MCU_NONE_TNZSB;
 
@@ -523,7 +523,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
+void tnzs_state::init_kabukiz()
 {
 	uint8_t *SOUND = memregion("audiocpu")->base();
 	m_mcu_type = MCU_NONE_KABUKIZ;
@@ -531,7 +531,7 @@ DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
 	m_audiobank->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,insectx)
+void tnzs_state::init_insectx()
 {
 	m_mcu_type = MCU_NONE_INSECTX;
 
@@ -541,7 +541,7 @@ DRIVER_INIT_MEMBER(tnzs_state,insectx)
 	m_subcpu->space(AS_PROGRAM).install_read_port(0xc002, 0xc002, "IN2" );
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,kageki)
+void tnzs_state::init_kageki()
 {
 	m_mcu_type = MCU_NONE_KAGEKI;
 }
@@ -610,7 +610,7 @@ INTERRUPT_GEN_MEMBER(tnzs_state::arknoid2_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(tnzs_state,tnzs)
+void tnzs_state::machine_reset_tnzs()
 {
 	/* initialize the mcu simulation */
 	switch (m_mcu_type)
@@ -631,13 +631,13 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 	m_insertcoin = 0;       // this might belong to mcu_reset
 }
 
-MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
+void tnzs_state::machine_reset_jpopnics()
 {
 	m_mcu_type = -1;
 }
 
 
-MACHINE_START_MEMBER(tnzs_state,tnzs_common)
+void tnzs_state::machine_start_tnzs_common()
 {
 	uint8_t *SUB = memregion("sub")->base();
 
@@ -650,9 +650,9 @@ MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 	save_item(NAME(m_bank2));
 }
 
-MACHINE_START_MEMBER(tnzs_state,tnzs)
+void tnzs_state::machine_start_tnzs()
 {
-	MACHINE_START_CALL_MEMBER( tnzs_common );
+	machine_start_tnzs_common();
 
 	save_item(NAME(m_kageki_csport_sel));
 	save_item(NAME(m_input_select));

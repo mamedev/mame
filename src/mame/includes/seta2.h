@@ -99,18 +99,18 @@ public:
 	DECLARE_READ16_MEMBER(staraudi_tileram_r);
 	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
 
-	DECLARE_DRIVER_INIT(funcube3);
-	DECLARE_DRIVER_INIT(funcube);
-	DECLARE_DRIVER_INIT(funcube2);
-	DECLARE_DRIVER_INIT(staraudi);
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
+	void init_staraudi();
 
-	DECLARE_MACHINE_START(mj4simai);
-	DECLARE_MACHINE_START(funcube);
-	DECLARE_MACHINE_RESET(funcube);
+	void machine_start_mj4simai();
+	void machine_start_funcube();
+	void machine_reset_funcube();
 
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(yoffset);
-	DECLARE_VIDEO_START(xoffset);
+	void video_start_yoffset();
+	void video_start_xoffset();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

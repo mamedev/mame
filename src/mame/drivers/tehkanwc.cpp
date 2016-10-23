@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
+void tehkanwc_state::init_teedoff()
 {
 	/* Patch to avoid the game jumping in shared memory */
 

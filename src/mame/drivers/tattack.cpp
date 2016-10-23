@@ -37,7 +37,7 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_tmap;
-	DECLARE_DRIVER_INIT(tattack);
+	void init_tattack();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
@@ -241,7 +241,7 @@ ROM_START( tattack )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(tattack_state,tattack)
+void tattack_state::init_tattack()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

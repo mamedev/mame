@@ -38,19 +38,19 @@ public:
 	DECLARE_READ8_MEMBER(rtc_r);
 
 	void init();
-	DECLARE_DRIVER_INIT(corv);
-	DECLARE_DRIVER_INIT(dh);
-	DECLARE_DRIVER_INIT(i500);
-	DECLARE_DRIVER_INIT(jb);
-	DECLARE_DRIVER_INIT(jm);
-	DECLARE_DRIVER_INIT(nf);
-	DECLARE_DRIVER_INIT(rs);
-	DECLARE_DRIVER_INIT(fs);
-	DECLARE_DRIVER_INIT(ts);
-	DECLARE_DRIVER_INIT(tom);
-	DECLARE_DRIVER_INIT(wd);
-	DECLARE_DRIVER_INIT(wcs);
-	DECLARE_DRIVER_INIT(tfs);
+	void init_corv();
+	void init_dh();
+	void init_i500();
+	void init_jb();
+	void init_jm();
+	void init_nf();
+	void init_rs();
+	void init_fs();
+	void init_ts();
+	void init_tom();
+	void init_wd();
+	void init_wcs();
+	void init_tfs();
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -260,7 +260,7 @@ void wpc_s_state::init()
 	save_item(NAME(zc));
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, corv)
+void wpc_s_state::init_corv()
 {
 	pic->set_serial("536 123456 12345 123");
 	lamp->set_names(lamps_corv);
@@ -268,7 +268,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, corv)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, dh)
+void wpc_s_state::init_dh()
 {
 	pic->set_serial("530 123456 12345 123");
 	lamp->set_names(lamps_dh);
@@ -276,7 +276,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, dh)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, i500)
+void wpc_s_state::init_i500()
 {
 	pic->set_serial("526 123456 12345 123");
 	lamp->set_names(lamps_i500);
@@ -284,7 +284,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, i500)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jb)
+void wpc_s_state::init_jb()
 {
 	pic->set_serial("551 123456 12345 123");
 	lamp->set_names(lamps_jb);
@@ -292,7 +292,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jb)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jm)
+void wpc_s_state::init_jm()
 {
 	pic->set_serial("542 123456 12345 123");
 	lamp->set_names(lamps_jm);
@@ -300,7 +300,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jm)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, nf)
+void wpc_s_state::init_nf()
 {
 	pic->set_serial("525 123456 12345 123");
 	lamp->set_names(lamps_nf);
@@ -308,7 +308,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, nf)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, rs)
+void wpc_s_state::init_rs()
 {
 	pic->set_serial("524 123456 12345 123");
 	lamp->set_names(lamps_rs);
@@ -316,7 +316,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, rs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, fs)
+void wpc_s_state::init_fs()
 {
 	pic->set_serial("529 123456 12345 123");
 	lamp->set_names(lamps_fs);
@@ -324,7 +324,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, fs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, ts)
+void wpc_s_state::init_ts()
 {
 	pic->set_serial("532 123456 12345 123");
 	lamp->set_names(lamps_ts);
@@ -332,7 +332,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, ts)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tom)
+void wpc_s_state::init_tom()
 {
 	pic->set_serial("124 123456 12345 123");
 	lamp->set_names(lamps_tom);
@@ -340,7 +340,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, tom)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wd)
+void wpc_s_state::init_wd()
 {
 	pic->set_serial("544 123456 12345 123");
 	lamp->set_names(lamps_wd);
@@ -348,7 +348,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wd)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wcs)
+void wpc_s_state::init_wcs()
 {
 	pic->set_serial("531 123456 12345 123");
 	lamp->set_names(lamps_wcs);
@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wcs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tfs)
+void wpc_s_state::init_tfs()
 {
 	pic->set_serial("648 123456 12345 123");
 	lamp->set_names(nullptr);

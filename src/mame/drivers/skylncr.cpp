@@ -198,7 +198,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	DECLARE_DRIVER_INIT(sonikfig);
+	void init_sonikfig();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -1974,7 +1974,7 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+void skylncr_state::init_sonikfig()
 /*
   Encryption: For each 8 bytes group,
   swap byte #1 with #4 and #3 with #6.

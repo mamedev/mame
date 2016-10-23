@@ -92,10 +92,10 @@ public:
 		m_adpcm(*this, "adpcm") { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_DRIVER_INIT(chinagat);
-	DECLARE_MACHINE_START(chinagat);
-	DECLARE_MACHINE_RESET(chinagat);
-	DECLARE_VIDEO_START(chinagat);
+	void init_chinagat();
+	void machine_start_chinagat();
+	void machine_reset_chinagat();
+	void video_start_chinagat();
 	DECLARE_WRITE8_MEMBER( chinagat_interrupt_w );
 	DECLARE_WRITE8_MEMBER( chinagat_video_ctrl_w );
 	DECLARE_WRITE8_MEMBER( chinagat_bankswitch_w );
@@ -111,7 +111,7 @@ public:
 };
 
 
-VIDEO_START_MEMBER(chinagat_state,chinagat)
+void chinagat_state::video_start_chinagat()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -505,7 +505,7 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(chinagat_state,chinagat)
+void chinagat_state::machine_start_chinagat()
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -526,7 +526,7 @@ MACHINE_START_MEMBER(chinagat_state,chinagat)
 }
 
 
-MACHINE_RESET_MEMBER(chinagat_state,chinagat)
+void chinagat_state::machine_reset_chinagat()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -897,7 +897,7 @@ ROM_START( saiyugoub2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chinagat_state,chinagat)
+void chinagat_state::init_chinagat()
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SUB = memregion("sub")->base();

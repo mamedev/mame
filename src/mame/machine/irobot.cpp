@@ -391,7 +391,7 @@ void irobot_state::load_oproms()
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT_MEMBER(irobot_state,irobot)
+void irobot_state::init_irobot()
 {
 	int i;
 	for (i = 0; i < 16; i++)

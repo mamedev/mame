@@ -38,7 +38,7 @@ public:
 		: archimedes_state(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
-	DECLARE_DRIVER_INIT(ertictac);
+	void init_ertictac();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(ertictac_state,ertictac)
+void ertictac_state::init_ertictac()
 {
 	archimedes_driver_init();
 }

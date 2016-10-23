@@ -61,7 +61,7 @@ public:
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(boogwing);
+	void init_boogwing();
 	virtual void video_start() override;
 	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

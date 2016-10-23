@@ -874,7 +874,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(fromance_state,fromance)
+void fromance_state::machine_start_fromance()
 {
 	uint8_t *ROM = memregion("sub")->base();
 
@@ -892,7 +892,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(fromance_state,fromance)
+void fromance_state::machine_reset_fromance()
 {
 	int i;
 

@@ -80,15 +80,15 @@ public:
 	int m_cur_screen;
 	uint8_t* m_rom;
 
-	DECLARE_DRIVER_INIT(hp48);
+	void init_hp48();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(hp48);
-	DECLARE_MACHINE_START(hp49g);
-	DECLARE_MACHINE_START(hp48gx);
-	DECLARE_MACHINE_START(hp48g);
-	DECLARE_MACHINE_START(hp48gp);
-	DECLARE_MACHINE_START(hp48sx);
-	DECLARE_MACHINE_START(hp48s);
+	void machine_start_hp49g();
+	void machine_start_hp48gx();
+	void machine_start_hp48g();
+	void machine_start_hp48gp();
+	void machine_start_hp48sx();
+	void machine_start_hp48s();
 	uint32_t screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hp48_machine_start(hp48_models model);
 	DECLARE_WRITE8_MEMBER(hp48_io_w);

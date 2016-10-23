@@ -2157,42 +2157,36 @@ void mac_state::mac_driver_init(model_t model)
 	machine().save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), this));
 }
 
-#define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac_state,label)     \
-{   \
-	mac_driver_init(model); \
-}
-
-MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
-MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
-MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
-MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
-MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
-MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
-MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
-MAC_DRIVER_INIT(maclc3, MODEL_MAC_LC_III)
-MAC_DRIVER_INIT(maclc3plus, MODEL_MAC_LC_III_PLUS)
-MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
-MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
-MAC_DRIVER_INIT(macii, MODEL_MAC_II)
-MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
-MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
-MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
-MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
-MAC_DRIVER_INIT(macpm7100, MODEL_MAC_POWERMAC_7100)
-MAC_DRIVER_INIT(macpm8100, MODEL_MAC_POWERMAC_8100)
-MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
-MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
-MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
-MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
-MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
-MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
-MAC_DRIVER_INIT(macpd210, MODEL_MAC_PBDUO_210)
-MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
-MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
-MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
-MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
-MAC_DRIVER_INIT(maclc520, MODEL_MAC_LC_520)
+void mac_state::init_mac128k512k() { mac_driver_init(MODEL_MAC_128K512K); }
+void mac_state::init_mac512ke() { mac_driver_init(MODEL_MAC_512KE); }
+void mac_state::init_macplus() { mac_driver_init(MODEL_MAC_PLUS); }
+void mac_state::init_macse() { mac_driver_init(MODEL_MAC_SE); }
+void mac_state::init_macclassic() { mac_driver_init(MODEL_MAC_CLASSIC); }
+void mac_state::init_maclc() { mac_driver_init(MODEL_MAC_LC); }
+void mac_state::init_maclc2() { mac_driver_init(MODEL_MAC_LC_II); }
+void mac_state::init_maclc3() { mac_driver_init(MODEL_MAC_LC_III); }
+void mac_state::init_maclc3plus() { mac_driver_init(MODEL_MAC_LC_III_PLUS); }
+void mac_state::init_maciici() { mac_driver_init(MODEL_MAC_IICI); }
+void mac_state::init_maciisi() { mac_driver_init(MODEL_MAC_IISI); }
+void mac_state::init_macii() { mac_driver_init(MODEL_MAC_II); }
+void mac_state::init_macse30() { mac_driver_init(MODEL_MAC_SE30); }
+void mac_state::init_macclassic2() { mac_driver_init(MODEL_MAC_CLASSIC_II); }
+void mac_state::init_maclrcclassic() { mac_driver_init(MODEL_MAC_COLOR_CLASSIC); }
+void mac_state::init_macpm6100() { mac_driver_init(MODEL_MAC_POWERMAC_6100); }
+void mac_state::init_macpm7100() { mac_driver_init(MODEL_MAC_POWERMAC_7100); }
+void mac_state::init_macpm8100() { mac_driver_init(MODEL_MAC_POWERMAC_8100); }
+void mac_state::init_macprtb() { mac_driver_init(MODEL_MAC_PORTABLE); }
+void mac_state::init_macpb100() { mac_driver_init(MODEL_MAC_PB100); }
+void mac_state::init_macpb140() { mac_driver_init(MODEL_MAC_PB140); }
+void mac_state::init_macpb160() { mac_driver_init(MODEL_MAC_PB160); }
+void mac_state::init_maciivx() { mac_driver_init(MODEL_MAC_IIVX); }
+void mac_state::init_maciifx() { mac_driver_init(MODEL_MAC_IIFX); }
+void mac_state::init_macpd210() { mac_driver_init(MODEL_MAC_PBDUO_210); }
+void mac_state::init_macquadra700() { mac_driver_init(MODEL_MAC_QUADRA_700); }
+void mac_state::init_maciicx() { mac_driver_init(MODEL_MAC_IICX); }
+void mac_state::init_maciifdhd() { mac_driver_init(MODEL_MAC_II_FDHD); }
+void mac_state::init_maciix() { mac_driver_init(MODEL_MAC_IIX); }
+void mac_state::init_maclc520() { mac_driver_init(MODEL_MAC_LC_520); }
 
 void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {

@@ -248,13 +248,13 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
-	DECLARE_DRIVER_INIT(megat3te);
+	void init_megat3te();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(meritm_crt250_questions);
-	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
-	DECLARE_MACHINE_START(meritm_crt260);
-	DECLARE_MACHINE_START(merit_common);
+	void machine_start_meritm_crt250_questions();
+	void machine_start_meritm_crt250_crt252_crt258();
+	void machine_start_meritm_crt260();
+	void machine_start_merit_common();
 	uint32_t screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
@@ -1024,7 +1024,7 @@ static const z80_daisy_config meritm_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_START_MEMBER(meritm_state,merit_common)
+void meritm_state::machine_start_merit_common()
 {
 	m_z80pio_0->strobe_a(1);
 	m_z80pio_0->strobe_b(1);
@@ -1037,23 +1037,23 @@ void meritm_state::machine_start()
 	m_bank1->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	meritm_crt250_switch_banks();
-	MACHINE_START_CALL_MEMBER(merit_common);
+	machine_start_merit_common();
 	save_item(NAME(m_bank));
 
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
+void meritm_state::machine_start_meritm_crt250_questions()
 {
 	meritm_state::machine_start();
 	save_item(NAME(m_questions_loword_address));
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
+void meritm_state::machine_start_meritm_crt250_crt252_crt258()
 {
-	MACHINE_START_CALL_MEMBER(meritm_crt250_questions);
+	machine_start_meritm_crt250_questions();
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt260)
+void meritm_state::machine_start_meritm_crt260()
 {
 	m_ram = std::make_unique<uint8_t[]>( 0x8000 );
 	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
@@ -1064,7 +1064,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	m_bank = 0xff;
 	m_psd_a15 = 0;
 	meritm_switch_banks();
-	MACHINE_START_CALL_MEMBER(merit_common);
+	machine_start_merit_common();
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
 	save_pointer(NAME(m_ram.get()), 0x8000);
@@ -2285,7 +2285,7 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(meritm_state,megat3te)
+void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 }

@@ -27,7 +27,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(kissp);
+	void init_kissp();
 };
 
 
@@ -42,7 +42,7 @@ void kissp_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(kissp_state,kissp)
+void kissp_state::init_kissp()
 {
 }
 

@@ -38,8 +38,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
 	DECLARE_WRITE16_MEMBER(m90_video_control_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
-	DECLARE_DRIVER_INIT(bomblord);
-	DECLARE_DRIVER_INIT(quizf1);
+	void init_bomblord();
+	void init_quizf1();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1w_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
@@ -54,8 +54,8 @@ public:
 	TILE_GET_INFO_MEMBER(dynablsb_get_pf2w_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(bomblord);
-	DECLARE_VIDEO_START(dynablsb);
+	void video_start_bomblord();
+	void video_start_dynablsb();
 	uint32_t screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -178,7 +178,7 @@ READ8_MEMBER(pacman_state::acitya_decrypt_rom )
 }
 
 
-MACHINE_START_MEMBER(pacman_state,acitya)
+void pacman_state::machine_start_acitya()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -196,7 +196,7 @@ MACHINE_START_MEMBER(pacman_state,acitya)
 }
 
 
-MACHINE_RESET_MEMBER(pacman_state,acitya)
+void pacman_state::machine_reset_acitya()
 {
 	/* The initial state of the counter is 0x0B */
 	m_counter = 0x0B;

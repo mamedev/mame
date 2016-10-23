@@ -118,15 +118,15 @@ public:
 	DECLARE_WRITE8_MEMBER(led2_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(misc_couple_w);
-	DECLARE_DRIVER_INIT(couple);
-	DECLARE_DRIVER_INIT(key_5);
-	DECLARE_DRIVER_INIT(key_4);
-	DECLARE_DRIVER_INIT(key_7);
-	DECLARE_DRIVER_INIT(key_0);
-	DECLARE_DRIVER_INIT(key_2);
-	DECLARE_DRIVER_INIT(dtrvwz5);
+	void init_couple();
+	void init_key_5();
+	void init_key_4();
+	void init_key_7();
+	void init_key_0();
+	void init_key_2();
+	void init_dtrvwz5();
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(casino5);
+	void machine_start_casino5();
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -1346,7 +1346,7 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
-MACHINE_START_MEMBER(merit_state,casino5)
+void merit_state::machine_start_casino5()
 {
 	merit_state::machine_start();
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x2000);
@@ -2355,32 +2355,32 @@ ROM_START( couplei )
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
-DRIVER_INIT_MEMBER(merit_state,key_0)
+void merit_state::init_key_0()
 {
 	m_decryption_key = 0;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_2)
+void merit_state::init_key_2()
 {
 	m_decryption_key = 2;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_4)
+void merit_state::init_key_4()
 {
 	m_decryption_key = 4;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_5)
+void merit_state::init_key_5()
 {
 	m_decryption_key = 5;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_7)
+void merit_state::init_key_7()
 {
 	m_decryption_key = 7;
 }
 
-DRIVER_INIT_MEMBER(merit_state,couple)
+void merit_state::init_couple()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2405,7 +2405,7 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 	membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
-DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
+void merit_state::init_dtrvwz5()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();

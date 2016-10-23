@@ -1371,7 +1371,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
+void ampoker2_state::init_rabbitpk()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 	}
 }
 
-DRIVER_INIT_MEMBER(ampoker2_state, piccolop)
+void ampoker2_state::init_piccolop()
 {
 /*
   The protection is based on a stuck bit at RAM offset $C416.

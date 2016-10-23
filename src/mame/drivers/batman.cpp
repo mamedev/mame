@@ -40,7 +40,7 @@ void batman_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(batman_state,batman)
+void batman_state::machine_start_batman()
 {
 	atarigen_state::machine_start();
 
@@ -49,7 +49,7 @@ MACHINE_START_MEMBER(batman_state,batman)
 }
 
 
-MACHINE_RESET_MEMBER(batman_state,batman)
+void batman_state::machine_reset_batman()
 {
 	atarigen_state::machine_reset();
 }

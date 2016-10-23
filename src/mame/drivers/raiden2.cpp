@@ -513,7 +513,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 /* VIDEO START (move to video file) */
 
 
-VIDEO_START_MEMBER(raiden2_state,raiden2)
+void raiden2_state::video_start_raiden2()
 {
 	back_data = make_unique_clear<uint16_t[]>(0x800/2);
 	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
@@ -734,7 +734,7 @@ void raiden2_state::common_reset()
 	tx_bank = 0;
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,raiden2)
+void raiden2_state::machine_reset_raiden2()
 {
 	common_reset();
 	sprcpt_init();
@@ -746,7 +746,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,raidendx)
+void raiden2_state::machine_reset_raidendx()
 {
 	common_reset();
 	sprcpt_init();
@@ -759,7 +759,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
+void raiden2_state::machine_reset_zeroteam()
 {
 	bg_bank = 0;
 	fg_bank = 2;
@@ -774,7 +774,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,xsedae)
+void raiden2_state::machine_reset_xsedae()
 {
 	bg_bank = 0;
 	fg_bank = 2;
@@ -3063,7 +3063,7 @@ void raiden2_state::init_blending(const uint16_t *table)
 		blend_active[*table++] = true;
 }
 
-DRIVER_INIT_MEMBER(raiden2_state,raiden2)
+void raiden2_state::init_raiden2()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -3073,7 +3073,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 	raiden2_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(raiden2_state,raidendx)
+void raiden2_state::init_raidendx()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -3087,7 +3087,7 @@ const uint16_t raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
-DRIVER_INIT_MEMBER(raiden2_state,xsedae)
+void raiden2_state::init_xsedae()
 {
 	init_blending(xsedae_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -3109,7 +3109,7 @@ const uint16_t raiden2_state::zeroteam_blended_colors[] = {
 };
 
 
-DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
+void raiden2_state::init_zeroteam()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };

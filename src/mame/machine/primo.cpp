@@ -210,19 +210,19 @@ void primo_state::primo_common_driver_init (primo_state *state)
 	m_port_FD = 0x00;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo32)
+void primo_state::init_primo32()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0x6800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo48)
+void primo_state::init_primo48()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xa800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo64)
+void primo_state::init_primo64()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xe800;
@@ -254,7 +254,7 @@ void primo_state::machine_reset()
 	primo_common_machine_init();
 }
 
-MACHINE_RESET_MEMBER(primo_state,primob)
+void primo_state::machine_reset_primob()
 {
 	primo_common_machine_init();
 

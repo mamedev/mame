@@ -142,22 +142,22 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
-	DECLARE_DRIVER_INIT(bbc);
-	DECLARE_VIDEO_START(bbc);
+	void init_bbc();
+	void video_start_bbc();
 
-	DECLARE_MACHINE_START(bbca);
-	DECLARE_MACHINE_RESET(bbca);
-	DECLARE_MACHINE_START(bbcb);
-	DECLARE_MACHINE_RESET(bbcb);
-	DECLARE_MACHINE_RESET(torch);
-	DECLARE_MACHINE_START(bbcbp);
-	DECLARE_MACHINE_RESET(bbcbp);
-	DECLARE_MACHINE_START(bbcm);
-	DECLARE_MACHINE_RESET(bbcm);
-	DECLARE_MACHINE_START(bbcmc);
-	DECLARE_MACHINE_RESET(bbcmc);
-	DECLARE_MACHINE_RESET(ltmpbp);
-	DECLARE_MACHINE_RESET(ltmpm);
+	void machine_start_bbca();
+	void machine_reset_bbca();
+	void machine_start_bbcb();
+	void machine_reset_bbcb();
+	void machine_reset_torch();
+	void machine_start_bbcbp();
+	void machine_reset_bbcbp();
+	void machine_start_bbcm();
+	void machine_reset_bbcm();
+	void machine_start_bbcmc();
+	void machine_reset_bbcmc();
+	void machine_reset_ltmpbp();
+	void machine_reset_ltmpm();
 
 	DECLARE_PALETTE_INIT(bbc);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);

@@ -102,7 +102,7 @@ void cyberbal_state::video_start_common(int screens)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::video_start_cyberbal()
 {
 	video_start_common(2);
 
@@ -112,7 +112,7 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::video_start_cyberbal2p()
 {
 	video_start_common(1);
 

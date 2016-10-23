@@ -45,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(pasopia);
+	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 private:
@@ -264,7 +264,7 @@ static const z80_daisy_config pasopia_daisy[] =
 
 
 
-DRIVER_INIT_MEMBER(pasopia_state,pasopia)
+void pasopia_state::init_pasopia()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.

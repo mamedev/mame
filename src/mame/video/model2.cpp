@@ -2584,7 +2584,7 @@ static void geo_parse( model2_state *state )
 /***********************************************************************************************/
 
 
-VIDEO_START_MEMBER(model2_state,model2)
+void model2_state::video_start_model2()
 {
 	const rectangle &visarea = m_screen->visible_area();
 	int width = visarea.width();

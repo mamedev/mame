@@ -225,7 +225,7 @@ WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(b2m_state,b2m)
+void b2m_state::init_b2m()
 {
 	m_vblank_state = 0;
 }

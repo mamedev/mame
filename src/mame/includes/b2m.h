@@ -56,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(b2m_palette_r);
 	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
-	DECLARE_DRIVER_INIT(b2m);
+	void init_b2m();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

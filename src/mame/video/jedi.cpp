@@ -30,7 +30,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(jedi_state,jedi)
+void jedi_state::video_start_jedi()
 {
 	/* register for saving */
 	save_item(NAME(m_vscroll));

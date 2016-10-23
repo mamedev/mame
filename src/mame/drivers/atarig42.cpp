@@ -38,7 +38,7 @@ void atarig42_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarig42_state,atarig42)
+void atarig42_state::machine_start_atarig42()
 {
 	atarigen_state::machine_start();
 
@@ -50,7 +50,7 @@ MACHINE_START_MEMBER(atarig42_state,atarig42)
 }
 
 
-MACHINE_RESET_MEMBER(atarig42_state,atarig42)
+void atarig42_state::machine_reset_atarig42()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -822,7 +822,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig42_state,roadriot)
+void atarig42_state::init_roadriot()
 {
 	m_playfield_base = 0x400;
 
@@ -853,7 +853,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 }
 
 
-DRIVER_INIT_MEMBER(atarig42_state,guardian)
+void atarig42_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 

@@ -90,16 +90,16 @@ public:
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 
-	DECLARE_DRIVER_INIT(gladiatr);
-	DECLARE_DRIVER_INIT(ppking);
+	void init_gladiatr();
+	void init_ppking();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 
-	DECLARE_MACHINE_RESET(ppking);
-	DECLARE_VIDEO_START(ppking);
-	DECLARE_MACHINE_RESET(gladiator);
-	DECLARE_VIDEO_START(gladiatr);
+	void machine_reset_ppking();
+	void video_start_ppking();
+	void machine_reset_gladiator();
+	void video_start_gladiatr();
 
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

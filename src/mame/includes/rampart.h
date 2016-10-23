@@ -30,10 +30,10 @@ public:
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(rampart);
-	DECLARE_MACHINE_START(rampart);
-	DECLARE_MACHINE_RESET(rampart);
-	DECLARE_VIDEO_START(rampart);
+	void init_rampart();
+	void machine_start_rampart();
+	void machine_reset_rampart();
+	void video_start_rampart();
 	uint32_t screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

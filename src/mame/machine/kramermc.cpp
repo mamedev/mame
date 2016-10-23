@@ -32,7 +32,7 @@ WRITE8_MEMBER(kramermc_state::kramermc_port_a_w)
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(kramermc_state,kramermc)
+void kramermc_state::init_kramermc()
 {
 }
 

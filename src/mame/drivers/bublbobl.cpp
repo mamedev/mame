@@ -725,7 +725,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(bublbobl_state,common)
+void bublbobl_state::machine_start_common()
 {
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
@@ -733,7 +733,7 @@ MACHINE_START_MEMBER(bublbobl_state,common)
 	save_item(NAME(m_video_enable));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,common)
+void bublbobl_state::machine_reset_common()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
@@ -741,16 +741,16 @@ MACHINE_RESET_MEMBER(bublbobl_state,common)
 }
 
 
-MACHINE_START_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::machine_start_tokio()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_tokio_prot_count));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::machine_reset_tokio()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_tokio_prot_count = 0;
 }
@@ -801,9 +801,9 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::machine_start_bublbobl()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_ddr1));
 	save_item(NAME(m_ddr2));
@@ -819,9 +819,9 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 	save_item(NAME(m_port4_out));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::machine_reset_bublbobl()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_ddr1 = 0;
 	m_ddr2 = 0;
@@ -887,17 +887,17 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,boblbobl)
+void bublbobl_state::machine_start_boblbobl()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_ic43_a));
 	save_item(NAME(m_ic43_b));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
+void bublbobl_state::machine_reset_boblbobl()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_ic43_a = 0;
 	m_ic43_b = 0;
@@ -917,9 +917,9 @@ static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,bub68705)
+void bublbobl_state::machine_start_bub68705()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
@@ -931,9 +931,9 @@ MACHINE_START_MEMBER(bublbobl_state,bub68705)
 	save_item(NAME(m_latch));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
+void bublbobl_state::machine_reset_bub68705()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_port_a_in = 0;
 	m_port_a_out = 0;
@@ -1835,7 +1835,7 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::init_bublbobl()
 {
 	configure_banks();
 
@@ -1843,7 +1843,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 	m_video_enable = 0;
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::init_tokio()
 {
 	configure_banks();
 
@@ -1852,14 +1852,14 @@ DRIVER_INIT_MEMBER(bublbobl_state,tokio)
 	m_video_enable = 1;
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,tokiob)
+void bublbobl_state::init_tokiob()
 {
-	DRIVER_INIT_CALL(tokio);
+	init_tokio();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,dland)
+void bublbobl_state::init_dland()
 {
 	// rearrange gfx to original format
 	int i;
@@ -1870,7 +1870,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 	for (i = 0x40000; i < 0x80000; i++)
 		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(bublbobl);
+	init_bublbobl();
 }
 
 

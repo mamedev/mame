@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(mcr_state,mcr)
+void mcr_state::video_start_mcr()
 {
 	/* the tilemap callback is based on the CPU board */
 	switch (mcr_cpu_board)

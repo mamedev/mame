@@ -1125,22 +1125,22 @@ ROM_END
    video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
-DRIVER_INIT_MEMBER(tecmo_state,rygar)
+void tecmo_state::init_rygar()
 {
 	m_video_type = 0;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,silkworm)
+void tecmo_state::init_silkworm()
 {
 	m_video_type = 1;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,gemini)
+void tecmo_state::init_gemini()
 {
 	m_video_type = 2;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,backfirt)
+void tecmo_state::init_backfirt()
 {
 	m_video_type = 2;
 

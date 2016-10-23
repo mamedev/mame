@@ -623,7 +623,7 @@ void crospang_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(crospang_state,crospang)
+void crospang_state::init_crospang()
 {
 	tumblepb_gfx1_rearrange();
 }

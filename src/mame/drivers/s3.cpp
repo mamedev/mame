@@ -82,8 +82,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s3);
-	DECLARE_MACHINE_RESET(s3a);
+	void machine_reset_s3();
+	void machine_reset_s3a();
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -259,13 +259,13 @@ static INPUT_PORTS_START( s3 )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s3_state, s3 )
+void s3_state::machine_reset_s3()
 {
 	m_t_c = 0;
 	m_chimes = 1;
 }
 
-MACHINE_RESET_MEMBER( s3_state, s3a )
+void s3_state::machine_reset_s3a()
 {
 	m_t_c = 0;
 	m_chimes = 0;

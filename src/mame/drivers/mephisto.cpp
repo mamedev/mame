@@ -104,10 +104,10 @@ public:
 	//uint8_t *m_p_ram;
 	uint8_t m_led7;
 	uint8_t m_allowNMI;
-	DECLARE_DRIVER_INIT(mephisto);
+	void init_mephisto();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(mm2);
+	void machine_start_mm2();
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
@@ -318,7 +318,7 @@ void mephisto_state::machine_start()
 	//mboard_savestate_register();
 }
 
-MACHINE_START_MEMBER(mephisto_state,mm2)
+void mephisto_state::machine_start_mm2()
 {
 	m_lcd_shift_counter = 3;
 	m_led7=0xff;
@@ -444,7 +444,7 @@ ROM_START(mm50)
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mephisto_state,mephisto)
+void mephisto_state::init_mephisto()
 {
 	m_lcd_shift_counter = 3;
 }

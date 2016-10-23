@@ -289,7 +289,7 @@ public:
 	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
-	DECLARE_DRIVER_INIT(witch);
+	void init_witch();
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
@@ -911,7 +911,7 @@ ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
 ROM_END
 
-DRIVER_INIT_MEMBER(witch_state,witch)
+void witch_state::init_witch()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
 	membank("bank1")->set_entry(0);

@@ -189,7 +189,7 @@
             tileinfo.category = category;
         }
 
-        VIDEO_START_MEMBER( my_state, my_driver )
+        void my_state::video_start_my_driver()
         {
             // first create the tilemap
             tmap = &machine().tilemap().create(

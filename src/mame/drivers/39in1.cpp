@@ -76,8 +76,8 @@ public:
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
-	DECLARE_DRIVER_INIT(39in1);
-	DECLARE_MACHINE_START(60in1);
+	void init_39in1();
+	void machine_start_60in1();
 	virtual void machine_start() override;
 	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
@@ -1438,7 +1438,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 	return 0x37;
 }
 
-DRIVER_INIT_MEMBER(_39in1_state,39in1)
+void _39in1_state::init_39in1()
 {
 	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
@@ -1554,7 +1554,7 @@ void _39in1_state::machine_start()
 	pxa255_start();
 }
 
-MACHINE_START_MEMBER(_39in1_state,60in1)
+void _39in1_state::machine_start_60in1()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;

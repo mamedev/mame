@@ -34,12 +34,12 @@ public:
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
-	DECLARE_DRIVER_INIT(condor);
-	DECLARE_DRIVER_INIT(vautourza);
+	void init_condor();
+	void init_vautourza();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_RESET(phoenix);
-	DECLARE_VIDEO_START(phoenix);
+	void machine_reset_phoenix();
+	void video_start_phoenix();
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);

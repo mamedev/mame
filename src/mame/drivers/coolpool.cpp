@@ -125,13 +125,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(coolpool_state,amerdart)
+void coolpool_state::machine_reset_amerdart()
 {
 	m_nvram_write_enable = 0;
 }
 
 
-MACHINE_RESET_MEMBER(coolpool_state,coolpool)
+void coolpool_state::machine_reset_coolpool()
 {
 	m_nvram_write_enable = 0;
 }
@@ -1111,14 +1111,14 @@ void coolpool_state::register_state_save()
 
 
 
-DRIVER_INIT_MEMBER(coolpool_state,amerdart)
+void coolpool_state::init_amerdart()
 {
 	m_lastresult = 0xffff;
 
 	register_state_save();
 }
 
-DRIVER_INIT_MEMBER(coolpool_state,coolpool)
+void coolpool_state::init_coolpool()
 {
 	m_dsp->space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
@@ -1126,7 +1126,7 @@ DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 }
 
 
-DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
+void coolpool_state::init_9ballsht()
 {
 	int a, len;
 	uint16_t *rom;

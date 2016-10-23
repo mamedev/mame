@@ -74,8 +74,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	DECLARE_DRIVER_INIT(inder);
-	DECLARE_DRIVER_INIT(inder1);
+	void init_inder();
+	void init_inder1();
 private:
 	bool m_pc0;
 	uint8_t m_game;
@@ -1306,7 +1306,7 @@ void inder_state::machine_reset()
 		m_7a->clear_w(1);
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder )
+void inder_state::init_inder()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a)
@@ -1318,7 +1318,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder1 )
+void inder_state::init_inder1()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a)

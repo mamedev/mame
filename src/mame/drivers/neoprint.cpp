@@ -70,13 +70,13 @@ public:
 	DECLARE_WRITE16_MEMBER(nprsp_palette_w);
 	DECLARE_WRITE8_MEMBER(nprsp_bank_w);
 	DECLARE_READ16_MEMBER(rom_window_r);
-	DECLARE_DRIVER_INIT(98best44);
-	DECLARE_DRIVER_INIT(npcartv1);
-	DECLARE_DRIVER_INIT(nprsp);
-	DECLARE_DRIVER_INIT(unkneo);
+	void init_98best44();
+	void init_npcartv1();
+	void init_nprsp();
+	void init_unkneo();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(nprsp);
+	void machine_reset_nprsp();
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(neoprint_state,nprsp)
+void neoprint_state::machine_reset_nprsp()
 {
 	m_bank_val = 0;
 }
@@ -635,7 +635,7 @@ ROM_START( nprsp )
 ROM_END
 
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
-DRIVER_INIT_MEMBER(neoprint_state,npcartv1)
+void neoprint_state::init_npcartv1()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -645,14 +645,14 @@ DRIVER_INIT_MEMBER(neoprint_state,npcartv1)
 }
 
 
-DRIVER_INIT_MEMBER(neoprint_state,98best44)
+void neoprint_state::init_98best44()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(neoprint_state,nprsp)
+void neoprint_state::init_nprsp()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -664,7 +664,7 @@ DRIVER_INIT_MEMBER(neoprint_state,nprsp)
 	ROM[0x4834/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(neoprint_state,unkneo)
+void neoprint_state::init_unkneo()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 	ROM[0x12c2/2] = 0x4e71;

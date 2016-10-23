@@ -596,7 +596,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }

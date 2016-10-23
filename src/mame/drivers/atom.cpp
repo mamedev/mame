@@ -951,7 +951,7 @@ ROM_END
 //  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
 //ROM_END
 
-DRIVER_INIT_MEMBER(atomeb_state, atomeb)
+void atomeb_state::init_atomeb()
 {
 	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
 	char str[8];

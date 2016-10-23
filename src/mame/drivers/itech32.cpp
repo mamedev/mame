@@ -472,7 +472,7 @@ void itech32_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(itech32_state,drivedge)
+void itech32_state::machine_reset_drivedge()
 {
 	itech32_state::machine_reset();
 
@@ -4224,7 +4224,7 @@ void itech32_state::init_program_rom()
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,timekill)
+void itech32_state::init_timekill()
 {
 	init_program_rom();
 	m_vram_height = 512;
@@ -4233,7 +4233,7 @@ DRIVER_INIT_MEMBER(itech32_state,timekill)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,hardyard)
+void itech32_state::init_hardyard()
 {
 	init_program_rom();
 	m_vram_height = 1024;
@@ -4242,7 +4242,7 @@ DRIVER_INIT_MEMBER(itech32_state,hardyard)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,bloodstm)
+void itech32_state::init_bloodstm()
 {
 	init_program_rom();
 	m_vram_height = 1024;
@@ -4251,7 +4251,7 @@ DRIVER_INIT_MEMBER(itech32_state,bloodstm)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,drivedge)
+void itech32_state::init_drivedge()
 {
 	init_program_rom();
 	m_vram_height = 1024;
@@ -4263,7 +4263,7 @@ DRIVER_INIT_MEMBER(itech32_state,drivedge)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,wcbowl)
+void itech32_state::init_wcbowl()
 {
 	/*
 	    This is the 3 tier PCB set:
@@ -4283,7 +4283,7 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowl)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,wcbowlj)
+void itech32_state::init_wcbowlj()
 {
 	/*
 	    This is the 3 tier PCB set:
@@ -4318,13 +4318,13 @@ void itech32_state::init_sftm_common(int prot_addr)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,sftm)
+void itech32_state::init_sftm()
 {
 	init_sftm_common(0x7a6a);
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,sftm110)
+void itech32_state::init_sftm110()
 {
 	init_sftm_common(0x7a66);
 }
@@ -4351,13 +4351,13 @@ void itech32_state::init_shuffle_bowl_common(int prot_addr)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,shufshot)
+void itech32_state::init_shufshot()
 {
 	init_shuffle_bowl_common(0x111a);
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,wcbowln)
+void itech32_state::init_wcbowln()
 {
 	/* The security PROM is NOT interchangeable between the Deluxe and "normal" versions. */
 	init_shuffle_bowl_common(0x1116);
@@ -4369,7 +4369,7 @@ void itech32_state::install_timekeeper()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), m48t02), write8_delegate(FUNC(timekeeper_device::write), m48t02), 0xffffffff);
 }
 
-DRIVER_INIT_MEMBER(itech32_state,wcbowlt)
+void itech32_state::init_wcbowlt()
 {
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
 	init_shuffle_bowl_common(0x111a);
@@ -4388,7 +4388,7 @@ void itech32_state::init_gt_common()
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,gt3d)
+void itech32_state::init_gt3d()
 {
 	/*
 	    This is the 3 tier PCB with the short ROM board:
@@ -4402,7 +4402,7 @@ DRIVER_INIT_MEMBER(itech32_state,gt3d)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,aama)
+void itech32_state::init_aama()
 {
 	/*
 	    This is the single PCB style board commonly referred to as:
@@ -4416,18 +4416,18 @@ DRIVER_INIT_MEMBER(itech32_state,aama)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,aamat)
+void itech32_state::init_aamat()
 {
 	/*
 	    Tournament Version - So install needed handler for the TimeKeeper ram
 	*/
-	DRIVER_INIT_CALL(aama);
+	init_aama();
 
 	install_timekeeper();
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,s_ver)
+void itech32_state::init_s_ver()
 {
 	/*
 	    This is a special 3 tier PCB with a short ROM board and 1 trackball
@@ -4440,7 +4440,7 @@ DRIVER_INIT_MEMBER(itech32_state,s_ver)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,gt3dl)
+void itech32_state::init_gt3dl()
 {
 	/*
 	    This is the 3 tier PCB with the long ROM board:
@@ -4454,11 +4454,11 @@ DRIVER_INIT_MEMBER(itech32_state,gt3dl)
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,gt2kp)
+void itech32_state::init_gt2kp()
 {
 	/* a little extra protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
-	DRIVER_INIT_CALL(aama);
+	init_aama();
 
 	/* The protection code is:
 
@@ -4475,11 +4475,11 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 }
 
 
-DRIVER_INIT_MEMBER(itech32_state,gtclasscp)
+void itech32_state::init_gtclasscp()
 {
 	/* a little extra protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
-	DRIVER_INIT_CALL(aama);
+	init_aama();
 
 	/* The protection code is:
 

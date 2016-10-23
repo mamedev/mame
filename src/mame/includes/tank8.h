@@ -78,7 +78,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_DRIVER_INIT(decode);
+	void init_decode();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tank8);

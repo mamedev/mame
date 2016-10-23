@@ -3705,12 +3705,12 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-MACHINE_START_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_start_konamigx()
 {
 	save_item(NAME(m_gx_wrport1_1));
 }
 
-MACHINE_RESET_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_reset_konamigx()
 {
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;
@@ -3829,7 +3829,7 @@ READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
 	return m_k056832->k_6bpp_rom_long_r(space,offset,mem_mask);
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,konamigx)
+void konamigx_state::init_konamigx()
 {
 	int i, match;
 	int readback = 0;
@@ -3917,10 +3917,10 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 #undef BPP66
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,posthack)
+void konamigx_state::init_posthack()
 {
 	m_use_68020_post_clock_hack = 1;
-	DRIVER_INIT_CALL(konamigx);
+	init_konamigx();
 }
 
 

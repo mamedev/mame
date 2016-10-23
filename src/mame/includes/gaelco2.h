@@ -49,17 +49,17 @@ public:
 	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
-	DECLARE_DRIVER_INIT(touchgo);
-	DECLARE_DRIVER_INIT(touchgop);
-	DECLARE_DRIVER_INIT(snowboar);
-	DECLARE_DRIVER_INIT(alighunt);
-	DECLARE_DRIVER_INIT(maniacsqa);
+	void init_touchgo();
+	void init_touchgop();
+	void init_snowboar();
+	void init_alighunt();
+	void init_maniacsqa();
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
-	DECLARE_VIDEO_START(gaelco2);
-	DECLARE_VIDEO_START(gaelco2_dual);
+	void video_start_gaelco2();
+	void video_start_gaelco2_dual();
 	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -96,7 +96,7 @@ public:
 	DECLARE_READ16_MEMBER(p2_gun_y);
 	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
-	DECLARE_DRIVER_INIT(bang);
+	void init_bang();
 };
 
 

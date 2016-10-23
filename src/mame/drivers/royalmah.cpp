@@ -206,8 +206,8 @@ public:
 	DECLARE_READ8_MEMBER(royalmah_player_2_port_r);
 	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
-	DECLARE_DRIVER_INIT(janptr96);
-	DECLARE_DRIVER_INIT(ippatsu);
+	void init_janptr96();
+	void init_ippatsu();
 	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
 	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -4902,12 +4902,12 @@ ROM_START( jansoua )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
+void royalmah_state::init_ippatsu()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x8000 );
 }
 
-DRIVER_INIT_MEMBER(royalmah_state,janptr96)
+void royalmah_state::init_janptr96()
 {
 	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
 	membank("bank3")->set_base(m_janptr96_nvram.get());

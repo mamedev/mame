@@ -1156,9 +1156,9 @@ public:
 	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
 
-	DECLARE_DRIVER_INIT(namcos12);
-	DECLARE_DRIVER_INIT(ptblank2);
-	DECLARE_DRIVER_INIT(technodr);
+	void init_namcos12();
+	void init_ptblank2();
+	void init_technodr();
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
@@ -1636,7 +1636,7 @@ static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
 ADDRESS_MAP_END
 
 
-DRIVER_INIT_MEMBER(namcos12_state,namcos12)
+void namcos12_state::init_namcos12()
 {
 	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
@@ -1652,17 +1652,17 @@ DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 	save_item( NAME(m_n_bankoffset) );
 }
 
-DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
+void namcos12_state::init_ptblank2()
 {
-	DRIVER_INIT_CALL(namcos12);
+	init_namcos12();
 
 	/* HACK: patch out wait for dma 5 to complete */
 	*( (uint32_t *)( memregion( "maincpu:rom" )->base() + 0x331c4 ) ) = 0;
 }
 
-DRIVER_INIT_MEMBER(namcos12_state,technodr)
+void namcos12_state::init_technodr()
 {
-	DRIVER_INIT_CALL(namcos12);
+	init_namcos12();
 
 	// HACK: patch H8 to fix COIN ERROR
 	*( (uint32_t *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;

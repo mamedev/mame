@@ -1619,9 +1619,9 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(namcos21_state,namcos21)
+void namcos21_state::machine_start_namcos21()
 {
-	MACHINE_START_CALL_MEMBER( namcos2 );
+	machine_start_namcos2();
 	namcos2_kickstart = namcos21_kickstart;
 }
 
@@ -2452,7 +2452,7 @@ void namcos21_state::init(int game_type)
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,winrun)
+void namcos21_state::init_winrun()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
@@ -2467,23 +2467,23 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 	m_mbNeedsKickstart = 0;
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,aircomb)
+void namcos21_state::init_aircomb()
 {
 	init(NAMCOS21_AIRCOMBAT);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,starblad)
+void namcos21_state::init_starblad()
 {
 	init(NAMCOS21_STARBLADE);
 }
 
 
-DRIVER_INIT_MEMBER(namcos21_state,cybsled)
+void namcos21_state::init_cybsled()
 {
 	init(NAMCOS21_CYBERSLED);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,solvalou)
+void namcos21_state::init_solvalou()
 {
 	uint16_t *mem = (uint16_t *)memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
@@ -2494,7 +2494,7 @@ DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 	init(NAMCOS21_SOLVALOU );
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,driveyes)
+void namcos21_state::init_driveyes()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;

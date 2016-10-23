@@ -24,63 +24,28 @@
 
 // core machine callbacks
 #define MCFG_MACHINE_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::MACHINE_START_NAME(_func), #_class "::machine_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::machine_start_##_func, #_class "::machine_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), #_class "::machine_reset_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::machine_reset_##_func, #_class "::machine_reset_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_MACHINE_RESET_REMOVE() \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate());
 
 // core sound callbacks
 #define MCFG_SOUND_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), #_class "::sound_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::sound_start_##_func, #_class "::sound_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), #_class "::sound_reset_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::sound_reset_##_func, #_class "::sound_reset_" #_func, downcast<_class *>(owner)));
 
 
 // core video callbacks
 #define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::VIDEO_START_NAME(_func), #_class "::video_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::video_start_##_func, #_class "::video_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_VIDEO_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::VIDEO_RESET_NAME(_func), #_class "::video_reset_" #_func, downcast<_class *>(owner)));
-
-
-
-//**************************************************************************
-//  OTHER MACROS
-//**************************************************************************
-
-#define MACHINE_START_NAME(name)    machine_start_##name
-#define MACHINE_START_CALL_MEMBER(name) MACHINE_START_NAME(name)()
-#define DECLARE_MACHINE_START(name) void MACHINE_START_NAME(name)() ATTR_COLD
-#define MACHINE_START_MEMBER(cls,name) void cls::MACHINE_START_NAME(name)()
-
-#define MACHINE_RESET_NAME(name)    machine_reset_##name
-#define MACHINE_RESET_CALL_MEMBER(name) MACHINE_RESET_NAME(name)()
-#define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
-#define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
-
-#define SOUND_START_NAME(name)      sound_start_##name
-#define DECLARE_SOUND_START(name)   void SOUND_START_NAME(name)() ATTR_COLD
-#define SOUND_START_MEMBER(cls,name) void cls::SOUND_START_NAME(name)()
-
-#define SOUND_RESET_NAME(name)      sound_reset_##name
-#define SOUND_RESET_CALL_MEMBER(name) SOUND_RESET_NAME(name)()
-#define DECLARE_SOUND_RESET(name)   void SOUND_RESET_NAME(name)()
-#define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
-
-#define VIDEO_START_NAME(name)      video_start_##name
-#define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
-#define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)() ATTR_COLD
-#define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
-
-#define VIDEO_RESET_NAME(name)      video_reset_##name
-#define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
-#define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
-#define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::video_reset_##_func, #_class "::video_reset_" #_func, downcast<_class *>(owner)));
 
 
 

@@ -69,7 +69,7 @@ public:
 
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
-	DECLARE_DRIVER_INIT(dambustr);
+	void init_dambustr();
 };
 
 
@@ -209,7 +209,7 @@ static GFXDECODE_START( dambustr )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(dambustr_state,dambustr)
+void dambustr_state::init_dambustr()
 {
 	int i, j, tmp;
 	int tmpram[16];

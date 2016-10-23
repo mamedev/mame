@@ -226,7 +226,7 @@ public:
 	DECLARE_READ8_MEMBER(cybertnk_mux_r);
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
-	DECLARE_DRIVER_INIT(cybertnk);
+	void init_cybertnk();
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
@@ -971,7 +971,7 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
+void cybertnk_state::init_cybertnk()
 {
 	uint32_t *spr = (uint32_t*)memregion("spr_gfx")->base();
 

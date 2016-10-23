@@ -1278,7 +1278,7 @@ ROM_START( gulfwar2a )
 	ROM_LOAD( "82s123.b24", 0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )    /* tile to sprite priority ?? */
 ROM_END
 
-DRIVER_INIT_MEMBER(twincobr_state,twincobr)
+void twincobr_state::init_twincobr()
 {
 	twincobr_driver_savestate();
 }

@@ -155,7 +155,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
 	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
-	DECLARE_DRIVER_INIT(pip);
+	void init_pip();
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
@@ -366,7 +366,7 @@ ROM_START( pntnpuzl )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
+void pntnpuzl_state::init_pip()
 {
 //  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;

@@ -94,7 +94,7 @@ void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
+void mw8080bw_state::machine_start_mw8080bw()
 {
 	mw8080bw_create_interrupt_timer();
 }
@@ -106,7 +106,7 @@ MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(mw8080bw_state,mw8080bw)
+void mw8080bw_state::machine_reset_mw8080bw()
 {
 	mw8080bw_start_interrupt_timer();
 }

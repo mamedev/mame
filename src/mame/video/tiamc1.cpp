@@ -188,7 +188,7 @@ void tiamc1_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
-VIDEO_START_MEMBER(tiamc1_state, kot)
+void tiamc1_state::video_start_kot()
 {
 	m_charram = memregion("gfx2")->base();
 

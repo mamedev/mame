@@ -95,9 +95,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint32_t screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_MACHINE_START(ddragon);
-	DECLARE_MACHINE_RESET(ddragon);
-	DECLARE_VIDEO_START(ddragon);
+	void machine_start_ddragon();
+	void machine_reset_ddragon();
+	void video_start_ddragon();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 
@@ -126,9 +126,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
-	DECLARE_DRIVER_INIT(toffy);
-	DECLARE_DRIVER_INIT(darktowr);
-	DECLARE_DRIVER_INIT(ddragon2);
-	DECLARE_DRIVER_INIT(ddragon);
-	DECLARE_DRIVER_INIT(ddragon6809);
+	void init_toffy();
+	void init_darktowr();
+	void init_ddragon2();
+	void init_ddragon();
+	void init_ddragon6809();
 };

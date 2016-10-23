@@ -87,8 +87,8 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(wmg_rombank_w);
-	DECLARE_MACHINE_RESET(wmg);
-	DECLARE_DRIVER_INIT(wmg);
+	void machine_reset_wmg();
+	void init_wmg();
 	uint8_t m_wmg_bank;
 	uint8_t m_wmg_def_bank;
 	uint8_t m_wmg_port_select;
@@ -223,7 +223,7 @@ WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
 }
 
 
-MACHINE_RESET_MEMBER( wmg_state, wmg )
+void wmg_state::machine_reset_wmg()
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	m_wmg_bank=0;
@@ -231,7 +231,7 @@ MACHINE_RESET_MEMBER( wmg_state, wmg )
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
 	wmg_rombank_w( space1, 0, 0);
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 	m_maincpu->reset();
 }
 
@@ -508,7 +508,7 @@ MACHINE_CONFIG_END
  *  Driver Initialisation
  *
  *************************************/
-DRIVER_INIT_MEMBER( wmg_state, wmg )
+void wmg_state::init_wmg()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	uint8_t *ROM = memregion("soundcpu")->base();

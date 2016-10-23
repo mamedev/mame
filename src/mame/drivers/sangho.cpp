@@ -90,10 +90,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
 	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
-	DECLARE_DRIVER_INIT(pzlestar);
+	void init_pzlestar();
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(pzlestar);
-	DECLARE_MACHINE_RESET(sexyboom);
+	void machine_reset_pzlestar();
+	void machine_reset_sexyboom();
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
 	DECLARE_READ8_MEMBER(sec_slot_r);
@@ -427,13 +427,13 @@ void sangho_state::machine_start()
 	m_ram = std::make_unique<uint8_t[]>(0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
 }
 
-MACHINE_RESET_MEMBER(sangho_state,pzlestar)
+void sangho_state::machine_reset_pzlestar()
 {
 	m_pzlestar_mem_bank = 2;
 	pzlestar_map_banks();
 }
 
-MACHINE_RESET_MEMBER(sangho_state,sexyboom)
+void sangho_state::machine_reset_sexyboom()
 {
 	m_sexyboom_bank[0] = 0x00;
 	m_sexyboom_bank[1] = 0x00;
@@ -527,7 +527,7 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-DRIVER_INIT_MEMBER(sangho_state,pzlestar)
+void sangho_state::init_pzlestar()
 {
 	uint8_t *ROM = m_region_user1->base();
 

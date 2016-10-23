@@ -11553,7 +11553,7 @@ YM2203
 
 is this the original Magical Odds?
 */
-DRIVER_INIT_MEMBER(wingco_state, magoddsc)
+void wingco_state::init_magoddsc()
 {
 	int A;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -12947,7 +12947,7 @@ ROM_START( fb2010 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cmaster_state, fb2010)
+void cmaster_state::init_fb2010()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -14895,7 +14895,7 @@ ROM_END
 
 /*********************************************************************************************************************/
 
-DRIVER_INIT_MEMBER(goldstar_state,goldstar)
+void goldstar_state::init_goldstar()
 {
 	int A;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -14978,7 +14978,7 @@ uint8_t cb3_state::chry10_decrypt(uint8_t cipherText)
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
 
-DRIVER_INIT_MEMBER(cb3_state, chry10)
+void cb3_state::init_chry10()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -15002,7 +15002,7 @@ DRIVER_INIT_MEMBER(cb3_state, chry10)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cb3)
+void cb3_state::init_cb3()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -15020,7 +15020,7 @@ DRIVER_INIT_MEMBER(cb3_state, cb3)
 }
 
 
-DRIVER_INIT_MEMBER(cb3_state, chrygld)
+void cb3_state::init_chrygld()
 {
 	int A;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15037,7 +15037,7 @@ DRIVER_INIT_MEMBER(cb3_state, chrygld)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, cm)
+void cmaster_state::init_cm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15048,7 +15048,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cm)
 	ROM[0x0025] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, cmv4)
+void cmaster_state::init_cmv4()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15059,7 +15059,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cmv4)
 	ROM[0x020d] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, cmast91)
+void goldstar_state::init_cmast91()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15070,14 +15070,14 @@ DRIVER_INIT_MEMBER(goldstar_state, cmast91)
 	ROM[0x0a92] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(wingco_state, lucky8a)
+void wingco_state::init_lucky8a()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
+void cmaster_state::init_nfb96sea()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15102,7 +15102,7 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, schery97)
+void cmaster_state::init_schery97()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15124,7 +15124,7 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, schery97a)
+void cmaster_state::init_schery97a()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15147,7 +15147,7 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97a)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, skill98)
+void cmaster_state::init_skill98()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15168,7 +15168,7 @@ DRIVER_INIT_MEMBER(cmaster_state, skill98)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
+void cmaster_state::init_nfb96_c1()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15189,7 +15189,7 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
 
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
+void cmaster_state::init_nfb96_c2()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15210,7 +15210,7 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
 	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(cmaster_state::fixedval58_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
+void cmaster_state::init_nfb96_d()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15237,7 +15237,7 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
+void cmaster_state::init_nfb96_dk()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15258,7 +15258,7 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
 
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp35)
+void cmaster_state::init_rp35()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15280,7 +15280,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp35)
 	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(cmaster_state::fixedval90_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp36)
+void cmaster_state::init_rp36()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15302,7 +15302,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36)
 	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
+void cmaster_state::init_rp36c3()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15324,7 +15324,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
+void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15347,7 +15347,7 @@ DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs s
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, po33)
+void cmaster_state::init_po33()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15370,7 +15370,7 @@ DRIVER_INIT_MEMBER(cmaster_state, po33)
 	/* oki6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, match133)
+void cmaster_state::init_match133()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15393,7 +15393,7 @@ DRIVER_INIT_MEMBER(cmaster_state, match133)
 	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(cmaster_state::fixedvale4_r), this));
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cherrys)
+void cb3_state::init_cherrys()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -15431,7 +15431,7 @@ DRIVER_INIT_MEMBER(cb3_state, cherrys)
 }
 
 /* todo: remove these patches! */
-DRIVER_INIT_MEMBER(unkch_state, unkch1)
+void unkch_state::init_unkch1()
 {
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15441,7 +15441,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch1)
 	ROM[0x9d53] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(unkch_state, unkch3)
+void unkch_state::init_unkch3()
 {
 	// game stores $04 at ($D77F) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15451,7 +15451,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch3)
 	ROM[0x9b87] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(unkch_state, unkch4)
+void unkch_state::init_unkch4()
 {
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15461,7 +15461,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch4)
 	ROM[0x9a6f] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, tonypok)
+void cmaster_state::init_tonypok()
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
 	address_space &io = m_maincpu->space(AS_IO);
@@ -15471,7 +15471,7 @@ DRIVER_INIT_MEMBER(cmaster_state, tonypok)
 
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, super9)
+void goldstar_state::init_super9()
 {
 	int i;
 	uint8_t *src = memregion("gfx1")->base();
@@ -15492,7 +15492,7 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cb3e)
+void cb3_state::init_cb3e()
 {
 /*  program bitswap */
 	int i;
@@ -15522,7 +15522,7 @@ DRIVER_INIT_MEMBER(cb3_state, cb3e)
 	}
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, wcherry)
+void goldstar_state::init_wcherry()
 {
 /*  bank 1 graphics */
 	int i;
@@ -15547,7 +15547,7 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
   Original custom hardware graphics decryption.
 
 */
-DRIVER_INIT_MEMBER(wingco_state, flaming7)
+void wingco_state::init_flaming7()
 {
 /*  bank 1 graphics */
 	int i;
@@ -15581,7 +15581,7 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
   Taiwanese custom hardware.
 
 */
-DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
+void wingco_state::init_flam7_tw()
 {
 /*  Patch to bypass the iButton electronic serial number check.
 

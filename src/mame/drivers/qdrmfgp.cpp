@@ -542,19 +542,19 @@ WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
  *
  *************************************/
 
-MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
+void qdrmfgp_state::machine_start_qdrmfgp()
 {
 	save_item(NAME(m_control));
 	save_item(NAME(m_pal));
 	save_item(NAME(m_gp2_irq_control));
 }
 
-MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
+void qdrmfgp_state::machine_start_qdrmfgp2()
 {
 	/* sound irq (CCU? 240Hz) */
 	machine().scheduler().timer_pulse(attotime::from_hz(XTAL_18_432MHz/76800), timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback),this));
 
-	MACHINE_START_CALL_MEMBER( qdrmfgp );
+	machine_start_qdrmfgp();
 }
 
 void qdrmfgp_state::machine_reset()

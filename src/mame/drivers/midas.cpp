@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	DECLARE_DRIVER_INIT(livequiz);
+	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -789,7 +789,7 @@ ROM_START( livequiz )
 	/* uploaded */
 ROM_END
 
-DRIVER_INIT_MEMBER(midas_state,livequiz)
+void midas_state::init_livequiz()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 

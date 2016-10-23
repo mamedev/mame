@@ -44,7 +44,7 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(by6803);
+	void init_by6803();
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -345,7 +345,7 @@ void by6803_state::machine_reset()
 	m_port2 = 2+8;
 }
 
-DRIVER_INIT_MEMBER(by6803_state,by6803)
+void by6803_state::init_by6803()
 {
 }
 

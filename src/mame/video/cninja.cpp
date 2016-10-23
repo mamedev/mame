@@ -11,7 +11,7 @@
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(cninja_state,stoneage)
+void cninja_state::video_start_stoneage()
 {
 	/* The bootleg has broken scroll registers */
 	m_deco_tilegen1->set_scrolldx(3, 0, -10, -10); /* pf4 16x16 tilemap */
@@ -248,7 +248,7 @@ uint32_t cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-VIDEO_START_MEMBER(cninja_state,mutantf)
+void cninja_state::video_start_mutantf()
 {
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();

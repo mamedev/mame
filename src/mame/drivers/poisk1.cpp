@@ -72,9 +72,9 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(poisk1);
-	DECLARE_MACHINE_START(poisk1);
-	DECLARE_MACHINE_RESET(poisk1);
+	void init_poisk1();
+	void machine_start_poisk1();
+	void machine_reset_poisk1();
 
 	DECLARE_PALETTE_INIT(p1);
 	virtual void video_start() override;
@@ -561,7 +561,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER( p1_state, poisk1 )
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -571,12 +571,12 @@ DRIVER_INIT_MEMBER( p1_state, poisk1 )
 	membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
-MACHINE_START_MEMBER( p1_state, poisk1 )
+void p1_state::machine_start_poisk1()
 {
 	DBG_LOG(0,"init",("machine_start()\n"));
 }
 
-MACHINE_RESET_MEMBER( p1_state, poisk1 )
+void p1_state::machine_reset_poisk1()
 {
 	DBG_LOG(0,"init",("machine_reset()\n"));
 

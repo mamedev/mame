@@ -2529,30 +2529,30 @@ void ssv_state::init_st010()
 	}
 }
 
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); save_item(NAME(m_trackball_select)); }
-DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); save_item(NAME(m_gdfs_lightgun_select)); save_item(NAME(m_gdfs_eeprom_old)); }
-DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init(0); }
-DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init(0); }
-DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init(0); }
-DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
+void ssv_state::init_drifto94()     {    init(0); init_st010();  }
+void ssv_state::init_eaglshot()     {    init(0); init_eaglshot_banking(); save_item(NAME(m_trackball_select)); }
+void ssv_state::init_gdfs()         {    init(0); save_item(NAME(m_gdfs_lightgun_select)); save_item(NAME(m_gdfs_eeprom_old)); }
+void ssv_state::init_hypreact()     {    init(0); }
+void ssv_state::init_hypreac2()     {    init(0); init_hypreac2_common();    }
+void ssv_state::init_janjans1()     {    init(0); }
+void ssv_state::init_keithlcy()     {    init(0); }
+void ssv_state::init_meosism()       {   init(0); }
+void ssv_state::init_mslider()       {   init(0); }
+void ssv_state::init_ryorioh()       {   init(0); }
+void ssv_state::init_srmp4()        {    init(0);
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
-DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
-DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
-DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
-DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
+void ssv_state::init_srmp7()        {    init(0); }
+void ssv_state::init_stmblade()     {    init(0); init_st010(); }
+void ssv_state::init_survarts()     {    init(0); }
+void ssv_state::init_dynagear()     {    init(0); }
+void ssv_state::init_sxyreact()     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
+void ssv_state::init_cairblad()     {    init(0); init_hypreac2_common();    }
+void ssv_state::init_sxyreac2()     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
+void ssv_state::init_twineag2()     {    init(1); init_st010();  }
+void ssv_state::init_ultrax()        {   init(1); }
+void ssv_state::init_vasara()        {   init(0); }
+void ssv_state::init_jsk()          {    init(0); save_item(NAME(m_latches)); }
 
 #define SSV_MASTER_CLOCK XTAL_48MHz/3
 

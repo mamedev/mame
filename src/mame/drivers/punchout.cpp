@@ -631,7 +631,7 @@ INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
 }
 
 
-MACHINE_RESET_MEMBER(punchout_state, spnchout)
+void punchout_state::machine_reset_spnchout()
 {
 	m_rp5h01->enable_w(0); // _CE -> GND
 }

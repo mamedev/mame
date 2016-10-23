@@ -465,7 +465,7 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(beathead_state,beathead)
+void beathead_state::init_beathead()
 {
 	/* prepare the speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000ae8, 0x00000aeb, read32_delegate(FUNC(beathead_state::speedup_r), this));

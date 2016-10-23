@@ -54,7 +54,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(minicom_io_w);
 	DECLARE_READ8_MEMBER(minicom_io_r);
-	DECLARE_DRIVER_INIT(minicom);
+	void init_minicom();
 private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -221,7 +221,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 	}
 }
 
-DRIVER_INIT_MEMBER( minicom_state, minicom )
+void minicom_state::init_minicom()
 {
 }
 

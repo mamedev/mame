@@ -73,7 +73,7 @@ public:
 	}
 
 	required_device<m68000_base_device> m_maincpu;
-	DECLARE_DRIVER_INIT(symbolics);
+	void init_symbolics();
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
@@ -275,7 +275,7 @@ TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 */
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(symbolics_state,symbolics)
+void symbolics_state::init_symbolics()
 {
 }
 

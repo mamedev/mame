@@ -585,7 +585,7 @@ WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(micro3d_state,micro3d)
+void micro3d_state::init_micro3d()
 {
 	address_space &space = m_drmath->space(AS_DATA);
 
@@ -599,7 +599,7 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 	m_maincpu->set_clock_scale(0.945f);
 }
 
-DRIVER_INIT_MEMBER(micro3d_state,botss)
+void micro3d_state::init_botss()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -607,7 +607,7 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
 	space.install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
 
-	DRIVER_INIT_CALL(micro3d);
+	init_micro3d();
 }
 
 void micro3d_state::machine_reset()

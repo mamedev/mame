@@ -1946,7 +1946,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segahang_state,generic)
+void segahang_state::init_generic()
 {
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
@@ -1961,31 +1961,31 @@ DRIVER_INIT_MEMBER(segahang_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segahang_state,sharrier)
+void segahang_state::init_sharrier()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_sharrier_video = true;
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segahang_state::sharrier_i8751_sim), this);
 }
 
-DRIVER_INIT_MEMBER(segahang_state,enduror)
+void segahang_state::init_enduror()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_sharrier_video = true;
 }
 
-DRIVER_INIT_MEMBER(segahang_state,endurobl)
+void segahang_state::init_endurobl()
 {
-	DRIVER_INIT_CALL(enduror);
+	init_enduror();
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
 	memcpy(m_decrypted_opcodes + 0x00000/2, rom + 0x30000/2, 0x10000);
 	memcpy(m_decrypted_opcodes + 0x10000/2, rom + 0x10000/2, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(segahang_state,endurob2)
+void segahang_state::init_endurob2()
 {
-	DRIVER_INIT_CALL(enduror);
+	init_enduror();
 
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());

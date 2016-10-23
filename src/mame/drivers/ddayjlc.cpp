@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(ddayjlc);
+	void init_ddayjlc();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -630,7 +630,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
+void ddayjlc_state::init_ddayjlc()
 {
 #define repack(n)\
 		dst[newadr+0+n] = src[oldaddr+0+n];\

@@ -61,7 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(microtan_bffx_r);
 	DECLARE_WRITE8_MEMBER(microtan_bffx_w);
 	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
-	DECLARE_DRIVER_INIT(microtan);
+	void init_microtan();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

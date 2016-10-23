@@ -752,7 +752,7 @@ static GFXDECODE_START( ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ojankohs_state,common)
+void ojankohs_state::machine_start_common()
 {
 	save_item(NAME(m_gfxreg));
 	save_item(NAME(m_flipscreen));
@@ -766,31 +766,31 @@ MACHINE_START_MEMBER(ojankohs_state,common)
 	save_item(NAME(m_vclk_left));
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankohs)
+void ojankohs_state::machine_start_ojankohs()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankoy)
+void ojankohs_state::machine_start_ojankoy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankoc)
+void ojankohs_state::machine_start_ojankoc()
 {
 	uint8_t *ROM = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
 void ojankohs_state::machine_reset()

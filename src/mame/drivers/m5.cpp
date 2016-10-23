@@ -1582,7 +1582,7 @@ ROM_END
 //  ROM( ntsc )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,ntsc)
+void m5_state::init_ntsc()
 {
 }
 
@@ -1591,7 +1591,7 @@ DRIVER_INIT_MEMBER(m5_state,ntsc)
 //  ROM( pal )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(m5_state,pal)
+void m5_state::init_pal()
 {
 }
 
@@ -1599,7 +1599,7 @@ DRIVER_INIT_MEMBER(m5_state,pal)
 //  ROM( BRNO )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(brno_state,brno)
+void brno_state::init_brno()
 {
 //  logerror("Driver init entered\n" );
 }

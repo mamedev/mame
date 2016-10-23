@@ -38,7 +38,7 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	DECLARE_DRIVER_INIT(mini2440);
+	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
@@ -211,7 +211,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mini2440_state,mini2440)
+void mini2440_state::init_mini2440()
 {
 	// do nothing
 }

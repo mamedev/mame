@@ -45,8 +45,8 @@ public:
 	DECLARE_READ16_MEMBER(ghunter_trackball_low_r);
 	DECLARE_READ16_MEMBER(ghunter_trackball_high_r);
 
-	DECLARE_DRIVER_INIT(deadang);
-	DECLARE_DRIVER_INIT(ghunter);
+	void init_deadang();
+	void init_ghunter();
 	virtual void video_start() override;
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);

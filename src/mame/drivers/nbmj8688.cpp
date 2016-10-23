@@ -42,7 +42,7 @@ TODO:
 #include "nbmj8688.lh"
 
 
-DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
+void nbmj8688_state::init_mjcamera()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
@@ -59,7 +59,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
+void nbmj8688_state::init_kanatuen()
 {
 	/* uses the same protection data as mjcamer, but a different check */
 	uint8_t *rom = memregion("voice")->base() + 0x30000;
@@ -70,7 +70,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
 	rom[0x0301] = 0xdc;
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
+void nbmj8688_state::init_kyuhito()
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
@@ -82,7 +82,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
+void nbmj8688_state::init_idhimitu()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
@@ -99,7 +99,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
+void nbmj8688_state::init_kaguya2()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();

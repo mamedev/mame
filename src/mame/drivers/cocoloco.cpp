@@ -222,7 +222,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	DECLARE_DRIVER_INIT(cocob);
+	void init_cocob();
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
@@ -610,7 +610,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(cocoloco_state, cocob)
+void cocoloco_state::init_cocob()
 {
 //  Just for testing...
 

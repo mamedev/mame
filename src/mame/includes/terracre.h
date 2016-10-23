@@ -42,14 +42,14 @@ public:
 	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrolly_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrollx_w);
-	DECLARE_DRIVER_INIT(amazon);
-	DECLARE_DRIVER_INIT(amatelas);
-	DECLARE_DRIVER_INIT(horekid);
+	void init_amazon();
+	void init_amatelas();
+	void init_horekid();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(terracre);
-	DECLARE_MACHINE_START(amazon);
+	void machine_start_amazon();
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

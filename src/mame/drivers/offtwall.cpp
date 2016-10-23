@@ -46,7 +46,7 @@ void offtwall_state::update_interrupts()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(offtwall_state,offtwall)
+void offtwall_state::machine_reset_offtwall()
 {
 	atarigen_state::machine_reset();
 }
@@ -467,7 +467,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwall)
+void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
@@ -479,7 +479,7 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 }
 
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
+void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));

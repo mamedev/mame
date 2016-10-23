@@ -93,7 +93,7 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(wms);
+	void init_wms();
 	DECLARE_READ8_MEMBER(test_r);
 		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -551,7 +551,7 @@ ROM_END
 *                Driver Init                 *
 *********************************************/
 
-DRIVER_INIT_MEMBER(wms_state,wms)
+void wms_state::init_wms()
 {
 }
 

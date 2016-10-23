@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hyperspt_videoram_w);
 	DECLARE_WRITE8_MEMBER(hyperspt_colorram_w);
 	DECLARE_WRITE8_MEMBER(hyperspt_flipscreen_w);
-	DECLARE_DRIVER_INIT(hyperspt);
+	void init_hyperspt();
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
@@ -52,7 +52,7 @@ public:
 	TILE_GET_INFO_MEMBER(roadf_get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hyperspt);
-	DECLARE_VIDEO_START(roadf);
+	void video_start_roadf();
 	uint32_t screen_update_hyperspt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

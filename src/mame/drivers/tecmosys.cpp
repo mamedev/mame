@@ -645,19 +645,19 @@ void tecmosys_state::descramble()
 	}
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,deroon)
+void tecmosys_state::init_deroon()
 {
 	descramble();
 	prot_init(0); // machine/tecmosys.c
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
+void tecmosys_state::init_tkdensho()
 {
 	descramble();
 	prot_init(1);
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
+void tecmosys_state::init_tkdensha()
 {
 	descramble();
 	prot_init(2);

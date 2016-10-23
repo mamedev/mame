@@ -379,7 +379,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 }
 
 
-SOUND_START_MEMBER(n8080_state,spacefev)
+void n8080_state::sound_start_spacefev()
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -392,7 +392,7 @@ SOUND_START_MEMBER(n8080_state,spacefev)
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,spacefev)
+void n8080_state::sound_reset_spacefev()
 {
 	m_n8080_hardware = 1;
 
@@ -408,7 +408,7 @@ SOUND_RESET_MEMBER(n8080_state,spacefev)
 }
 
 
-SOUND_START_MEMBER(n8080_state,sheriff)
+void n8080_state::sound_start_sheriff()
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -420,7 +420,7 @@ SOUND_START_MEMBER(n8080_state,sheriff)
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,sheriff)
+void n8080_state::sound_reset_sheriff()
 {
 	m_n8080_hardware = 2;
 
@@ -435,7 +435,7 @@ SOUND_RESET_MEMBER(n8080_state,sheriff)
 }
 
 
-SOUND_START_MEMBER(n8080_state,helifire)
+void n8080_state::sound_start_helifire()
 {
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -446,7 +446,7 @@ SOUND_START_MEMBER(n8080_state,helifire)
 	save_item(NAME(m_helifire_dac_phase));
 }
 
-SOUND_RESET_MEMBER(n8080_state,helifire)
+void n8080_state::sound_reset_helifire()
 {
 	m_n8080_hardware = 3;
 

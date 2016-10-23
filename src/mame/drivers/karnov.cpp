@@ -1268,25 +1268,25 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(karnov_state,karnov)
+void karnov_state::init_karnov()
 {
 	m_microcontroller_id = KARNOV;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,karnovj)
+void karnov_state::init_karnovj()
 {
 	m_microcontroller_id = KARNOVJ;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
+void karnov_state::init_wndrplnt()
 {
 	m_microcontroller_id = WNDRPLNT;
 	m_coin_mask = 0x00;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnov)
+void karnov_state::init_chelnov()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1295,7 +1295,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovu)
+void karnov_state::init_chelnovu()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1304,7 +1304,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovj)
+void karnov_state::init_chelnovj()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 

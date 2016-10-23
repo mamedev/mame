@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(sidepckt);
-	DECLARE_DRIVER_INIT(sidepcktj);
+	void init_sidepckt();
+	void init_sidepcktj();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

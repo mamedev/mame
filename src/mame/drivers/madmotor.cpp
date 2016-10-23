@@ -336,7 +336,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(madmotor_state,madmotor)
+void madmotor_state::init_madmotor()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;

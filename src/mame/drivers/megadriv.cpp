@@ -247,7 +247,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(md_cons_state, md_common)
+void md_cons_state::machine_start_md_common()
 {
 	static const char *const pad6names[2][4] = {
 		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
@@ -314,9 +314,9 @@ void md_cons_state::install_tmss()
 
 }
 
-MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
+void md_cons_state::machine_start_ms_megadriv()
 {
-	MACHINE_START_CALL_MEMBER( md_common );
+	machine_start_md_common();
 
 	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
 	if (m_cart->get_type() == SEGA_SVP)
@@ -334,19 +334,19 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 
 }
 
-MACHINE_START_MEMBER(md_cons_state, ms_megacd)
+void md_cons_state::machine_start_ms_megacd()
 {
-	MACHINE_START_CALL_MEMBER( md_common );
+	machine_start_md_common();
 
 	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for,
 	// at least when reading wordram? we might need to check what mode we're in the DMA...
 	m_vdp->set_dma_delay(2);
 }
 
-MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
+void md_cons_state::machine_reset_ms_megadriv()
 {
 	m_maincpu->reset();
-	MACHINE_RESET_CALL_MEMBER( megadriv );
+	machine_reset_megadriv();
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
 	if (m_32x)
@@ -450,16 +450,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(md_cons_state, mess_md_common)
+void md_cons_state::init_mess_md_common()
 {
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_cons_state::mess_md_io_read_data_port),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_cons_state::mess_md_io_write_data_port),this);
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, genesis)
+void md_cons_state::init_genesis()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -478,10 +478,10 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_eur)
+void md_cons_state::init_md_eur()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -500,10 +500,10 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
+void md_cons_state::init_md_jpn()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	if (m_32x)
 	{

@@ -204,7 +204,7 @@ public:
 
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
-	DECLARE_DRIVER_INIT(kenseim);
+	void init_kenseim();
 
 	// certain
 
@@ -684,11 +684,11 @@ ROM_START( kenseim )
 	ROM_LOAD( "kensei_mogura_ver1.0.u2", 0x00000, 0x08000, CRC(725cfcfc) SHA1(5a4c6e6efe2ddb38bec3218e55a746ea0146209f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(kenseim_state,kenseim)
+void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 
 	m_led_serial_data = 0;
 	m_led_clock = 0;

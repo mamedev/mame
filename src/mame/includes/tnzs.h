@@ -116,21 +116,21 @@ public:
 
 	SAMPLES_START_CB_MEMBER(kageki_init_samples);
 
-	DECLARE_DRIVER_INIT(arknoid2);
-	DECLARE_DRIVER_INIT(extrmatn);
-	DECLARE_DRIVER_INIT(drtoppel);
-	DECLARE_DRIVER_INIT(kabukiz);
-	DECLARE_DRIVER_INIT(plumpop);
-	DECLARE_DRIVER_INIT(insectx);
-	DECLARE_DRIVER_INIT(tnzs);
-	DECLARE_DRIVER_INIT(kageki);
-	DECLARE_DRIVER_INIT(chukatai);
-	DECLARE_DRIVER_INIT(tnzsb);
-	DECLARE_MACHINE_START(tnzs);
-	DECLARE_MACHINE_RESET(tnzs);
+	void init_arknoid2();
+	void init_extrmatn();
+	void init_drtoppel();
+	void init_kabukiz();
+	void init_plumpop();
+	void init_insectx();
+	void init_tnzs();
+	void init_kageki();
+	void init_chukatai();
+	void init_tnzsb();
+	void machine_start_tnzs();
+	void machine_reset_tnzs();
 	DECLARE_PALETTE_INIT(arknoid2);
-	DECLARE_MACHINE_START(tnzs_common);
-	DECLARE_MACHINE_RESET(jpopnics);
+	void machine_start_tnzs_common();
+	void machine_reset_jpopnics();
 
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tnzs(screen_device &screen, bool state);

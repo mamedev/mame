@@ -41,7 +41,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<decocomn_device> m_decocomn;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
-	DECLARE_DRIVER_INIT(dietgo);
+	void init_dietgo();
 	virtual void machine_start() override;
 	uint32_t screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);

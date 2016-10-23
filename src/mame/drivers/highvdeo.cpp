@@ -143,10 +143,10 @@ public:
 	DECLARE_READ16_MEMBER(tv_oki6376_r);
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_w);
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
-	DECLARE_DRIVER_INIT(fashion);
-	DECLARE_DRIVER_INIT(ciclone);
-	DECLARE_DRIVER_INIT(record);
-	DECLARE_VIDEO_START(tourvisn);
+	void init_fashion();
+	void init_ciclone();
+	void init_record();
+	void video_start_tourvisn();
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -159,7 +159,7 @@ public:
 
 
 
-VIDEO_START_MEMBER(highvdeo_state,tourvisn)
+void highvdeo_state::video_start_tourvisn()
 {
 }
 
@@ -1508,7 +1508,7 @@ READ16_MEMBER(highvdeo_state::ciclone_status_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(highvdeo_state,ciclone)
+void highvdeo_state::init_ciclone()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::ciclone_status_r), this));
 }
@@ -1579,7 +1579,7 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(highvdeo_state,fashion)
+void highvdeo_state::init_fashion()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x0002, 0x0003, write16_delegate(FUNC(highvdeo_state::fashion_output_w), this));
 }
@@ -1635,7 +1635,7 @@ READ16_MEMBER(highvdeo_state::record_status_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(highvdeo_state, record)
+void highvdeo_state::init_record()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::record_status_r), this));
 }

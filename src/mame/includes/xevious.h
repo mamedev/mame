@@ -26,15 +26,15 @@ public:
 	optional_device<samples_device> m_samples;
 
 	int32_t m_xevious_bs[2];
-	DECLARE_DRIVER_INIT(xevious);
-	DECLARE_DRIVER_INIT(xevios);
-	DECLARE_DRIVER_INIT(battles);
+	void init_xevious();
+	void init_xevios();
+	void init_battles();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_VIDEO_START(xevious);
+	void video_start_xevious();
 	DECLARE_PALETTE_INIT(xevious);
-	DECLARE_MACHINE_RESET(xevios);
-	DECLARE_MACHINE_RESET(battles);
+	void machine_reset_xevios();
+	void machine_reset_battles();
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(battles_nmi_generate);

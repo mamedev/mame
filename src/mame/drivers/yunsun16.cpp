@@ -149,7 +149,7 @@ number 0 on each voice. That sample is 00000-00000.
 	}
 }
 
-DRIVER_INIT_MEMBER(yunsun16_state,magicbub)
+void yunsun16_state::init_magicbub()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x800180, 0x800181);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800188, 0x800189, write16_delegate(FUNC(yunsun16_state::magicbub_sound_command_w), this));
@@ -567,14 +567,14 @@ void yunsun16_state::machine_reset()
 	m_sprites_scrolldy = -0x0f;
 }
 
-MACHINE_START_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_start_shocking()
 {
 	machine_start();
 	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
 	membank("okibank")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_reset_shocking()
 {
 	machine_reset();
 	membank("okibank")->set_entry(0);

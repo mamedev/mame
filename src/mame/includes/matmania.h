@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(matmania);
-	DECLARE_MACHINE_START(maniach);
-	DECLARE_MACHINE_RESET(maniach);
+	void machine_start_maniach();
+	void machine_reset_maniach();
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

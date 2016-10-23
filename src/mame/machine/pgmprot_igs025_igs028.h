@@ -19,8 +19,8 @@ public:
 
 	void igs025_to_igs028_callback( void );
 
-	DECLARE_DRIVER_INIT(olds);
-	DECLARE_MACHINE_RESET(olds);
+	void init_olds();
+	void machine_reset_olds();
 };
 
 MACHINE_CONFIG_EXTERN( pgm_028_025_ol );

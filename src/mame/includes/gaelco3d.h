@@ -135,12 +135,12 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
 	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
-	DECLARE_DRIVER_INIT(gaelco3d);
+	void init_gaelco3d();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(gaelco3d2);
-	DECLARE_MACHINE_RESET(common);
+	void machine_reset_gaelco3d2();
+	void machine_reset_common();
 	uint32_t screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);

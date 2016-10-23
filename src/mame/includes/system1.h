@@ -89,30 +89,30 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 
-	DECLARE_DRIVER_INIT(bank00);
-	DECLARE_DRIVER_INIT(bank0c);
-	DECLARE_DRIVER_INIT(bank44);
+	void init_bank00();
+	void init_bank0c();
+	void init_bank44();
 
-	DECLARE_DRIVER_INIT(nobb);
-	DECLARE_DRIVER_INIT(dakkochn);
-	DECLARE_DRIVER_INIT(bootleg);
-	DECLARE_DRIVER_INIT(shtngmst);
-	DECLARE_DRIVER_INIT(blockgal);
-	DECLARE_DRIVER_INIT(nob);
-	DECLARE_DRIVER_INIT(myherok);
-	DECLARE_DRIVER_INIT(ufosensi);
-	DECLARE_DRIVER_INIT(wbml);
-	DECLARE_DRIVER_INIT(bootsys2);
-	DECLARE_DRIVER_INIT(bootsys2d);
-	DECLARE_DRIVER_INIT(choplift);
+	void init_nobb();
+	void init_dakkochn();
+	void init_bootleg();
+	void init_shtngmst();
+	void init_blockgal();
+	void init_nob();
+	void init_myherok();
+	void init_ufosensi();
+	void init_wbml();
+	void init_bootsys2();
+	void init_bootsys2d();
+	void init_choplift();
 
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(system2);
-	DECLARE_VIDEO_START(system2);
-	DECLARE_MACHINE_START(myherok);
+	void machine_start_system2();
+	void video_start_system2();
+	void machine_start_myherok();
 	uint32_t screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

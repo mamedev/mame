@@ -34,7 +34,7 @@ public:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	DECLARE_DRIVER_INIT(hp49gp);
+	void init_hp49gp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
+void hp49gp_state::init_hp49gp()
 {
 	uint8_t *rom = (uint8_t *)memregion( "maincpu")->base();
 	memcpy( m_steppingstone, rom, 1024);

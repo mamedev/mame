@@ -1126,7 +1126,7 @@ static GFXDECODE_START( lemnangl )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(homedata_state,homedata)
+void homedata_state::machine_start_homedata()
 {
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));
@@ -1139,14 +1139,14 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 	save_item(NAME(m_snd_command));
 }
 
-MACHINE_START_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_start_reikaids()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1155,14 +1155,14 @@ MACHINE_START_MEMBER(homedata_state,reikaids)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_start_pteacher()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1172,7 +1172,7 @@ MACHINE_START_MEMBER(homedata_state,pteacher)
 	save_item(NAME(m_from_cpu));
 }
 
-MACHINE_RESET_MEMBER(homedata_state,homedata)
+void homedata_state::machine_reset_homedata()
 {
 	m_visible_page = 0;
 	m_flipscreen = 0;
@@ -1188,14 +1188,14 @@ MACHINE_RESET_MEMBER(homedata_state,homedata)
 	m_snd_command = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_reset_pteacher()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_upd7807_porta = 0;
 	m_gfx_bank[0] = 0;
@@ -1204,14 +1204,14 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 	m_from_cpu = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_reset_reikaids()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_reikaids_which = m_priority;  // m_priority is set in DRIVER_INIT
 	m_upd7807_porta = 0;
@@ -2007,7 +2007,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(homedata_state,jogakuen)
+void homedata_state::init_jogakuen()
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
 	   but with just these two addresses swapped. Instead of creating a new
@@ -2016,24 +2016,24 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mjikaga)
+void homedata_state::init_mjikaga()
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::init_reikaids()
 {
 	m_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(homedata_state,battlcry)
+void homedata_state::init_battlcry()
 {
 	m_priority = 1; /* priority and initial value for bank write */
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::init_mirderby()
 {
 }
 

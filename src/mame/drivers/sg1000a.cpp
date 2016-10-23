@@ -130,7 +130,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
-	DECLARE_DRIVER_INIT(sg1000a);
+	void init_sg1000a();
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };
@@ -326,7 +326,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
+void sg1000a_state::init_sg1000a()
 {
 }
 

@@ -68,21 +68,21 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	DECLARE_DRIVER_INIT(kyuhito);
-	DECLARE_DRIVER_INIT(idhimitu);
-	DECLARE_DRIVER_INIT(kaguya2);
-	DECLARE_DRIVER_INIT(mjcamera);
-	DECLARE_DRIVER_INIT(kanatuen);
-	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
+	void init_kyuhito();
+	void init_idhimitu();
+	void init_kaguya2();
+	void init_mjcamera();
+	void init_kanatuen();
+	void video_start_mbmj8688_pure_12bit();
 	DECLARE_PALETTE_INIT(mbmj8688_12bit);
-	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
+	void video_start_mbmj8688_pure_16bit_LCD();
 	DECLARE_PALETTE_INIT(mbmj8688_16bit);
 	DECLARE_PALETTE_INIT(mbmj8688_lcd);
-	DECLARE_VIDEO_START(mbmj8688_8bit);
+	void video_start_mbmj8688_8bit();
 	DECLARE_PALETTE_INIT(mbmj8688_8bit);
-	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
-	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
-	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
+	void video_start_mbmj8688_hybrid_16bit();
+	void video_start_mbmj8688_hybrid_12bit();
+	void video_start_mbmj8688_pure_16bit();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip();

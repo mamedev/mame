@@ -487,14 +487,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 		if (!m_irq4_disabled) m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(pgm_state,pgm)
+void pgm_state::machine_start_pgm()
 {
 //  machine().base_datetime(m_systime);
 
 	m_ics = machine().device("ics");
 }
 
-MACHINE_RESET_MEMBER(pgm_state,pgm)
+void pgm_state::machine_reset_pgm()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
@@ -4508,7 +4508,7 @@ void pgm_state::pgm_basic_init( bool set_bank)
 	m_rowscrollram = &m_videoram[0x7000/2];
 }
 
-DRIVER_INIT_MEMBER(pgm_state,pgm)
+void pgm_state::init_pgm()
 {
 	pgm_basic_init();
 }

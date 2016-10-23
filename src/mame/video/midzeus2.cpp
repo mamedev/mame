@@ -272,7 +272,7 @@ TIMER_CALLBACK_MEMBER(midzeus2_state::int_timer_callback)
 }
 
 
-VIDEO_START_MEMBER(midzeus2_state,midzeus2)
+void midzeus2_state::video_start_midzeus2()
 {
 	/* allocate memory for "wave" RAM */
 	waveram[0] = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);

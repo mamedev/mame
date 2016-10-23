@@ -149,7 +149,7 @@ static INPUT_PORTS_START( wpc_flip1 )
 	PORT_DIPSETTING(0xf0,"USA 2")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(wpc_flip1_state,wpc_flip1)
+void wpc_flip1_state::init_wpc_flip1()
 {
 	wpc_dot_state::init_wpc_dot();
 }

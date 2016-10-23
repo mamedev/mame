@@ -121,7 +121,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	DECLARE_DRIVER_INIT(jackie);
+	void init_jackie();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -563,7 +563,7 @@ static GFXDECODE_START( jackie )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(jackie_state,jackie)
+void jackie_state::init_jackie()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();

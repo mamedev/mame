@@ -231,7 +231,7 @@ void bzone_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(bzone_state,redbaron)
+void bzone_state::machine_start_redbaron()
 {
 	save_item(NAME(m_analog_data));
 	save_item(NAME(m_rb_input_select));
@@ -860,7 +860,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);

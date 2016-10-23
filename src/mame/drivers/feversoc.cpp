@@ -96,7 +96,7 @@ public:
 	required_shared_ptr<uint32_t> m_spriteram;
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
-	DECLARE_DRIVER_INIT(feversoc);
+	void init_feversoc();
 	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
@@ -319,7 +319,7 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-DRIVER_INIT_MEMBER(feversoc_state,feversoc)
+void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 

@@ -61,11 +61,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
-	DECLARE_DRIVER_INIT(dorodon);
+	void init_dorodon();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
-	DECLARE_MACHINE_START(ladybug);
-	DECLARE_VIDEO_START(ladybug);
+	void machine_start_ladybug();
+	void video_start_ladybug();
 	DECLARE_PALETTE_INIT(ladybug);
 	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

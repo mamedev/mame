@@ -192,7 +192,7 @@ protected:
 
 public:
 	int m_meter;
-	DECLARE_DRIVER_INIT(proconn);
+	void init_proconn();
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_WRITE16_MEMBER(serial_transmit);
@@ -1276,7 +1276,7 @@ ROM_START( pr_trktp )
 	ROM_LOAD( "305a30pn.990", 0x00000, 0x010000, CRC(5448e7d5) SHA1(81414083341364c011ab814a3f57d0831edb3036) )
 ROM_END
 
-DRIVER_INIT_MEMBER(proconn_state,proconn)
+void proconn_state::init_proconn()
 {
 }
 

@@ -6431,24 +6431,24 @@ void galaxian_state::unmap_galaxian_sound(offs_t base)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(galaxian_state,galaxian)
+void galaxian_state::init_galaxian()
 {
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,nolock)
+void galaxian_state::init_nolock()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* same as galaxian... */
-	DRIVER_INIT_CALL(galaxian);
+	init_galaxian();
 
 	/* ...but coin lockout disabled/disconnected */
 	space.unmap_write(0x6002, 0x6002, 0x7f8);
 }
 
-DRIVER_INIT_MEMBER(galaxian_state, warofbugg)
+void galaxian_state::init_warofbugg()
 {
 	uint8_t* romdata = memregion("maincpu")->base();
 	assert(memregion("maincpu")->bytes() == 0x4000);
@@ -6459,12 +6459,12 @@ DRIVER_INIT_MEMBER(galaxian_state, warofbugg)
 	for (int i = 0; i < 0x4000; i++)
 		romdata[i] = buf[i^0x7ff];
 
-	DRIVER_INIT_CALL(nolock);
+	init_nolock();
 
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,azurian)
+void galaxian_state::init_azurian()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6476,7 +6476,7 @@ DRIVER_INIT_MEMBER(galaxian_state,azurian)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
+void galaxian_state::init_gmgalax()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6493,7 +6493,7 @@ DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,pisces)
+void galaxian_state::init_pisces()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6505,7 +6505,7 @@ DRIVER_INIT_MEMBER(galaxian_state,pisces)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,batman2)
+void galaxian_state::init_batman2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6517,7 +6517,7 @@ DRIVER_INIT_MEMBER(galaxian_state,batman2)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,frogg)
+void galaxian_state::init_frogg()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6536,7 +6536,7 @@ DRIVER_INIT_MEMBER(galaxian_state,frogg)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(galaxian_state,mooncrst)
+void galaxian_state::init_mooncrst()
 {
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
@@ -6546,14 +6546,14 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrst)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,mooncrsu)
+void galaxian_state::init_mooncrsu()
 {
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
+void galaxian_state::init_mooncrgx()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6565,7 +6565,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,moonqsr)
+void galaxian_state::init_moonqsr()
 {
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::moonqsr_extend_tile_info, &galaxian_state::moonqsr_extend_sprite_info);
@@ -6579,12 +6579,12 @@ WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
 //  printf("artic_gfxbank_w %02x\n",data);
 }
 
-DRIVER_INIT_MEMBER(galaxian_state,pacmanbl)
+void galaxian_state::init_pacmanbl()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* same as galaxian... */
-	DRIVER_INIT_CALL(galaxian);
+	init_galaxian();
 
 	/* ...but coin lockout disabled/disconnected */
 	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),this));
@@ -6639,7 +6639,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	PALETTE_INIT_NAME(galaxian)(*m_palette);
 }
 
-DRIVER_INIT_MEMBER(galaxian_state,tenspot)
+void galaxian_state::init_tenspot()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6653,7 +6653,7 @@ DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 	//space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
 
 
-	DRIVER_INIT_CALL(galaxian);
+	init_galaxian();
 
 	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),this));
 
@@ -6666,7 +6666,7 @@ DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 
 
 
-DRIVER_INIT_MEMBER(galaxian_state,devilfsg)
+void galaxian_state::init_devilfsg()
 {
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
@@ -6676,7 +6676,7 @@ DRIVER_INIT_MEMBER(galaxian_state,devilfsg)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,zigzag)
+void galaxian_state::init_zigzag()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6713,14 +6713,14 @@ DRIVER_INIT_MEMBER(galaxian_state,zigzag)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,jumpbug)
+void galaxian_state::init_jumpbug()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::jumpbug_draw_background, &galaxian_state::jumpbug_extend_tile_info, &galaxian_state::jumpbug_extend_sprite_info);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,checkman)
+void galaxian_state::init_checkman()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -6740,7 +6740,7 @@ DRIVER_INIT_MEMBER(galaxian_state,checkman)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,checkmaj)
+void galaxian_state::init_checkmaj()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6755,7 +6755,7 @@ DRIVER_INIT_MEMBER(galaxian_state,checkmaj)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,dingo)
+void galaxian_state::init_dingo()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6770,7 +6770,7 @@ DRIVER_INIT_MEMBER(galaxian_state,dingo)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,dingoe)
+void galaxian_state::init_dingoe()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -6792,7 +6792,7 @@ DRIVER_INIT_MEMBER(galaxian_state,dingoe)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,skybase)
+void galaxian_state::init_skybase()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6810,7 +6810,7 @@ DRIVER_INIT_MEMBER(galaxian_state,skybase)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,kong)
+void galaxian_state::init_kong()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6847,7 +6847,7 @@ void galaxian_state::mshuttle_decode(const uint8_t convtable[8][16])
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,mshuttle)
+void galaxian_state::init_mshuttle()
 {
 	static const uint8_t convtable[8][16] =
 	{
@@ -6873,7 +6873,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mshuttle)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,mshuttlj)
+void galaxian_state::init_mshuttlj()
 {
 	static const uint8_t convtable[8][16] =
 	{
@@ -6898,7 +6898,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mshuttlj)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,fantastc)
+void galaxian_state::init_fantastc()
 {
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::upper_extend_sprite_info);
@@ -6931,7 +6931,7 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,timefgtr)
+void galaxian_state::init_timefgtr()
 {
 	/* two sprite generators */
 	m_numspritegens = 2;
@@ -6944,7 +6944,7 @@ DRIVER_INIT_MEMBER(galaxian_state,timefgtr)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,kingball)
+void galaxian_state::init_kingball()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6964,7 +6964,7 @@ DRIVER_INIT_MEMBER(galaxian_state,kingball)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,scorpnmc)
+void galaxian_state::init_scorpnmc()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6985,7 +6985,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpnmc)
 	space.unmap_readwrite(0x8000, 0x87ff);
 }
 
-DRIVER_INIT_MEMBER(galaxian_state,thepitm)
+void galaxian_state::init_thepitm()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -7009,7 +7009,7 @@ DRIVER_INIT_MEMBER(galaxian_state,thepitm)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(galaxian_state,theend)
+void galaxian_state::init_theend()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -7021,14 +7021,14 @@ DRIVER_INIT_MEMBER(galaxian_state,theend)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,scramble)
+void galaxian_state::init_scramble()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,sfx)
+void galaxian_state::init_sfx()
 {
 	/* basic configuration */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::upper_extend_tile_info, nullptr);
@@ -7040,7 +7040,7 @@ DRIVER_INIT_MEMBER(galaxian_state,sfx)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,atlantis)
+void galaxian_state::init_atlantis()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -7057,7 +7057,7 @@ DRIVER_INIT_MEMBER(galaxian_state,atlantis)
 
 
 
-DRIVER_INIT_MEMBER(galaxian_state,scobra)
+void galaxian_state::init_scobra()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
@@ -7065,7 +7065,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scobra)
 
 
 
-DRIVER_INIT_MEMBER(galaxian_state,scobrae)
+void galaxian_state::init_scobrae()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int offs;
@@ -7093,7 +7093,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scobrae)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,losttomb)
+void galaxian_state::init_losttomb()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
@@ -7103,7 +7103,7 @@ DRIVER_INIT_MEMBER(galaxian_state,losttomb)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,frogger)
+void galaxian_state::init_frogger()
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
@@ -7115,14 +7115,14 @@ DRIVER_INIT_MEMBER(galaxian_state,frogger)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,quaak)
+void galaxian_state::init_quaak()
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::quaak_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,froggermc)
+void galaxian_state::init_froggermc()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -7140,7 +7140,7 @@ DRIVER_INIT_MEMBER(galaxian_state,froggermc)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,froggers)
+void galaxian_state::init_froggers()
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
@@ -7150,7 +7150,7 @@ DRIVER_INIT_MEMBER(galaxian_state,froggers)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,turtles)
+void galaxian_state::init_turtles()
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::turtles_draw_background, nullptr, nullptr);
@@ -7158,7 +7158,7 @@ DRIVER_INIT_MEMBER(galaxian_state,turtles)
 
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT_MEMBER(galaxian_state,amidar)
+void galaxian_state::init_amidar()
 {
 	/* no existing amidar sets run on Amidar hardware as described by Amidar schematics! */
 	/* video extensions */
@@ -7167,7 +7167,7 @@ DRIVER_INIT_MEMBER(galaxian_state,amidar)
 #endif
 
 
-DRIVER_INIT_MEMBER(galaxian_state,scorpion)
+void galaxian_state::init_scorpion()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -7206,7 +7206,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,anteater)
+void galaxian_state::init_anteater()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::anteater_draw_background, nullptr, nullptr);
@@ -7216,14 +7216,14 @@ DRIVER_INIT_MEMBER(galaxian_state,anteater)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,anteateruk)
+void galaxian_state::init_anteateruk()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::anteater_draw_background, nullptr, nullptr);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,superbon)
+void galaxian_state::init_superbon()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
@@ -7233,14 +7233,14 @@ DRIVER_INIT_MEMBER(galaxian_state,superbon)
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,calipso)
+void galaxian_state::init_calipso()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, &galaxian_state::calipso_extend_sprite_info);
 }
 
 
-DRIVER_INIT_MEMBER(galaxian_state,moonwar)
+void galaxian_state::init_moonwar()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
@@ -7249,17 +7249,17 @@ DRIVER_INIT_MEMBER(galaxian_state,moonwar)
 }
 
 
-DRIVER_INIT_MEMBER( galaxian_state, ghostmun )
+void galaxian_state::init_ghostmun()
 {
 	/* same as Pacmanbl... */
-	DRIVER_INIT_CALL(pacmanbl);
+	init_pacmanbl();
 
 	/* ...but sprite clip limits need to be adjusted */
 	//galaxian_sprite_clip_start = 12; // this adjustment no longer exists
 	//galaxian_sprite_clip_end = 250;
 }
 
-DRIVER_INIT_MEMBER( galaxian_state, froggrs )
+void galaxian_state::init_froggrs()
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
@@ -7271,7 +7271,7 @@ DRIVER_INIT_MEMBER( galaxian_state, froggrs )
 
 
 
-DRIVER_INIT_MEMBER(galaxian_state,jungsub)
+void galaxian_state::init_jungsub()
 {
 	/* todo, decrypt program rom */
 	// seems slightly address dependent based on text strings

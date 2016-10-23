@@ -152,17 +152,17 @@ static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 	}
 };
 
-MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::machine_reset_olds()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 }
 
-DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 

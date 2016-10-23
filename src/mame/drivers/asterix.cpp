@@ -429,7 +429,7 @@ ROM_START( asterixj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(asterix_state,asterix)
+void asterix_state::init_asterix()
 {
 #if 0
 	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;

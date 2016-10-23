@@ -40,14 +40,14 @@ void atarig1_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_start_atarig1()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_which_input));
 }
 
 
-MACHINE_RESET_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_reset_atarig1()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -1283,24 +1283,24 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig1_state,hydra)
+void atarig1_state::init_hydra()
 {
 	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = 0;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,hydrap)
+void atarig1_state::init_hydrap()
 {
 	m_is_pitfight = 0;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfight)
+void atarig1_state::init_pitfight()
 {
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = 1;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
+void atarig1_state::init_pitfightb()
 {
 	pitfightb_cheap_slapstic_init();
 	save_item(NAME(m_bslapstic_bank));

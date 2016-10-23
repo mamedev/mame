@@ -774,17 +774,17 @@ void mag_exzi_protection_hack(cedar_magnet_state* state)
 
 
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
+void cedar_magnet_state::init_mag_time()
 {
 	m_prothack = mag_time_protection_hack;
 }
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
+void cedar_magnet_state::init_mag_xain()
 {
 	m_prothack = mag_xain_protection_hack;
 }
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
+void cedar_magnet_state::init_mag_exzi()
 {
 	m_prothack = mag_exzi_protection_hack;
 }

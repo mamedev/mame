@@ -297,7 +297,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(battlex_state,battlex)
+void battlex_state::init_battlex()
 {
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();

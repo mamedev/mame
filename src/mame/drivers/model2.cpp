@@ -370,13 +370,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[tnum] = 0;
 }
 
-MACHINE_START_MEMBER(model2_state,model2)
+void model2_state::machine_start_model2()
 {
 	m_copro_fifoin_data = make_unique_clear<uint32_t[]>(COPRO_FIFOIN_SIZE);
 	m_copro_fifoout_data = make_unique_clear<uint32_t[]>(COPRO_FIFOOUT_SIZE);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_common)
+void model2_state::machine_reset_model2_common()
 {
 	int i;
 
@@ -405,9 +405,9 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 		m_timers[i]->reset();
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2o)
+void model2_state::machine_reset_model2o()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
+	machine_reset_model2_common();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -415,7 +415,7 @@ MACHINE_RESET_MEMBER(model2_state,model2o)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_scsp)
+void model2_state::machine_reset_model2_scsp()
 {
 	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
 	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
@@ -426,10 +426,10 @@ MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 	m_scsp->set_ram_base(m_soundram);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2)
+void model2_state::machine_reset_model2()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -437,10 +437,10 @@ MACHINE_RESET_MEMBER(model2_state,model2)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2b)
+void model2_state::machine_reset_model2b()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -452,10 +452,10 @@ MACHINE_RESET_MEMBER(model2_state,model2b)
 	m_dsp_type = DSP_TYPE_SHARC;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2c)
+void model2_state::machine_reset_model2c()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -5849,46 +5849,46 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-DRIVER_INIT_MEMBER(model2_state,genprot)
+void model2_state::init_genprot()
 {
 	//std::string key = parameter(":315_5881:key");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,pltkids)
+void model2_state::init_pltkids()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,zerogun)
+void model2_state::init_zerogun()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,daytonam)
+void model2_state::init_daytonam()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,sgt24h)
+void model2_state::init_sgt24h()
 {
-//  DRIVER_INIT_CALL(genprot);
+//  init_genprot();
 
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,doa)
+void model2_state::init_doa()
 {
 	m_0229crypt->install_doa_protection();
 
@@ -5897,12 +5897,12 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 	ROM[0x808/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,rchase2)
+void model2_state::init_rchase2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,srallyc)
+void model2_state::init_srallyc()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),this));
 }

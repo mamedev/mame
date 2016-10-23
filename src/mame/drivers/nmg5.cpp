@@ -280,10 +280,10 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	DECLARE_DRIVER_INIT(prot_val_00);
-	DECLARE_DRIVER_INIT(prot_val_10);
-	DECLARE_DRIVER_INIT(prot_val_20);
-	DECLARE_DRIVER_INIT(prot_val_40);
+	void init_prot_val_00();
+	void init_prot_val_10();
+	void init_prot_val_20();
+	void init_prot_val_40();
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start() override;
@@ -1558,22 +1558,22 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_00)
+void nmg5_state::init_prot_val_00()
 {
 	m_prot_val = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_10)
+void nmg5_state::init_prot_val_10()
 {
 	m_prot_val = 0x10;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_20)
+void nmg5_state::init_prot_val_20()
 {
 	m_prot_val = 0x20;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
+void nmg5_state::init_prot_val_40()
 {
 	m_prot_val = 0x40;
 }

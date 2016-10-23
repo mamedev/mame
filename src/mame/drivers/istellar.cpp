@@ -56,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(z80_2_unknown_read);
 	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
-	DECLARE_DRIVER_INIT(istellar);
+	void init_istellar();
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(istellar);
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -412,7 +412,7 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
 	m_z80_2_nmi_enable = 0;
 

@@ -66,18 +66,18 @@ public:
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(navarone);
-	DECLARE_DRIVER_INIT(geebee);
-	DECLARE_DRIVER_INIT(kaitein);
-	DECLARE_DRIVER_INIT(warpwarp);
-	DECLARE_DRIVER_INIT(sos);
-	DECLARE_DRIVER_INIT(kaitei);
-	DECLARE_DRIVER_INIT(bombbee);
-	DECLARE_VIDEO_START(geebee);
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
+	void video_start_geebee();
 	DECLARE_PALETTE_INIT(geebee);
-	DECLARE_VIDEO_START(warpwarp);
+	void video_start_warpwarp();
 	DECLARE_PALETTE_INIT(warpwarp);
-	DECLARE_VIDEO_START(navarone);
+	void video_start_navarone();
 	DECLARE_PALETTE_INIT(navarone);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

@@ -362,7 +362,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
+void rocnrope_state::init_rocnrope()
 {
 	memregion("maincpu")->base()[0x703d] = 0x98^0x22; // HACK: fix one instruction
 }

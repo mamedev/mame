@@ -102,7 +102,7 @@ public:
 
 	void machine_start() override;
 
-	DECLARE_MACHINE_RESET(tandy1000rl);
+	void machine_reset_tandy1000rl();
 
 	struct
 	{
@@ -376,7 +376,7 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_bank( bank );
 }
 
-MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
+void tandy1000_state::machine_reset_tandy1000rl()
 {
 	m_tandy_bios_bank = 6;
 	tandy1000_set_bios_bank();

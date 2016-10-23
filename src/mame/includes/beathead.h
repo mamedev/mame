@@ -80,6 +80,6 @@ public:
 	DECLARE_WRITE32_MEMBER( finescroll_w );
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
-	DECLARE_DRIVER_INIT(beathead);
+	void init_beathead();
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 };

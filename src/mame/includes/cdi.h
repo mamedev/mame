@@ -104,18 +104,18 @@ public:
 	virtual void machine_start() override { }
 	virtual void video_start() override;
 
-	DECLARE_MACHINE_RESET(cdimono1);
-	DECLARE_MACHINE_RESET(cdimono2);
-	DECLARE_MACHINE_RESET(quizard12);
-	DECLARE_MACHINE_RESET(quizard17);
-	DECLARE_MACHINE_RESET(quizard18);
-	DECLARE_MACHINE_RESET(quizard22);
-	DECLARE_MACHINE_RESET(quizard23);
-	DECLARE_MACHINE_RESET(quizard32);
-	DECLARE_MACHINE_RESET(quizard34);
-	DECLARE_MACHINE_RESET(quizard4r40);
-	DECLARE_MACHINE_RESET(quizard4r41);
-	DECLARE_MACHINE_RESET(quizard4r42);
+	void machine_reset_cdimono1();
+	void machine_reset_cdimono2();
+	void machine_reset_quizard12();
+	void machine_reset_quizard17();
+	void machine_reset_quizard18();
+	void machine_reset_quizard22();
+	void machine_reset_quizard23();
+	void machine_reset_quizard32();
+	void machine_reset_quizard34();
+	void machine_reset_quizard4r40();
+	void machine_reset_quizard4r41();
+	void machine_reset_quizard4r42();
 	DECLARE_READ8_MEMBER(servo_io_r);
 	DECLARE_WRITE8_MEMBER(servo_io_w);
 	DECLARE_READ8_MEMBER(slave_io_r);

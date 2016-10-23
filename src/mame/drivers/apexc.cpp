@@ -33,7 +33,7 @@ public:
 
 	int m_letters;
 	int m_pos;
-	DECLARE_DRIVER_INIT(apexc);
+	void init_apexc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
@@ -727,7 +727,7 @@ enum
 };
 
 /* apexc driver init : builds a font for use by the teletyper */
-DRIVER_INIT_MEMBER(apexc_state,apexc)
+void apexc_state::init_apexc()
 {
 	uint8_t *dst;
 

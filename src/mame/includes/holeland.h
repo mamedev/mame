@@ -43,8 +43,8 @@ public:
 	TILE_GET_INFO_MEMBER(holeland_get_tile_info);
 	TILE_GET_INFO_MEMBER(crzrally_get_tile_info);
 
-	DECLARE_VIDEO_START(holeland);
-	DECLARE_VIDEO_START(crzrally);
+	void video_start_holeland();
+	void video_start_crzrally();
 
 	uint32_t screen_update_holeland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

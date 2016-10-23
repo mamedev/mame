@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state,taitol)
+void taitol_state::video_start_taitol()
 {
 	int i;
 

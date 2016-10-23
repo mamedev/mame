@@ -97,11 +97,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(sb2003);
-	DECLARE_DRIVER_INIT(dynabomb);
-	DECLARE_DRIVER_INIT(legendoh);
-	DECLARE_DRIVER_INIT(spotty);
+	void init_common();
+	void init_sb2003();
+	void init_dynabomb();
+	void init_legendoh();
+	void init_spotty();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
@@ -1106,7 +1106,7 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 	return m_mainram[0x6626c/4];
 }
 
-DRIVER_INIT_MEMBER(limenko_state,common)
+void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
@@ -1115,29 +1115,29 @@ DRIVER_INIT_MEMBER(limenko_state,common)
 	m_spriteram_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(limenko_state,dynabomb)
+void limenko_state::init_dynabomb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(limenko_state,legendoh)
+void limenko_state::init_legendoh()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(limenko_state,sb2003)
+void limenko_state::init_sb2003()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
-DRIVER_INIT_MEMBER(limenko_state,spotty)
+void limenko_state::init_spotty()
 {
 	uint8_t *dst    = memregion("gfx1")->base();
 	uint8_t *src    = memregion("user2")->base();

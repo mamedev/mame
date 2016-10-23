@@ -421,14 +421,14 @@ public:
 	DECLARE_READ8_MEMBER(comm_eeprom_r);
 	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
-	DECLARE_DRIVER_INIT(hornet);
-	DECLARE_DRIVER_INIT(hornet_2board);
-	DECLARE_DRIVER_INIT(gradius4);
-	DECLARE_DRIVER_INIT(nbapbp);
-	DECLARE_DRIVER_INIT(terabrst);
+	void init_hornet();
+	void init_hornet_2board();
+	void init_gradius4();
+	void init_nbapbp();
+	void init_terabrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(hornet_2board);
+	void machine_reset_hornet_2board();
 	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -1293,7 +1293,7 @@ void hornet_state::jamma_jvs_cmd_exec()
 /*****************************************************************************/
 
 
-DRIVER_INIT_MEMBER(hornet_state,hornet)
+void hornet_state::init_hornet()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
@@ -1301,7 +1301,7 @@ DRIVER_INIT_MEMBER(hornet_state,hornet)
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
 }
 
-DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
+void hornet_state::init_hornet_2board()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
@@ -1310,21 +1310,21 @@ DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
 }
 
-DRIVER_INIT_MEMBER(hornet_state, gradius4)
+void hornet_state::init_gradius4()
 {
-	DRIVER_INIT_CALL(hornet);
+	init_hornet();
 	m_dsp->enable_recompiler();
 }
 
-DRIVER_INIT_MEMBER(hornet_state, nbapbp)
+void hornet_state::init_nbapbp()
 {
-	DRIVER_INIT_CALL(hornet);
+	init_hornet();
 	m_dsp->enable_recompiler();
 }
 
-DRIVER_INIT_MEMBER(hornet_state, terabrst)
+void hornet_state::init_terabrst()
 {
-	DRIVER_INIT_CALL(hornet);
+	init_hornet();
 	m_dsp->enable_recompiler();
 }
 

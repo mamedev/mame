@@ -149,7 +149,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_DRIVER_INIT(luckgrln);
+	void init_luckgrln();
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( _7smash, luckgrln )
 	MCFG_CPU_IO_MAP(_7smash_io)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
+void luckgrln_state::init_luckgrln()
 {
 	int i;
 	uint8_t x,v;

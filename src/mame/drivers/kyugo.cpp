@@ -1357,7 +1357,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
+void kyugo_state::init_srdmissn()
 {
 	/* shared RAM is mapped at 0xe000 as well  */
 	m_maincpu->space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);

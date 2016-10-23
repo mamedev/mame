@@ -15,7 +15,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(special_state,special)
+void special_state::init_special()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -144,7 +144,7 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-MACHINE_RESET_MEMBER(special_state,special)
+void special_state::machine_reset_special()
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
@@ -217,12 +217,12 @@ WRITE8_MEMBER( special_state::specimx_select_bank )
 	specimx_set_bank(offset, data);
 }
 
-MACHINE_START_MEMBER(special_state,specimx)
+void special_state::machine_start_specimx()
 {
 	m_drive = 0;
 }
 
-MACHINE_RESET_MEMBER(special_state,specimx)
+void special_state::machine_reset_specimx()
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
 	timer_set(attotime::zero, TIMER_PIT8253_GATES);
@@ -342,14 +342,14 @@ void special_state::erik_set_bank()
 	}
 }
 
-DRIVER_INIT_MEMBER(special_state,erik)
+void special_state::init_erik()
 {
 	m_erik_color_1 = 0;
 	m_erik_color_2 = 0;
 	m_erik_background = 0;
 }
 
-MACHINE_RESET_MEMBER(special_state,erik)
+void special_state::machine_reset_erik()
 {
 	m_RR_register = 0x00;
 	m_RC_register = 0x00;

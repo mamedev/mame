@@ -48,8 +48,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
 
-	DECLARE_DRIVER_INIT(quiz18k);
-	DECLARE_DRIVER_INIT(welltris);
+	void init_quiz18k();
+	void init_welltris();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

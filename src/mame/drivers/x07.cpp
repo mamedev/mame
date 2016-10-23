@@ -1548,7 +1548,7 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)
+void x07_state::init_x07()
 {
 	uint8_t *RAM = memregion("default")->base();
 	uint8_t *GFX = memregion("gfx1")->base();

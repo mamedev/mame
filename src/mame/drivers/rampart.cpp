@@ -62,7 +62,7 @@ void rampart_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(rampart_state,rampart)
+void rampart_state::machine_reset_rampart()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -478,7 +478,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rampart_state,rampart)
+void rampart_state::init_rampart()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

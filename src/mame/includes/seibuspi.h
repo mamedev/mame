@@ -131,10 +131,10 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(spi);
-	DECLARE_MACHINE_RESET(sxx2e);
-	DECLARE_VIDEO_START(ejanhs);
-	DECLARE_VIDEO_START(sys386f);
+	void machine_reset_spi();
+	void machine_reset_sxx2e();
+	void video_start_ejanhs();
+	void video_start_sys386f();
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_midl_tile_info);
@@ -145,16 +145,16 @@ public:
 	void register_video_state();
 	void init_spi_common();
 	void init_sei252();
-	DECLARE_DRIVER_INIT(batlball);
-	DECLARE_DRIVER_INIT(senkyu);
-	DECLARE_DRIVER_INIT(viprp1);
-	DECLARE_DRIVER_INIT(viprp1o);
-	DECLARE_DRIVER_INIT(rdft);
-	DECLARE_DRIVER_INIT(rfjet);
-	DECLARE_DRIVER_INIT(senkyua);
-	DECLARE_DRIVER_INIT(rdft2);
-	DECLARE_DRIVER_INIT(ejanhs);
-	DECLARE_DRIVER_INIT(sys386f);
+	void init_batlball();
+	void init_senkyu();
+	void init_viprp1();
+	void init_viprp1o();
+	void init_rdft();
+	void init_rfjet();
+	void init_senkyua();
+	void init_rdft2();
+	void init_ejanhs();
+	void init_sys386f();
 
 	void text_decrypt(uint8_t *rom);
 	void bg_decrypt(uint8_t *rom, int size);

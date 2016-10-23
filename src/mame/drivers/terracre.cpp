@@ -174,7 +174,7 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 	}
 }
 
-MACHINE_START_MEMBER(terracre_state,amazon)
+void terracre_state::machine_start_amazon()
 {
 	/* set up for save */
 	save_item(NAME(m_mAmazonProtCmd));
@@ -940,17 +940,17 @@ ROM_START( boobhack )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, BAD_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
-DRIVER_INIT_MEMBER(terracre_state,amazon)
+void terracre_state::init_amazon()
 {
 	m_mpProtData = mAmazonProtData;
 }
 
-DRIVER_INIT_MEMBER(terracre_state,amatelas)
+void terracre_state::init_amatelas()
 {
 	m_mpProtData = mAmatelasProtData;
 }
 
-DRIVER_INIT_MEMBER(terracre_state,horekid)
+void terracre_state::init_horekid()
 {
 	m_mpProtData = mHoreKidProtData;
 }

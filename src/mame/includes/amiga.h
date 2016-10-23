@@ -423,8 +423,8 @@ public:
 	int m_aga_sprite_fetched_words;
 	int m_aga_sprite_dma_used_words[8];
 
-	DECLARE_VIDEO_START( amiga );
-	DECLARE_VIDEO_START( amiga_aga );
+	void video_start_amiga();
+	void video_start_amiga_aga();
 	DECLARE_PALETTE_INIT( amiga );
 
 	void render_scanline(bitmap_ind16 &bitmap, int scanline);

@@ -872,15 +872,15 @@ ROM_START( 1943bj )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
 ROM_END
 
-DRIVER_INIT_MEMBER(_1943_state,1943)
+void _1943_state::init_1943()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(_1943_state,1943b)
+void _1943_state::init_1943b()
 {
-	DRIVER_INIT_CALL(1943);
+	init_1943();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 }

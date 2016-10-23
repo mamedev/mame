@@ -125,8 +125,8 @@ public:
 	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
 
-	DECLARE_DRIVER_INIT(skydest);
-	DECLARE_DRIVER_INIT(cyclemb);
+	void init_skydest();
+	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
@@ -1037,13 +1037,13 @@ ROM_START( skydest )
 	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) ) // on daughterboard, _not_ a color prom
 ROM_END
 
-DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
+void cyclemb_state::init_cyclemb()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
 }
 
-DRIVER_INIT_MEMBER(cyclemb_state,skydest)
+void cyclemb_state::init_skydest()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;

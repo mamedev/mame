@@ -116,8 +116,8 @@ public:
 
 	int m_rom_pagesize;
 	uint8_t* m_flash;
-	DECLARE_DRIVER_INIT(touryuu);
-	DECLARE_DRIVER_INIT(bballoon);
+	void init_touryuu();
+	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -758,12 +758,12 @@ ROM_START( touryuu )
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 
-DRIVER_INIT_MEMBER(ghosteo_state,bballoon)
+void ghosteo_state::init_bballoon()
 {
 	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
 }
 
-DRIVER_INIT_MEMBER(ghosteo_state,touryuu)
+void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }

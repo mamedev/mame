@@ -1178,7 +1178,7 @@ ROM_START( wgp2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wgp_state,wgp)
+void wgp_state::init_wgp()
 {
 #if 0
 	/* Patch for coding error that causes corrupt data in
@@ -1188,7 +1188,7 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 #endif
 }
 
-DRIVER_INIT_MEMBER(wgp_state,wgp2)
+void wgp_state::init_wgp2()
 {
 	/* Code patches to prevent failure in memory checks */
 	uint16_t *ROM = (uint16_t *)memregion("sub")->base();

@@ -289,7 +289,7 @@ static const int jumppoints_other[0x100] =
 		-1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-MACHINE_RESET_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_reset_raiga()
 {
 	m_prot = 0;
 	m_jumpcode = 0;
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(gaiden_state,raiga)
 	m_spr_offset_y = 0;
 }
 
-MACHINE_START_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_start_raiga()
 {
 	save_item(NAME(m_prot));
 	save_item(NAME(m_jumpcode));
@@ -1528,14 +1528,14 @@ ROM_START( drgnbowla )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaiden_state,shadoww)
+void gaiden_state::init_shadoww()
 {
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 	m_raiga_jumppoints = jumppoints_00;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,wildfang)
+void gaiden_state::init_wildfang()
 {
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
@@ -1547,7 +1547,7 @@ DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,raiga)
+void gaiden_state::init_raiga()
 {
 	/* sprite size Y independent from sprite size X */
 	m_sprite_sizey = 2;
@@ -1599,14 +1599,14 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
+void gaiden_state::init_drgnbowl()
 {
 	m_raiga_jumppoints = jumppoints_00;
 
 	descramble_drgnbowl(1);
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
+void gaiden_state::init_drgnbowla()
 {
 	m_raiga_jumppoints = jumppoints_00;
 
@@ -1651,12 +1651,12 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,mastninj)
+void gaiden_state::init_mastninj()
 {
 	// rearrange the graphic roms into a format that MAME can decode
 	descramble_mastninj_gfx(memregion("gfx2")->base());
 	descramble_mastninj_gfx(memregion("gfx3")->base());
-	DRIVER_INIT_CALL(shadoww);
+	init_shadoww();
 }
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS

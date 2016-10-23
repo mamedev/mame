@@ -43,9 +43,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 
-	DECLARE_MACHINE_START(toobin);
-	DECLARE_MACHINE_RESET(toobin);
-	DECLARE_VIDEO_START(toobin);
+	void machine_start_toobin();
+	void machine_reset_toobin();
+	void video_start_toobin();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

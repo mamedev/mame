@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	DECLARE_DRIVER_INIT(chanbara);
+	void init_chanbara();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;
@@ -453,7 +453,7 @@ ROM_START( chanbara )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chanbara_state,chanbara)
+void chanbara_state::init_chanbara()
 {
 	uint8_t   *src = memregion("gfx4")->base();
 	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;

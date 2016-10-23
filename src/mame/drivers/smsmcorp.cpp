@@ -247,7 +247,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(sureshot);
+	void machine_start_sureshot();
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -520,7 +520,7 @@ void smsmfg_state::machine_start()
 	save_item(NAME(m_communication_port));
 }
 
-MACHINE_START_MEMBER(smsmfg_state,sureshot)
+void smsmfg_state::machine_start_sureshot()
 {
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));

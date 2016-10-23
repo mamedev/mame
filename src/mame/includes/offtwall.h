@@ -36,12 +36,12 @@ public:
 	DECLARE_READ16_MEMBER(bankrom_r);
 	DECLARE_READ16_MEMBER(spritecache_count_r);
 	DECLARE_READ16_MEMBER(unknown_verify_r);
-	DECLARE_DRIVER_INIT(offtwall);
-	DECLARE_DRIVER_INIT(offtwalc);
+	void init_offtwall();
+	void init_offtwalc();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(offtwall);
-	DECLARE_MACHINE_RESET(offtwall);
-	DECLARE_VIDEO_START(offtwall);
+	void machine_start_offtwall();
+	void machine_reset_offtwall();
+	void video_start_offtwall();
 	uint32_t screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

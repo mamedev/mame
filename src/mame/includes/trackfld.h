@@ -63,21 +63,21 @@ public:
 	DECLARE_READ8_MEMBER(trackfld_speech_r);
 	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
 
-	DECLARE_DRIVER_INIT(trackfld);
-	DECLARE_DRIVER_INIT(atlantol);
-	DECLARE_DRIVER_INIT(wizzquiz);
-	DECLARE_DRIVER_INIT(mastkin);
-	DECLARE_DRIVER_INIT(trackfldnz);
+	void init_trackfld();
+	void init_atlantol();
+	void init_wizzquiz();
+	void init_mastkin();
+	void init_trackfldnz();
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(trackfld);
-	DECLARE_MACHINE_RESET(trackfld);
-	DECLARE_VIDEO_START(trackfld);
+	void machine_start_trackfld();
+	void machine_reset_trackfld();
+	void video_start_trackfld();
 	DECLARE_PALETTE_INIT(trackfld);
-	DECLARE_VIDEO_START(atlantol);
+	void video_start_atlantol();
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);

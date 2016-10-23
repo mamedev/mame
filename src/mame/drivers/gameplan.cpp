@@ -931,7 +931,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gameplan_state,gameplan)
+void gameplan_state::machine_start_gameplan()
 {
 	/* register for save states */
 	save_item(NAME(m_current_port));
@@ -945,7 +945,7 @@ MACHINE_START_MEMBER(gameplan_state,gameplan)
 }
 
 
-MACHINE_RESET_MEMBER(gameplan_state,gameplan)
+void gameplan_state::machine_reset_gameplan()
 {
 	m_current_port = 0;
 	m_video_x = 0;

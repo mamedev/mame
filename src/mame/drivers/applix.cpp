@@ -128,7 +128,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	DECLARE_DRIVER_INIT(applix);
+	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -926,7 +926,7 @@ ROM_START( applix )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(applix_state, applix)
+void applix_state::init_applix()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);

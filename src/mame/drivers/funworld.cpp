@@ -2948,13 +2948,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_start_lunapark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_reset_lunapark()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -6020,7 +6020,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(funworld_state, tabblue)
+void funworld_state::init_tabblue()
 {
 /****************************************************************************************************
 
@@ -6058,7 +6058,7 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2b)
+void funworld_state::init_magicd2b()
 /*****************************************************************
 
   For a serie of Mexican Rockwell's 65c02
@@ -6079,7 +6079,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2c)
+void funworld_state::init_magicd2c()
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
@@ -6101,7 +6101,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, mongolnw)
+void funworld_state::init_mongolnw()
 {
 /* temporary patch to avoid hardware errors for debug purposes */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -6113,7 +6113,7 @@ DRIVER_INIT_MEMBER(funworld_state, mongolnw)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, soccernw)
+void funworld_state::init_soccernw()
 {
 /* temporary patch to avoid hardware errors for debug purposes */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -6127,7 +6127,7 @@ DRIVER_INIT_MEMBER(funworld_state, soccernw)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, saloon)
+void funworld_state::init_saloon()
 /*************************************************
 
     LEOPARDO 5 Hardware
@@ -6236,7 +6236,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, multiwin)
+void funworld_state::init_multiwin()
 /*****************************************************
 
   This only decrypt the text strings.
@@ -6264,7 +6264,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, royalcdc)
+void funworld_state::init_royalcdc()
 {
 /*****************************************************
 
@@ -6315,7 +6315,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, dino4)
+void funworld_state::init_dino4()
 /*****************************************************
 
   DINO 4 hardware.
@@ -6387,7 +6387,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, ctunk)
+void funworld_state::init_ctunk()
 /*********************************************************
 
   CTUNK: Rare board with blue TAB board encryption scheme
@@ -6588,7 +6588,7 @@ static uint8_t rcdino4_keys80[] =
 	0x06, 0x1e, 0x28, 0x5a, 0xcf, 0x79, 0x11
 };
 
-DRIVER_INIT_MEMBER(funworld_state, rcdino4)
+void funworld_state::init_rcdino4()
 /*****************************************************
 
   Dino4 hardware with CPU+PLCC daughterboard
@@ -6726,7 +6726,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 	while (1);
 }
 
-DRIVER_INIT_MEMBER(funworld_state, rcdinch)
+void funworld_state::init_rcdinch()
 /*****************************************************
 
   Dino4 hardware with CPU+PLCC daughterboard

@@ -359,7 +359,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ginganin_state,ginganin)
+void ginganin_state::init_ginganin()
 {
 	uint16_t *rom;
 
