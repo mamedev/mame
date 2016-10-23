@@ -258,7 +258,7 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 		m_palette->set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
 		break;
 	case 0x020:
-		m_palette->set_pen_color(1, rgb_t::white);
+		m_palette->set_pen_color(1, rgb_t::white());
 		break;
 	default:
 		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
@@ -323,7 +323,7 @@ WRITE8_MEMBER( generic_terminal_device::kbd_put )
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( generic_terminal )
-	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white)
+	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)

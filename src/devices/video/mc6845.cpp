@@ -1501,7 +1501,7 @@ machine_config_constructor mos8563_device::device_mconfig_additions() const
 // VICE palette
 PALETTE_INIT_MEMBER(mos8563_device, mos8563)
 {
-	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
 	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
 	palette.set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
@@ -1516,7 +1516,7 @@ PALETTE_INIT_MEMBER(mos8563_device, mos8563)
 	palette.set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
 	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
 	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
-	palette.set_pen_color(15, rgb_t::white);
+	palette.set_pen_color(15, rgb_t::white());
 }
 
 

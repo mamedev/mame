@@ -504,8 +504,8 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 static const rgb_t apexc_palette[] =
 {
-	rgb_t::white,
-	rgb_t::black,
+	rgb_t::white(),
+	rgb_t::black(),
 	rgb_t(255, 0, 0),
 	rgb_t(50, 0, 0)
 };

@@ -20,7 +20,7 @@ uint32_t mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rg
 	while (1)
 	{
 		/* plot the current pixel */
-		pen_t pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+		pen_t pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		/* next pixel */
@@ -35,7 +35,7 @@ uint32_t mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rg
 
 			for (i = 0; i < 4; i++)
 			{
-				pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
@@ -122,7 +122,7 @@ uint32_t mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rg
 	{
 		/* plot the current pixel */
 		uint8_t bit = video_data & 0x01;
-		pen_t pen = bit ? rgb_t::white : rgb_t::black;
+		pen_t pen = bit ? rgb_t::white() : rgb_t::black();
 
 		/* possibly draw trench in the background, top of trench first */
 		if (!(width & 0x80) && draw_trench)
@@ -172,11 +172,11 @@ uint32_t mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rg
 			for (i = 0; i < 4; i++)
 			{
 				if(video_data & 0x01)
-					pen = rgb_t::white;
+					pen = rgb_t::white();
 				else if(m_spcenctr_brightness)
 					pen = rgb_t(m_spcenctr_brightness, m_spcenctr_brightness, m_spcenctr_brightness);
 				else
-					pen = rgb_t::black;
+					pen = rgb_t::black();
 
 				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
@@ -278,7 +278,7 @@ uint32_t mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rg
 		if ((bit == 0) && (cloud_data & 0x01))
 			pen = PHANTOM2_RGB32_CLOUD_PEN;
 		else
-			pen = bit ? rgb_t::white : rgb_t::black;
+			pen = bit ? rgb_t::white() : rgb_t::black();
 
 		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
@@ -313,7 +313,7 @@ uint32_t mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rg
 
 			for (i = 0; i < 4; i++)
 			{
-				pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
@@ -377,7 +377,7 @@ uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rg
 	while (1)
 	{
 		/* plot the current pixel */
-		pen_t pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+		pen_t pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
 		if (flip)
 			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
@@ -396,7 +396,7 @@ uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rg
 
 			for (i = 0; i < 4; i++)
 			{
-				pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
 				if (flip)
 					bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;

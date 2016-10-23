@@ -187,7 +187,7 @@ uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb3
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data >> 1;

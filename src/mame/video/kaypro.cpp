@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(kaypro_state,kaypro)
 {
-	palette.set_pen_color(0, rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0, 220, 0)); /* green */
 	palette.set_pen_color(2, rgb_t(0, 110, 0)); /* low intensity green */
 }

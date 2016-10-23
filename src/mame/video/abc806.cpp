@@ -398,7 +398,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
+				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black()))
 				{
 					bitmap.pix32(y, x) = pen[(dot >> 12) & 0x07];
 				}
@@ -451,7 +451,7 @@ void abc806_state::video_start()
 uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!m_txoff)
 	{

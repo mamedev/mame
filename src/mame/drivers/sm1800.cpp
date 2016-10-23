@@ -127,9 +127,9 @@ READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
 
 PALETTE_INIT_MEMBER(sm1800_state, sm1800)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white
-	palette.set_pen_color(2, rgb_t::white); // highlight
+	palette.set_pen_color(2, rgb_t::white()); // highlight
 }
 
 

@@ -243,7 +243,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( btm2105, electron )
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_COLOR(rgb_t::amber)
+	MCFG_SCREEN_COLOR(rgb_t::amber())
 
 	/* expansion port */
 	MCFG_DEVICE_MODIFY("exp")

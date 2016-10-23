@@ -287,7 +287,7 @@ PALETTE_INIT_MEMBER(mgames_state, mgames)
 		if (i & 0x01)
 			color = rgb_t(pal2bit((i & 0x6) >> 1), pal2bit((i & 0x18) >> 3), pal2bit((i & 0x60) >> 5));
 		else
-			color = rgb_t::black;
+			color = rgb_t::black();
 
 		palette.set_pen_color(i, color);
 	}

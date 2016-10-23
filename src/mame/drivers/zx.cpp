@@ -306,14 +306,14 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(zx_state, zx)
 {
-	palette.set_pen_color(0,rgb_t::white); /* white */
-	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t::white());
+	palette.set_pen_color(1, rgb_t::black());
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette.set_pen_color(0,rgb_t(64, 244, 244)); /* cyan */
-	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t(64, 244, 244)); /* cyan */
+	palette.set_pen_color(1, rgb_t::black());
 }
 
 static MACHINE_CONFIG_START( zx80, zx_state )

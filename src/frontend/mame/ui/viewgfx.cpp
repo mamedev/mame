@@ -423,7 +423,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, ch);
 		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
 
@@ -433,12 +433,12 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, "0123456789ABCDEF"[x & 0xf]);
+		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		// if we're skipping, draw a point between the character and the box to indicate which
 		// one it's referring to
 		if (skip != 0)
-			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, rgb_t::white, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	// draw the side column headers
@@ -455,14 +455,14 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
 			sprintf(buffer, "%5X", state.palette.offset + y * state.palette.columns);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, mui.machine().render().ui_aspect(), buffer[x]);
-				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, buffer[x]);
+				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, buffer[x]);
 			}
 		}
 
@@ -717,7 +717,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, ch);
 		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
 
@@ -727,12 +727,12 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, "0123456789ABCDEF"[x & 0xf]);
+		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		// if we're skipping, draw a point between the character and the box to indicate which
 		// one it's referring to
 		if (skip != 0)
-			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, rgb_t::white, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	// draw the side column headers
@@ -749,14 +749,14 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
 			sprintf(buffer, "%5X", info.offset[set] + y * xcells);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, mui.machine().render().ui_aspect(), buffer[x]);
-				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, buffer[x]);
+				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, buffer[x]);
 			}
 		}
 
@@ -765,7 +765,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 
 	// add the final quad
 	container.add_quad(cellboxbounds.x0, cellboxbounds.y0, cellboxbounds.x1, cellboxbounds.y1,
-						rgb_t::white, state.texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+						rgb_t::white(), state.texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// handle keyboard navigation before drawing
 	gfxset_handle_keys(mui.machine(), state, xcells, ycells);
@@ -1122,7 +1122,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (auto ch : title)
 	{
-		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white, *ui_font, ch);
+		container.add_char(x0, y0, chheight, mui.machine().render().ui_aspect(), rgb_t::white(), *ui_font, ch);
 		x0 += ui_font->char_width(chheight, mui.machine().render().ui_aspect(), ch);
 	}
 
@@ -1132,7 +1132,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	// add the final quad
 	container.add_quad(mapboxbounds.x0, mapboxbounds.y0,
 						mapboxbounds.x1, mapboxbounds.y1,
-						rgb_t::white, state.texture,
+						rgb_t::white(), state.texture,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state.tilemap.rotate));
 
 	// handle keyboard input

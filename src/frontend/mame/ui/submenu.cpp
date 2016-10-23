@@ -426,7 +426,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	float width;
 
 	ui().draw_text_full(container(), _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 
@@ -454,7 +454,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 		if (selected_sm_option.entry != nullptr)
 		{
 			ui().draw_text_full(container(), selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+					mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
 			maxwidth = std::max(origx2 - origx1, width);

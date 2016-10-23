@@ -2771,7 +2771,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp3))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

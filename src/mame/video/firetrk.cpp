@@ -28,10 +28,10 @@ PALETTE_INIT_MEMBER(firetrk_state, firetrk)
 	};
 	static const rgb_t palette_source[] =
 	{
-		rgb_t::black,
+		rgb_t::black(),
 		rgb_t(0x5b, 0x5b, 0x5b),
 		rgb_t(0xa4, 0xa4, 0xa4),
-		rgb_t::white
+		rgb_t::white()
 	};
 
 	m_color1_mask = m_color2_mask = 0;
@@ -108,8 +108,8 @@ PALETTE_INIT_MEMBER(firetrk_state,montecar)
 		prom_to_palette(i, color_prom[0x100 + colortable_source[i]]);
 	}
 
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 0, rgb_t::black);
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 1, rgb_t::white);
+	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 0, rgb_t::black());
+	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 1, rgb_t::white());
 }
 
 
