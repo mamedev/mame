@@ -9,17 +9,6 @@
 #include "emu.h"
 #include <stdarg.h>
 
-static char *output;
-
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
-
-	va_start(vl, fmt);
-	vsprintf(output, fmt, vl);
-	va_end(vl);
-}
-
 /*****************************************************************************/
 
 
@@ -191,12 +180,10 @@ static const char *regnames[0x40] =
 #define ARC_REGOP_SHIMM     ((op & 0x000001ff) >> 0  ) // aka D
 
 
-CPU_DISASSEMBLE(arc)
+static offs_t internal_disasm_arc(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	op = big_endianize_int32(op);
-
-	output = buffer;
 
 	uint8_t opcode = ARC_OPERATION;
 
@@ -204,21 +191,30 @@ CPU_DISASSEMBLE(arc)
 	{
 		case 0x04: // B
 		case 0x05: // BL
-		print("%s(%s)(%s) %08x", basic[opcode], conditions[ARC_CONDITION], delaytype[ARC_BRANCH_DELAY], (ARC_BRANCH_ADDR<<2)+pc+4);
+		util::stream_format(stream, "%s(%s)(%s) %08x", basic[opcode], conditions[ARC_CONDITION], delaytype[ARC_BRANCH_DELAY], (ARC_BRANCH_ADDR<<2)+pc+4);
 		break;
 
 		case 0x08: // ADD
 		// todo, short / long immediate formats
-		print("%s %s , %s , %s (%08x)", basic[opcode], regnames[ARC_REGOP_DEST], regnames[ARC_REGOP_OP1], regnames[ARC_REGOP_OP2], op &~ 0xfffffe00);
+		util::stream_format(stream, "%s %s , %s , %s (%08x)", basic[opcode], regnames[ARC_REGOP_DEST], regnames[ARC_REGOP_OP1], regnames[ARC_REGOP_OP2], op &~ 0xfffffe00);
 		break;
 
 
 		default:
-		print("%s (%08x)", basic[opcode], op &~ 0xf8000000);
+		util::stream_format(stream, "%s (%08x)", basic[opcode], op &~ 0xf8000000);
 		break;
 	}
 
-
-
 	return 4 | DASMFLAG_SUPPORTED;
 }
+
+
+CPU_DISASSEMBLE(arc)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_arc(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
+}
+
