@@ -637,6 +637,7 @@ uint32_t ie15_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 /* F4 Character Displayer */
+#ifdef UNUSED_DEFINITION
 static const gfx_layout ie15_charlayout =
 {
 	7, 8,                   /* 7x8 pixels in 10x11 cell */
@@ -653,6 +654,7 @@ static const gfx_layout ie15_charlayout =
 static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
+#endif
 
 //PALETTE_INIT_MEMBER( ie15_state, ie15 )
 //{
