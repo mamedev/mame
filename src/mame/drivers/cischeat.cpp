@@ -215,9 +215,9 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
 	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
-		Each board expects reads from the other boards and writes to own bank.
-		Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
-		so it's likely to be the only thing needed. */
+	    Each board expects reads from the other boards and writes to own bank.
+	    Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
+	    so it's likely to be the only thing needed. */
 	AM_RANGE(0x084000, 0x0847ff) AM_RAM                                                 // Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
@@ -359,7 +359,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 		case 1: return ioport("P2Y")->read() | (ioport("P2X")->read()<<8);
 		case 2: return ioport("P1Y")->read() | (ioport("P1X")->read()<<8);
 	}
-	
+
 	return 0xffff;
 }
 
@@ -369,7 +369,7 @@ READ16_MEMBER(cischeat_state::wildplt_mux_r)
 	uint16_t split_in = 0xffff;
 	switch(m_wildplt_output & 0xc)
 	{
-//		case 0: return ioport("IN1")->read();
+//      case 0: return ioport("IN1")->read();
 		case 4: split_in = ioport("IN1_1")->read(); break;
 		case 8: split_in = ioport("IN1_2")->read(); break;
 	}
@@ -405,11 +405,11 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082308, 0x082309) AM_READNOP AM_WRITE(f1gpstar_comms_w)
 	AM_RANGE(0x082400, 0x082401) AM_WRITE(active_layers_w)
 
-//	AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x098000, 0x09ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
-	
+
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
@@ -1416,7 +1416,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( f1gpstr2 )
 	PORT_INCLUDE( f1gpstar )
-	
+
 	PORT_MODIFY("IN4")
 	PORT_DIPNAME( 0x0e, 0x00, "Unit ID" ) PORT_DIPLOCATION("SW03:2,3,4")          // -> !f901c
 	PORT_DIPSETTING(    0x00, "1 (McLaren)" )
@@ -1489,9 +1489,9 @@ static INPUT_PORTS_START( wildplt )
 
 	PORT_START("IN1_1")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW ) 
+	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfff3, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("IN1_2")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Bomb")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -1895,8 +1895,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
 
-//	if(scanline == 69)
-//		m_cpu1->set_input_line(1, HOLD_LINE);
+//  if(scanline == 69)
+//      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 

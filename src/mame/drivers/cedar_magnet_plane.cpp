@@ -59,7 +59,7 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcd_w)
 WRITE8_MEMBER(cedar_magnet_plane_device::plane_portce_w)
 {
 	m_curline = data;
-	
+
 }
 
 WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
@@ -75,17 +75,17 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_plane )
 	MCFG_CPU_VBLANK_INT_DRIVER(":screen", cedar_magnet_board_device,  irq)
 
 	MCFG_DEVICE_ADD("z80pio0", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_plane_device, pio0_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_plane_device, pio0_pa_w))
-//	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_plane_device, pio0_pb_r))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_plane_device, pio0_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_plane_device, pio0_pb_w))
-	
+
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_plane_device, pio1_pa_r))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_plane_device, pio1_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_plane_device, pio1_pa_w))
-//	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_plane_device, pio1_pb_r))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_plane_device, pio1_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_plane_device, pio1_pb_w))
 MACHINE_CONFIG_END
 
@@ -93,7 +93,7 @@ MACHINE_CONFIG_END
 READ8_MEMBER(cedar_magnet_plane_device::pio0_pa_r)
 {
 // this is read
-//	logerror("%s: pio0_pa_r\n", machine().describe_context());
+//  logerror("%s: pio0_pa_r\n", machine().describe_context());
 	return 0x00;
 }
 

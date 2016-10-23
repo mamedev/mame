@@ -1008,7 +1008,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				}
 
 				if (m_snd_3.length == 0 && m_snd_3.length_enabled && !(m_snd_control.cycles & FRAME_CYCLES))
-				{   
+				{
 					tick_length(m_snd_3);
 				}
 			}
@@ -1072,7 +1072,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				}
 
 				if (m_snd_4.length == 0 && m_snd_4.length_enabled && !(m_snd_control.cycles & FRAME_CYCLES))
-				{   
+				{
 					tick_length(m_snd_4);
 				}
 			}
@@ -1162,8 +1162,8 @@ void dmg_apu_device::apu_power_off()
 }
 
 
-void cgb04_apu_device::apu_power_off()            
-{            
+void cgb04_apu_device::apu_power_off()
+{
 	sound_w_internal(NR10, 0x00);
 	m_snd_1.duty = 0;
 	sound_w_internal(NR11, 0x00);
@@ -1172,13 +1172,13 @@ void cgb04_apu_device::apu_power_off()
 	sound_w_internal(NR14, 0x00);
 	m_snd_1.length_counting = false;
 	m_snd_1.sweep_neg_mode_used = false;
-    
+
 	sound_w_internal(NR21, 0x00);
 	sound_w_internal(NR22, 0x00);
 	sound_w_internal(NR23, 0x00);
 	sound_w_internal(NR24, 0x00);
 	m_snd_2.length_counting = false;
-        
+
 	sound_w_internal(NR30, 0x00);
 	sound_w_internal(NR31, 0x00);
 	sound_w_internal(NR32, 0x00);

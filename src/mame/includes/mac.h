@@ -217,7 +217,7 @@ public:
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
 	bool m_main_buffer;
@@ -421,7 +421,7 @@ private:
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<dac_8bit_pwm_device> m_dac;
-	
+
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;

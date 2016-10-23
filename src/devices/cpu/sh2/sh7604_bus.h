@@ -27,12 +27,12 @@
 // ======================> sh7604_bus_device
 
 class sh7604_bus_device : public device_t,
-    					  public device_memory_interface
+						  public device_memory_interface
 {
 public:
 	// construction/destruction
 	sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -61,12 +61,12 @@ protected:
 private:
 	bool m_is_slave;
 	const address_space_config      m_space_config;
-	
+
 	uint16_t m_bcr1;
 	uint16_t m_bcr2;
 	uint16_t m_wcr;
 	uint16_t m_mcr;
- 	uint16_t m_rtcsr;
+	uint16_t m_rtcsr;
 	uint16_t m_rtcor;
 };
 

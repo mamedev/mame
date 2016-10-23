@@ -3489,12 +3489,12 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		   first create a row vector with components (x,y,z,1) then multiply the vector by the matrix
 		    transformed = rowvector * matrix
 		   in direct3d the matrix is stored as the sequence (first digit row, second digit column)
-			11 12 13 14
-			21 22 23 24
-			31 32 33 34
-			41 42 43 44
+		    11 12 13 14
+		    21 22 23 24
+		    31 32 33 34
+		    41 42 43 44
 		   but it is sent transposed as the sequence
-			11 21 31 41 12 22 32 42 13 23 33 43 14 24 34 44
+		    11 21 31 41 12 22 32 42 13 23 33 43 14 24 34 44
 		   so in matrix.modelview[x][y] x is the column and y is the row of the direct3d matrix
 		*/
 		*(uint32_t *)(&matrix.modelview[maddress >> 2][maddress & 3]) = data;

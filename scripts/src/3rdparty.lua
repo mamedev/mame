@@ -1483,14 +1483,14 @@ project "linenoise-ng"
 	kind (LIBTYPE)
 
 	addprojectflags()
-	
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
-	configuration { }	
-	
+	configuration { }
+
 	includedirs {
 		MAME_DIR .. "3rdparty/linenoise-ng/include",
 	}

@@ -572,7 +572,7 @@ static ADDRESS_MAP_START( yutnori_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP
 	AM_RANGE(0x30000e, 0x30000f) AM_READNOP //AM_READ( yutnori_unk_r ) // ??
 
-//	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
+//  AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
 	AM_RANGE(0x400000, 0x400001) AM_NOP
 
 	AM_RANGE(0x500000, 0x5001ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -2013,7 +2013,7 @@ static MACHINE_CONFIG_START( yutnori, snowbros_state )
 	MCFG_CPU_PROGRAM_MAP(yutnori_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-//	MCFG_WATCHDOG_ADD("watchdog") // maybe
+//  MCFG_WATCHDOG_ADD("watchdog") // maybe
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2756,16 +2756,16 @@ ROM_START( yutnori )
 
 	ROM_REGION( 0x4010, "mcu", 0 )    /* PIC code */
 	ROM_LOAD( "pic16c64a-04-p",    0x000000, 0x4010, BAD_DUMP CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) ) // dump seems to be 99% empty, protected, only configuration bytes dumped?
-		
+
 	ROM_REGION( 0x120000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "GRAPHICS_ROM_1",    0x000000, 0x80000, CRC(d4881b49) SHA1(e169b7eca48a0bd66ad55fe21197a4bb491198bb) )
 	ROM_LOAD( "GRAPHICS_ROM_2",    0x080000, 0x80000, CRC(8cd9ce60) SHA1(d1db929ca6128ec2ebe983e6161f200ba421bd31) )
 	ROM_LOAD( "GRAPHICS_ROM_3",    0x100000, 0x20000, CRC(04f7c2ac) SHA1(927fa0f76ff1801845776d47aa5311f485b0b809) )
-	
+
 	ROM_REGION(0x80000, "oki1", 0 ) // 2 banks, 1 large sample in each (music)
 	ROM_LOAD("SOUND ROM", 0x000000, 0x080000, CRC(d24c2e43) SHA1(5c7a130048463558d695857ffc056a95a8072219) )
 
-	ROM_REGION(0x40000, "oki2", 0 ) 
+	ROM_REGION(0x40000, "oki2", 0 )
 	ROM_LOAD("VOICE_ROM", 0x000000, 0x040000, CRC(25e85201) SHA1(6c0001e2942f49b62e1bbf3a68c59abad1e2f94c) )
 ROM_END
 

@@ -1657,7 +1657,7 @@ void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 	// It looks like it's due to a buggy random number generator,
 	// then it possibly happens on the real arcade cabinet too.
 	// I doubt it is protection related, but you can never be sure.
-	// Update 131016: there's also a 5208 VECTOR ERROR happening at worm mid-boss on stage 10, I'm prone to think it's 
+	// Update 131016: there's also a 5208 VECTOR ERROR happening at worm mid-boss on stage 10, I'm prone to think it's
 	// a timing/sprite fault on our side therefore marking as UNEMULATED_PROTECTION until this is resolved. -AS
 	uint8_t *ROM = memregion("maincpu")->base() + offset;
 	ROM[0] = 0xe6;

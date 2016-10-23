@@ -941,7 +941,7 @@ ROM_START( supertr )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "u36.bin", 0x00000, 0x01000, CRC(01f30203) SHA1(b902845af0e4d96446550539596354d9962d78be) )
 
-	ROM_REGION( 0x40000, "questions", 0 ) 
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "q1.rom", 0x00000, 0x08000, NO_DUMP )
 	ROM_LOAD( "q2.rom", 0x08000, 0x08000, NO_DUMP )
 	ROM_LOAD( "q3.rom", 0x10000, 0x08000, NO_DUMP )
@@ -950,7 +950,7 @@ ROM_START( supertr )
 	ROM_LOAD( "q6.rom", 0x28000, 0x08000, NO_DUMP )
 	ROM_LOAD( "q7.rom", 0x30000, 0x08000, NO_DUMP )
 	ROM_LOAD( "q8.rom", 0x38000, 0x08000, NO_DUMP )
-	
+
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */

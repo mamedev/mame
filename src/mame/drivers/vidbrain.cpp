@@ -107,7 +107,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_keylatch, i)) data |= m_io[i]->read();	
+		if (BIT(m_keylatch, i)) data |= m_io[i]->read();
 	}
 
 	if (!m_uv->kbd_r()) data |= m_uv201_31->read();

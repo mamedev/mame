@@ -120,26 +120,26 @@ std::string machine_info::warnings_string()
 		}
 
 		if (m_machine.system().flags & MACHINE_NODEVICE_MICROPHONE )
-			buf << _("This machine has unemulated microphone device.\n");	
-		
+			buf << _("This machine has unemulated microphone device.\n");
+
 		if (m_machine.system().flags & MACHINE_NODEVICE_CAMERA )
-			buf << _("This machine has unemulated camera device.\n");	
-		
+			buf << _("This machine has unemulated camera device.\n");
+
 		if (m_machine.system().flags & MACHINE_NODEVICE_PRINTER )
-			buf << _("This machine has unemulated printer device.\n");	
-		
+			buf << _("This machine has unemulated printer device.\n");
+
 		if (m_machine.system().flags & MACHINE_NODEVICE_LAN )
-			buf << _("This machine has unemulated linking capabilities.\n");	
-		
+			buf << _("This machine has unemulated linking capabilities.\n");
+
 		if (m_machine.system().flags & MACHINE_NODEVICE_WAN )
-			buf << _("This machine has unemulated networking capabilities.\n");	
-		
+			buf << _("This machine has unemulated networking capabilities.\n");
+
 		if (m_machine.system().flags & MACHINE_NO_SOUND_HW )
 		{
 			buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 		}
 
-	
+
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
 		if (m_machine.system().flags & (MACHINE_FATAL_FLAGS))
 		{

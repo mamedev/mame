@@ -274,9 +274,9 @@ private:
 	uint8_t   m_env_dir_ctrl;
 	uint8_t   m_vol_latch;
 	uint8_t   m_flt_latch;
-	uint8_t	m_rp;
-	uint8_t	m_ws;
-	int		m_dir;
+	uint8_t m_rp;
+	uint8_t m_ws;
+	int     m_dir;
 
 	double  m_freq;
 	bool    m_active;

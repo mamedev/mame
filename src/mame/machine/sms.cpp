@@ -460,10 +460,10 @@ WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 	m_smsj_audio_control = data & 0x03;
 
 	/*  Mute settings:
-		0,0 : PSG only (power-on default)
-		0,1 : FM only
-		1,0 : Both PSG and FM disabled
-		1,1 : Both PSG and FM enabled 
+	    0,0 : PSG only (power-on default)
+	    0,1 : FM only
+	    1,0 : Both PSG and FM disabled
+	    1,1 : Both PSG and FM enabled
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
 		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);

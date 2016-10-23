@@ -371,25 +371,25 @@ public:
 
 gfx_layout const screenfont =
 {
-	8, 16,												// 8x8
-	RGN_FRAC(1, 1),										// whole region
-	1,													// 1bpp
-	{ 0 },												// bitplane offset
-	{ 0*1,  1*1,  2*1,  3*1,  4*1,  5*1,  6*1,  7*1 },	// x offsets
+	8, 16,                                              // 8x8
+	RGN_FRAC(1, 1),                                     // whole region
+	1,                                                  // 1bpp
+	{ 0 },                                              // bitplane offset
+	{ 0*1,  1*1,  2*1,  3*1,  4*1,  5*1,  6*1,  7*1 },  // x offsets
 	{ 0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },	// y offsets
-	128													// stride
+	  8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },  // y offsets
+	128                                                 // stride
 };
 
 gfx_layout const printfont =
 {
-	8, 8,										// 7x8
-	RGN_FRAC(1, 1),								// whole region
-	1,											// 1bpp
-	{ 0 },										// bitplane offset
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },	// x offsets
-	{ 7*1, 6*1, 5*1, 4*1, 3*1, 2*1, 1*1, 0*1 },	// y offsets
-	64											// stride
+	8, 8,                                       // 7x8
+	RGN_FRAC(1, 1),                             // whole region
+	1,                                          // 1bpp
+	{ 0 },                                      // bitplane offset
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 }, // x offsets
+	{ 7*1, 6*1, 5*1, 4*1, 3*1, 2*1, 1*1, 0*1 }, // y offsets
+	64                                          // stride
 };
 
 GFXDECODE_START( anzterm )
@@ -464,17 +464,17 @@ ROM_START( anzterm )
 	ROM_LOAD( "ck-a-pr01.ic4",                0x0000, 0x0800, CRC(d0981882) SHA1(b55fd313c9b3e00039501a53a53c820d98f2258a) )
 	ROM_LOAD( "ck-b-pr01.ic3",                0x0000, 0x0800, CRC(96c9d90d) SHA1(400980c7a2c5306be28b74284c626ef2ed24c1a5) )
 
-    // Undumped microcontroller ROM in MICR reader
-    ROM_REGION( 0x0fc0, "micrmcu", 0 )
-    ROM_LOAD( "mk3870.u14",                   0x0000, 0x0fc0, NO_DUMP )
+	// Undumped microcontroller ROM in MICR reader
+	ROM_REGION( 0x0fc0, "micrmcu", 0 )
+	ROM_LOAD( "mk3870.u14",                   0x0000, 0x0fc0, NO_DUMP )
 
-    // MICR reader data table ROMS, no idea how this stuff is used but dumps should be preserved
-    ROM_REGION( 0x5000, "micrdata", 0 )
-    ROM_LOAD( "cdn1-ebb.u20",                 0x0000, 0x1000, CRC(0f9a9db3) SHA1(aedfe3ba7afb1d0a827fec5418369fca9348940f) )
-    ROM_LOAD( "cdn2-ebb.u16",                 0x1000, 0x1000, CRC(648fff69) SHA1(59653d34067d9a3061857507868fd2147dadf537) )
-    ROM_LOAD( "6047204005.u15",               0x2000, 0x0800, CRC(70bfac37) SHA1(84081249ead5b957d98b3bd06665ef52d0a0243c) )
-    ROM_LOAD( "6048225001.u29",               0x3000, 0x1000, CRC(59c73999) SHA1(7dd12b500e13b177d19a24d148310541f7e660b4) )
-    ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
+	// MICR reader data table ROMS, no idea how this stuff is used but dumps should be preserved
+	ROM_REGION( 0x5000, "micrdata", 0 )
+	ROM_LOAD( "cdn1-ebb.u20",                 0x0000, 0x1000, CRC(0f9a9db3) SHA1(aedfe3ba7afb1d0a827fec5418369fca9348940f) )
+	ROM_LOAD( "cdn2-ebb.u16",                 0x1000, 0x1000, CRC(648fff69) SHA1(59653d34067d9a3061857507868fd2147dadf537) )
+	ROM_LOAD( "6047204005.u15",               0x2000, 0x0800, CRC(70bfac37) SHA1(84081249ead5b957d98b3bd06665ef52d0a0243c) )
+	ROM_LOAD( "6048225001.u29",               0x3000, 0x1000, CRC(59c73999) SHA1(7dd12b500e13b177d19a24d148310541f7e660b4) )
+	ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
 ROM_END
 
 COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, driver_device, 0, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision

@@ -1695,11 +1695,11 @@ WRITE8_MEMBER(grobot9_state::lamps_w)
 	{
 		// E1: speaker out
 		m_speaker->level_w(data >> 1 & 1);
-		
+
 		// E3: input mux high bit
 		m_inp_mux = (m_inp_mux & 7) | (data & 8);
 	}
-	
+
 	// D,F,E0: lamps
 	m_port[offset] = data;
 	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);

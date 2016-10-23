@@ -202,7 +202,7 @@ corrected set of dumps with sub-channels intact, but first the CHD parsers
 needs to be updated to support it. Contenders for this field at the time
 of writing include RawDump and TruRip dumps.
 See: http://rawdump.net/
-	 http://www.trurip.org/
+     http://www.trurip.org/
 -->
 
 <!-- The following images are from the redump.org set of dumps. -->
@@ -3488,7 +3488,7 @@ See: http://rawdump.net/
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="monkey">
 		<!-- Source: redump.org - http://redump.org/disc/36040/
 		<rom name="Secret of Monkey Island, The (USA).cue" size="3488" crc="04a1e02f" md5="027ccf6397d96b6d9a5b7b33adcaa9fc" sha1="2c14e74a3fca8214008621434a530d861268307c"/>
@@ -5232,7 +5232,7 @@ See: http://rawdump.net/
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).ccd" size="2990" crc="75ef5a02" md5="6d65d70b42192358761a2ad4cdd9a31e" sha1="64317ace80a4c67052a6f6174dafd1f86fd01a84"/>
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).img" size="480673536" crc="5a313588" md5="5b537f47d1b36755e2fd7cda042fee04" sha1="a3233561fb73248e3cc09b542ce045b4b15a5a4a"/>
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).sub" size="19619328" crc="ec7a4537" md5="1c1ffbdeeb5ca4644036544ede3bb7df" sha1="073b4e227275b69fb97d3d4add8f2b5f162d80ac"/>
-			-->
+		    -->
 		<description>BC Racers (USA)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
@@ -5293,32 +5293,32 @@ See: http://rawdump.net/
 	</software>
 
 <!--
-	<software name="colrmech">
-		<description>Color Mechanica (USA)</description>
-		<year>2013</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="release" value="20131227" />
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="color mechanica (usa)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="colrmech">
+        <description>Color Mechanica (USA)</description>
+        <year>2013</year>
+        <publisher>&lt;unlicensed&gt;</publisher>
+        <info name="release" value="20131227" />
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="color mechanica (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<!-- This was exclusively bundled with the JVC X'Eye console -->
 <!--
-	<software name="comptons200s" cloneof="comptons">
-		<description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
-		<year>1994</year>
-		<publisher>Compton's NewMedia</publisher>
-		<info name="serial" value="T-118025"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia v2.00s (usa)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="comptons200s" cloneof="comptons">
+        <description>Compton's Interactive Encyclopedia v2.00S (USA)</description>
+        <year>1994</year>
+        <publisher>Compton's NewMedia</publisher>
+        <info name="serial" value="T-118025"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="compton's interactive encyclopedia v2.00s (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<!-- This was exclusively bundled with the JVC X'Eye console -->
@@ -5561,16 +5561,16 @@ See: http://rawdump.net/
 	</software>
 
 <!--
-	<software name="musijpbr">
-		<description>Music from the Sega CD Games - Jurassic Park, Batman Returns (USA)</description>
-		<year>1993</year>
-		<publisher>Sega Multimedia Studio</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="music from the sega cd games - jurassic park, batman returns (usa)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="musijpbr">
+        <description>Music from the Sega CD Games - Jurassic Park, Batman Returns (USA)</description>
+        <year>1993</year>
+        <publisher>Sega Multimedia Studio</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="music from the sega cd games - jurassic park, batman returns (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="mypaint">
@@ -5768,16 +5768,16 @@ See: http://rawdump.net/
 
 	<!--
 	<software name="surgical32x" cloneof="surgical">
-		<description>Surgical Strike (Bra, 32X)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="157036"/>
-		<info name="release" value="199601xx" />
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="surgical strike (bra, 32x)" status="nodump" />
-			</diskarea>
-		</part>
+	    <description>Surgical Strike (Bra, 32X)</description>
+	    <year>1996</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="157036"/>
+	    <info name="release" value="199601xx" />
+	    <part name="cdrom" interface="scd_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="surgical strike (bra, 32x)" status="nodump" />
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -5846,20 +5846,20 @@ See: http://rawdump.net/
 	</software>
 
 <!--
-	This game was developed for the Sega Mega-CD system by Virtual Studio and was released in Europe.
-	A stateside release never happened, but in 2014 Good Deal Games released a set of reproduction disc
-	made from a prototype build of the US version of the game.
-	-->
+    This game was developed for the Sega Mega-CD system by Virtual Studio and was released in Europe.
+    A stateside release never happened, but in 2014 Good Deal Games released a set of reproduction disc
+    made from a prototype build of the US version of the game.
+    -->
 	<!--
 	<software name="smurfs">
-		<description>The Smurfs (USA, Prototype)</description>
-		<year>2014</year>
-		<publisher>Good Deal Games</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="the smurfs (usa, prototype)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>The Smurfs (USA, Prototype)</description>
+	    <year>2014</year>
+	    <publisher>Good Deal Games</publisher>
+	    <part name="cdrom" interface="scd_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="the smurfs (usa, prototype)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 -->
 
@@ -5895,17 +5895,17 @@ See: http://rawdump.net/
 	</software>
 
 <!--
-	<software name="wixeye">
-		<description>What is X'Eye Multi Entertainment System (USA)</description>
-		<year>1993?</year>
-		<publisher>JVC</publisher>
-		<info name="serial" value="SMJ-4110"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="what is x'eye multi entertainment system (usa)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="wixeye">
+        <description>What is X'Eye Multi Entertainment System (USA)</description>
+        <year>1993?</year>
+        <publisher>JVC</publisher>
+        <info name="serial" value="SMJ-4110"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="what is x'eye multi entertainment system (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="wolfchld">

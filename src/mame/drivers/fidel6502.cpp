@@ -4,7 +4,7 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
-    
+
     NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
     greatly affecting user playability of emulated electronic board games.
     As workaround for the chess games, use an external chess GUI on the side,

@@ -3617,7 +3617,7 @@ void z80_device::state_import( const device_state_entry &entry )
 		case STATE_GENPC:
 			m_prvpc = m_pc;
 			break;
-			
+
 		case STATE_GENPCBASE:
 			m_pc = m_prvpc;
 			break;
