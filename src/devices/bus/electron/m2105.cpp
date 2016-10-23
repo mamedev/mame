@@ -142,9 +142,9 @@ void electron_m2105_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfc40, 0xfc5f, READ8_DEVICE_DELEGATE(m_via6522_1, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_1, via6522_device, write));
-	space.install_readwrite_handler(0xfc60, 0xfc6f, READ8_DEVICE_DELEGATE(m_duart, mc68681_device, read), WRITE8_DEVICE_DELEGATE(m_duart, mc68681_device, write));
-	space.install_readwrite_handler(0xfc70, 0xfc8f, READ8_DEVICE_DELEGATE(m_via6522_0, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_0, via6522_device, write));
+	space.install_readwrite_handler(0xfc40, 0xfc5f, read8_delegate(FUNC(via6522_device::read), (via6522_device *)m_via6522_1), write8_delegate(FUNC(via6522_device::write), (via6522_device *)m_via6522_1));
+	space.install_readwrite_handler(0xfc60, 0xfc6f, read8_delegate(FUNC(mc68681_device::read), (mc68681_device *)m_duart), write8_delegate(FUNC(mc68681_device::write), (mc68681_device *)m_duart));
+	space.install_readwrite_handler(0xfc70, 0xfc8f, read8_delegate(FUNC(via6522_device::read), (via6522_device *)m_via6522_0), write8_delegate(FUNC(via6522_device::write), (via6522_device *)m_via6522_0));
 }
 
 //-------------------------------------------------

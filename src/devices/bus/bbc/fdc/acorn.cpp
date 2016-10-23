@@ -187,7 +187,7 @@ void bbc_acorn8271_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_device(0xfe80, 0xfe83, *m_fdc, &i8271_device::map);
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, i8271_device, data_r), WRITE8_DEVICE_DELEGATE(m_fdc, i8271_device, data_w));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, read8_delegate(FUNC(i8271_device::data_r), (i8271_device *)m_fdc), write8_delegate(FUNC(i8271_device::data_w), (i8271_device *)m_fdc));
 }
 
 void bbc_acorn1770_device::device_start()
@@ -196,8 +196,8 @@ void bbc_acorn1770_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_acorn1770_device, wd1770l_read), WRITE8_DELEGATE(bbc_acorn1770_device, wd1770l_write));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_acorn1770_device::wd1770l_read), this), write8_delegate(FUNC(bbc_acorn1770_device::wd1770l_write), this));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, read8_delegate(FUNC(wd1770_t::read), (wd1770_t *)m_fdc), write8_delegate(FUNC(wd1770_t::write), (wd1770_t *)m_fdc));
 
 	m_drive_control = 0xfe;
 }

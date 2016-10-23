@@ -153,8 +153,8 @@ void ep64_exdos_device::device_start()
 {
 	m_slot->program().install_rom(0x080000, 0x087fff, m_rom->base());
 
-	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
-	m_slot->io().install_readwrite_handler(0x18, 0x18, 0, 0x04, 0, READ8_DELEGATE(ep64_exdos_device, read), WRITE8_DELEGATE(ep64_exdos_device, write));
+	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, read8_delegate(FUNC(wd_fdc_t::read), (wd_fdc_t *)m_fdc), write8_delegate(FUNC(wd_fdc_t::write), (wd_fdc_t *)m_fdc));
+	m_slot->io().install_readwrite_handler(0x18, 0x18, 0, 0x04, 0, read8_delegate(FUNC(ep64_exdos_device::read), this), write8_delegate(FUNC(ep64_exdos_device::write), this));
 }
 
 

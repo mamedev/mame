@@ -115,8 +115,8 @@ void electron_plus3_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xfcc0, 0xfcc3, WRITE8_DELEGATE(electron_plus3_device, wd1770_status_w));
-	space.install_readwrite_handler(0xfcc4, 0xfccf, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_write_handler(0xfcc0, 0xfcc3, write8_delegate(FUNC(electron_plus3_device::wd1770_status_w), this));
+	space.install_readwrite_handler(0xfcc4, 0xfccf, read8_delegate(FUNC(wd1770_t::read), (wd1770_t *)m_fdc), write8_delegate(FUNC(wd1770_t::write), (wd1770_t *)m_fdc));
 }
 
 //-------------------------------------------------

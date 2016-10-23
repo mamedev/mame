@@ -2563,7 +2563,7 @@ void rainbow_state::diagnostic_w(address_space &space, offs_t offset, uint8_t da
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, read8_delegate(FUNC(upd7201_device::cd_ba_r), (upd7201_device *)m_mpsc), write8_delegate(FUNC(upd7201_device::cd_ba_w), (upd7201_device *)m_mpsc) );
 			printf("\n **** COMM HANDLER INSTALLED **** ");
 	}
 

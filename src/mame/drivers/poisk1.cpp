@@ -205,7 +205,7 @@ void p1_state::p1_ppi2_porta_w(address_space &space, offs_t offset, uint8_t data
 			program.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
 		} else {
 			program.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
-			program.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
+			program.install_write_handler( 0xb8000, 0xbbfff, write8_delegate(FUNC(p1_state::p1_vram_w), this) );
 		}
 	}
 	// DISPLAY BANK

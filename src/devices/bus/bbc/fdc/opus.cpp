@@ -178,8 +178,8 @@ void bbc_opusfdc_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
-	space.install_readwrite_handler(0xfe84, 0xfe84, READ8_DELEGATE(bbc_opusfdc_device, ctrl_r), WRITE8_DELEGATE(bbc_opusfdc_device, ctrl_w));
+	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(wd_fdc_t::read), (wd_fdc_t *)m_fdc), write8_delegate(FUNC(wd_fdc_t::write), (wd_fdc_t *)m_fdc));
+	space.install_readwrite_handler(0xfe84, 0xfe84, read8_delegate(FUNC(bbc_opusfdc_device::ctrl_r), this), write8_delegate(FUNC(bbc_opusfdc_device::ctrl_w), this));
 }
 
 //-------------------------------------------------

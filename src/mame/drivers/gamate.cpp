@@ -128,7 +128,7 @@ uint8_t gamate_state::gamate_cart_protection_r(address_space &space, offs_t offs
 		ret=(card_protection.cartridge_byte&0x80) ? 2 : 0;
 		if (card_protection.bit_shifter==7 && !card_protection.failed)
 		{ // now protection chip on cartridge activates cartridge chip select on cpu accesses
-//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r)); // next time I will try to get this working
+//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gamate_state::gamate_cart_protection_r), this)); // next time I will try to get this working
 		}
 		card_protection.cartridge_byte<<=1;
 	}
@@ -328,7 +328,7 @@ void gamate_state::machine_start()
 	m_cart_ptr = memregion("maincpu")->base() + 0x6000;
 	if (m_cart->exists())
 	{
-//      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
+//      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gamate_state::gamate_cart_protection_r), this));
 		m_cart_ptr = m_cart->get_rom_base();
 		m_bankmulti->set_base(m_cart->get_rom_base()+1);
 		m_bank->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset

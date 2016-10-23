@@ -330,7 +330,7 @@ void abc806_state::bankswitch()
 
 					program.install_read_bank(0x7000, 0x77ff, bank_name);
 					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+					program.install_readwrite_handler(0x7800, 0x7fff, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -365,7 +365,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+				program.install_readwrite_handler(0x7800, 0x7fff, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 			}
 			else
 			{
