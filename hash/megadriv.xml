@@ -22443,7 +22443,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>System 3 / Ocean</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
-				<rom name="PS-md.BIN" size="0x100000" crc="2348da80" sha1="f529598f56c581854d2bde2ee960100273813539" offset="0x000000"/>
+				<rom name="ps-md.bin" size="0x100000" crc="2348da80" sha1="f529598f56c581854d2bde2ee960100273813539" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31369,7 +31369,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="究極麻將II"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110" offset="0x000000"/>
+				<rom name="pretty girl mahjongg (ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
