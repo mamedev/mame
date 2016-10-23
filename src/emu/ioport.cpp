@@ -2516,7 +2516,7 @@ bool ioport_manager::playback_read<bool>(bool &result)
 {
 	uint8_t temp;
 	playback_read(temp);
-	return result = temp != 0;
+	return result = bool(temp);
 }
 
 
