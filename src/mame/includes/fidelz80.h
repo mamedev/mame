@@ -41,7 +41,7 @@ public:
 	// misc common
 	uint16_t m_inp_mux;                   // multiplexed keypad/leds mask
 	uint16_t m_led_select;
-	uint16_t m_7seg_data;                 // data for seg leds
+	uint32_t m_7seg_data;                 // data for seg leds
 	uint16_t m_led_data;
 	uint8_t m_speech_data;
 	uint8_t m_speech_bank;                // speech rom higher address bits
