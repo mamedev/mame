@@ -67,7 +67,7 @@ public:
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
 	DECLARE_DRIVER_INIT(kingtut);
-	DECLARE_VIDEO_START(kongambl);
+	void video_start_kongambl();
 	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
@@ -80,7 +80,7 @@ public:
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start_kongambl()
 {
 	#if CUSTOM_DRAW
 

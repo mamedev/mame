@@ -183,7 +183,7 @@ public:
 	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
-	DECLARE_MACHINE_RESET(cshooter);
+	void machine_reset_cshooter();
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 };
 
@@ -203,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
 }
 
 
-MACHINE_RESET_MEMBER(airraid_state,cshooter)
+void airraid_state::machine_reset_cshooter()
 {
 }
 

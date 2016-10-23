@@ -87,9 +87,9 @@ public:
 	DECLARE_DRIVER_INIT(samplebank);
 
 
-	DECLARE_MACHINE_RESET(gtmr);
-	DECLARE_VIDEO_START(kaneko16);
-	DECLARE_MACHINE_RESET(mgcrystl);
+	void machine_reset_gtmr();
+	void video_start_kaneko16();
+	void machine_reset_mgcrystl();
 	uint32_t screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template<class _BitmapClass>
@@ -165,7 +165,7 @@ public:
 
 	DECLARE_DRIVER_INIT(berlwall);
 	DECLARE_PALETTE_INIT(berlwall);
-	DECLARE_VIDEO_START(berlwall);
+	void video_start_berlwall();
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

@@ -70,8 +70,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(karnov);
-	DECLARE_VIDEO_START(karnov);
-	DECLARE_VIDEO_START(wndrplnt);
+	void video_start_karnov();
+	void video_start_wndrplnt();
 	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(karnov_interrupt);
 	void karnov_flipscreen_w( int data );

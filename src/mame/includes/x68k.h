@@ -255,10 +255,10 @@ public:
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile_16);
-	DECLARE_MACHINE_START(x68030);
-	DECLARE_MACHINE_RESET(x68000);
-	DECLARE_MACHINE_START(x68000);
-	DECLARE_VIDEO_START(x68000);
+	void machine_start_x68030();
+	void machine_reset_x68000();
+	void machine_start_x68000();
+	void video_start_x68000();
 	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(x68k_led_callback);

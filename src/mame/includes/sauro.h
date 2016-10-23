@@ -58,8 +58,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 
 	DECLARE_DRIVER_INIT(tecfri);
-	DECLARE_VIDEO_START(trckydoc);
-	DECLARE_VIDEO_START(sauro);
+	void video_start_trckydoc();
+	void video_start_sauro();
 
 	uint32_t screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -33,7 +33,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(exidy440_state,exidy440)
+void exidy440_state::video_start_exidy440()
 {
 	/* reset the system */
 	m_firq_enable = 0;
@@ -53,9 +53,9 @@ VIDEO_START_MEMBER(exidy440_state,exidy440)
 }
 
 
-VIDEO_START_MEMBER(exidy440_state,topsecex)
+void exidy440_state::video_start_topsecex()
 {
-	VIDEO_START_CALL_MEMBER(exidy440);
+	video_start_exidy440();
 
 	m_topsecex_yscroll = 0;
 }

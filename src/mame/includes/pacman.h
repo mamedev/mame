@@ -135,14 +135,14 @@ public:
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
-	DECLARE_VIDEO_START(pacman);
+	void video_start_pacman();
 	DECLARE_PALETTE_INIT(pacman);
-	DECLARE_VIDEO_START(birdiy);
-	DECLARE_VIDEO_START(s2650games);
-	DECLARE_MACHINE_RESET(mschamp);
-	DECLARE_MACHINE_RESET(superabc);
-	DECLARE_VIDEO_START(pengo);
-	DECLARE_VIDEO_START(jrpacman);
+	void video_start_birdiy();
+	void video_start_s2650games();
+	void machine_reset_mschamp();
+	void machine_reset_superabc();
+	void video_start_pengo();
+	void video_start_jrpacman();
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -161,8 +161,8 @@ public:
 	void theglobp_decrypt_rom_A();
 	void theglobp_decrypt_rom_B();
 	DECLARE_READ8_MEMBER(theglobp_decrypt_rom);
-	DECLARE_MACHINE_START(theglobp);
-	DECLARE_MACHINE_RESET(theglobp);
+	void machine_start_theglobp();
+	void machine_reset_theglobp();
 
 	// pacplus.c
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
@@ -178,6 +178,6 @@ public:
 	void acitya_decrypt_rom_A();
 	void acitya_decrypt_rom_B();
 	DECLARE_READ8_MEMBER(acitya_decrypt_rom);
-	DECLARE_MACHINE_START(acitya);
-	DECLARE_MACHINE_RESET(acitya);
+	void machine_start_acitya();
+	void machine_reset_acitya();
 };

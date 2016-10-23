@@ -46,9 +46,9 @@ public:
 	DECLARE_WRITE16_MEMBER(burglarx_sound_bank_w);
 	DECLARE_WRITE32_MEMBER(zeropnt2_eeprom_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_MACHINE_RESET(unico);
-	DECLARE_VIDEO_START(unico);
-	DECLARE_MACHINE_RESET(zeropt);
+	void machine_reset_unico();
+	void video_start_unico();
+	void machine_reset_zeropt();
 	uint32_t screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

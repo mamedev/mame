@@ -165,7 +165,7 @@ public:
 	m_picocart(*this, "picoslot") { }
 
 	required_device<pico_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(pico);
+	void machine_start_pico();
 };
 
 
@@ -374,7 +374,7 @@ static SLOT_INTERFACE_START(pico_cart)
 	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
 SLOT_INTERFACE_END
 
-MACHINE_START_MEMBER(pico_state,pico)
+void pico_state::machine_start_pico()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
@@ -559,7 +559,7 @@ public:
 	m_picocart(*this, "coperaslot") { }
 
 	required_device<copera_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(copera);
+	void machine_start_copera();
 };
 
 
@@ -582,7 +582,7 @@ static SLOT_INTERFACE_START(copera_cart)
 	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
 SLOT_INTERFACE_END
 
-MACHINE_START_MEMBER(copera_state,copera)
+void copera_state::machine_start_copera()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));

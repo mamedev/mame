@@ -444,7 +444,7 @@ void opwolf_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 }
 
-MACHINE_RESET_MEMBER(opwolf_state,opwolf)
+void opwolf_state::machine_reset_opwolf()
 {
 	m_adpcm_b[0] = m_adpcm_b[1] = 0;
 	m_adpcm_c[0] = m_adpcm_c[1] = 0;

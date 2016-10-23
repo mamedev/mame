@@ -1141,7 +1141,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(armedf_state,armedf)
+void armedf_state::machine_start_armedf()
 {
 	save_item(NAME(m_old_mcu_mode));
 	save_item(NAME(m_scroll_msb));
@@ -1153,7 +1153,7 @@ MACHINE_START_MEMBER(armedf_state,armedf)
 	save_item(NAME(m_bg_scrolly));
 }
 
-MACHINE_RESET_MEMBER(armedf_state,armedf)
+void armedf_state::machine_reset_armedf()
 {
 	m_old_mcu_mode = 0;
 	m_scroll_msb = 0;
@@ -1520,15 +1520,15 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::machine_start_bigfghtr()
 {
-	MACHINE_START_CALL_MEMBER(armedf);
+	machine_start_armedf();
 	save_item(NAME(m_read_latch));
 }
 
-MACHINE_RESET_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::machine_reset_bigfghtr()
 {
-	MACHINE_RESET_CALL_MEMBER(armedf);
+	machine_reset_armedf();
 	m_read_latch = 0;
 }
 

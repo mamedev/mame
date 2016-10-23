@@ -264,7 +264,7 @@ void ti85_state::machine_start()
 	membank("bank2")->set_base(m_bios + 0x04000);
 }
 
-MACHINE_RESET_MEMBER(ti85_state,ti85)
+void ti85_state::machine_reset_ti85()
 {
 	m_red_out = 0x00;
 	m_white_out = 0x00;
@@ -285,7 +285,7 @@ DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
 }
 
 
-MACHINE_RESET_MEMBER(ti85_state,ti83p)
+void ti85_state::machine_reset_ti83p()
 {
 	m_red_out = 0x00;
 	m_white_out = 0x00;
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(ti85_state,ti83p)
 	}
 }
 
-MACHINE_START_MEMBER(ti85_state,ti83p)
+void ti85_state::machine_start_ti83p()
 {
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -396,28 +396,28 @@ void ti85_state::ti8xpse_init_common()
 }
 
 
-MACHINE_START_MEMBER(ti85_state,ti83pse)
+void ti85_state::machine_start_ti83pse()
 {
 	m_model = TI84PSE;
 
 	ti8xpse_init_common();
 }
 
-MACHINE_START_MEMBER(ti85_state,ti84pse)
+void ti85_state::machine_start_ti84pse()
 {
 	m_model = TI83PSE;
 
 	ti8xpse_init_common();
 }
 
-MACHINE_START_MEMBER(ti85_state,ti84p)
+void ti85_state::machine_start_ti84p()
 {
 	m_model = TI84P;
 
 	ti8xpse_init_common();
 }
 
-MACHINE_START_MEMBER(ti85_state,ti86)
+void ti85_state::machine_start_ti86()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();

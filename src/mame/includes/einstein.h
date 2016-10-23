@@ -120,8 +120,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(einstein2);
-	DECLARE_MACHINE_RESET(einstein2);
+	void machine_start_einstein2();
+	void machine_reset_einstein2();
 	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);

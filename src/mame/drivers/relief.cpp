@@ -47,7 +47,7 @@ void relief_state::update_interrupts()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(relief_state,relief)
+void relief_state::machine_reset_relief()
 {
 	atarigen_state::machine_reset();
 

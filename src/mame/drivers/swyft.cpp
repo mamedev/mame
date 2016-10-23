@@ -333,9 +333,9 @@ public:
 	optional_ioport m_y6;
 	optional_ioport m_y7;*/
 
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
+	void machine_start_swyft();
+	void machine_reset_swyft();
+	void video_start_swyft();
 
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -577,7 +577,7 @@ static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, swyft_state)
 	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(swyft_state,swyft)
+void swyft_state::machine_start_swyft()
 {
 	m_via0->write_ca1(1);
 	m_via0->write_ca2(1);
@@ -590,11 +590,11 @@ MACHINE_START_MEMBER(swyft_state,swyft)
 	m_via1->write_cb2(1);
 }
 
-MACHINE_RESET_MEMBER(swyft_state,swyft)
+void swyft_state::machine_reset_swyft()
 {
 }
 
-VIDEO_START_MEMBER(swyft_state,swyft)
+void swyft_state::video_start_swyft()
 {
 }
 

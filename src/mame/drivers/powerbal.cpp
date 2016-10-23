@@ -37,9 +37,9 @@ public:
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
-	DECLARE_MACHINE_START(powerbal);
-	DECLARE_MACHINE_RESET(powerbal);
-	DECLARE_VIDEO_START(powerbal);
+	void machine_start_powerbal();
+	void machine_reset_powerbal();
+	void video_start_powerbal();
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
@@ -427,7 +427,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-VIDEO_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::video_start_powerbal()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -476,12 +476,12 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_start_powerbal()
 {
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_reset_powerbal()
 {
 	m_tilebank = 0;
 }

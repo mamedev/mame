@@ -216,11 +216,11 @@
 /*                                                     */
 /*******************************************************/
 
-MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
+void _8080bw_state::machine_start_extra_8080bw()
 {
-	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
-	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_extra_8080bw_sh();
+	machine_start_extra_8080bw_vh();
+	machine_start_mw8080bw();
 }
 
 /*******************************************************/
@@ -1331,14 +1331,14 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(_8080bw_state,rollingc)
+void _8080bw_state::machine_start_rollingc()
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x400);
 	m_scattered_colorram2 = std::make_unique<uint8_t []>(0x400);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
 	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
@@ -1466,19 +1466,19 @@ static INPUT_PORTS_START( schaserm )
 	PORT_DIPSETTING(    0x03, "4" )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(_8080bw_state,schaser)
+void _8080bw_state::machine_start_schaser()
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
-	MACHINE_START_CALL_MEMBER(schaser_sh);
-	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_schaser_sh();
+	machine_start_extra_8080bw_vh();
+	machine_start_mw8080bw();
 }
 
-MACHINE_RESET_MEMBER(_8080bw_state,schaser)
+void _8080bw_state::machine_reset_schaser()
 {
-	MACHINE_RESET_CALL_MEMBER(schaser_sh);
-	MACHINE_RESET_CALL_MEMBER(mw8080bw);
+	machine_reset_schaser_sh();
+	machine_reset_mw8080bw();
 }
 
 static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
@@ -1594,14 +1594,14 @@ static INPUT_PORTS_START( schasercv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(_8080bw_state,schasercv)
+void _8080bw_state::machine_start_schasercv()
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
-	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
-	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_extra_8080bw_sh();
+	machine_start_extra_8080bw_vh();
+	machine_start_mw8080bw();
 }
 
 static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
@@ -1687,12 +1687,12 @@ static INPUT_PORTS_START( sflush )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(_8080bw_state,sflush)
+void _8080bw_state::machine_start_sflush()
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
@@ -1874,14 +1874,14 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 	}
 }
 
-MACHINE_START_MEMBER(_8080bw_state,polaris)
+void _8080bw_state::machine_start_polaris()
 {
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
@@ -2659,14 +2659,14 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 
 */
 
-MACHINE_START_MEMBER(_8080bw_state,darthvdr)
+void _8080bw_state::machine_start_darthvdr()
 {
 	/* do nothing for now - different interrupt system */
 	m_fleet_step = 3;
 }
 
 
-MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
+void _8080bw_state::machine_reset_darthvdr()
 {
 	/* do nothing for now - different interrupt system */
 }
@@ -3106,12 +3106,12 @@ static INPUT_PORTS_START( gunchamp )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(_8080bw_state, claybust)
+void _8080bw_state::machine_start_claybust()
 {
 	m_claybust_gun_pos = 0;
 	save_item(NAME(m_claybust_gun_pos));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 MACHINE_CONFIG_DERIVED_CLASS( claybust, invaders, _8080bw_state )

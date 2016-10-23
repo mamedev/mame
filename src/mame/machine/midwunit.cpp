@@ -334,7 +334,7 @@ DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midwunit_state,midwunit)
+void midwunit_state::machine_reset_midwunit()
 {
 	int i;
 

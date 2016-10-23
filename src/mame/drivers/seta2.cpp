@@ -218,7 +218,7 @@ ADDRESS_MAP_END
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta2_state, mj4simai)
+void seta2_state::machine_start_mj4simai()
 {
 	save_item(NAME(m_keyboard_row));
 }
@@ -2484,13 +2484,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(seta2_state, funcube)
+void seta2_state::machine_start_funcube()
 {
 	save_item(NAME(m_funcube_coin_start_cycles));
 	save_item(NAME(m_funcube_hopper_motor));
 }
 
-MACHINE_RESET_MEMBER(seta2_state, funcube)
+void seta2_state::machine_reset_funcube()
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;

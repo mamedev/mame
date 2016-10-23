@@ -136,12 +136,12 @@ public:
 	DECLARE_DRIVER_INIT(hiimpact);
 	DECLARE_DRIVER_INIT(mkyturbo);
 	DECLARE_DRIVER_INIT(term2la2);
-	DECLARE_MACHINE_RESET(midyunit);
-	DECLARE_VIDEO_START(midzunit);
-	DECLARE_VIDEO_START(midyunit_4bit);
-	DECLARE_VIDEO_START(midyunit_6bit);
-	DECLARE_VIDEO_START(mkyawdim);
-	DECLARE_VIDEO_START(common);
+	void machine_reset_midyunit();
+	void video_start_midzunit();
+	void video_start_midyunit_4bit();
+	void video_start_midyunit_6bit();
+	void video_start_mkyawdim();
+	void video_start_common();
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 

@@ -34,7 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
-	DECLARE_MACHINE_RESET(pentagon);
+	void machine_reset_pentagon();
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(pentagon_state,pentagon)
+void pentagon_state::machine_reset_pentagon()
 {
 	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

@@ -67,7 +67,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(wswan);
-	DECLARE_MACHINE_START(wscolor);
+	void machine_start_wscolor();
 	DECLARE_PALETTE_INIT(wscolor);
 
 protected:

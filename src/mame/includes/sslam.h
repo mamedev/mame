@@ -67,8 +67,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
-	DECLARE_VIDEO_START(sslam);
-	DECLARE_VIDEO_START(powerbls);
+	void video_start_sslam();
+	void video_start_powerbls();
 	uint32_t screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(music_playback);

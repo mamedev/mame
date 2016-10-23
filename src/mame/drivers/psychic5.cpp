@@ -336,14 +336,14 @@ Notes (23-Jan-2016 AS):
 #include "includes/psychic5.h"
 
 
-MACHINE_START_MEMBER(psychic5_state, psychic5)
+void psychic5_state::machine_start_psychic5()
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_bank_latch));
 }
 
-MACHINE_START_MEMBER(psychic5_state, bombsa)
+void psychic5_state::machine_start_bombsa()
 {
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 

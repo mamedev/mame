@@ -413,7 +413,7 @@ WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 }
 
 
-VIDEO_START_MEMBER(vectrex_state,raaspec)
+void vectrex_state::video_start_raaspec()
 {
 	const rectangle &visarea = m_screen->visible_area();
 

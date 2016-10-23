@@ -15,7 +15,7 @@
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::video_start_mlc()
 {
 	if (m_gfxdecode->gfx(0)->granularity()==16)
 		m_colour_mask=0x7f;

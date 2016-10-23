@@ -44,7 +44,7 @@ public:
 	uint8_t m_cd_io_status;
 	uint8_t m_cd_param[8];
 	uint8_t m_cd_result[8];
-	DECLARE_MACHINE_RESET(psx);
+	void machine_reset_psx();
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );

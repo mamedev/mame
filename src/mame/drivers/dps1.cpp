@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_DRIVER_INIT(dps1);
-	DECLARE_MACHINE_RESET(dps1);
+	void machine_reset_dps1();
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
-MACHINE_RESET_MEMBER( dps1_state, dps1 )
+void dps1_state::machine_reset_dps1()
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

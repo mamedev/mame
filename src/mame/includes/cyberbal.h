@@ -79,12 +79,12 @@ public:
 	DECLARE_DRIVER_INIT(cyberbalt);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(cyberbal);
-	DECLARE_MACHINE_START(cyberbal2p);
-	DECLARE_MACHINE_RESET(cyberbal);
-	DECLARE_VIDEO_START(cyberbal);
-	DECLARE_MACHINE_RESET(cyberbal2p);
-	DECLARE_VIDEO_START(cyberbal2p);
+	void machine_start_cyberbal();
+	void machine_start_cyberbal2p();
+	void machine_reset_cyberbal();
+	void video_start_cyberbal();
+	void machine_reset_cyberbal2p();
+	void video_start_cyberbal2p();
 	uint32_t screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

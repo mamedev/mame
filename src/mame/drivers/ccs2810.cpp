@@ -82,7 +82,7 @@ public:
 
 	DECLARE_DRIVER_INIT(ccs2810);
 	DECLARE_DRIVER_INIT(ccs2422);
-	DECLARE_MACHINE_RESET(ccs);
+	void machine_reset_ccs();
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(port20_r);
 	DECLARE_READ8_MEMBER(port25_r);
@@ -287,7 +287,7 @@ WRITE8_MEMBER( ccs_state::port40_w )
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-MACHINE_RESET_MEMBER( ccs_state, ccs )
+void ccs_state::machine_reset_ccs()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

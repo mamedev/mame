@@ -31,9 +31,9 @@ public:
 	DECLARE_DRIVER_INIT(xybots);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(xybots);
-	DECLARE_MACHINE_RESET(xybots);
-	DECLARE_VIDEO_START(xybots);
+	void machine_start_xybots();
+	void machine_reset_xybots();
+	void video_start_xybots();
 	uint32_t screen_update_xybots(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

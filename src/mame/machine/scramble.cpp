@@ -15,20 +15,20 @@
 #include "includes/scramble.h"
 
 
-MACHINE_RESET_MEMBER(scramble_state,scramble)
+void scramble_state::machine_reset_scramble()
 {
-	MACHINE_RESET_CALL_MEMBER(galaxold);
+	machine_reset_galaxold();
 
 	if (m_audiocpu != nullptr)
 		sh_init();
 }
 
-MACHINE_RESET_MEMBER(scramble_state,explorer)
+void scramble_state::machine_reset_explorer()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
-	MACHINE_RESET_CALL_MEMBER(galaxold);
+	machine_reset_galaxold();
 }
 
 

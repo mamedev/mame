@@ -1562,7 +1562,7 @@ void model1_state::tgp_scan()
 	m_render_done = 0;
 }
 
-VIDEO_START_MEMBER(model1_state, model1)
+void model1_state::video_start_model1()
 {
 	m_view = auto_alloc_clear(machine(), <model1_state::view_t>());
 

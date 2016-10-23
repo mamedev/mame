@@ -17,7 +17,7 @@
  *
  *************************************/
 
-SOUND_START_MEMBER( mw8080bw_state, samples )
+void mw8080bw_state::sound_start_samples()
 {
 	/* setup for save states */
 	save_item(NAME(m_port_1_last));

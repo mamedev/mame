@@ -117,8 +117,8 @@ public:
 
 	void r2dx_setbanking(void);
 
-	DECLARE_MACHINE_RESET(r2dx_v33);
-	DECLARE_MACHINE_RESET(nzeroteam);
+	void machine_reset_r2dx_v33();
+	void machine_reset_nzeroteam();
 
 	int m_r2dxbank;
 	int m_r2dxgameselect;
@@ -740,12 +740,12 @@ static INPUT_PORTS_START( zerotm2k )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
+void r2dx_v33_state::machine_reset_r2dx_v33()
 {
 	common_reset();
 }
 
-MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
+void r2dx_v33_state::machine_reset_nzeroteam()
 {
 	common_reset();
 

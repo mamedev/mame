@@ -124,8 +124,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
 	DECLARE_DRIVER_INIT(fixed);
 	DECLARE_DRIVER_INIT(variable);
-	DECLARE_MACHINE_START(dlair);
-	DECLARE_MACHINE_RESET(dlair);
+	void machine_start_dlair();
+	void machine_reset_dlair();
 	DECLARE_PALETTE_INIT(dleuro);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
@@ -229,12 +229,12 @@ uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_START_MEMBER(dlair_state,dlair)
+void dlair_state::machine_start_dlair()
 {
 }
 
 
-MACHINE_RESET_MEMBER(dlair_state,dlair)
+void dlair_state::machine_reset_dlair()
 {
 #if 0
 

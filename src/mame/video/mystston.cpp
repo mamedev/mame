@@ -212,7 +212,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-VIDEO_START_MEMBER(mystston_state,mystston)
+void mystston_state::video_start_mystston()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(mystston_state,mystston)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(mystston_state,mystston)
+void mystston_state::video_reset_mystston()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }

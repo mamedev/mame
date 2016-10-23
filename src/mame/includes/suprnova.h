@@ -142,11 +142,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_MACHINE_RESET(sknsa);
-	DECLARE_MACHINE_RESET(sknsj);
-	DECLARE_MACHINE_RESET(sknsu);
-	DECLARE_MACHINE_RESET(sknse);
-	DECLARE_MACHINE_RESET(sknsk);
+	void machine_reset_sknsa();
+	void machine_reset_sknsj();
+	void machine_reset_sknsu();
+	void machine_reset_sknse();
+	void machine_reset_sknsk();
 
 	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);

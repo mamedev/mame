@@ -284,7 +284,7 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 
 ************************************************************/
 
-VIDEO_START_MEMBER( mbee_state, mono )
+void mbee_state::video_start_mono()
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
@@ -293,7 +293,7 @@ VIDEO_START_MEMBER( mbee_state, mono )
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER( mbee_state, standard )
+void mbee_state::video_start_standard()
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
@@ -302,7 +302,7 @@ VIDEO_START_MEMBER( mbee_state, standard )
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER( mbee_state, premium )
+void mbee_state::video_start_premium()
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();

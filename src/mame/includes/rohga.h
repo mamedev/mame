@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(nitrobal);
 	DECLARE_DRIVER_INIT(schmeisr);
 	DECLARE_DRIVER_INIT(rohga);
-	DECLARE_VIDEO_START(wizdfire);
+	void video_start_wizdfire();
 	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

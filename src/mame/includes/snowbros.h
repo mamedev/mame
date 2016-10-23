@@ -63,8 +63,8 @@ public:
 	DECLARE_DRIVER_INIT(toto);
 	DECLARE_DRIVER_INIT(hyperpac);
 	DECLARE_DRIVER_INIT(yutnori);
-	DECLARE_MACHINE_RESET(semiprot);
-	DECLARE_MACHINE_RESET(finalttr);
+	void machine_reset_semiprot();
+	void machine_reset_finalttr();
 
 	uint32_t screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

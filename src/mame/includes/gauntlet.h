@@ -52,9 +52,9 @@ public:
 	DECLARE_DRIVER_INIT(vindctr2);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(gauntlet);
-	DECLARE_MACHINE_RESET(gauntlet);
-	DECLARE_VIDEO_START(gauntlet);
+	void machine_start_gauntlet();
+	void machine_reset_gauntlet();
+	void video_start_gauntlet();
 	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gauntlet_xscroll_w );
 	DECLARE_WRITE16_MEMBER( gauntlet_yscroll_w );

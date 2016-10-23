@@ -423,12 +423,12 @@ static const uint16_t recalh_eeprom[64] = {
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-MACHINE_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_start_f3()
 {
 	save_item(NAME(m_coin_word));
 }
 
-MACHINE_RESET_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_reset_f3()
 {
 	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

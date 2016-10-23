@@ -377,7 +377,7 @@ Boards:
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(pacman_state,mschamp)
+void pacman_state::machine_reset_mschamp()
 {
 	uint8_t *rom = memregion("maincpu")->base() + 0x10000;
 	int whichbank = ioport("GAME")->read() & 1;
@@ -389,7 +389,7 @@ MACHINE_RESET_MEMBER(pacman_state,mschamp)
 	membank("bank2")->set_entry(whichbank);
 }
 
-MACHINE_RESET_MEMBER(pacman_state,superabc)
+void pacman_state::machine_reset_superabc()
 {
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }

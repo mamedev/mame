@@ -172,8 +172,8 @@ public:
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	DECLARE_DRIVER_INIT(mmd2);
-	DECLARE_MACHINE_RESET(mmd1);
-	DECLARE_MACHINE_RESET(mmd2);
+	void machine_reset_mmd1();
+	void machine_reset_mmd2();
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -425,12 +425,12 @@ WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
 	output().set_value("led_inte", state);
 }
 
-MACHINE_RESET_MEMBER(mmd1_state,mmd1)
+void mmd1_state::machine_reset_mmd1()
 {
 	m_return_code = 0xff;
 }
 
-MACHINE_RESET_MEMBER(mmd1_state,mmd2)
+void mmd1_state::machine_reset_mmd2()
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);

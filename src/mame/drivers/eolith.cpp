@@ -1485,7 +1485,7 @@ ROM_START( hidctch3 )
 ROM_END
 
 
-MACHINE_RESET_MEMBER(eolith_state,eolith)
+void eolith_state::machine_reset_eolith()
 {
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }

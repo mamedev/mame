@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
   Machine Initialization
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(galaxy_state,galaxy)
+void galaxy_state::machine_reset_galaxy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -194,7 +194,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 	DRIVER_INIT_CALL(galaxy);
 }
 
-MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
+void galaxy_state::machine_reset_galaxyp()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

@@ -289,7 +289,7 @@ static const int jumppoints_other[0x100] =
 		-1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-MACHINE_RESET_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_reset_raiga()
 {
 	m_prot = 0;
 	m_jumpcode = 0;
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(gaiden_state,raiga)
 	m_spr_offset_y = 0;
 }
 
-MACHINE_START_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_start_raiga()
 {
 	save_item(NAME(m_prot));
 	save_item(NAME(m_jumpcode));

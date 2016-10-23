@@ -480,7 +480,7 @@ void nbmj8891_state::gfxdraw()
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER( nbmj8891_state, _1layer )
+void nbmj8891_state::video_start__1layer()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();

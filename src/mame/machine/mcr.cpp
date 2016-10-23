@@ -99,20 +99,20 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr_state,mcr)
+void mcr_state::machine_start_mcr()
 {
 	save_item(NAME(mcr_cocktail_flip));
 }
 
 
-MACHINE_START_MEMBER(mcr_state,nflfoot)
+void mcr_state::machine_start_nflfoot()
 {
 	/* allocate a timer for the IPU watchdog */
 	ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_state::ipu_watchdog_reset),this));
 }
 
 
-MACHINE_RESET_MEMBER(mcr_state,mcr)
+void mcr_state::machine_reset_mcr()
 {
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;

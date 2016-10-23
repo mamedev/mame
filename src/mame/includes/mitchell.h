@@ -119,9 +119,9 @@ public:
 	DECLARE_DRIVER_INIT(blockbl);
 	DECLARE_DRIVER_INIT(dokaben);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_MACHINE_START(mitchell);
-	DECLARE_MACHINE_RESET(mitchell);
-	DECLARE_VIDEO_START(pang);
+	void machine_start_mitchell();
+	void machine_reset_mitchell();
+	void video_start_pang();
 	uint32_t screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mitchell_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

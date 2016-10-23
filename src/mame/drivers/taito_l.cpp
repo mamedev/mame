@@ -139,7 +139,7 @@ void taitol_state::state_register(  )
 	save_item(NAME(m_flipscreen));
 }
 
-MACHINE_START_MEMBER(taitol_state,taito_l)
+void taitol_state::machine_start_taito_l()
 {
 	save_item(NAME(m_rambanks));
 	save_item(NAME(m_palette_ram));
@@ -193,7 +193,7 @@ void taitol_state::taito_machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(taitol_state,fhawk)
+void taitol_state::machine_reset_fhawk()
 {
 	taito_machine_reset();
 	m_porte0_tag = nullptr;
@@ -202,7 +202,7 @@ MACHINE_RESET_MEMBER(taitol_state,fhawk)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,raimais)
+void taitol_state::machine_reset_raimais()
 {
 	taito_machine_reset();
 	m_porte0_tag = nullptr;
@@ -211,7 +211,7 @@ MACHINE_RESET_MEMBER(taitol_state,raimais)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,champwr)
+void taitol_state::machine_reset_champwr()
 {
 	taito_machine_reset();
 	m_porte0_tag = nullptr;
@@ -221,7 +221,7 @@ MACHINE_RESET_MEMBER(taitol_state,champwr)
 }
 
 
-MACHINE_RESET_MEMBER(taitol_state,kurikint)
+void taitol_state::machine_reset_kurikint()
 {
 	taito_machine_reset();
 	m_porte0_tag = nullptr;
@@ -230,7 +230,7 @@ MACHINE_RESET_MEMBER(taitol_state,kurikint)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,evilston)
+void taitol_state::machine_reset_evilston()
 {
 	taito_machine_reset();
 	m_porte0_tag = nullptr;
@@ -239,7 +239,7 @@ MACHINE_RESET_MEMBER(taitol_state,evilston)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,puzznic)
+void taitol_state::machine_reset_puzznic()
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
@@ -248,7 +248,7 @@ MACHINE_RESET_MEMBER(taitol_state,puzznic)
 	m_portf1_tag = "IN1";
 }
 
-MACHINE_RESET_MEMBER(taitol_state,plotting)
+void taitol_state::machine_reset_plotting()
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
@@ -257,7 +257,7 @@ MACHINE_RESET_MEMBER(taitol_state,plotting)
 	m_portf1_tag = "IN1";
 }
 
-MACHINE_RESET_MEMBER(taitol_state,palamed)
+void taitol_state::machine_reset_palamed()
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
@@ -266,7 +266,7 @@ MACHINE_RESET_MEMBER(taitol_state,palamed)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,cachat)
+void taitol_state::machine_reset_cachat()
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
@@ -275,7 +275,7 @@ MACHINE_RESET_MEMBER(taitol_state,cachat)
 	m_portf1_tag = nullptr;
 }
 
-MACHINE_RESET_MEMBER(taitol_state,horshoes)
+void taitol_state::machine_reset_horshoes()
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";

@@ -64,8 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 
 	// machine
-	DECLARE_MACHINE_START(thedealr);
-	DECLARE_MACHINE_RESET(thedealr);
+	void machine_start_thedealr();
+	void machine_reset_thedealr();
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
@@ -128,7 +128,7 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-MACHINE_RESET_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_reset_thedealr()
 {
 	iox_reset();
 }
@@ -497,7 +497,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_start_thedealr()
 {
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));

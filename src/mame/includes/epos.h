@@ -28,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_DRIVER_INIT(dealer);
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(epos);
-	DECLARE_MACHINE_START(dealer);
+	void machine_start_epos();
+	void machine_start_dealer();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_pens( pen_t *pens );
 	required_device<cpu_device> m_maincpu;

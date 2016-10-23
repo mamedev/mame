@@ -19,8 +19,8 @@ public:
 
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);
-	DECLARE_MACHINE_RESET(killbld);
-	DECLARE_MACHINE_RESET(dw3);
+	void machine_reset_killbld();
+	void machine_reset_dw3();
 
 	void igs025_to_igs022_callback( void );
 

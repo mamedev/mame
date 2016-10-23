@@ -1084,7 +1084,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 }
 
 
-VIDEO_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::video_start_amstrad()
 {
 	amstrad_init_lookups();
 
@@ -3104,14 +3104,14 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::machine_start_amstrad()
 {
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,amstrad)
+void amstrad_state::machine_reset_amstrad()
 {
 	amstrad_common_init();
 	amstrad_reset_machine();
@@ -3126,7 +3126,7 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,plus)
+void amstrad_state::machine_start_plus()
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
@@ -3141,7 +3141,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,plus)
+void amstrad_state::machine_reset_plus()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3173,7 +3173,7 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
-MACHINE_START_MEMBER(amstrad_state,gx4000)
+void amstrad_state::machine_start_gx4000()
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
@@ -3184,7 +3184,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 		m_region_cart = memregion("maincpu");
 }
 
-MACHINE_RESET_MEMBER(amstrad_state,gx4000)
+void amstrad_state::machine_reset_gx4000()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3215,7 +3215,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
-MACHINE_START_MEMBER(amstrad_state,kccomp)
+void amstrad_state::machine_start_kccomp()
 {
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
@@ -3229,7 +3229,7 @@ MACHINE_START_MEMBER(amstrad_state,kccomp)
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,kccomp)
+void amstrad_state::machine_reset_kccomp()
 {
 	amstrad_common_init();
 	kccomp_reset_machine();
@@ -3244,13 +3244,13 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,aleste)
+void amstrad_state::machine_start_aleste()
 {
 	m_system_type = SYSTEM_ALESTE;
 	m_centronics->write_data7(0);
 }
 
-MACHINE_RESET_MEMBER(amstrad_state,aleste)
+void amstrad_state::machine_reset_aleste()
 {
 	amstrad_common_init();
 	amstrad_reset_machine();

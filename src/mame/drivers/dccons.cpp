@@ -575,7 +575,7 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
+void dc_cons_state::machine_reset_dc_console()
 {
 	dc_state::machine_reset();
 	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);

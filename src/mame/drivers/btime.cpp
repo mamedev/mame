@@ -1235,7 +1235,7 @@ static DISCRETE_SOUND_START( btime_sound )
 DISCRETE_SOUND_END
 
 
-MACHINE_START_MEMBER(btime_state,btime)
+void btime_state::machine_start_btime()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -1245,9 +1245,9 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_audio_nmi_state));
 }
 
-MACHINE_START_MEMBER(btime_state,mmonkey)
+void btime_state::machine_start_mmonkey()
 {
-	MACHINE_START_CALL_MEMBER(btime);
+	machine_start_btime();
 
 	save_item(NAME(m_protection_command));
 	save_item(NAME(m_protection_status));
@@ -1255,7 +1255,7 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 	save_item(NAME(m_protection_ret));
 }
 
-MACHINE_RESET_MEMBER(btime_state,btime)
+void btime_state::machine_reset_btime()
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
 	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
@@ -1270,16 +1270,16 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_audio_nmi_state = 0;
 }
 
-MACHINE_RESET_MEMBER(btime_state,lnc)
+void btime_state::machine_reset_lnc()
 {
 	*m_lnc_charbank = 1;
 
-	MACHINE_RESET_CALL_MEMBER(btime);
+	machine_reset_btime();
 }
 
-MACHINE_RESET_MEMBER(btime_state,mmonkey)
+void btime_state::machine_reset_mmonkey()
 {
-	MACHINE_RESET_CALL_MEMBER(lnc);
+	machine_reset_lnc();
 
 	m_protection_command = 0;
 	m_protection_status = 0;

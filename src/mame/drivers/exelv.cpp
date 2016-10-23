@@ -90,8 +90,8 @@ public:
 	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
 	DECLARE_READ8_MEMBER( rom_r );
 
-	DECLARE_MACHINE_START(exl100);
-	DECLARE_MACHINE_START(exeltel);
+	void machine_start_exl100();
+	void machine_start_exeltel();
 
 	/* tms7020 i/o ports */
 	uint8_t   m_tms7020_portb;
@@ -451,7 +451,7 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-MACHINE_START_MEMBER( exelv_state, exl100)
+void exelv_state::machine_start_exl100()
 {
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
@@ -462,7 +462,7 @@ MACHINE_START_MEMBER( exelv_state, exl100)
 	save_item(NAME(m_wx319));
 }
 
-MACHINE_START_MEMBER( exelv_state, exeltel)
+void exelv_state::machine_start_exeltel()
 {
 	uint8_t *rom = memregion("user1")->base() + 0x0200;
 	membank("bank1")->configure_entry(0, rom);

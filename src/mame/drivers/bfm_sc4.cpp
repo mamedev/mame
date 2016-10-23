@@ -803,7 +803,7 @@ uint16_t sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, 
 	}
 }
 
-MACHINE_RESET_MEMBER(sc4_state,sc4)
+void sc4_state::machine_reset_sc4()
 {
 	m_dochk41 = true;
 
@@ -811,7 +811,7 @@ MACHINE_RESET_MEMBER(sc4_state,sc4)
 }
 
 
-MACHINE_START_MEMBER(sc4_state,sc4)
+void sc4_state::machine_start_sc4()
 {
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
@@ -1245,11 +1245,11 @@ MACHINE_CONFIG_START( sc4_no_reels, sc4_state )
 	MCFG_FRAGMENT_ADD(sc4_common)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(sc4_adder4_state,adder4)
+void sc4_adder4_state::machine_start_adder4()
 {
 	m_adder4cpuregion = (uint32_t*)memregion( "adder4" )->base();
 	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
-	MACHINE_START_CALL_MEMBER(sc4);
+	machine_start_sc4();
 }
 
 MACHINE_CONFIG_START( sc4_adder4, sc4_adder4_state )

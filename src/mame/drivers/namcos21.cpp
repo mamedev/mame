@@ -1619,9 +1619,9 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(namcos21_state,namcos21)
+void namcos21_state::machine_start_namcos21()
 {
-	MACHINE_START_CALL_MEMBER( namcos2 );
+	machine_start_namcos2();
 	namcos2_kickstart = namcos21_kickstart;
 }
 

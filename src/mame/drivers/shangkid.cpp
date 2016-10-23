@@ -144,12 +144,12 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 
 /***************************************************************************************/
 
-MACHINE_RESET_MEMBER(shangkid_state,chinhero)
+void shangkid_state::machine_reset_chinhero()
 {
 	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
 }
 
-MACHINE_RESET_MEMBER(shangkid_state,shangkid)
+void shangkid_state::machine_reset_shangkid()
 {
 	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
 

@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(matmania_state,maniach)
+void matmania_state::machine_start_maniach()
 {
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
@@ -482,7 +482,7 @@ MACHINE_START_MEMBER(matmania_state,maniach)
 	save_item(NAME(m_from_mcu));
 }
 
-MACHINE_RESET_MEMBER(matmania_state,maniach)
+void matmania_state::machine_reset_maniach()
 {
 	m_port_a_in = 0;
 	m_port_a_out = 0;

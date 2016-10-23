@@ -131,8 +131,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(playch10);
-	DECLARE_MACHINE_START(playch10_hboard);
-	DECLARE_VIDEO_START(playch10_hboard);
+	void machine_start_playch10_hboard();
+	void video_start_playch10_hboard();
 	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -59,9 +59,9 @@ public:
 	DECLARE_DRIVER_INIT(pitfightb);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(atarig1);
-	DECLARE_MACHINE_RESET(atarig1);
-	DECLARE_VIDEO_START(atarig1);
+	void machine_start_atarig1();
+	void machine_reset_atarig1();
+	void video_start_atarig1();
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	void pitfightb_cheap_slapstic_init();

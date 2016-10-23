@@ -3280,19 +3280,19 @@ GFXDECODE_END
 *
 ********************************************************************/
 
-MACHINE_START_MEMBER(cps_state,common)
+void cps_state::machine_start_common()
 {
 }
 
-MACHINE_START_MEMBER(cps_state,cps1)
+void cps_state::machine_start_cps1()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(cps_state,qsound)
+void cps_state::machine_start_qsound()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 

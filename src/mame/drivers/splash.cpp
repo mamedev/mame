@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(splash_state,funystrp)
+void splash_state::machine_reset_funystrp()
 {
 	m_adpcm_data = 0;
 	m_ret = 0x100;
@@ -473,12 +473,12 @@ static GFXDECODE_START( splash )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(splash_state,splash)
+void splash_state::machine_start_splash()
 {
 	save_item(NAME(m_adpcm_data));
 }
 
-MACHINE_RESET_MEMBER(splash_state,splash)
+void splash_state::machine_reset_splash()
 {
 	m_adpcm_data = 0;
 	m_ret = 0x100;
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_START( splash, splash_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(splash_state, roldfrog)
+void splash_state::machine_start_roldfrog()
 {
 	save_item(NAME(m_ret));
 	save_item(NAME(m_vblank_irq));
@@ -611,7 +611,7 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 }
 
 
-MACHINE_START_MEMBER(splash_state, funystrp)
+void splash_state::machine_start_funystrp()
 {
 	save_item(NAME(m_funystrp_val));
 	save_item(NAME(m_funystrp_ff3cc7_val));

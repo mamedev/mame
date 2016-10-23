@@ -125,7 +125,7 @@ WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offs
 ***************************************************************************/
 
 
-VIDEO_START_MEMBER(unico_state,unico)
+void unico_state::video_start_unico()
 {
 	m_vram   = make_unique_clear<uint16_t[]>(0xc000 / 2);
 	m_scroll = make_unique_clear<uint16_t[]>(0x18 / 2);

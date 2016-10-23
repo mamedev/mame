@@ -75,8 +75,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bballs_68705_w);
 	DECLARE_READ8_MEMBER(pushman_68000_r);
 	DECLARE_WRITE8_MEMBER(pushman_68000_w);
-	DECLARE_MACHINE_RESET(pushman);
-	DECLARE_MACHINE_RESET(bballs);
+	void machine_reset_pushman();
+	void machine_reset_bballs();
 
 	virtual void machine_start() override;
 

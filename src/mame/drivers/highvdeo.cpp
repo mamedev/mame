@@ -146,7 +146,7 @@ public:
 	DECLARE_DRIVER_INIT(fashion);
 	DECLARE_DRIVER_INIT(ciclone);
 	DECLARE_DRIVER_INIT(record);
-	DECLARE_VIDEO_START(tourvisn);
+	void video_start_tourvisn();
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -159,7 +159,7 @@ public:
 
 
 
-VIDEO_START_MEMBER(highvdeo_state,tourvisn)
+void highvdeo_state::video_start_tourvisn()
 {
 }
 

@@ -144,7 +144,7 @@ void wwfwfest_state::video_start()
 
 }
 
-VIDEO_START_MEMBER(wwfwfest_state,wwfwfstb)
+void wwfwfest_state::video_start_wwfwfstb()
 {
 	wwfwfest_state::video_start();
 

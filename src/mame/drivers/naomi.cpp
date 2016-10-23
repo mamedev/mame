@@ -2629,7 +2629,7 @@ static INPUT_PORTS_START( aw1w )
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(naomi_state,naomi)
+void naomi_state::machine_reset_naomi()
 {
 	naomi_state::machine_reset();
 	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);

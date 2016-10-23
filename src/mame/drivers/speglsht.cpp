@@ -135,9 +135,9 @@ public:
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	DECLARE_DRIVER_INIT(speglsht);
-	DECLARE_MACHINE_RESET(speglsht);
+	void machine_reset_speglsht();
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(speglsht);
+	void video_start_speglsht();
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
@@ -343,15 +343,15 @@ static GFXDECODE_START( speglsht )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(speglsht_state,speglsht)
+void speglsht_state::machine_reset_speglsht()
 {
 	memset(m_shared,0,0x1000);
 }
 
-VIDEO_START_MEMBER(speglsht_state,speglsht)
+void speglsht_state::video_start_speglsht()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
-//  VIDEO_START_CALL_MEMBER(st0016);
+//  video_start_st0016();
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \

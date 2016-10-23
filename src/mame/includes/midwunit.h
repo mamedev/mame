@@ -54,8 +54,8 @@ public:
 	DECLARE_DRIVER_INIT(umk3r11);
 	DECLARE_DRIVER_INIT(mk3r20);
 
-	DECLARE_MACHINE_RESET(midwunit);
-	DECLARE_VIDEO_START(midwunit);
+	void machine_reset_midwunit();
+	void video_start_midwunit();
 
 	void register_state_saving();
 	void init_wunit_generic();

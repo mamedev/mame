@@ -124,9 +124,9 @@ public:
 	DECLARE_DRIVER_INIT(hero);
 	DECLARE_DRIVER_INIT(superbik);
 	DECLARE_DRIVER_INIT(hunchbaka);
-	DECLARE_MACHINE_START(cvs);
-	DECLARE_MACHINE_RESET(cvs);
-	DECLARE_VIDEO_START(cvs);
+	void machine_start_cvs();
+	void machine_reset_cvs();
+	void video_start_cvs();
 	DECLARE_PALETTE_INIT(cvs);
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);

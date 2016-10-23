@@ -899,7 +899,7 @@ void apollo_state::machine_reset()
 {
 	MLOG1(("machine_reset"));
 
-	MACHINE_RESET_CALL_MEMBER(apollo);
+	machine_reset_apollo();
 
 #ifdef APOLLO_XXL
 	// set configuration
@@ -921,7 +921,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 	MLOG1(("apollo_reset_instr_callback"));
 
 	// reset the CPU board devices
-	MACHINE_RESET_CALL_MEMBER(apollo);
+	machine_reset_apollo();
 
 	// reset the ISA bus devices
 	m_isa->reset();
@@ -947,7 +947,7 @@ void apollo_state::machine_start(){
 	// clear ram
 	memset(messram->ptr(), 0x55, messram->bytes());
 
-	MACHINE_START_CALL_MEMBER(apollo);
+	machine_start_apollo();
 
 	// install nop handlers for unmapped ISA bus addresses
 	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));

@@ -134,7 +134,7 @@ READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 */
 
 
-MACHINE_START_MEMBER(fastfred_state,imago)
+void fastfred_state::machine_start_imago()
 {
 	machine_start();
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);

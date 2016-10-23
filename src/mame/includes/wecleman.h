@@ -97,10 +97,10 @@ public:
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
-	DECLARE_MACHINE_RESET(wecleman);
-	DECLARE_VIDEO_START(wecleman);
-	DECLARE_MACHINE_RESET(hotchase);
-	DECLARE_VIDEO_START(hotchase);
+	void machine_reset_wecleman();
+	void video_start_wecleman();
+	void machine_reset_hotchase();
+	void video_start_hotchase();
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);

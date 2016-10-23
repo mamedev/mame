@@ -540,7 +540,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
-	DECLARE_MACHINE_START(vcc);
+	void machine_start_vcc();
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
@@ -779,7 +779,7 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
-MACHINE_START_MEMBER(fidelz80_state,vcc)
+void fidelz80_state::machine_start_vcc()
 {
 	machine_start();
 

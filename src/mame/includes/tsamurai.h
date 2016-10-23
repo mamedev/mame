@@ -97,13 +97,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(m660);
-	DECLARE_MACHINE_START(tsamurai);
-	DECLARE_MACHINE_START(vsgongf);
+	void machine_start_m660();
+	void machine_start_tsamurai();
+	void machine_start_vsgongf();
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(m660);
-	DECLARE_VIDEO_START(tsamurai);
-	DECLARE_VIDEO_START(vsgongf);
+	void video_start_m660();
+	void video_start_tsamurai();
+	void video_start_vsgongf();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

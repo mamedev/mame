@@ -61,7 +61,7 @@ public:
 	required_shared_ptr<uint8_t> m_riot_ram;
 	uint16_t m_current_screen_height;
 
-	DECLARE_MACHINE_START(a2600);
+	void machine_start_a2600();
 	DECLARE_WRITE8_MEMBER(switch_A_w);
 	DECLARE_READ8_MEMBER(switch_A_r);
 	DECLARE_WRITE8_MEMBER(switch_B_w);
@@ -359,7 +359,7 @@ WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 	m_tia->write(space, offset, data);
 }
 
-MACHINE_START_MEMBER(a2600_state,a2600)
+void a2600_state::machine_start_a2600()
 {
 	m_current_screen_height = m_screen->height();
 	memset(m_riot_ram, 0x00, 0x80);

@@ -118,10 +118,10 @@ public:
 	DECLARE_DRIVER_INIT(sqixr0);
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
-	DECLARE_MACHINE_START(pbillian);
-	DECLARE_VIDEO_START(pbillian);
-	DECLARE_MACHINE_START(superqix);
-	DECLARE_VIDEO_START(superqix);
+	void machine_start_pbillian();
+	void video_start_pbillian();
+	void machine_start_superqix();
+	void video_start_superqix();
 	DECLARE_PALETTE_DECODER(BBGGRRII);
 	uint32_t screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

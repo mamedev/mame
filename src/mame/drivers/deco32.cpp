@@ -1765,7 +1765,7 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-MACHINE_RESET_MEMBER(deco32_state,deco32)
+void deco32_state::machine_reset_deco32()
 {
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }

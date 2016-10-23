@@ -45,9 +45,9 @@ public:
 	DECLARE_DRIVER_INIT(cmast91);
 	DECLARE_DRIVER_INIT(wcherry);
 	DECLARE_DRIVER_INIT(super9);
-	DECLARE_VIDEO_START(goldstar);
+	void video_start_goldstar();
 	DECLARE_PALETTE_INIT(cm);
-	DECLARE_VIDEO_START(cherrym);
+	void video_start_cherrym();
 	DECLARE_PALETTE_INIT(cmast91);
 	DECLARE_PALETTE_INIT(lucky8);
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -172,8 +172,8 @@ public:
 	DECLARE_DRIVER_INIT(flaming7);
 	DECLARE_DRIVER_INIT(flam7_tw);
 
-	DECLARE_VIDEO_START(bingowng);
-	DECLARE_VIDEO_START(magical);
+	void video_start_bingowng();
+	void video_start_magical();
 	DECLARE_PALETTE_INIT(magodds);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -238,7 +238,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
 	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
 
-	DECLARE_VIDEO_START(sangho);
+	void video_start_sangho();
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -281,7 +281,7 @@ public:
 	DECLARE_DRIVER_INIT(unkch3);
 	DECLARE_DRIVER_INIT(unkch4);
 
-	DECLARE_VIDEO_START(unkch);
+	void video_start_unkch();
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);

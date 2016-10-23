@@ -832,7 +832,7 @@ void slapfght_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(slapfght_state,getstar)
+void slapfght_state::machine_reset_getstar()
 {
 	// don't boot the mcu since we don't have a dump yet
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

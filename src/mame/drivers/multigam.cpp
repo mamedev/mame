@@ -188,9 +188,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(multigam);
-	DECLARE_MACHINE_START(multigm3);
-	DECLARE_MACHINE_RESET(multigm3);
-	DECLARE_MACHINE_START(supergm3);
+	void machine_start_multigm3();
+	void machine_reset_multigm3();
+	void machine_start_supergm3();
 	uint32_t screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
@@ -1154,7 +1154,7 @@ void multigam_state::machine_reset()
 {
 }
 
-MACHINE_RESET_MEMBER(multigam_state,multigm3)
+void multigam_state::machine_reset_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* reset the ppu */
@@ -1174,7 +1174,7 @@ void multigam_state::machine_start()
 	membank("bank1")->set_base(memregion("gfx1")->base());
 }
 
-MACHINE_START_MEMBER(multigam_state,multigm3)
+void multigam_state::machine_start_multigm3()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
@@ -1196,7 +1196,7 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 	set_videorom_bank(0, 8, 0, 8);
 }
 
-MACHINE_START_MEMBER(multigam_state,supergm3)
+void multigam_state::machine_start_supergm3()
 {
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();

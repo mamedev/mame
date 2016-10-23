@@ -273,7 +273,7 @@ void z80ne_state::reset_lx390_banking()
 	 */
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
+void z80ne_state::machine_reset_z80ne_base()
 {
 	int i;
 
@@ -326,32 +326,32 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_reset_z80ne()
 {
 	LOG(("In machine_reset z80ne\n"));
 	reset_lx382_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80net)
+void z80ne_state::machine_reset_z80net()
 {
 	LOG(("In machine_reset z80net\n"));
-	MACHINE_RESET_CALL_MEMBER( z80ne );
+	machine_reset_z80ne();
 	reset_lx388();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netb)
+void z80ne_state::machine_reset_z80netb()
 {
 	LOG(("In machine_reset z80netb\n"));
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 	reset_lx388();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netf)
+void z80ne_state::machine_reset_z80netf()
 {
 	LOG(("In machine_reset z80netf\n"));
 	reset_lx390_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 	reset_lx388();
 }
 
@@ -377,7 +377,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 	}
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_start_z80ne()
 {
 	LOG(("In MACHINE_START z80ne\n"));
 	m_lx385_ctrl = 0x1f;
@@ -389,21 +389,21 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80net)
+void z80ne_state::machine_start_z80net()
 {
-	MACHINE_START_CALL_MEMBER( z80ne );
+	machine_start_z80ne();
 	LOG(("In MACHINE_START z80net\n"));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80netb)
+void z80ne_state::machine_start_z80netb()
 {
-	MACHINE_START_CALL_MEMBER( z80net );
+	machine_start_z80net();
 	LOG(("In MACHINE_START z80netb\n"));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80netf)
+void z80ne_state::machine_start_z80netf()
 {
-	MACHINE_START_CALL_MEMBER( z80net );
+	machine_start_z80net();
 	LOG(("In MACHINE_START z80netf\n"));
 }
 

@@ -199,8 +199,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(apollo);
-	DECLARE_MACHINE_START(apollo);
+	void machine_reset_apollo();
+	void machine_start_apollo();
 
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);

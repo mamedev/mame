@@ -94,9 +94,9 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
-	DECLARE_VIDEO_START(pgm);
-	DECLARE_MACHINE_START(pgm);
-	DECLARE_MACHINE_RESET(pgm);
+	void video_start_pgm();
+	void machine_start_pgm();
+	void machine_reset_pgm();
 	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);

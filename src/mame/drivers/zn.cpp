@@ -104,17 +104,17 @@ public:
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
 	DECLARE_DRIVER_INIT(coh1000tb);
-	DECLARE_MACHINE_RESET(coh1000c);
-	DECLARE_MACHINE_RESET(glpracr);
-	DECLARE_MACHINE_RESET(coh1000ta);
-	DECLARE_MACHINE_RESET(coh1000tb);
-	DECLARE_MACHINE_RESET(coh1002tb);
-	DECLARE_MACHINE_RESET(coh1002e);
-	DECLARE_MACHINE_RESET(bam2);
-	DECLARE_MACHINE_RESET(nbajamex);
-	DECLARE_MACHINE_RESET(coh1001l);
-	DECLARE_MACHINE_RESET(coh1002v);
-	DECLARE_MACHINE_RESET(coh1002m);
+	void machine_reset_coh1000c();
+	void machine_reset_glpracr();
+	void machine_reset_coh1000ta();
+	void machine_reset_coh1000tb();
+	void machine_reset_coh1002tb();
+	void machine_reset_coh1002e();
+	void machine_reset_bam2();
+	void machine_reset_nbajamex();
+	void machine_reset_coh1001l();
+	void machine_reset_coh1002v();
+	void machine_reset_coh1002m();
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -516,15 +516,15 @@ static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1000c)
+void zn_state::machine_reset_coh1000c()
 {
 	membank("bankedroms")->set_base(memregion("maskroms")->base() + 0x400000 ); /* banked game rom */
 }
 
-MACHINE_RESET_MEMBER(zn_state,glpracr)
+void zn_state::machine_reset_glpracr()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr qsound rom sockets are empty
-	MACHINE_RESET_CALL_MEMBER(coh1000c);
+	machine_reset_coh1000c();
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1000ta)
+void zn_state::machine_reset_coh1000ta()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }
@@ -1046,7 +1046,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 }
 
-MACHINE_RESET_MEMBER(zn_state,coh1000tb)
+void zn_state::machine_reset_coh1000tb()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked game rom */
 }
@@ -1495,7 +1495,7 @@ static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1002e)
+void zn_state::machine_reset_coh1002e()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }
@@ -1630,7 +1630,7 @@ static ADDRESS_MAP_START(bam2_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,bam2)
+void zn_state::machine_reset_bam2()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + 0x400000 );
 }
@@ -1934,7 +1934,7 @@ static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,nbajamex)
+void zn_state::machine_reset_nbajamex()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 	membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + 0x200000 );
@@ -2112,7 +2112,7 @@ static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1001l)
+void zn_state::machine_reset_coh1001l()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
 }
@@ -2168,7 +2168,7 @@ static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1002v)
+void zn_state::machine_reset_coh1002v()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
 }
@@ -2351,7 +2351,7 @@ static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(zn_state,coh1002m)
+void zn_state::machine_reset_coh1002m()
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }

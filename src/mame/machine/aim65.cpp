@@ -375,12 +375,12 @@ WRITE8_MEMBER( aim65_state::aim65_pa_w )
 	}
 }
 
-VIDEO_START_MEMBER(aim65_state,aim65)
+void aim65_state::video_start_aim65()
 {
 	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::aim65_printer_timer),this));
 	m_printerRAM = std::make_unique<uint16_t[]>((600 * 10 * 2) / 2);
 	memset(m_printerRAM, 0, videoram_size);
-	VIDEO_START_CALL_MEMBER(generic);
+	video_start_generic();
 	m_printer_x = 0;
 	m_printer_y = 0;
 	m_printer_dir = 0;

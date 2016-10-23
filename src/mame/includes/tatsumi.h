@@ -133,11 +133,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
-	DECLARE_MACHINE_RESET(apache3);
-	DECLARE_VIDEO_START(apache3);
-	DECLARE_VIDEO_START(roundup5);
-	DECLARE_VIDEO_START(cyclwarr);
-	DECLARE_VIDEO_START(bigfight);
+	void machine_reset_apache3();
+	void video_start_apache3();
+	void video_start_roundup5();
+	void video_start_cyclwarr();
+	void video_start_bigfight();
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

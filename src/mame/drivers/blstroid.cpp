@@ -47,7 +47,7 @@ WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
 }
 
 
-MACHINE_RESET_MEMBER(blstroid_state,blstroid)
+void blstroid_state::machine_reset_blstroid()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);

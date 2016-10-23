@@ -13,7 +13,7 @@
 
 
 
-VIDEO_START_MEMBER(p2000t_state,p2000m)
+void p2000t_state::video_start_p2000m()
 {
 	m_frame_count = 0;
 }

@@ -368,7 +368,7 @@ WRITE8_MEMBER(nbmj9195_state::clut_1_w){ clut_w(offset, data, 1); }
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER(nbmj9195_state,_1layer)
+void nbmj9195_state::video_start__1layer()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -457,7 +457,7 @@ void nbmj9195_state::postload()
 	m_screen_refresh = 1;
 }
 
-VIDEO_START_MEMBER(nbmj9195_state,nb22090)
+void nbmj9195_state::video_start_nb22090()
 {
 	nbmj9195_state::video_start();
 

@@ -122,9 +122,9 @@ static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32, pgm_arm_type2_state )
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
+void pgm_arm_type2_state::machine_start_pgm_arm_type2()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
+	machine_start_pgm();
 	/* register type specific Save State stuff here */
 }
 

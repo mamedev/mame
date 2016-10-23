@@ -101,10 +101,10 @@ public:
 	DECLARE_DRIVER_INIT(famicom);
 
 	// these are needed until we modernize the FDS controller
-	DECLARE_MACHINE_START(fds);
-	DECLARE_MACHINE_START(famitwin);
-	DECLARE_MACHINE_RESET(fds);
-	DECLARE_MACHINE_RESET(famitwin);
+	void machine_start_fds();
+	void machine_start_famitwin();
+	void machine_reset_fds();
+	void machine_reset_famitwin();
 	void setup_disk(nes_disksys_device *slot);
 
 private:

@@ -815,12 +815,12 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(fantland_state,fantland)
+void fantland_state::machine_start_fantland()
 {
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,fantland)
+void fantland_state::machine_reset_fantland()
 {
 	m_nmi_enable = 0;
 }
@@ -927,9 +927,9 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(fantland_state,borntofi)
+void fantland_state::machine_start_borntofi()
 {
-	MACHINE_START_CALL_MEMBER(fantland);
+	machine_start_fantland();
 
 	save_item(NAME(m_old_x));
 	save_item(NAME(m_old_y));
@@ -941,11 +941,11 @@ MACHINE_START_MEMBER(fantland_state,borntofi)
 	save_item(NAME(m_adpcm_nibble));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,borntofi)
+void fantland_state::machine_reset_borntofi()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(fantland);
+	machine_reset_fantland();
 
 	for (i = 0; i < 2; i++)
 	{

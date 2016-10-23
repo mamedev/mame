@@ -115,10 +115,10 @@ public:
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
-	DECLARE_MACHINE_START(mcr);
-	DECLARE_MACHINE_RESET(mcr);
-	DECLARE_VIDEO_START(mcr);
-	DECLARE_MACHINE_START(nflfoot);
+	void machine_start_mcr();
+	void machine_reset_mcr();
+	void video_start_mcr();
+	void machine_start_nflfoot();
 	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_hopper_callback);

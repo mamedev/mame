@@ -69,11 +69,11 @@ public:
 	required_device<dac_bit_interface> m_dac;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_DRIVER_INIT(brailab4);
-	DECLARE_VIDEO_START(homelab2);
-	DECLARE_MACHINE_RESET(homelab3);
-	DECLARE_VIDEO_START(homelab3);
-	DECLARE_MACHINE_RESET(brailab4);
-	DECLARE_VIDEO_START(brailab4);
+	void video_start_homelab2();
+	void machine_reset_homelab3();
+	void video_start_homelab3();
+	void machine_reset_brailab4();
+	void video_start_brailab4();
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
@@ -126,11 +126,11 @@ WRITE8_MEMBER( homelab_state::cass_w )
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
-MACHINE_RESET_MEMBER(homelab_state,homelab3)
+void homelab_state::machine_reset_homelab3()
 {
 }
 
-MACHINE_RESET_MEMBER(homelab_state,brailab4)
+void homelab_state::machine_reset_brailab4()
 {
 	membank("bank1")->set_entry(0);
 }
@@ -543,19 +543,19 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(homelab_state,homelab2)
+void homelab_state::video_start_homelab2()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0xc000;
 }
 
-VIDEO_START_MEMBER(homelab_state,homelab3)
+void homelab_state::video_start_homelab3()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0xf800;
 }
 
-VIDEO_START_MEMBER(homelab_state,brailab4)
+void homelab_state::video_start_brailab4()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0x17800;

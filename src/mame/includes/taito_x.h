@@ -15,8 +15,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(kyustrkr);
-	DECLARE_MACHINE_START(taitox);
-	DECLARE_MACHINE_START(superman);
+	void machine_start_taitox();
+	void machine_start_superman();
 
 	// superman c-chip
 	uint16_t m_current_bank;

@@ -62,9 +62,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
-	DECLARE_MACHINE_START(atarigx2);
-	DECLARE_MACHINE_RESET(atarigx2);
-	DECLARE_VIDEO_START(atarigx2);
+	void machine_start_atarigx2();
+	void machine_reset_atarigx2();
+	void video_start_atarigx2();
 	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
 };

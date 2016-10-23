@@ -269,7 +269,7 @@ void metro_state::expand_gfx1()
 	}
 }
 
-VIDEO_START_MEMBER(metro_state,metro_i4100)
+void metro_state::video_start_metro_i4100()
 {
 	expand_gfx1();
 
@@ -284,38 +284,38 @@ VIDEO_START_MEMBER(metro_state,metro_i4100)
 	m_sprite_xoffs_dx = 0;
 }
 
-VIDEO_START_MEMBER(metro_state,metro_i4220)
+void metro_state::video_start_metro_i4220()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4100);
+	video_start_metro_i4100();
 
 	m_support_8bpp = 1;     // balcube
 	m_support_16x16 = 1;    // vmetal
 }
-VIDEO_START_MEMBER(metro_state,metro_i4220_dx_tmap)
+void metro_state::video_start_metro_i4220_dx_tmap()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4220);
+	video_start_metro_i4220();
 
 	m_tilemap_scrolldx[0] = -2;
 	m_tilemap_scrolldx[1] = -2;
 	m_tilemap_scrolldx[2] = -2;
 }
-VIDEO_START_MEMBER(metro_state,metro_i4220_dx_sprite)
+void metro_state::video_start_metro_i4220_dx_sprite()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4220);
+	video_start_metro_i4220();
 
 	m_sprite_xoffs_dx = 8;
 }
 
-VIDEO_START_MEMBER(metro_state,metro_i4300)
+void metro_state::video_start_metro_i4300()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4220);
+	video_start_metro_i4220();
 
 	// any additional feature?
 }
 
-VIDEO_START_MEMBER(metro_state,blzntrnd)
+void metro_state::video_start_blzntrnd()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4220);
+	video_start_metro_i4220();
 
 	m_has_zoom = 1;
 
@@ -326,9 +326,9 @@ VIDEO_START_MEMBER(metro_state,blzntrnd)
 	m_tilemap_scrolldx[2] = 8;
 }
 
-VIDEO_START_MEMBER(metro_state,gstrik2)
+void metro_state::video_start_gstrik2()
 {
-	VIDEO_START_CALL_MEMBER(metro_i4220);
+	video_start_metro_i4220();
 
 	m_has_zoom = 1;
 

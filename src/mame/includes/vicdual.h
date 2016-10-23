@@ -142,10 +142,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
-	DECLARE_MACHINE_START(samurai);
-	DECLARE_MACHINE_START(nsub);
-	DECLARE_MACHINE_RESET(nsub);
-	DECLARE_MACHINE_START(frogs_audio);
+	void machine_start_samurai();
+	void machine_start_nsub();
+	void machine_reset_nsub();
+	void machine_start_frogs_audio();
 
 	virtual void machine_start() override;
 

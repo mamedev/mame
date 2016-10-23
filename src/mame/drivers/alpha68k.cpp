@@ -1825,7 +1825,7 @@ WRITE8_MEMBER(alpha68k_state::porta_w)
 /******************************************************************************/
 
 
-MACHINE_START_MEMBER(alpha68k_state,common)
+void alpha68k_state::machine_start_common()
 {
 	save_item(NAME(m_trigstate));
 	save_item(NAME(m_deposits1));
@@ -1837,7 +1837,7 @@ MACHINE_START_MEMBER(alpha68k_state,common)
 	save_item(NAME(m_flipscreen));
 }
 
-MACHINE_RESET_MEMBER(alpha68k_state,common)
+void alpha68k_state::machine_reset_common()
 {
 	m_trigstate = 0;
 	m_deposits1 = 0;
@@ -1849,29 +1849,29 @@ MACHINE_RESET_MEMBER(alpha68k_state,common)
 	m_flipscreen = 0;
 }
 
-MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
+void alpha68k_state::machine_start_alpha68k_V()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
 }
 
-MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
+void alpha68k_state::machine_reset_alpha68k_V()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_bank_base = 0;
 	m_last_bank = 0;
 }
 
-MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
+void alpha68k_state::machine_reset_alpha68k_II()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_bank_base = 0;
 	m_last_bank = 0;
@@ -1880,13 +1880,13 @@ MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 	m_buffer_68 = 0;
 }
 
-MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
+void alpha68k_state::machine_start_alpha68k_II()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));

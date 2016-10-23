@@ -409,7 +409,7 @@ static GFXDECODE_START( pleiads )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(phoenix_state,phoenix)
+void phoenix_state::machine_reset_phoenix()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }

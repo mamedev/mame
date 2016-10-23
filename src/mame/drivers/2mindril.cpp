@@ -62,8 +62,8 @@ public:
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
 	DECLARE_DRIVER_INIT(drill);
-	DECLARE_MACHINE_START(drill);
-	DECLARE_MACHINE_RESET(drill);
+	void machine_start_drill();
+	void machine_reset_drill();
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void tile_decode();
@@ -429,14 +429,14 @@ WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 }
 
 
-MACHINE_START_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_start_drill()
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 	save_item(NAME(m_irq_reg));
 }
 
-MACHINE_RESET_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_reset_drill()
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;

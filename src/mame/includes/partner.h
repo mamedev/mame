@@ -28,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
 	DECLARE_DRIVER_INIT(partner);
-	DECLARE_MACHINE_START(partner);
-	DECLARE_MACHINE_RESET(partner);
+	void machine_start_partner();
+	void machine_reset_partner();
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	void partner_window_1(uint8_t bank_num, uint16_t offset,uint8_t *rom);

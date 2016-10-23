@@ -77,8 +77,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s4);
-	DECLARE_MACHINE_RESET(s4a);
+	void machine_reset_s4();
+	void machine_reset_s4a();
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -254,13 +254,13 @@ static INPUT_PORTS_START( s4 )
 	PORT_DIPSETTING(    0x07, "31" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s4_state, s4 )
+void s4_state::machine_reset_s4()
 {
 	m_t_c = 0;
 	m_chimes = 1;
 }
 
-MACHINE_RESET_MEMBER( s4_state, s4a )
+void s4_state::machine_reset_s4a()
 {
 	m_t_c = 0;
 	m_chimes = 0;

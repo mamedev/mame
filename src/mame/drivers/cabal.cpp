@@ -51,18 +51,18 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "sound/msm5205.h"
 #include "includes/cabal.h"
 
-MACHINE_START_MEMBER(cabal_state,cabal)
+void cabal_state::machine_start_cabal()
 {
 	save_item(NAME(m_last));
 }
 
-MACHINE_START_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_start_cabalbl()
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 }
 
-MACHINE_RESET_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_reset_cabalbl()
 {
 	m_sound_command1 = m_sound_command2 = 0xff;
 }

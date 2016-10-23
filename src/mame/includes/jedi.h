@@ -82,7 +82,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
-	DECLARE_VIDEO_START(jedi);
+	void video_start_jedi();
 	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(generate_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_audio_latch_w);

@@ -44,7 +44,7 @@ void atarigx2_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::machine_reset_atarigx2()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);

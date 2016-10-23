@@ -87,8 +87,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
-	DECLARE_MACHINE_START(neocd);
-	DECLARE_MACHINE_RESET(neocd);
+	void machine_start_neocd();
+	void machine_reset_neocd();
 
 	// neoCD
 
@@ -823,7 +823,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
  *
  *************************************/
 
-MACHINE_START_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_start_neocd()
 {
 	m_type = NEOGEO_CD;
 	common_machine_start();
@@ -860,7 +860,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_reset_neocd()
 {
 	neogeo_state::machine_reset();
 

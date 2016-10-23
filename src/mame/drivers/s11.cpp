@@ -159,7 +159,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s11_state, s11 )
+void s11_state::machine_reset_s11()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);

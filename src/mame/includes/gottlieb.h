@@ -128,7 +128,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(screwloo);
+	void video_start_screwloo();
 	uint32_t screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
 	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);

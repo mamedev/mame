@@ -291,7 +291,7 @@ INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
 	m_scc->mcu_frame();
 }
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
+void cdi_state::machine_reset_cdimono1()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
@@ -305,7 +305,7 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
+void cdi_state::machine_reset_cdimono2()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
@@ -317,34 +317,34 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard12 )
+void cdi_state::machine_reset_quizard12()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x021f);
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard17 )
+void cdi_state::machine_reset_quizard17()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x021f);
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
 /* Untested - copied from quizard17 */
-MACHINE_RESET_MEMBER( cdi_state, quizard18 )
+void cdi_state::machine_reset_quizard18()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x021f);
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard22 )
+void cdi_state::machine_reset_quizard22()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	// 0x2b1: Italian
 	// 0x001: French
@@ -355,9 +355,9 @@ MACHINE_RESET_MEMBER( cdi_state, quizard22 )
 }
 
 /* Untested - copied from quizard22 */
-MACHINE_RESET_MEMBER( cdi_state, quizard23 )
+void cdi_state::machine_reset_quizard23()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	// 0x2b1: Italian
 	// 0x001: French
@@ -367,45 +367,45 @@ MACHINE_RESET_MEMBER( cdi_state, quizard23 )
 	m_scc->set_quizard_mcu_ack(0x59);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard32 )
+void cdi_state::machine_reset_quizard32()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x00ae);
 	m_scc->set_quizard_mcu_ack(0x58);
 }
 
 /* Untested - copied from quizard32 */
-MACHINE_RESET_MEMBER( cdi_state, quizard34 )
+void cdi_state::machine_reset_quizard34()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x00ae);
 	m_scc->set_quizard_mcu_ack(0x58);
 }
 
 /* Untested - copied from quizard4r41 */
-MACHINE_RESET_MEMBER( cdi_state, quizard4r40 )
+void cdi_state::machine_reset_quizard4r40()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	//m_scc->set_quizard_mcu_value(0x0139);
 	m_scc->set_quizard_mcu_value(0x011f);
 	m_scc->set_quizard_mcu_ack(0x57);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard4r41 )
+void cdi_state::machine_reset_quizard4r41()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	//m_scc->set_quizard_mcu_value(0x0139);
 	m_scc->set_quizard_mcu_value(0x011f);
 	m_scc->set_quizard_mcu_ack(0x57);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard4r42 )
+void cdi_state::machine_reset_quizard4r42()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x01ae);
 	m_scc->set_quizard_mcu_ack(0x57);

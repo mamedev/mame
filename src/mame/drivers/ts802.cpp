@@ -43,7 +43,7 @@ public:
 	}
 
 	DECLARE_DRIVER_INIT(ts802);
-	DECLARE_MACHINE_RESET(ts802);
+	void machine_reset_ts802();
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
 	DECLARE_READ8_MEMBER(port0e_r) { return 0; };
@@ -140,7 +140,7 @@ static SLOT_INTERFACE_START( ts802_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_RESET_MEMBER( ts802_state, ts802 )
+void ts802_state::machine_reset_ts802()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

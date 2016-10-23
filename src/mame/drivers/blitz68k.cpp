@@ -172,8 +172,8 @@ public:
 	DECLARE_DRIVER_INIT(megadblj);
 	DECLARE_DRIVER_INIT(hermit);
 	DECLARE_DRIVER_INIT(dualgame);
-	DECLARE_VIDEO_START(blitz68k);
-	DECLARE_VIDEO_START(blitz68k_addr_factor1);
+	void video_start_blitz68k();
+	void video_start_blitz68k_addr_factor1();
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
@@ -201,15 +201,15 @@ struct blit_t
 	int addr_factor;
 } blit;
 
-VIDEO_START_MEMBER(blitz68k_state,blitz68k)
+void blitz68k_state::video_start_blitz68k()
 {
 	m_blit_buffer = std::make_unique<uint8_t[]>(512*256);
 	blit.addr_factor = 2;
 }
 
-VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
+void blitz68k_state::video_start_blitz68k_addr_factor1()
 {
-	VIDEO_START_CALL_MEMBER(blitz68k);
+	video_start_blitz68k();
 	blit.addr_factor = 1;
 }
 

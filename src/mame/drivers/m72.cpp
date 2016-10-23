@@ -238,7 +238,7 @@ void m72_state::machine_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
 }
 
-MACHINE_START_MEMBER(m72_state,kengo)
+void m72_state::machine_start_kengo()
 {
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
 }
@@ -258,7 +258,7 @@ void m72_state::machine_reset()
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
 }
 
-MACHINE_RESET_MEMBER(m72_state,kengo)
+void m72_state::machine_reset_kengo()
 {
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }

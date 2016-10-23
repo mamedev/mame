@@ -15,7 +15,7 @@
 
 
 
-VIDEO_START_MEMBER(apple2gs_state,apple2gs)
+void apple2gs_state::video_start_apple2gs()
 {
 	m_bordercolor = 0;
 	apple2_video_start(m_slowmem.get(), m_slowmem.get()+0x10000, 0, 8);

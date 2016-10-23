@@ -138,12 +138,12 @@ public:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_MACHINE_START( cbm2 );
-	DECLARE_MACHINE_START( cbm2_ntsc );
-	DECLARE_MACHINE_START( cbm2_pal );
-	DECLARE_MACHINE_START( cbm2x_ntsc );
-	DECLARE_MACHINE_START( cbm2x_pal );
-	DECLARE_MACHINE_RESET( cbm2 );
+	void machine_start_cbm2();
+	void machine_start_cbm2_ntsc();
+	void machine_start_cbm2_pal();
+	void machine_start_cbm2x_ntsc();
+	void machine_start_cbm2x_pal();
+	void machine_reset_cbm2();
 
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
@@ -254,10 +254,10 @@ public:
 	required_device<mos6566_device> m_vic;
 	optional_shared_ptr<uint8_t> m_color_ram;
 
-	DECLARE_MACHINE_START( p500 );
-	DECLARE_MACHINE_START( p500_ntsc );
-	DECLARE_MACHINE_START( p500_pal );
-	DECLARE_MACHINE_RESET( p500 );
+	void machine_start_p500();
+	void machine_start_p500_ntsc();
+	void machine_start_p500_pal();
+	void machine_reset_p500();
 
 	void read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
 		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
@@ -2088,7 +2088,7 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 //  MACHINE_START( cbm2 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm2_state, cbm2 )
+void cbm2_state::machine_start_cbm2()
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -2118,11 +2118,11 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 //  MACHINE_START( cbm2_ntsc )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
+void cbm2_state::machine_start_cbm2_ntsc()
 {
 	m_ntsc = 1;
 
-	MACHINE_START_CALL_MEMBER(cbm2);
+	machine_start_cbm2();
 }
 
 
@@ -2130,11 +2130,11 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
 //  MACHINE_START( cbm2_pal )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
+void cbm2_state::machine_start_cbm2_pal()
 {
 	m_ntsc = 0;
 
-	MACHINE_START_CALL_MEMBER(cbm2);
+	machine_start_cbm2();
 }
 
 
@@ -2142,12 +2142,12 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 //  MACHINE_START( cbm2x_ntsc )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
+void cbm2_state::machine_start_cbm2x_ntsc()
 {
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
-	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
+	machine_start_cbm2_ntsc();
 }
 
 
@@ -2155,12 +2155,12 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 //  MACHINE_START( cbm2x_pal )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
+void cbm2_state::machine_start_cbm2x_pal()
 {
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
 
-	MACHINE_START_CALL_MEMBER(cbm2_pal);
+	machine_start_cbm2_pal();
 }
 
 
@@ -2168,11 +2168,11 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 //  MACHINE_START( p500 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( p500_state, p500 )
+void p500_state::machine_start_p500()
 {
 	m_video_ram_size = 0x400;
 
-	MACHINE_START_CALL_MEMBER(cbm2);
+	machine_start_cbm2();
 
 	// allocate memory
 	m_color_ram.allocate(0x400);
@@ -2189,11 +2189,11 @@ MACHINE_START_MEMBER( p500_state, p500 )
 //  MACHINE_START( p500_ntsc )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( p500_state, p500_ntsc )
+void p500_state::machine_start_p500_ntsc()
 {
 	m_ntsc = 1;
 
-	MACHINE_START_CALL_MEMBER(p500);
+	machine_start_p500();
 }
 
 
@@ -2201,15 +2201,15 @@ MACHINE_START_MEMBER( p500_state, p500_ntsc )
 //  MACHINE_START( p500_pal )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( p500_state, p500_pal )
+void p500_state::machine_start_p500_pal()
 {
 	m_ntsc = 0;
 
-	MACHINE_START_CALL_MEMBER(p500);
+	machine_start_p500();
 }
 
 
-MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
+void cbm2_state::machine_reset_cbm2()
 {
 	m_dramon = 1;
 	m_busen1 = 1;
@@ -2234,9 +2234,9 @@ m_ext_cia_pb = 0xff;
 }
 
 
-MACHINE_RESET_MEMBER( p500_state, p500 )
+void p500_state::machine_reset_p500()
 {
-	MACHINE_RESET_CALL_MEMBER(cbm2);
+	machine_reset_cbm2();
 
 	m_vic->reset();
 

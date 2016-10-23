@@ -425,7 +425,7 @@ void einstein_state::machine_reset()
     floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
 }
 
-MACHINE_RESET_MEMBER(einstein_state,einstein2)
+void einstein_state::machine_reset_einstein2()
 {
 	/* call standard initialization first */
 	einstein_state::machine_reset();
@@ -435,7 +435,7 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
-MACHINE_START_MEMBER(einstein_state,einstein2)
+void einstein_state::machine_start_einstein2()
 {
 	m_crtc_ram = std::make_unique<uint8_t[]>(2048);
 	memset(m_crtc_ram.get(), 0, sizeof(uint8_t) * 2048);

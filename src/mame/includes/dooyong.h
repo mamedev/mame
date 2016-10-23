@@ -203,10 +203,10 @@ public:
 	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_MACHINE_START(cpu_z80);
-	DECLARE_VIDEO_START(bluehawk);
-	DECLARE_VIDEO_START(flytiger);
-	DECLARE_VIDEO_START(primella);
+	void machine_start_cpu_z80();
+	void video_start_bluehawk();
+	void video_start_flytiger();
+	void video_start_primella();
 
 	std::unique_ptr<uint8_t[]> m_paletteram_flytiger;
 	uint8_t m_sprites_disabled = 0;
@@ -231,13 +231,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_MACHINE_RESET(sound_ym2203);
+	void machine_reset_sound_ym2203();
 	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(lastday);
-	DECLARE_VIDEO_START(gulfstrm);
-	DECLARE_VIDEO_START(pollux);
+	void video_start_lastday();
+	void video_start_gulfstrm();
+	void video_start_pollux();
 
 	int m_interrupt_line_1 = 0;
 	int m_interrupt_line_2 = 0;
@@ -271,7 +271,7 @@ public:
 	}
 
 	uint32_t screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(rshark);
+	void video_start_rshark();
 };
 
 class popbingo_state : public dooyong_68k_state
@@ -286,7 +286,7 @@ public:
 	}
 
 	uint32_t screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(popbingo);
+	void video_start_popbingo();
 
 protected:
 	bitmap_ind16 m_bg_bitmap;

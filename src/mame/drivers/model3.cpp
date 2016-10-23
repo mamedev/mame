@@ -1283,28 +1283,28 @@ TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
 	m_dma_busy = 0;
 }
 
-MACHINE_START_MEMBER(model3_state,model3_10)
+void model3_state::machine_start_model3_10()
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-MACHINE_START_MEMBER(model3_state,model3_15)
+void model3_state::machine_start_model3_15()
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-MACHINE_START_MEMBER(model3_state,model3_20)
+void model3_state::machine_start_model3_20()
 {
 	configure_fast_ram(machine());
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
-MACHINE_START_MEMBER(model3_state,model3_21)
+void model3_state::machine_start_model3_21()
 {
 	configure_fast_ram(machine());
 
@@ -1362,10 +1362,10 @@ void model3_state::model3_init(int step)
 	}
 }
 
-MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(0x10); }
-MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(0x15); }
-MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
-MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
+void model3_state::machine_reset_model3_10(){ model3_init(0x10); }
+void model3_state::machine_reset_model3_15(){ model3_init(0x15); }
+void model3_state::machine_reset_model3_20(){ model3_init(0x20); }
+void model3_state::machine_reset_model3_21(){ model3_init(0x21); }
 
 
 READ64_MEMBER(model3_state::model3_ctrl_r)

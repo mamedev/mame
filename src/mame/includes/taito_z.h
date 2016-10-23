@@ -100,10 +100,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 	DECLARE_DRIVER_INIT(taitoz);
 	DECLARE_DRIVER_INIT(bshark);
-	DECLARE_MACHINE_START(taitoz);
-	DECLARE_MACHINE_RESET(taitoz);
-	DECLARE_VIDEO_START(taitoz);
-	DECLARE_MACHINE_START(bshark);
+	void machine_start_taitoz();
+	void machine_reset_taitoz();
+	void video_start_taitoz();
+	void machine_start_bshark();
 	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

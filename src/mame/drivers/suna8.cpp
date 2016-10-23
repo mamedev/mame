@@ -1980,7 +1980,7 @@ MACHINE_CONFIG_END
 
 /* 1 x 24 MHz crystal */
 
-MACHINE_RESET_MEMBER(suna8_state,brickzn)
+void suna8_state::machine_reset_brickzn()
 {
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
 	m_paletteram_enab = 1;  // for brickzn11
@@ -2070,7 +2070,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 		if (m_nmi_enable)   m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(suna8_state,hardhea2)
+void suna8_state::machine_reset_hardhea2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);

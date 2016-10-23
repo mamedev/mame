@@ -82,8 +82,8 @@ public:
 	DECLARE_DRIVER_INIT(jdreddp);
 	DECLARE_DRIVER_INIT(mk2);
 
-	DECLARE_MACHINE_RESET(midtunit);
-	DECLARE_VIDEO_START(midtunit);
+	void machine_reset_midtunit();
+	void video_start_midtunit();
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);

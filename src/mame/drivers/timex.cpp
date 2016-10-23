@@ -549,7 +549,7 @@ static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(spectrum_state,ts2068)
+void spectrum_state::machine_reset_ts2068()
 {
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
@@ -559,7 +559,7 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 }
 
 
@@ -586,7 +586,7 @@ static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,tc2048)
+void spectrum_state::machine_reset_tc2048()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -594,7 +594,7 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 	membank("bank2")->set_base(messram);
 	m_port_ff_data = 0;
 	m_port_f4_data = -1;
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 }
 
 

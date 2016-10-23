@@ -71,8 +71,8 @@ public:
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
 	DECLARE_DRIVER_INIT(sapizps3b);
-	DECLARE_MACHINE_RESET(sapi1);
-	DECLARE_MACHINE_RESET(sapizps3);
+	void machine_reset_sapi1();
+	void machine_reset_sapizps3();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -502,13 +502,13 @@ WRITE8_MEMBER( sapi1_state::sapi3_25_w )
 	m_zps3_25 = data & 0xfc; //??
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapi1 )
+void sapi1_state::machine_reset_sapi1()
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::machine_reset_sapizps3()
 {
 	m_keyboard_mask = 0;
 	m_bank1->set_entry(1);

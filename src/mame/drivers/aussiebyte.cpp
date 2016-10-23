@@ -421,7 +421,7 @@ SLOT_INTERFACE_END
     Machine Driver
 
 ************************************************************/
-MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
+void aussiebyte_state::machine_reset_aussiebyte()
 {
 	m_port15 = false;
 	m_port17 = 0;

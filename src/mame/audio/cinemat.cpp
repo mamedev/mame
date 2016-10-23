@@ -168,7 +168,7 @@ void cinemat_state::spacewar_sound_w(uint8_t sound_val, uint8_t bits_changed)
 	}
 }
 
-SOUND_RESET_MEMBER( cinemat_state, spacewar )
+void cinemat_state::sound_reset_spacewar()
 {
 	generic_init(&cinemat_state::spacewar_sound_w);
 }
@@ -216,7 +216,7 @@ void cinemat_state::barrier_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(2, 2);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, barrier )
+void cinemat_state::sound_reset_barrier()
 {
 	generic_init(&cinemat_state::barrier_sound_w);
 }
@@ -269,7 +269,7 @@ void cinemat_state::speedfrk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 	output().set_led_value(0, ~sound_val & 0x02);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, speedfrk )
+void cinemat_state::sound_reset_speedfrk()
 {
 	generic_init(&cinemat_state::speedfrk_sound_w);
 }
@@ -338,7 +338,7 @@ void cinemat_state::starhawk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->stop(3);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, starhawk )
+void cinemat_state::sound_reset_starhawk()
 {
 	generic_init(&cinemat_state::starhawk_sound_w);
 }
@@ -401,7 +401,7 @@ void cinemat_state::sundance_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(5, 5);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, sundance )
+void cinemat_state::sound_reset_sundance()
 {
 	generic_init(&cinemat_state::sundance_sound_w);
 }
@@ -483,7 +483,7 @@ void cinemat_state::tailg_sound_w(uint8_t sound_val, uint8_t bits_changed)
 	}
 }
 
-SOUND_RESET_MEMBER( cinemat_state, tailg )
+void cinemat_state::sound_reset_tailg()
 {
 	generic_init(&cinemat_state::tailg_sound_w);
 }
@@ -545,7 +545,7 @@ void cinemat_state::warrior_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(4, 4);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, warrior )
+void cinemat_state::sound_reset_warrior()
 {
 	generic_init(&cinemat_state::warrior_sound_w);
 }
@@ -633,7 +633,7 @@ void cinemat_state::armora_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->stop(6);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, armora )
+void cinemat_state::sound_reset_armora()
 {
 	generic_init(&cinemat_state::armora_sound_w);
 }
@@ -718,7 +718,7 @@ void cinemat_state::ripoff_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(4, 4);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, ripoff )
+void cinemat_state::sound_reset_ripoff()
 {
 	generic_init(&cinemat_state::ripoff_sound_w);
 }
@@ -825,7 +825,7 @@ void cinemat_state::starcas_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(7, 7);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, starcas )
+void cinemat_state::sound_reset_starcas()
 {
 	generic_init(&cinemat_state::starcas_sound_w);
 }
@@ -953,7 +953,7 @@ void cinemat_state::solarq_sound_w(uint8_t sound_val, uint8_t bits_changed)
 	}
 }
 
-SOUND_RESET_MEMBER( cinemat_state, solarq )
+void cinemat_state::sound_reset_solarq()
 {
 	generic_init(&cinemat_state::solarq_sound_w);
 }
@@ -1081,7 +1081,7 @@ void cinemat_state::boxingb_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(11, 11);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, boxingb )
+void cinemat_state::sound_reset_boxingb()
 {
 	generic_init(&cinemat_state::boxingb_sound_w);
 }
@@ -1188,7 +1188,7 @@ void cinemat_state::wotw_sound_w(uint8_t sound_val, uint8_t bits_changed)
 		m_samples->start(7, 7);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, wotw )
+void cinemat_state::sound_reset_wotw()
 {
 	generic_init(&cinemat_state::wotw_sound_w);
 }
@@ -1266,7 +1266,7 @@ WRITE8_MEMBER(cinemat_state::sound_output_w)
 	logerror("sound_output = %02X\n", data);
 }
 
-SOUND_RESET_MEMBER( cinemat_state, demon )
+void cinemat_state::sound_reset_demon()
 {
 	/* generic init */
 	generic_init(&cinemat_state::demon_sound_w);
@@ -1354,9 +1354,9 @@ WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 }
 
 
-SOUND_RESET_MEMBER( cinemat_state, qb3 )
+void cinemat_state::sound_reset_qb3()
 {
-	SOUND_RESET_CALL_MEMBER(demon);
+	sound_reset_demon();
 	m_maincpu->space(AS_IO).install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),this));
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */

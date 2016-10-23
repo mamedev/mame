@@ -95,7 +95,7 @@ public:
 	DECLARE_DRIVER_INIT(phantoma);
 
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(teetert);
+	void machine_start_teetert();
 
 	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

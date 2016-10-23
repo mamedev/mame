@@ -483,7 +483,7 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midtunit_state,midtunit)
+void midtunit_state::machine_reset_midtunit()
 {
 	/* reset sound */
 	switch (m_chip_type)

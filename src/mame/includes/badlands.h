@@ -38,10 +38,10 @@ public:
 	DECLARE_READ16_MEMBER(badlandsb_unk_r);
 	DECLARE_DRIVER_INIT(badlands);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(badlands);
-	DECLARE_MACHINE_RESET(badlands);
-	DECLARE_VIDEO_START(badlands);
-	DECLARE_MACHINE_RESET(badlandsb);
+	void machine_start_badlands();
+	void machine_reset_badlands();
+	void video_start_badlands();
+	void machine_reset_badlandsb();
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );

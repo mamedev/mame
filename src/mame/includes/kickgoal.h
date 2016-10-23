@@ -76,8 +76,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(kickgoal);
-	DECLARE_VIDEO_START(actionhw);
+	void video_start_kickgoal();
+	void video_start_actionhw();
 	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
 	void kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

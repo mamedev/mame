@@ -908,14 +908,14 @@ void ninjakd2_state::machine_reset()
 	m_rom_bank_mask = num_banks - 1;
 }
 
-MACHINE_START_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_start_omegaf()
 {
 	omegaf_io_protection_start();
 
 	machine_start();
 }
 
-MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_reset_omegaf()
 {
 	omegaf_io_protection_reset();
 

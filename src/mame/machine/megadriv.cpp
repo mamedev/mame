@@ -782,11 +782,11 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-VIDEO_START_MEMBER(md_base_state,megadriv)
+void md_base_state::video_start_megadriv()
 {
 }
 
-MACHINE_START_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_start_megadriv()
 {
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
@@ -799,7 +799,7 @@ MACHINE_START_MEMBER(md_base_state,megadriv)
 	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
-MACHINE_RESET_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_reset_megadriv()
 {
 	/* default state of z80 = reset, with bus */
 	osd_printf_debug("Resetting Megadrive / Genesis\n");

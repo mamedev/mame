@@ -124,8 +124,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
-	DECLARE_MACHINE_START(as2888);
-	DECLARE_MACHINE_RESET(by35);
+	void machine_start_as2888();
+	void machine_reset_by35();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
@@ -987,7 +987,7 @@ DRIVER_INIT_MEMBER( by35_state, by35_7 )
 }
 
 
-MACHINE_RESET_MEMBER( by35_state, by35 )
+void by35_state::machine_reset_by35()
 {
 	render_target *target = machine().render().first_target();
 
@@ -1002,9 +1002,9 @@ MACHINE_RESET_MEMBER( by35_state, by35 )
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
 
-MACHINE_START_MEMBER( by35_state, as2888 )
+void by35_state::machine_start_as2888()
 {
-	MACHINE_RESET_CALL_MEMBER( by35 );
+	machine_reset_by35();
 	m_snd_prom = memregion("sound1")->base();
 }
 

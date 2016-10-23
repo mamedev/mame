@@ -178,7 +178,7 @@ public:
 	optional_device<saturn_control_port_device> m_ctrl2;
 
 	bitmap_rgb32 m_tmpbitmap;
-	DECLARE_VIDEO_START(stv_vdp2);
+	void video_start_stv_vdp2();
 	uint32_t screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);

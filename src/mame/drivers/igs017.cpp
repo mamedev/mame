@@ -164,9 +164,9 @@ public:
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(iqblocka);
-	DECLARE_MACHINE_RESET(mgcs);
-	DECLARE_MACHINE_RESET(lhzb2a);
+	void machine_reset_iqblocka();
+	void machine_reset_mgcs();
+	void machine_reset_lhzb2a();
 	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
@@ -3239,7 +3239,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 }
 
 
-MACHINE_RESET_MEMBER(igs017_state,iqblocka)
+void igs017_state::machine_reset_iqblocka()
 {
 	m_input_select = 0;
 }
@@ -3301,9 +3301,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(igs017_state,mgcs)
+void igs017_state::machine_reset_mgcs()
 {
-	MACHINE_RESET_CALL_MEMBER( iqblocka );
+	machine_reset_iqblocka();
 
 	m_scramble_data = 0;
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
@@ -3394,9 +3394,9 @@ MACHINE_CONFIG_END
 
 // lhzb2a
 
-MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
+void igs017_state::machine_reset_lhzb2a()
 {
-	MACHINE_RESET_CALL_MEMBER( mgcs );
+	machine_reset_mgcs();
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 

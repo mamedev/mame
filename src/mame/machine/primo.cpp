@@ -254,7 +254,7 @@ void primo_state::machine_reset()
 	primo_common_machine_init();
 }
 
-MACHINE_RESET_MEMBER(primo_state,primob)
+void primo_state::machine_reset_primob()
 {
 	primo_common_machine_init();
 

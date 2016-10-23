@@ -866,14 +866,14 @@ void jack_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(jack_state,striv)
+void jack_state::machine_start_striv()
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-MACHINE_RESET_MEMBER(jack_state,striv)
+void jack_state::machine_reset_striv()
 {
 	m_question_address = 0;
 	m_question_rom = 0;
@@ -883,7 +883,7 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 }
 
 
-MACHINE_START_MEMBER(jack_state,joinem)
+void jack_state::machine_start_joinem()
 {
 	m_joinem_palette_bank = 0;
 
@@ -891,7 +891,7 @@ MACHINE_START_MEMBER(jack_state,joinem)
 	save_item(NAME(m_joinem_palette_bank));
 }
 
-MACHINE_RESET_MEMBER(jack_state,joinem)
+void jack_state::machine_reset_joinem()
 {
 	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
 }

@@ -34,7 +34,7 @@ public:
 	DECLARE_READ16_MEMBER(vram_r);
 
 	DECLARE_DRIVER_INIT(eolith16);
-	DECLARE_VIDEO_START(eolith16);
+	void video_start_eolith16();
 	DECLARE_PALETTE_INIT(eolith16);
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(eolith16_state,eolith16)
+void eolith16_state::video_start_eolith16()
 {
 	m_vram = std::make_unique<uint16_t[]>(0x10000);
 	save_pointer(NAME(m_vram.get()), 0x10000);

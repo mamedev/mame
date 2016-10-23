@@ -290,19 +290,19 @@ static INPUT_PORTS_START( hec2hrp )
 INPUT_PORTS_END
 
 /*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
+void hec2hrp_state::machine_start_hec2hrp()
 /*****************************************************************************/
 {
 	hector_init();
 }
 
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
+void hec2hrp_state::machine_reset_hec2hrp()
 {
 	// Machines init
 	hector_reset(1, 0);
 }
 /*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
+void hec2hrp_state::machine_start_hec2hrx()
 /*****************************************************************************/
 {
 	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
@@ -335,7 +335,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	hector_init();
 }
 /*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
+void hec2hrp_state::machine_start_hec2mdhrx()
 /*****************************************************************************/
 //minidisc
 {
@@ -359,7 +359,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 
 	hector_init();
 }
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
+void hec2hrp_state::machine_reset_hec2hrx()
 {
 	//Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
@@ -372,7 +372,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 	hector_disc2_reset();
 }
 //minidisc
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
+void hec2hrp_state::machine_reset_hec2mdhrx()
 {
 	//Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);

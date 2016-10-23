@@ -159,10 +159,10 @@ public:
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
 	DECLARE_DRIVER_INIT(fghthist);
-	DECLARE_MACHINE_RESET(deco32);
-	DECLARE_VIDEO_START(captaven);
-	DECLARE_VIDEO_START(fghthist);
-	DECLARE_VIDEO_START(nslasher);
+	void machine_reset_deco32();
+	void video_start_captaven();
+	void video_start_fghthist();
+	void video_start_nslasher();
 
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
@@ -223,8 +223,8 @@ public:
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(dragngunj);
 	DECLARE_DRIVER_INIT(lockload);
-	DECLARE_VIDEO_START(dragngun);
-	DECLARE_VIDEO_START(lockload);
+	void video_start_dragngun();
+	void video_start_lockload();
 	void dragngun_init_common();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);

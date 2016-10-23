@@ -27,7 +27,7 @@ public:
 		{ }
 
 	DECLARE_READ32_MEMBER(dd_null_r);
-	DECLARE_MACHINE_START(n64dd);
+	void machine_start_n64dd();
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
 	void mempak_format(uint8_t* pak);
@@ -367,7 +367,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	return image_init_result::PASS;
 }
 
-MACHINE_START_MEMBER(n64_mess_state,n64dd)
+void n64_mess_state::machine_start_n64dd()
 {
 	machine_start();
 	machine().device<n64_periphs>("rcp")->dd_present = true;

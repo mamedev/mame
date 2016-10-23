@@ -87,7 +87,7 @@ public:
 
 	DECLARE_DRIVER_INIT(niyanpai);
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(musobana);
+	void machine_start_musobana();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int vram, int offset);

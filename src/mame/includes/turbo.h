@@ -155,11 +155,11 @@ public:
 	DECLARE_DRIVER_INIT(turbo_enc);
 	DECLARE_DRIVER_INIT(turbo_noenc);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_VIDEO_START(turbo);
+	void video_start_turbo();
 	DECLARE_PALETTE_INIT(turbo);
 	DECLARE_PALETTE_INIT(subroc3d);
-	DECLARE_MACHINE_RESET(buckrog);
-	DECLARE_VIDEO_START(buckrog);
+	void machine_reset_buckrog();
+	void video_start_buckrog();
 	DECLARE_PALETTE_INIT(buckrog);
 	uint32_t screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

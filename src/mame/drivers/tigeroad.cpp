@@ -578,7 +578,7 @@ void tigeroad_state::machine_start()
 	save_item(NAME(m_new_latch));
 }
 
-MACHINE_RESET_MEMBER(tigeroad_state,pushman)
+void tigeroad_state::machine_reset_pushman()
 {
 	// todo, move to an MCU sim reset function in machine/tigeroad.c
 	m_latch = 0;
@@ -706,9 +706,9 @@ static MACHINE_CONFIG_DERIVED( pushman, f1dream_comad )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(tigeroad_state,bballs)
+void tigeroad_state::machine_reset_bballs()
 {
-	MACHINE_RESET_CALL_MEMBER(pushman);
+	machine_reset_pushman();
 
 	m_latch = 0x400;
 }

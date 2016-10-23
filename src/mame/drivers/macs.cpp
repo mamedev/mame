@@ -88,8 +88,8 @@ public:
 	DECLARE_DRIVER_INIT(kisekaeh);
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
-	DECLARE_MACHINE_RESET(macs);
-	DECLARE_MACHINE_START(macs);
+	void machine_reset_macs();
+	void machine_start_macs();
 	ST0016_DMA_OFFS_CB(dma_offset);
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -644,7 +644,7 @@ static const uint8_t ramdata[160]=
 };
 #endif
 
-MACHINE_START_MEMBER(macs_state,macs)
+void macs_state::machine_start_macs()
 {
 	membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
 	membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
@@ -663,7 +663,7 @@ MACHINE_START_MEMBER(macs_state,macs)
 	membank("bank4")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(macs_state,macs)
+void macs_state::machine_reset_macs()
 {
 	#if 0
 	uint8_t *macs_ram1 = m_ram1.get();

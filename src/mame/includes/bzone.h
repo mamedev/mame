@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
 	DECLARE_DRIVER_INIT(bradley);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(redbaron);
+	void machine_start_redbaron();
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
 };

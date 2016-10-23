@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(port1a_w);
 	DECLARE_DRIVER_INIT(dsb46);
-	DECLARE_MACHINE_RESET(dsb46);
+	void machine_reset_dsb46();
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -79,7 +79,7 @@ DRIVER_INIT_MEMBER(dsb46_state, dsb46)
 	membank("write")->configure_entry(0, &RAM[0x00000]);
 }
 
-MACHINE_RESET_MEMBER( dsb46_state,dsb46 )
+void dsb46_state::machine_reset_dsb46()
 {
 	membank("read")->set_entry(0);
 	membank("write")->set_entry(0);

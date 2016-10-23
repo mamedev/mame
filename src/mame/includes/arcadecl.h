@@ -27,9 +27,9 @@ public:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(sparkz);
-	DECLARE_MACHINE_START(arcadecl);
-	DECLARE_MACHINE_RESET(arcadecl);
-	DECLARE_VIDEO_START(arcadecl);
+	void machine_start_arcadecl();
+	void machine_reset_arcadecl();
+	void video_start_arcadecl();
 	uint32_t screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void arcadecl_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

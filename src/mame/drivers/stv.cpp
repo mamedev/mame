@@ -1179,9 +1179,9 @@ static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, stv_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(stv_state,batmanfr)
+void stv_state::machine_reset_batmanfr()
 {
-	MACHINE_RESET_CALL_MEMBER(stv);
+	machine_reset_stv();
 
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(stv_state,stv)
+void stv_state::machine_reset_stv()
 {
 	m_scsp_last_line = 0;
 
@@ -1308,7 +1308,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+void stv_state::machine_start_stv()
 {
 	system_time systime;
 	machine().base_datetime(systime);

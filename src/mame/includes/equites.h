@@ -111,9 +111,9 @@ public:
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
-	DECLARE_VIDEO_START(equites);
+	void video_start_equites();
 	DECLARE_PALETTE_INIT(equites);
-	DECLARE_VIDEO_START(splndrbt);
+	void video_start_splndrbt();
 	DECLARE_PALETTE_INIT(splndrbt);
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

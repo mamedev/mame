@@ -417,7 +417,7 @@ public:
 	DECLARE_DRIVER_INIT( ddr );
 	DECLARE_DRIVER_INIT( hyperbbc );
 	DECLARE_DRIVER_INIT( drmn );
-	DECLARE_MACHINE_RESET( konami573 );
+	void machine_reset_konami573();
 	WRITE_LINE_MEMBER( h8_clk_w );
 	DECLARE_READ_LINE_MEMBER( h8_d0_r );
 	DECLARE_READ_LINE_MEMBER( h8_d1_r );
@@ -735,7 +735,7 @@ void ksys573_state::driver_start()
 	save_item( NAME( m_control ) );
 }
 
-MACHINE_RESET_MEMBER( ksys573_state,konami573 )
+void ksys573_state::machine_reset_konami573()
 {
 	update_disc();
 

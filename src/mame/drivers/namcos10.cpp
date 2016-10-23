@@ -342,7 +342,7 @@ public:
 	DECLARE_DRIVER_INIT(mrdrilrg);
 	DECLARE_DRIVER_INIT(chocovdr);
 	DECLARE_DRIVER_INIT(konotako);
-	DECLARE_MACHINE_RESET(namcos10);
+	void machine_reset_namcos10();
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
 };
@@ -761,7 +761,7 @@ DRIVER_INIT_MEMBER(namcos10_state,konotako)
 }
 
 
-MACHINE_RESET_MEMBER(namcos10_state,namcos10)
+void namcos10_state::machine_reset_namcos10()
 {
 	i2c_dev_clock = i2c_dev_data = 1;
 	i2c_host_clock = i2c_host_data = 1;

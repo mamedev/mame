@@ -55,7 +55,7 @@ class naomi_state : public dc_state
 
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_MACHINE_RESET(naomi);
+	void machine_reset_naomi();
 	DECLARE_DRIVER_INIT(atomiswave);
 	DECLARE_DRIVER_INIT(xtrmhnt2);
 	DECLARE_DRIVER_INIT(naomigd);

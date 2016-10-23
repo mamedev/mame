@@ -152,7 +152,7 @@ ADDRESS_MAP_END
 
 
 
-MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
+void pgm_arm_type3_state::machine_reset_pgm_arm_type3_reset()
 {
 	// internal roms aren't fully dumped
 	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
@@ -176,12 +176,12 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 			temp16[(base) / 2] = regionhack; base += 2;
 		}
 	}
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 }
 
-MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
+void pgm_arm_type3_state::machine_start_pgm_arm_type3()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
+	machine_start_pgm();
 	/* register type specific Save State stuff here */
 }
 

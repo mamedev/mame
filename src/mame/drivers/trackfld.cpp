@@ -867,7 +867,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_start_trackfld()
 {
 	/* video */
 	save_item(NAME(m_bg_bank));
@@ -876,7 +876,7 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 	save_item(NAME(m_old_gfx_bank));
 }
 
-MACHINE_RESET_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_reset_trackfld()
 {
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;

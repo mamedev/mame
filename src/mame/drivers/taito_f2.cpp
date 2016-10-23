@@ -2836,14 +2836,14 @@ WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
                       MACHINE DRIVERS
 ***********************************************************/
 
-MACHINE_START_MEMBER(taitof2_state,common)
+void taitof2_state::machine_start_common()
 {
 	m_int6_timer = timer_alloc(TIMER_TAITOF2_INTERRUPT6);
 }
 
-MACHINE_START_MEMBER(taitof2_state,f2)
+void taitof2_state::machine_start_f2()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank2")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 

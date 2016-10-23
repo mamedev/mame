@@ -45,7 +45,7 @@ public:
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
 	DECLARE_READ8_MEMBER(ps1_portb_r);
-	DECLARE_MACHINE_START(vrom_fix);
+	void machine_start_vrom_fix();
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
@@ -270,7 +270,7 @@ DRIVER_INIT_MEMBER(at_state,atpci)
 	init_at_common(0x100000);
 }
 
-MACHINE_START_MEMBER(at_state,vrom_fix)
+void at_state::machine_start_vrom_fix()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");

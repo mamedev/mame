@@ -77,7 +77,7 @@ void atarigt_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_reset_atarigt()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);

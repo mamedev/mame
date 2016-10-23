@@ -316,10 +316,10 @@ public:
 	DECLARE_DRIVER_INIT(hangplt);
 	DECLARE_DRIVER_INIT(hangpltu);
 	DECLARE_DRIVER_INIT(gticlub);
-	DECLARE_MACHINE_START(gticlub);
-	DECLARE_MACHINE_RESET(gticlub);
-	DECLARE_MACHINE_RESET(hangplt);
-	DECLARE_VIDEO_START(gticlub);
+	void machine_start_gticlub();
+	void machine_reset_gticlub();
+	void machine_reset_hangplt();
+	void video_start_gticlub();
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
@@ -489,7 +489,7 @@ WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
 
 /******************************************************************/
 
-MACHINE_START_MEMBER(gticlub_state,gticlub)
+void gticlub_state::machine_start_gticlub()
 {
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -816,7 +816,7 @@ ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
 	return value;
 }
 
-MACHINE_RESET_MEMBER(gticlub_state,gticlub)
+void gticlub_state::machine_reset_gticlub()
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -827,7 +827,7 @@ void gticlub_state::gticlub_led_setreg(int offset, uint8_t data)
 }
 
 
-VIDEO_START_MEMBER(gticlub_state,gticlub)
+void gticlub_state::video_start_gticlub()
 {
 	m_gticlub_led_reg[0] = m_gticlub_led_reg[1] = 0x7f;
 	/*
@@ -1034,7 +1034,7 @@ static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(gticlub_state,hangplt)
+void gticlub_state::machine_reset_hangplt()
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

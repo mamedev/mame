@@ -125,13 +125,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(coolpool_state,amerdart)
+void coolpool_state::machine_reset_amerdart()
 {
 	m_nvram_write_enable = 0;
 }
 
 
-MACHINE_RESET_MEMBER(coolpool_state,coolpool)
+void coolpool_state::machine_reset_coolpool()
 {
 	m_nvram_write_enable = 0;
 }

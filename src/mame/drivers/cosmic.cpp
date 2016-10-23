@@ -966,7 +966,7 @@ static const char *const cosmicg_sample_names[] =
 };
 
 
-MACHINE_START_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_start_cosmic()
 {
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
@@ -978,7 +978,7 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 	save_item(NAME(m_color_registers));
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_reset_cosmic()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -987,7 +987,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 	m_color_registers[2] = 0;
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::machine_reset_cosmicg()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;

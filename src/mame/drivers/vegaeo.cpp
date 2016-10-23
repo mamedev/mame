@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	DECLARE_DRIVER_INIT(vegaeo);
-	DECLARE_VIDEO_START(vega);
+	void video_start_vega();
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-VIDEO_START_MEMBER(vegaeo_state,vega)
+void vegaeo_state::video_start_vega()
 {
 	m_vega_vram = std::make_unique<uint32_t[]>(0x14000*2/4);
 	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);

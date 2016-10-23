@@ -240,15 +240,15 @@ public:
 	DECLARE_DRIVER_INIT(m4andyfh);
 	DECLARE_DRIVER_INIT(m4andyge);
 	DECLARE_DRIVER_INIT(m4apachg);
-	DECLARE_MACHINE_START(mod2);
-	DECLARE_MACHINE_RESET(mpu4);
-	DECLARE_MACHINE_START(mpu4yam);
-	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4oki_alt);
-	DECLARE_MACHINE_START(mod4oki_5r);
-	DECLARE_MACHINE_START(mod2_alt);
-	DECLARE_MACHINE_START(mpu4bwb);
-	DECLARE_MACHINE_START(mpu4cry);
+	void machine_start_mod2();
+	void machine_reset_mpu4();
+	void machine_start_mpu4yam();
+	void machine_start_mpu4oki();
+	void machine_start_mpu4oki_alt();
+	void machine_start_mod4oki_5r();
+	void machine_start_mod2_alt();
+	void machine_start_mpu4bwb();
+	void machine_start_mpu4cry();
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }

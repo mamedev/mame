@@ -288,7 +288,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(powerins_state, powerinsa)
+void powerins_state::machine_start_powerinsa()
 {
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }

@@ -102,7 +102,7 @@ public:
 	DECLARE_DRIVER_INIT(vectrex);
 	virtual void video_start() override;
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(raaspec);
+	void video_start_raaspec();
 	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
 	TIMER_CALLBACK_MEMBER(update_level);

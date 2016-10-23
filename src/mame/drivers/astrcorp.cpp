@@ -81,7 +81,7 @@ public:
 	DECLARE_DRIVER_INIT(astoneag);
 	DECLARE_DRIVER_INIT(showhanc);
 	DECLARE_DRIVER_INIT(showhand);
-	DECLARE_VIDEO_START(astrocorp);
+	void video_start_astrocorp();
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -91,7 +91,7 @@ public:
                                 Video
 ***************************************************************************/
 
-VIDEO_START_MEMBER(astrocorp_state,astrocorp)
+void astrocorp_state::video_start_astrocorp()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 

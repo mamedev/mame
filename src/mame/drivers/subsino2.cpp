@@ -172,7 +172,7 @@ public:
 	DECLARE_DRIVER_INIT(ptrain);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
-	DECLARE_VIDEO_START(subsino2);
+	void video_start_subsino2();
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
@@ -601,7 +601,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
                                 Video Update
 ***************************************************************************/
 
-VIDEO_START_MEMBER(subsino2_state,subsino2)
+void subsino2_state::video_start_subsino2()
 {
 	m_hm86171_colorram = std::make_unique<uint8_t[]>(256*3);
 

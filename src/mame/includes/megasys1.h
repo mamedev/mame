@@ -150,10 +150,10 @@ public:
 	DECLARE_DRIVER_INIT(stdragona);
 	DECLARE_DRIVER_INIT(stdragonb);
 	DECLARE_DRIVER_INIT(systemz);
-	DECLARE_MACHINE_RESET(megasys1);
-	DECLARE_VIDEO_START(megasys1);
+	void machine_reset_megasys1();
+	void video_start_megasys1();
 	DECLARE_PALETTE_INIT(megasys1);
-	DECLARE_MACHINE_RESET(megasys1_hachoo);
+	void machine_reset_megasys1_hachoo();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

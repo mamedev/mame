@@ -80,14 +80,14 @@ public:
 		{ }
 
 	// Machine management
-	DECLARE_MACHINE_START(ti99_4);
-	DECLARE_MACHINE_START(ti99_4a);
-	DECLARE_MACHINE_START(ti99_4qi);
-	DECLARE_MACHINE_START(ti99_4ev);
+	void machine_start_ti99_4();
+	void machine_start_ti99_4a();
+	void machine_start_ti99_4qi();
+	void machine_start_ti99_4ev();
 
-	DECLARE_MACHINE_RESET(ti99_4);
-	DECLARE_MACHINE_RESET(ti99_4a);
-	DECLARE_MACHINE_RESET(ti99_4ev);
+	void machine_reset_ti99_4();
+	void machine_reset_ti99_4a();
+	void machine_reset_ti99_4ev();
 
 	// Processor connections with the main board
 	DECLARE_READ8_MEMBER( cruread );
@@ -798,7 +798,7 @@ void ti99_4x_state::register_save_state()
     Machine definitions
 ******************************************************************************/
 
-MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
+void ti99_4x_state::machine_start_ti99_4()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -807,7 +807,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 	register_save_state();
 }
 
-MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
+void ti99_4x_state::machine_reset_ti99_4()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -922,7 +922,7 @@ MACHINE_CONFIG_END
     TI-99/4A - replaced the 99/4 and became the standard TI-99 console
 ***********************************************************************/
 
-MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
+void ti99_4x_state::machine_start_ti99_4a()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -931,7 +931,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 	register_save_state();
 }
 
-MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
+void ti99_4x_state::machine_reset_ti99_4a()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_END
     those from Atarisoft.
 *************************************************************************/
 
-MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
+void ti99_4x_state::machine_start_ti99_4qi()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -1080,7 +1080,7 @@ MACHINE_CONFIG_END
     which is intended to use the EVPC, does not have an own sound chip.
 *************************************************************************/
 
-MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
+void ti99_4x_state::machine_start_ti99_4ev()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -1092,7 +1092,7 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
 	register_save_state();
 }
 
-MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
+void ti99_4x_state::machine_reset_ti99_4ev()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);

@@ -458,8 +458,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 
-	DECLARE_MACHINE_START(saturn);
-	DECLARE_MACHINE_RESET(saturn);
+	void machine_start_saturn();
+	void machine_reset_saturn();
 
 	DECLARE_READ8_MEMBER(saturn_cart_type_r);
 	DECLARE_READ32_MEMBER(abus_dummy_r);
@@ -640,7 +640,7 @@ void saturn_state::debug_commands(int ref, int params, const char **param)
 }
 
 
-MACHINE_START_MEMBER(sat_console_state, saturn)
+void sat_console_state::machine_start_saturn()
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -752,7 +752,7 @@ WRITE32_MEMBER(sat_console_state::saturn_null_ram_w)
 {
 }
 
-MACHINE_RESET_MEMBER(sat_console_state,saturn)
+void sat_console_state::machine_reset_saturn()
 {
 	m_scsp_last_line = 0;
 

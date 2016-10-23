@@ -20,7 +20,7 @@ IRQ_CALLBACK_MEMBER(mc80_state::mc8020_irq_callback)
 	return 0x00;
 }
 
-MACHINE_RESET_MEMBER(mc80_state,mc8020)
+void mc80_state::machine_reset_mc8020()
 {
 }
 
@@ -93,7 +93,7 @@ IRQ_CALLBACK_MEMBER(mc80_state::mc8030_irq_callback )
 	return 0x20;
 }
 
-MACHINE_RESET_MEMBER(mc80_state,mc8030)
+void mc80_state::machine_reset_mc8030()
 {
 }
 

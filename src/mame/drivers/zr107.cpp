@@ -251,8 +251,8 @@ public:
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(zr107);
 	DECLARE_DRIVER_INIT(jetwave);
-	DECLARE_VIDEO_START(zr107);
-	DECLARE_VIDEO_START(jetwave);
+	void video_start_zr107();
+	void video_start_jetwave();
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
@@ -269,7 +269,7 @@ protected:
 
 
 
-VIDEO_START_MEMBER(zr107_state,jetwave)
+void zr107_state::video_start_jetwave()
 {
 }
 
@@ -309,7 +309,7 @@ K056832_CB_MEMBER(zr107_state::tile_callback)
 	*color += layer * 0x40;
 }
 
-VIDEO_START_MEMBER(zr107_state,zr107)
+void zr107_state::video_start_zr107()
 {
 	m_k056832->set_layer_offs(0, -29, -27);
 	m_k056832->set_layer_offs(1, -29, -27);

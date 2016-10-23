@@ -494,7 +494,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::machine_reset_mlc()
 {
 	m_vbl_i = 0xffffffff;
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");

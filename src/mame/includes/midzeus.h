@@ -64,9 +64,9 @@ public:
 	DECLARE_DRIVER_INIT(mk4);
 	DECLARE_DRIVER_INIT(thegrid);
 	DECLARE_DRIVER_INIT(crusnexo);
-	DECLARE_MACHINE_START(midzeus);
-	DECLARE_MACHINE_RESET(midzeus);
-	DECLARE_VIDEO_START(midzeus);
+	void machine_start_midzeus();
+	void machine_reset_midzeus();
+	void video_start_midzeus();
 	uint32_t screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);

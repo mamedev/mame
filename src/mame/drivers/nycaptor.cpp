@@ -245,7 +245,7 @@ WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 }
 
 
-MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
+void nycaptor_state::machine_reset_ta7630()
 {
 	int i;
 	double db           = 0.0;
@@ -772,7 +772,7 @@ void nycaptor_state::machine_start()
 
 void nycaptor_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	machine_reset_ta7630();
 
 	m_generic_control_reg = 0;
 	m_sound_nmi_enable = 0;

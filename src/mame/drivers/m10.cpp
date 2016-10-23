@@ -166,14 +166,14 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 	}
 }
 
-MACHINE_START_MEMBER(m10_state,m10)
+void m10_state::machine_start_m10()
 {
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
 
-MACHINE_RESET_MEMBER(m10_state,m10)
+void m10_state::machine_reset_m10()
 {
 	m_bottomline = 0;
 	m_flip = 0;

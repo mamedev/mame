@@ -91,7 +91,7 @@ const atari_motion_objects_config thunderj_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(thunderj_state,thunderj)
+void thunderj_state::video_start_thunderj()
 {
 }
 

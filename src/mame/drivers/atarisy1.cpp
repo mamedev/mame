@@ -218,7 +218,7 @@ void atarisy1_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_start_atarisy1()
 {
 	atarigen_state::machine_start();
 
@@ -228,7 +228,7 @@ MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 }
 
 
-MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_reset_atarisy1()
 {
 	atarigen_state::machine_reset();
 

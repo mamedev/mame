@@ -156,14 +156,14 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-MACHINE_START_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_start_gauntlet()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sound_reset_val));
 }
 
 
-MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_reset_gauntlet()
 {
 	m_sound_reset_val = 1;
 

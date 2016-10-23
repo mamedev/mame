@@ -3705,12 +3705,12 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-MACHINE_START_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_start_konamigx()
 {
 	save_item(NAME(m_gx_wrport1_1));
 }
 
-MACHINE_RESET_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_reset_konamigx()
 {
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;

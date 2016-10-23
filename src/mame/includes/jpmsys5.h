@@ -85,10 +85,10 @@ public:
 	DECLARE_READ16_MEMBER(mux_awp_r);
 	DECLARE_READ16_MEMBER(coins_awp_r);
 	void sys5_draw_lamps();
-	DECLARE_MACHINE_START(jpmsys5v);
-	DECLARE_MACHINE_RESET(jpmsys5v);
-	DECLARE_MACHINE_START(jpmsys5);
-	DECLARE_MACHINE_RESET(jpmsys5);
+	void machine_start_jpmsys5v();
+	void machine_reset_jpmsys5v();
+	void machine_start_jpmsys5();
+	void machine_reset_jpmsys5();
 	uint32_t screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(touch_cb);
 };

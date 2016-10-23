@@ -53,7 +53,7 @@ public:
 	DECLARE_DRIVER_INIT(primo32);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(primob);
+	void machine_reset_primob();
 	uint32_t screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
 	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);

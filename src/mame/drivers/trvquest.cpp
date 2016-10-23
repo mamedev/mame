@@ -148,7 +148,7 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(gameplan_state,trvquest)
+void gameplan_state::machine_start_trvquest()
 {
 	/* register for save states */
 	save_item(NAME(m_video_x));
@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(gameplan_state,trvquest)
 	m_via_0->write_pb5(1);
 }
 
-MACHINE_RESET_MEMBER(gameplan_state,trvquest)
+void gameplan_state::machine_reset_trvquest()
 {
 	m_video_x = 0;
 	m_video_y = 0;

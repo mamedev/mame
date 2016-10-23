@@ -792,7 +792,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(exidy_state,teetert)
+void exidy_state::machine_start_teetert()
 {
 	save_item(NAME(m_last_dial));
 }

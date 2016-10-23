@@ -96,7 +96,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(wgp2);
+	void video_start_wgp2();
 	uint32_t screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
 	void wgp_postload();

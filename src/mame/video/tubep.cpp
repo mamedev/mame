@@ -338,7 +338,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_START_MEMBER(tubep_state,tubep)
+void tubep_state::video_start_tubep()
 {
 	m_spritemap = std::make_unique<uint8_t[]>(256*256*2);
 
@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_RESET_MEMBER(tubep_state,tubep)
+void tubep_state::video_reset_tubep()
 {
 	memset(m_spritemap.get(),0,256*256*2);
 

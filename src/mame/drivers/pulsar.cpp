@@ -60,7 +60,7 @@ public:
 	}
 
 	DECLARE_DRIVER_INIT(pulsar);
-	DECLARE_MACHINE_RESET(pulsar);
+	void machine_reset_pulsar();
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE_LINE_MEMBER(fr_w);
@@ -192,7 +192,7 @@ SLOT_INTERFACE_END
 static INPUT_PORTS_START( pulsar )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( pulsar_state, pulsar )
+void pulsar_state::machine_reset_pulsar()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom

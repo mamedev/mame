@@ -127,8 +127,8 @@ public:
 	DECLARE_WRITE8_MEMBER(portB_w);
 
 	DECLARE_DRIVER_INIT(junofrst);
-	DECLARE_MACHINE_START(junofrst);
-	DECLARE_MACHINE_RESET(junofrst);
+	void machine_start_junofrst();
+	void machine_reset_junofrst();
 
 	INTERRUPT_GEN_MEMBER(_30hz_irq);
 };
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( junofrst )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_start_junofrst()
 {
 	save_item(NAME(m_i8039_status));
 	save_item(NAME(m_last_irq));
@@ -389,7 +389,7 @@ MACHINE_START_MEMBER(junofrst_state,junofrst)
 	save_item(NAME(m_blitterdata));
 }
 
-MACHINE_RESET_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_reset_junofrst()
 {
 	m_i8039_status = 0;
 	m_last_irq = 0;

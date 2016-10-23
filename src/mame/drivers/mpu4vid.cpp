@@ -276,9 +276,9 @@ public:
 	DECLARE_DRIVER_INIT(skiltrek);
 	DECLARE_DRIVER_INIT(crmaze3);
 	DECLARE_DRIVER_INIT(cybcas);
-	DECLARE_MACHINE_START(mpu4_vid);
-	DECLARE_MACHINE_RESET(mpu4_vid);
-	DECLARE_VIDEO_START(mpu4_vid);
+	void machine_start_mpu4_vid();
+	void machine_reset_mpu4_vid();
+	void video_start_mpu4_vid();
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -427,7 +427,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::video_start_mpu4_vid()
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -1208,7 +1208,7 @@ WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 }
 
 /* machine start (called only once) */
-MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_start_mpu4_vid()
 {
 	mpu4_config_common();
 
@@ -1220,7 +1220,7 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_reset_mpu4_vid()
 {
 	m_vfd->reset(); //for debug ports only
 

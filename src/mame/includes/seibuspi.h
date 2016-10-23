@@ -131,10 +131,10 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(spi);
-	DECLARE_MACHINE_RESET(sxx2e);
-	DECLARE_VIDEO_START(ejanhs);
-	DECLARE_VIDEO_START(sys386f);
+	void machine_reset_spi();
+	void machine_reset_sxx2e();
+	void video_start_ejanhs();
+	void video_start_sys386f();
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_midl_tile_info);

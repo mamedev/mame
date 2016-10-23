@@ -380,7 +380,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 ***************************************************************************/
 
 
-MACHINE_START_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_start_toaplan2()
 {
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_old_p1_paddle_h));
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_reset_toaplan2()
 {
 	m_mcu_data = 0x00;
 
@@ -407,9 +407,9 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,ghox)
+void toaplan2_state::machine_reset_ghox()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	machine_reset_toaplan2();
 	m_old_p1_paddle_h = 0;
 	m_old_p2_paddle_h = 0;
 }

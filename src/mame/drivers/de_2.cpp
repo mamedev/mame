@@ -56,8 +56,8 @@ protected:
 
 public:
 	DECLARE_DRIVER_INIT(de_2);
-	DECLARE_MACHINE_RESET(de_2);
-	DECLARE_MACHINE_RESET(de_2_alpha3);
+	void machine_reset_de_2();
+	void machine_reset_de_2_alpha3();
 	DECLARE_WRITE8_MEMBER(sample_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
 	DECLARE_WRITE8_MEMBER(type2alpha3_pia34_pa_w);
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( de_2 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(de_2_state, de_2)
+void de_2_state::machine_reset_de_2()
 {
 	m_sample_bank->set_entry(0);
 	m_more_data = false;

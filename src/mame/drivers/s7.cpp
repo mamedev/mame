@@ -110,7 +110,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
-	DECLARE_MACHINE_RESET(s7);
+	void machine_reset_s7();
 	DECLARE_DRIVER_INIT(s7);
 private:
 	uint8_t m_sound_data;
@@ -408,7 +408,7 @@ void s7_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
-MACHINE_RESET_MEMBER( s7_state, s7 )
+void s7_state::machine_reset_s7()
 {
 }
 

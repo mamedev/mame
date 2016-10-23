@@ -753,7 +753,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 }
 
-MACHINE_RESET_MEMBER(model1_state,model1)
+void model1_state::machine_reset_model1()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
@@ -768,7 +768,7 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 	}
 }
 
-MACHINE_RESET_MEMBER(model1_state,model1_vr)
+void model1_state::machine_reset_model1_vr()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();

@@ -275,12 +275,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_START_MEMBER(actfancr_state,triothep)
+void actfancr_state::machine_start_triothep()
 {
 	save_item(NAME(m_trio_control_select));
 }
 
-MACHINE_RESET_MEMBER(actfancr_state,triothep)
+void actfancr_state::machine_reset_triothep()
 {
 	m_trio_control_select = 0;
 }

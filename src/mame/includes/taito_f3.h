@@ -306,9 +306,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info8);
 	TILE_GET_INFO_MEMBER(get_tile_info_vram);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
-	DECLARE_MACHINE_START(f3);
-	DECLARE_MACHINE_RESET(f3);
-	DECLARE_VIDEO_START(f3);
+	void machine_start_f3();
+	void machine_reset_f3();
+	void video_start_f3();
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_f3(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);

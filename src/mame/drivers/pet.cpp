@@ -240,11 +240,11 @@ public:
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
-	DECLARE_MACHINE_START( pet );
-	DECLARE_MACHINE_START( pet2001 );
-	DECLARE_MACHINE_RESET( pet );
-	DECLARE_MACHINE_START( pet40 );
-	DECLARE_MACHINE_RESET( pet40 );
+	void machine_start_pet();
+	void machine_start_pet2001();
+	void machine_reset_pet();
+	void machine_start_pet40();
+	void machine_reset_pet40();
 
 	MC6845_BEGIN_UPDATE( pet_begin_update );
 	MC6845_UPDATE_ROW( pet40_update_row );
@@ -344,8 +344,8 @@ public:
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_START( pet80 );
-	DECLARE_MACHINE_RESET( pet80 );
+	void machine_start_pet80();
+	void machine_reset_pet80();
 
 	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
@@ -390,8 +390,8 @@ public:
 	required_device<pla_device> m_pla1;
 	required_device<pla_device> m_pla2;
 
-	DECLARE_MACHINE_START( cbm8296 );
-	DECLARE_MACHINE_RESET( cbm8296 );
+	void machine_start_cbm8296();
+	void machine_reset_cbm8296();
 
 	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
@@ -1546,7 +1546,7 @@ SLOT_INTERFACE_END
 //  MACHINE_START( pet )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet )
+void pet_state::machine_start_pet()
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -1587,15 +1587,15 @@ MACHINE_START_MEMBER( pet_state, pet )
 //  MACHINE_START( pet2001 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet2001 )
+void pet_state::machine_start_pet2001()
 {
 	m_video_ram_size = 0x400;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet_state, pet )
+void pet_state::machine_reset_pet()
 {
 	m_maincpu->reset();
 
@@ -1613,17 +1613,17 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 //  MACHINE_START( pet40 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet40 )
+void pet_state::machine_start_pet40()
 {
 	m_video_ram_size = 0x400;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet_state, pet40 )
+void pet_state::machine_reset_pet40()
 {
-	MACHINE_RESET_CALL_MEMBER(pet);
+	machine_reset_pet();
 
 	m_crtc->reset();
 }
@@ -1633,17 +1633,17 @@ MACHINE_RESET_MEMBER( pet_state, pet40 )
 //  MACHINE_START( pet80 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet80_state, pet80 )
+void pet80_state::machine_start_pet80()
 {
 	m_video_ram_size = 0x800;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet80_state, pet80 )
+void pet80_state::machine_reset_pet80()
 {
-	MACHINE_RESET_CALL_MEMBER(pet);
+	machine_reset_pet();
 
 	m_crtc->reset();
 }
@@ -1653,9 +1653,9 @@ MACHINE_RESET_MEMBER( pet80_state, pet80 )
 //  MACHINE_START( cbm8296 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
+void cbm8296_state::machine_start_cbm8296()
 {
-	MACHINE_START_CALL_MEMBER(pet80);
+	machine_start_pet80();
 
 	// state saving
 	save_item(NAME(m_cr));
@@ -1663,9 +1663,9 @@ MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
 }
 
 
-MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
+void cbm8296_state::machine_reset_cbm8296()
 {
-	MACHINE_RESET_CALL_MEMBER(pet80);
+	machine_reset_pet80();
 
 	m_cr = 0;
 	m_via_pa = 0xff;

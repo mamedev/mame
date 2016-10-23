@@ -180,7 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(ffight2b);
 	DECLARE_DRIVER_INIT(endless);
 	DECLARE_DRIVER_INIT(mk3snes);
-	DECLARE_MACHINE_RESET(ffight2b);
+	void machine_reset_ffight2b();
 };
 
 
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_DERIVED( mk3snes, kinstb )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER( snesb_state, ffight2b )
+void snesb_state::machine_reset_ffight2b()
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	snes_state::machine_reset();

@@ -69,9 +69,9 @@ public:
 	DECLARE_DRIVER_INIT(gatsbee);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_MACHINE_START(galaga);
-	DECLARE_MACHINE_RESET(galaga);
-	DECLARE_VIDEO_START(galaga);
+	void machine_start_galaga();
+	void machine_reset_galaga();
+	void video_start_galaga();
 	DECLARE_PALETTE_INIT(galaga);
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_galaga(screen_device &screen, bool state);

@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_WRITE8_MEMBER(motor_w);
-	DECLARE_MACHINE_RESET(excali64);
+	void machine_reset_excali64();
 	required_device<palette_device> m_palette;
 
 private:
@@ -399,7 +399,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(2);
 }
 
-MACHINE_RESET_MEMBER( excali64_state, excali64 )
+void excali64_state::machine_reset_excali64()
 {
 	membank("bankr1")->set_entry(1); // read from ROM
 	membank("bankr2")->set_entry(1); // read from ROM

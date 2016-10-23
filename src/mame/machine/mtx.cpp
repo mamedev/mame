@@ -396,7 +396,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
     MACHINE_START( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_START_MEMBER(mtx_state,mtx512)
+void mtx_state::machine_start_mtx512()
 {
 	ram_device *messram = m_ram;
 
@@ -407,7 +407,7 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(mtx_state,mtx512)
+void mtx_state::machine_reset_mtx512()
 {
 	/* bank switching */
 	bankswitch(0);

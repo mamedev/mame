@@ -71,8 +71,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(spyhunt_get_alpha_tile_info);
-	DECLARE_VIDEO_START(mcrmono);
-	DECLARE_VIDEO_START(spyhunt);
+	void video_start_mcrmono();
+	void video_start_spyhunt();
 	DECLARE_PALETTE_INIT(spyhunt);
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

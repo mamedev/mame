@@ -28,17 +28,17 @@ public:
 		{ }
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_MACHINE_RESET(mikrosha);
+	void machine_reset_mikrosha();
 
 protected:
 	required_device<generic_slot_device> m_cart;
 };
 
-MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
+void mikrosha_state::machine_reset_mikrosha()
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-	MACHINE_RESET_CALL_MEMBER(radio86);
+	machine_reset_radio86();
 }
 
 /* Address maps */

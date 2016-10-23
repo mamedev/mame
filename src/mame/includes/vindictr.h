@@ -33,9 +33,9 @@ public:
 	DECLARE_DRIVER_INIT(vindictr);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(vindictr);
-	DECLARE_MACHINE_RESET(vindictr);
-	DECLARE_VIDEO_START(vindictr);
+	void machine_start_vindictr();
+	void machine_reset_vindictr();
+	void video_start_vindictr();
 	uint32_t screen_update_vindictr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( vindictr_paletteram_w );
 

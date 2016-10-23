@@ -464,7 +464,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(fromanc2_state,fromanc4)
+void fromanc2_state::machine_start_fromanc4()
 {
 	save_item(NAME(m_portselect));
 	save_item(NAME(m_sndcpu_nmi_flag));
@@ -475,7 +475,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_START_MEMBER(fromanc2_state,fromanc2)
+void fromanc2_state::machine_start_fromanc2()
 {
 	m_bankedram = std::make_unique<uint8_t[]>(0x4000 * 3);
 
@@ -483,7 +483,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 	membank("bank2")->configure_entry(0, memregion("sub")->base() + 0x08000);
 	membank("bank2")->configure_entries(1, 3, m_bankedram.get(), 0x4000);
 
-	MACHINE_START_CALL_MEMBER(fromanc4);
+	machine_start_fromanc4();
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));

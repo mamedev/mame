@@ -352,7 +352,7 @@ void wardner_state::driver_start()
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	machine_reset_twincobr();
 
 	m_toaplan_main_cpu = 1;     /* Z80 */
 	twincobr_display(1);

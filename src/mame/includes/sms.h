@@ -207,12 +207,12 @@ public:
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
 	DECLARE_DRIVER_INIT(sms);
-	DECLARE_MACHINE_START(sms);
-	DECLARE_MACHINE_RESET(sms);
-	DECLARE_VIDEO_START(gamegear);
-	DECLARE_VIDEO_RESET(gamegear);
-	DECLARE_VIDEO_START(sms1);
-	DECLARE_VIDEO_RESET(sms1);
+	void machine_start_sms();
+	void machine_reset_sms();
+	void video_start_gamegear();
+	void video_reset_gamegear();
+	void video_start_sms1();
+	void video_reset_sms1();
 
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

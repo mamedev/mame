@@ -54,7 +54,7 @@ public:
 	}
 
 	DECLARE_DRIVER_INIT(rc702);
-	DECLARE_MACHINE_RESET(rc702);
+	void machine_reset_rc702();
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(port14_w);
@@ -141,7 +141,7 @@ static INPUT_PORTS_START( rc702 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( rc702_state, rc702 )
+void rc702_state::machine_reset_rc702()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

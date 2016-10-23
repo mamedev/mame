@@ -80,14 +80,14 @@ TODO:
 #include "includes/lvcards.h"
 
 
-MACHINE_START_MEMBER(lvcards_state,lvpoker)
+void lvcards_state::machine_start_lvpoker()
 {
 	save_item(NAME(m_payout));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_result));
 }
 
-MACHINE_RESET_MEMBER(lvcards_state,lvpoker)
+void lvcards_state::machine_reset_lvpoker()
 {
 	m_payout = 0;
 	m_pulse = 0;

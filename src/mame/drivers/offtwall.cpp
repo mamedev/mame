@@ -46,7 +46,7 @@ void offtwall_state::update_interrupts()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(offtwall_state,offtwall)
+void offtwall_state::machine_reset_offtwall()
 {
 	atarigen_state::machine_reset();
 }

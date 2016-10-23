@@ -628,7 +628,7 @@ void hyprduel_state::machine_reset()
 	*m_irq_enable = 0xff;
 }
 
-MACHINE_START_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::machine_start_hyprduel()
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
@@ -636,9 +636,9 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	save_item(NAME(m_cpu_trigger));
 }
 
-MACHINE_START_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::machine_start_magerror()
 {
-	MACHINE_START_CALL_MEMBER(hyprduel);
+	machine_start_hyprduel();
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 

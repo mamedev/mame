@@ -876,7 +876,7 @@ static GFXDECODE_START( dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_start_mystwarr()
 {
 	membank("z80bank")->configure_entries(0, 16, memregion("soundcpu")->base(), 0x4000);
 	membank("z80bank")->set_entry(2);
@@ -892,7 +892,7 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 	save_item(NAME(m_sound_nmi_clk));
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_reset_mystwarr()
 {
 	int i;
 
@@ -907,7 +907,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
+void mystwarr_state::machine_reset_dadandrn()
 {
 	int i;
 
@@ -915,7 +915,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
+void mystwarr_state::machine_reset_viostorm()
 {
 	int i;
 
@@ -923,7 +923,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
+void mystwarr_state::machine_reset_metamrph()
 {
 	int i;
 
@@ -937,7 +937,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 	}
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
+void mystwarr_state::machine_reset_martchmp()
 {
 	int i;
 
@@ -947,7 +947,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
+void mystwarr_state::machine_reset_gaiapols()
 {
 	int i;
 

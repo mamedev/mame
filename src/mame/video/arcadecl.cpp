@@ -54,7 +54,7 @@ const atari_motion_objects_config arcadecl_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(arcadecl_state,arcadecl)
+void arcadecl_state::video_start_arcadecl()
 {
 	if (m_mob != nullptr)
 		m_mob->set_scroll(-12, 0x110);

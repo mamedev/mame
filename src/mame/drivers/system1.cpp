@@ -394,7 +394,7 @@ void system1_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(system1_state,system2)
+void system1_state::machine_start_system2()
 {
 	system1_state::machine_start();
 	m_mute_xor = 0x01;

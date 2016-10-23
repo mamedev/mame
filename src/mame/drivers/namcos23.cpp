@@ -1555,8 +1555,8 @@ public:
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
 	DECLARE_DRIVER_INIT(s23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
-	DECLARE_VIDEO_START(s23);
-	DECLARE_MACHINE_RESET(gmen);
+	void video_start_s23();
+	void machine_reset_gmen();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2379,7 +2379,7 @@ WRITE32_MEMBER(namcos23_state::textchar_w)
 
 // Video start/update callbacks
 
-VIDEO_START_MEMBER(namcos23_state,s23)
+void namcos23_state::video_start_s23()
 {
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -3453,7 +3453,7 @@ void namcos23_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(namcos23_state,gmen)
+void namcos23_state::machine_reset_gmen()
 {
 	machine_reset();
 

@@ -62,9 +62,9 @@ public:
 
 	DECLARE_DRIVER_INIT(cabal);
 	DECLARE_DRIVER_INIT(cabalbl2);
-	DECLARE_MACHINE_START(cabal);
-	DECLARE_MACHINE_START(cabalbl);
-	DECLARE_MACHINE_RESET(cabalbl);
+	void machine_start_cabal();
+	void machine_start_cabalbl();
+	void machine_reset_cabalbl();
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

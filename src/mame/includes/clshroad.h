@@ -40,9 +40,9 @@ public:
 
 	DECLARE_DRIVER_INIT(firebatl);
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(firebatl);
+	void video_start_firebatl();
 	DECLARE_PALETTE_INIT(firebatl);
-	DECLARE_VIDEO_START(clshroad);
+	void video_start_clshroad();
 	DECLARE_PALETTE_INIT(clshroad);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

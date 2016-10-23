@@ -88,8 +88,8 @@ public:
 
 	void install_stvbios_speedups( void );
 
-	DECLARE_MACHINE_START(stv);
-	DECLARE_MACHINE_RESET(stv);
+	void machine_start_stv();
+	void machine_reset_stv();
 
 	/* Batman Forever specifics */
 	optional_device<adsp2181_device>    m_adsp;
@@ -103,7 +103,7 @@ public:
 		uint16_t bdma_word_count;
 	} m_adsp_regs;
 
-	DECLARE_MACHINE_RESET(batmanfr);
+	void machine_reset_batmanfr();
 	DECLARE_READ16_MEMBER( adsp_control_r );
 	DECLARE_WRITE16_MEMBER( adsp_control_w );
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);

@@ -411,7 +411,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 }
 
 // Portable/PB100 video
-VIDEO_START_MEMBER(mac_state,macprtb)
+void mac_state::video_start_macprtb()
 {
 }
 

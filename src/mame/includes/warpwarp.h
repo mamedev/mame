@@ -73,11 +73,11 @@ public:
 	DECLARE_DRIVER_INIT(sos);
 	DECLARE_DRIVER_INIT(kaitei);
 	DECLARE_DRIVER_INIT(bombbee);
-	DECLARE_VIDEO_START(geebee);
+	void video_start_geebee();
 	DECLARE_PALETTE_INIT(geebee);
-	DECLARE_VIDEO_START(warpwarp);
+	void video_start_warpwarp();
 	DECLARE_PALETTE_INIT(warpwarp);
-	DECLARE_VIDEO_START(navarone);
+	void video_start_navarone();
 	DECLARE_PALETTE_INIT(navarone);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

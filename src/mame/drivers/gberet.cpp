@@ -386,14 +386,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gberet_state,gberet)
+void gberet_state::machine_start_gberet()
 {
 	save_item(NAME(m_interrupt_mask));
 	save_item(NAME(m_interrupt_ticks));
 	save_item(NAME(m_spritebank));
 }
 
-MACHINE_RESET_MEMBER(gberet_state,gberet)
+void gberet_state::machine_reset_gberet()
 {
 	m_interrupt_mask = 0;
 	m_interrupt_ticks = 0;

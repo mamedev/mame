@@ -40,13 +40,13 @@ public:
 
 	DECLARE_DRIVER_INIT(raiders5);
 	DECLARE_DRIVER_INIT(pkunwar);
-	DECLARE_VIDEO_START(nova2001);
+	void video_start_nova2001();
 	DECLARE_PALETTE_INIT(nova2001);
 	DECLARE_PALETTE_DECODER(BBGGRRII);
-	DECLARE_MACHINE_START(ninjakun);
-	DECLARE_VIDEO_START(ninjakun);
-	DECLARE_VIDEO_START(pkunwar);
-	DECLARE_VIDEO_START(raiders5);
+	void machine_start_ninjakun();
+	void video_start_ninjakun();
+	void video_start_pkunwar();
+	void video_start_raiders5();
 
 	TILE_GET_INFO_MEMBER(nova2001_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(nova2001_get_fg_tile_info);

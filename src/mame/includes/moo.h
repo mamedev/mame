@@ -79,10 +79,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(moo_prot_w);
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
-	DECLARE_MACHINE_START(moo);
-	DECLARE_MACHINE_RESET(moo);
-	DECLARE_VIDEO_START(moo);
-	DECLARE_VIDEO_START(bucky);
+	void machine_start_moo();
+	void machine_reset_moo();
+	void video_start_moo();
+	void video_start_bucky();
 	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);

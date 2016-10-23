@@ -136,7 +136,7 @@ static INPUT_PORTS_START( s11b )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s11b_state, s11b )
+void s11b_state::machine_reset_s11b()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);

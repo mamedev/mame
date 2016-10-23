@@ -252,7 +252,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(combatsc_state,combatsc)
+void combatsc_state::video_start_combatsc()
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -271,7 +271,7 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 	save_pointer(NAME(m_spriteram[1].get()), 0x800);
 }
 
-VIDEO_START_MEMBER(combatsc_state,combatscb)
+void combatsc_state::video_start_combatscb()
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

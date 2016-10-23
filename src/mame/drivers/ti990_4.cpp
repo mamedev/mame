@@ -67,7 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(ti990_4);
 	DECLARE_DRIVER_INIT(ti990_4v);
 
-	DECLARE_MACHINE_RESET(ti990_4);
+	void machine_reset_ti990_4();
 
 private:
 	void        hold_load();
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
     nullptr
 }; */
 
-MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
+void ti990_4_state::machine_reset_ti990_4()
 {
 	hold_load();
 	reset_int_lines();

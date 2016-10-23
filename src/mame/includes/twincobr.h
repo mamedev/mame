@@ -104,8 +104,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	DECLARE_MACHINE_RESET(twincobr);
-	DECLARE_VIDEO_START(toaplan0);
+	void machine_reset_twincobr();
+	void video_start_toaplan0();
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);

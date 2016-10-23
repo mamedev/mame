@@ -67,8 +67,8 @@ public:
 	DECLARE_READ8_MEMBER(lsasquad_mcu_status_r);
 	DECLARE_READ8_MEMBER(daikaiju_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(unk);
-	DECLARE_MACHINE_START(lsasquad);
-	DECLARE_MACHINE_RESET(lsasquad);
+	void machine_start_lsasquad();
+	void machine_reset_lsasquad();
 	uint32_t screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);

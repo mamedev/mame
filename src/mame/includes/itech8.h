@@ -131,8 +131,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(slikshot);
-	DECLARE_MACHINE_START(sstrike);
+	void video_start_slikshot();
+	void machine_start_sstrike();
 
 	uint32_t screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -119,7 +119,7 @@ public:
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
-	DECLARE_VIDEO_START(vertical);
+	void video_start_vertical();
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 };
@@ -176,7 +176,7 @@ void statriv2_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
-VIDEO_START_MEMBER(statriv2_state,vertical)
+void statriv2_state::video_start_vertical()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }

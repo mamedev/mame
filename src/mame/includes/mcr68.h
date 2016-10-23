@@ -104,12 +104,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zwackery_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(zwackery_get_fg_tile_info);
-	DECLARE_MACHINE_START(zwackery);
-	DECLARE_MACHINE_RESET(zwackery);
-	DECLARE_VIDEO_START(zwackery);
-	DECLARE_MACHINE_START(mcr68);
-	DECLARE_MACHINE_RESET(mcr68);
-	DECLARE_VIDEO_START(mcr68);
+	void machine_start_zwackery();
+	void machine_reset_zwackery();
+	void video_start_zwackery();
+	void machine_start_mcr68();
+	void machine_reset_mcr68();
+	void video_start_mcr68();
 	uint32_t screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcr68_interrupt);

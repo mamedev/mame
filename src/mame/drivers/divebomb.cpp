@@ -591,7 +591,7 @@ ROM_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_start_divebomb()
 {
 	m_bank1->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
@@ -609,7 +609,7 @@ MACHINE_START_MEMBER(divebomb_state, divebomb)
 }
 
 
-MACHINE_RESET_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_reset_divebomb()
 {
 	roz1_enable = false;
 	roz2_enable = false;

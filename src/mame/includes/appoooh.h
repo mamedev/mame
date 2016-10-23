@@ -57,7 +57,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(appoooh);
+	void video_start_appoooh();
 	DECLARE_PALETTE_INIT(appoooh);
 	DECLARE_PALETTE_INIT(robowres);
 	uint32_t screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

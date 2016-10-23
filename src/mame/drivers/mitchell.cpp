@@ -1090,7 +1090,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_start_mitchell()
 {
 	save_item(NAME(m_sample_buffer));
 	save_item(NAME(m_sample_select));
@@ -1102,7 +1102,7 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 //  save_item(NAME(init_eeprom_count));
 }
 
-MACHINE_RESET_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_reset_mitchell()
 {
 	m_sample_buffer = 0;
 	m_sample_select = 0;

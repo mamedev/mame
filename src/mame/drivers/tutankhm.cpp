@@ -203,7 +203,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(tutankhm_state,tutankhm)
+void tutankhm_state::machine_start_tutankhm()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
@@ -213,7 +213,7 @@ MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 	save_item(NAME(m_flip_y));
 }
 
-MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
+void tutankhm_state::machine_reset_tutankhm()
 {
 	m_irq_toggle = 0;
 	m_irq_enable = 0;

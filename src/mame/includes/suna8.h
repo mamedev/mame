@@ -155,13 +155,13 @@ public:
 	DECLARE_DRIVER_INIT(suna8);
 
 	void suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_type);
-	DECLARE_VIDEO_START(suna8_text);
-	DECLARE_VIDEO_START(suna8_sparkman);
-	DECLARE_VIDEO_START(suna8_brickzn);
-	DECLARE_VIDEO_START(suna8_starfigh);
+	void video_start_suna8_text();
+	void video_start_suna8_sparkman();
+	void video_start_suna8_brickzn();
+	void video_start_suna8_starfigh();
 
-	DECLARE_MACHINE_RESET(brickzn);
-	DECLARE_MACHINE_RESET(hardhea2);
+	void machine_reset_brickzn();
+	void machine_reset_hardhea2();
 	uint32_t screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 

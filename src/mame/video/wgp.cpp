@@ -69,7 +69,7 @@ void wgp_state::video_start()
 	wgp_core_vh_start(32, 16);
 }
 
-VIDEO_START_MEMBER(wgp_state,wgp2)
+void wgp_state::video_start_wgp2()
 {
 	wgp_core_vh_start(32, 16);
 }

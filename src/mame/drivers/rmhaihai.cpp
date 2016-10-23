@@ -69,8 +69,8 @@ public:
 
 	DECLARE_DRIVER_INIT(rmhaihai);
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(themj);
-	DECLARE_MACHINE_RESET(themj);
+	void machine_start_themj();
+	void machine_reset_themj();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -207,13 +207,13 @@ WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
 	membank("bank2")->set_entry(data & 0x03);
 }
 
-MACHINE_START_MEMBER(rmhaihai_state,themj)
+void rmhaihai_state::machine_start_themj()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(rmhaihai_state,themj)
+void rmhaihai_state::machine_reset_themj()
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);

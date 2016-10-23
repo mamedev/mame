@@ -242,8 +242,8 @@ public:
 	DECLARE_DRIVER_INIT(ucytokyu);
 	DECLARE_DRIVER_INIT(haekaka);
 
-	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl);
+	void machine_reset_sigmab98();
+	void machine_reset_sammymdl();
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -2131,7 +2131,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
+void sigmab98_state::machine_reset_sigmab98()
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -2207,7 +2207,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
+void sigmab98_state::machine_reset_sammymdl()
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }

@@ -2021,7 +2021,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 
-MACHINE_START_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_start_tumbleb()
 {
 	save_item(NAME(m_music_command));
 	save_item(NAME(m_music_bank));
@@ -2031,7 +2031,7 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_reset_tumbleb()
 {
 	m_music_command = 0;
 	m_music_bank = 0;
@@ -2203,7 +2203,7 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
+void tumbleb_state::machine_reset_htchctch()
 {
 	if (memregion("user1") != nullptr)
 	{
@@ -2215,7 +2215,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 			m_mainram[0x000 / 2 + i] = PROTDATA[i];
 	}
 
-	MACHINE_RESET_CALL_MEMBER(tumbleb);
+	machine_reset_tumbleb();
 }
 
 static MACHINE_CONFIG_START( htchctch, tumbleb_state )

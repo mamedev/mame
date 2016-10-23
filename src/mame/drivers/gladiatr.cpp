@@ -243,7 +243,7 @@ READ8_MEMBER(gladiatr_state::gladiator_button3_r )
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
+void gladiatr_state::machine_reset_gladiator()
 {
 	/* 6809 bank memory set */
 	{
@@ -351,7 +351,7 @@ READ8_MEMBER(gladiatr_state::ppking_qx1_r)
 		return m_flag1;
 }
 
-MACHINE_RESET_MEMBER(gladiatr_state,ppking)
+void gladiatr_state::machine_reset_ppking()
 {
 	m_data1 = m_data2 = 0;
 	m_flag1 = m_flag2 = 1;

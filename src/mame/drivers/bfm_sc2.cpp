@@ -345,11 +345,11 @@ public:
 	DECLARE_DRIVER_INIT(focus);
 	DECLARE_DRIVER_INIT(drwho);
 	DECLARE_DRIVER_INIT(drwho_common);
-	DECLARE_MACHINE_START(bfm_sc2);
-	DECLARE_MACHINE_RESET(init);
-	DECLARE_MACHINE_RESET(awp_init);
-	DECLARE_MACHINE_START(sc2dmd);
-	DECLARE_MACHINE_RESET(dm01_init);
+	void machine_start_bfm_sc2();
+	void machine_reset_init();
+	void machine_reset_awp_init();
+	void machine_start_sc2dmd();
+	void machine_reset_dm01_init();
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void on_scorpion2_reset();
 	void Scorpion2_SetSwitchState(int strobe, int data, int state);
@@ -1410,7 +1410,7 @@ int bfm_sc2_state::read_e2ram()
 
 // machine init (called only once) ////////////////////////////////////////
 
-MACHINE_RESET_MEMBER(bfm_sc2_state,init)
+void bfm_sc2_state::machine_reset_init()
 {
 	// reset the board //////////////////////////////////////////////////////
 
@@ -2203,7 +2203,7 @@ MACHINE_CONFIG_END
 // machine driver for scorpion2 board + adder2 expansion //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
+void bfm_sc2_state::machine_start_bfm_sc2()
 {
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != nullptr)
@@ -2718,7 +2718,7 @@ WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
 }
 
 /* machine init (called only once) */
-MACHINE_RESET_MEMBER(bfm_sc2_state,awp_init)
+void bfm_sc2_state::machine_reset_awp_init()
 {
 	on_scorpion2_reset();
 	m_vfd0->reset();
@@ -2726,7 +2726,7 @@ MACHINE_RESET_MEMBER(bfm_sc2_state,awp_init)
 }
 
 
-MACHINE_RESET_MEMBER(bfm_sc2_state,dm01_init)
+void bfm_sc2_state::machine_reset_dm01_init()
 {
 	on_scorpion2_reset();
 }
@@ -3658,9 +3658,9 @@ WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
 //TODO: Reset callback for DMD
 }
 
-MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
+void bfm_sc2_state::machine_start_sc2dmd()
 {
-	MACHINE_START_CALL_MEMBER(bfm_sc2);
+	machine_start_bfm_sc2();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x2800, 0x2800, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),this));
 	space.install_write_handler(0x2900, 0x2900, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),this));

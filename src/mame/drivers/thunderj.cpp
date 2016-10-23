@@ -58,14 +58,14 @@ void thunderj_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(thunderj_state,thunderj)
+void thunderj_state::machine_start_thunderj()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_alpha_tile_bank));
 }
 
 
-MACHINE_RESET_MEMBER(thunderj_state,thunderj)
+void thunderj_state::machine_reset_thunderj()
 {
 	atarigen_state::machine_reset();
 }

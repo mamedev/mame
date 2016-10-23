@@ -75,9 +75,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ff7f_w);
 	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
 	DECLARE_WRITE16_MEMBER(sound_bank_w);
-	DECLARE_MACHINE_RESET(tickee);
-	DECLARE_VIDEO_START(tickee);
-	DECLARE_MACHINE_RESET(rapidfir);
+	void machine_reset_tickee();
+	void video_start_tickee();
+	void machine_reset_rapidfir();
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
  *
  *************************************/
 
-VIDEO_START_MEMBER(tickee_state,tickee)
+void tickee_state::video_start_tickee()
 {
 	/* start a timer going on the first scanline of every frame */
 	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
@@ -265,13 +265,13 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(tickee_state,tickee)
+void tickee_state::machine_reset_tickee()
 {
 	m_beamxadd = 50;
 	m_beamyadd = 0;
 }
 
-MACHINE_RESET_MEMBER(tickee_state,rapidfir)
+void tickee_state::machine_reset_rapidfir()
 {
 	m_beamxadd = 0;
 	m_beamyadd = -5;

@@ -472,7 +472,7 @@ void itech32_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(itech32_state,drivedge)
+void itech32_state::machine_reset_drivedge()
 {
 	itech32_state::machine_reset();
 

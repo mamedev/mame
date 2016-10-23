@@ -22,7 +22,7 @@ public:
 	DECLARE_DRIVER_INIT(drgw2j);
 	DECLARE_DRIVER_INIT(drgw2hk);
 
-	DECLARE_MACHINE_RESET(drgw2);
+	void machine_reset_drgw2();
 };
 
 MACHINE_CONFIG_EXTERN( pgm_012_025_drgw2 );

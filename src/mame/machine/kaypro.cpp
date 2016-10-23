@@ -240,14 +240,14 @@ WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
     Machine
 
 ************************************************************/
-MACHINE_START_MEMBER( kaypro_state,kayproii )
+void kaypro_state::machine_start_kayproii()
 {
 	m_pio_s->strobe_a(0);
 }
 
-MACHINE_RESET_MEMBER( kaypro_state,kaypro )
+void kaypro_state::machine_reset_kaypro()
 {
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
+	machine_reset_kay_kbd();
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram

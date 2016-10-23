@@ -1061,7 +1061,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 }
 
 
-MACHINE_RESET_MEMBER(wecleman_state,wecleman)
+void wecleman_state::machine_reset_wecleman()
 {
 	m_k007232->set_bank( 0, 1 );
 }
@@ -1123,7 +1123,7 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state,hotchase)
+void wecleman_state::machine_reset_hotchase()
 {
 	int i;
 

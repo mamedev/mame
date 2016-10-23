@@ -559,13 +559,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
 }
 
 
-MACHINE_START_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_start_namcofl()
 {
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 }
 
 
-MACHINE_RESET_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_reset_namcofl()
 {
 	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));

@@ -205,7 +205,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-MACHINE_RESET_MEMBER( super80_state, super80 )
+void super80_state::machine_reset_super80()
 {
 	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
 	m_keylatch = 0xff;
@@ -215,7 +215,7 @@ MACHINE_RESET_MEMBER( super80_state, super80 )
 	membank("boot")->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( super80_state, super80r )
+void super80_state::machine_reset_super80r()
 {
 	m_portf0 = 0x14;
 	m_keylatch = 0xff;

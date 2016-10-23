@@ -702,7 +702,7 @@ INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(liberate_state,liberate)
+void liberate_state::machine_start_liberate()
 {
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));
@@ -713,7 +713,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 	save_item(NAME(m_io_ram));
 }
 
-MACHINE_RESET_MEMBER(liberate_state,liberate)
+void liberate_state::machine_reset_liberate()
 {
 	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 

@@ -128,7 +128,7 @@ WRITE8_MEMBER( s11c_state::bgbank_w )
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 */
-MACHINE_RESET_MEMBER( s11c_state, s11c )
+void s11c_state::machine_reset_s11c()
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)

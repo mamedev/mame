@@ -255,7 +255,7 @@ void legionna_state::common_video_start()
 	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(legionna_state,legionna)
+void legionna_state::video_start_legionna()
 {
 	common_video_start();
 
@@ -265,7 +265,7 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 	m_sprite_pri_mask[3] = 0xfffe;
 }
 
-VIDEO_START_MEMBER(legionna_state,heatbrl)
+void legionna_state::video_start_heatbrl()
 {
 	common_video_start();
 
@@ -276,9 +276,9 @@ VIDEO_START_MEMBER(legionna_state,heatbrl)
 	m_sprite_pri_mask[3] = 0xffff;
 }
 
-VIDEO_START_MEMBER(legionna_state,godzilla)
+void legionna_state::video_start_godzilla()
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	video_start_legionna();
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
@@ -290,7 +290,7 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 	m_sprite_pri_mask[3] = 0xffff;
 }
 
-VIDEO_START_MEMBER(legionna_state,denjinmk)
+void legionna_state::video_start_denjinmk()
 {
 	common_video_allocate_ptr();
 
@@ -313,7 +313,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_text_layer->set_transparent_pen(7);//?
 }
 
-VIDEO_START_MEMBER(legionna_state,cupsoc)
+void legionna_state::video_start_cupsoc()
 {
 	common_video_allocate_ptr();
 
@@ -331,9 +331,9 @@ VIDEO_START_MEMBER(legionna_state,cupsoc)
 	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(legionna_state,grainbow)
+void legionna_state::video_start_grainbow()
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	video_start_legionna();
 	m_sprite_xoffs = m_sprite_yoffs = 16;
 
 	m_has_extended_banking = 0;

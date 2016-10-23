@@ -114,8 +114,8 @@ public:
 	DECLARE_DRIVER_INIT(zookeep);
 	DECLARE_DRIVER_INIT(kram3);
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(qixmcu);
-	DECLARE_VIDEO_START(qix);
+	void machine_start_qixmcu();
+	void video_start_qix();
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);

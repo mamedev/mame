@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
-	DECLARE_MACHINE_RESET(elwro800);
+	void machine_reset_elwro800();
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 	DECLARE_READ8_MEMBER(i8255_port_c_r);
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
@@ -492,7 +492,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(elwro800_state,elwro800)
+void elwro800_state::machine_reset_elwro800()
 {
 	uint8_t *messram = m_ram->pointer();
 

@@ -83,7 +83,7 @@ private:
  *
  *************************************/
 
-MACHINE_START_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_start_midzeus()
 {
 	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -100,7 +100,7 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 }
 
 
-MACHINE_RESET_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_reset_midzeus()
 {
 	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;

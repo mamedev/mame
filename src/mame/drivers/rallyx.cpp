@@ -814,13 +814,13 @@ static const char *const rallyx_sample_names[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(rallyx_state,rallyx)
+void rallyx_state::machine_start_rallyx()
 {
 	save_item(NAME(m_last_bang));
 	save_item(NAME(m_stars_enable));
 }
 
-MACHINE_RESET_MEMBER(rallyx_state,rallyx)
+void rallyx_state::machine_reset_rallyx()
 {
 	m_last_bang = 0;
 	m_stars_enable = 0;

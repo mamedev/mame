@@ -878,7 +878,7 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,maze)
+void mw8080bw_state::machine_start_maze()
 {
 	/* create astable timer for IC B1 */
 	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback),this));
@@ -890,7 +890,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 	save_item(NAME(m_maze_tone_timing_state));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mw8080bw_state::maze_update_discrete), this));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -971,12 +971,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,boothill)
+void mw8080bw_state::machine_start_boothill()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1173,12 +1173,12 @@ MACHINE_CONFIG_END
 #define DESERTGU_DIP_SW_0_1_SET_2_TAG   ("DIPSW01SET2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,desertgu)
+void mw8080bw_state::machine_start_desertgu()
 {
 	/* setup for save states */
 	save_item(NAME(m_desertgun_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1501,12 +1501,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,gmissile)
+void mw8080bw_state::machine_start_gmissile()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1597,12 +1597,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,m4)
+void mw8080bw_state::machine_start_m4()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1695,12 +1695,12 @@ MACHINE_CONFIG_END
 #define CLOWNS_CONTROLLER_P2_TAG        ("CONTP2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,clowns)
+void mw8080bw_state::machine_start_clowns()
 {
 	/* setup for save states */
 	save_item(NAME(m_clowns_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2135,7 +2135,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
+void mw8080bw_state::machine_start_spcenctr()
 {
 	/* setup for save states */
 	save_item(NAME(m_spcenctr_strobe_state));
@@ -2145,7 +2145,7 @@ MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 	save_item(NAME(m_spcenctr_bright_control));
 	save_item(NAME(m_spcenctr_brightness));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2286,12 +2286,12 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_START_MEMBER(mw8080bw_state,phantom2)
+void mw8080bw_state::machine_start_phantom2()
 {
 	/* setup for save states */
 	save_item(NAME(m_phantom2_cloud_counter));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2512,12 +2512,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,invaders)
+void mw8080bw_state::machine_start_invaders()
 {
 	/* setup for save states */
 	save_item(NAME(m_flip_screen));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 

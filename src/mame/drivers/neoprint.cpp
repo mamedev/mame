@@ -76,7 +76,7 @@ public:
 	DECLARE_DRIVER_INIT(unkneo);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(nprsp);
+	void machine_reset_nprsp();
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(neoprint_state,nprsp)
+void neoprint_state::machine_reset_nprsp()
 {
 	m_bank_val = 0;
 }

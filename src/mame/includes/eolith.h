@@ -76,8 +76,8 @@ public:
 	DECLARE_DRIVER_INIT(hidnc2k);
 	DECLARE_DRIVER_INIT(landbrka);
 
-	DECLARE_MACHINE_RESET(eolith);
-	DECLARE_VIDEO_START(eolith);
+	void machine_reset_eolith();
+	void video_start_eolith();
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

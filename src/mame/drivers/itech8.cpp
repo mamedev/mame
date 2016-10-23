@@ -591,7 +591,7 @@ WRITE8_MEMBER(itech8_state::nmi_ack_w)
 
 
 
-MACHINE_START_MEMBER(itech8_state,sstrike)
+void itech8_state::machine_start_sstrike()
 {
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);

@@ -104,13 +104,13 @@ public:
 	DECLARE_DRIVER_INIT(funcube2);
 	DECLARE_DRIVER_INIT(staraudi);
 
-	DECLARE_MACHINE_START(mj4simai);
-	DECLARE_MACHINE_START(funcube);
-	DECLARE_MACHINE_RESET(funcube);
+	void machine_start_mj4simai();
+	void machine_start_funcube();
+	void machine_reset_funcube();
 
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(yoffset);
-	DECLARE_VIDEO_START(xoffset);
+	void video_start_yoffset();
+	void video_start_xoffset();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

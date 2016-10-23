@@ -3879,7 +3879,7 @@ static MACHINE_CONFIG_DERIVED( propcycl, namcos22s )
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(namcos22_state,adillor)
+void namcos22_state::machine_start_adillor()
 {
 	machine_start();
 

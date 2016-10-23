@@ -174,7 +174,7 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 	}
 }
 
-MACHINE_START_MEMBER(terracre_state,amazon)
+void terracre_state::machine_start_amazon()
 {
 	/* set up for save */
 	save_item(NAME(m_mAmazonProtCmd));

@@ -841,7 +841,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-MACHINE_START_MEMBER(galaga_state,galaga)
+void galaga_state::machine_start_galaga()
 {
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
@@ -862,7 +862,7 @@ void galaga_state::bosco_latch_reset()
 		bosco_latch_w(space,i,0);
 }
 
-MACHINE_RESET_MEMBER(galaga_state,galaga)
+void galaga_state::machine_reset_galaga()
 {
 	/* Reset all latches */
 	bosco_latch_reset();
@@ -870,9 +870,9 @@ MACHINE_RESET_MEMBER(galaga_state,galaga)
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
-MACHINE_RESET_MEMBER(xevious_state,battles)
+void xevious_state::machine_reset_battles()
 {
-	MACHINE_RESET_CALL_MEMBER(galaga);
+	machine_reset_galaga();
 	battles_customio_init();
 }
 

@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_START_MEMBER(aes_state, aes)
+void aes_state::machine_start_aes()
 {
 	m_type = NEOGEO_AES;
 	common_machine_start();

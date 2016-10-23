@@ -74,13 +74,13 @@ void bagman_state::machine_start()
 	save_item(NAME(m_columnvalue));
 }
 
-MACHINE_START_MEMBER(bagman_state, bagman)
+void bagman_state::machine_start_bagman()
 {
 	bagman_state::machine_start();
 	save_item(NAME(m_ls259_buf));
 }
 
-MACHINE_START_MEMBER(bagman_state, squaitsa)
+void bagman_state::machine_start_squaitsa()
 {
 	bagman_state::machine_start();
 	save_item(NAME(m_p1_res));

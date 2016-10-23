@@ -131,7 +131,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(getstar);
+	void machine_reset_getstar();
 
 	void init_banks();
 	DECLARE_DRIVER_INIT(getstarj);
@@ -143,8 +143,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	DECLARE_VIDEO_START(perfrman);
-	DECLARE_VIDEO_START(slapfight);
+	void video_start_perfrman();
+	void video_start_slapfight();
 
 	void draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	void draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

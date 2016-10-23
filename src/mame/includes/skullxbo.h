@@ -38,9 +38,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	WRITE16_MEMBER(playfield_latch_w);
 	WRITE16_MEMBER(playfield_latched_w);
-	DECLARE_MACHINE_START(skullxbo);
-	DECLARE_MACHINE_RESET(skullxbo);
-	DECLARE_VIDEO_START(skullxbo);
+	void machine_start_skullxbo();
+	void machine_reset_skullxbo();
+	void video_start_skullxbo();
 	uint32_t screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	void skullxbo_scanline_update(int scanline);

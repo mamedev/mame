@@ -113,8 +113,8 @@ public:
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 	DECLARE_DRIVER_INIT(konamigq);
-	DECLARE_MACHINE_START(konamigq);
-	DECLARE_MACHINE_RESET(konamigq);
+	void machine_start_konamigq();
+	void machine_reset_konamigq();
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 
@@ -296,7 +296,7 @@ DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
-MACHINE_START_MEMBER(konamigq_state,konamigq)
+void konamigq_state::machine_start_konamigq()
 {
 	save_pointer(NAME(m_p_n_pcmram), 0x380000);
 	save_item(NAME(m_sector_buffer));
@@ -304,7 +304,7 @@ MACHINE_START_MEMBER(konamigq_state,konamigq)
 	save_item(NAME(m_sound_intck));
 }
 
-MACHINE_RESET_MEMBER(konamigq_state,konamigq)
+void konamigq_state::machine_reset_konamigq()
 {
 }
 

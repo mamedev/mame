@@ -191,7 +191,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::machine_start_atarisy2()
 {
 	atarigen_state::machine_start();
 
@@ -206,7 +206,7 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 }
 
 
-MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::machine_reset_atarisy2()
 {
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();

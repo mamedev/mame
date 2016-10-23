@@ -223,8 +223,8 @@ public:
 		m_cassette(*this, "cassette") { };
 
 	// Machine management
-	DECLARE_MACHINE_START(ti99_8);
-	DECLARE_MACHINE_RESET(ti99_8);
+	void machine_start_ti99_8();
+	void machine_reset_ti99_8();
 
 	// Processor connections with the main board
 	DECLARE_READ8_MEMBER( cruread );
@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 	m_mainboard->dbin_in(state);
 }
 
-MACHINE_START_MEMBER(ti99_8_state,ti99_8)
+void ti99_8_state::machine_start_ti99_8()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -696,7 +696,7 @@ MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 	save_item(NAME(m_int2));
 }
 
-MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
+void ti99_8_state::machine_reset_ti99_8()
 {
 	m_cpu->hold_line(CLEAR_LINE);
 

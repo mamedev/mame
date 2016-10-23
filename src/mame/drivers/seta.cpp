@@ -2184,7 +2184,7 @@ static ADDRESS_MAP_START( keroppi_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(seta_state,keroppi)
+void seta_state::machine_start_keroppi()
 {
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
@@ -3224,7 +3224,7 @@ ADDRESS_MAP_END
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(seta_state,calibr50)
+void seta_state::machine_reset_calibr50()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
@@ -8499,7 +8499,7 @@ INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
-MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
+void seta_state::machine_start_wrofaero(){ uPD71054_timer_init(); }
 #endif  // __uPD71054_TIMER
 
 

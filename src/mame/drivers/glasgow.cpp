@@ -80,9 +80,9 @@ public:
 	DECLARE_READ32_MEMBER(read_newkeys32);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
-	DECLARE_MACHINE_START(dallas32);
-	DECLARE_MACHINE_START(glasgow);
-	DECLARE_MACHINE_RESET(glasgow);
+	void machine_start_dallas32();
+	void machine_start_glasgow();
+	void machine_reset_glasgow();
 
 private:
 	uint8_t m_lcd_shift_counter;
@@ -516,20 +516,20 @@ TIMER_DEVICE_CALLBACK_MEMBER( glasgow_state::update_nmi32 )
 	m_maincpu->set_input_line(6, HOLD_LINE); // this was 7 in the old code, which is correct?
 }
 
-MACHINE_START_MEMBER( glasgow_state, glasgow )
+void glasgow_state::machine_start_glasgow()
 {
 	m_key_selector = 0;
 	m_lcd_shift_counter = 3;
 }
 
 
-MACHINE_START_MEMBER( glasgow_state, dallas32 )
+void glasgow_state::machine_start_dallas32()
 {
 	m_lcd_shift_counter = 3;
 }
 
 
-MACHINE_RESET_MEMBER( glasgow_state, glasgow )
+void glasgow_state::machine_reset_glasgow()
 {
 	m_lcd_shift_counter = 3;
 	m_selected[0] = 0xff;

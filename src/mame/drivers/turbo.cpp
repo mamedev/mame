@@ -188,7 +188,7 @@
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(turbo_state,buckrog)
+void turbo_state::machine_reset_buckrog()
 {
 	m_buckrog_command = 0x00;
 	memset(m_alt_spriteram, 0x00, sizeof(m_alt_spriteram));

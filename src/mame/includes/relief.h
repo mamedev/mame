@@ -37,9 +37,9 @@ public:
 	DECLARE_DRIVER_INIT(relief);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
-	DECLARE_MACHINE_START(relief);
-	DECLARE_MACHINE_RESET(relief);
-	DECLARE_VIDEO_START(relief);
+	void machine_start_relief();
+	void machine_reset_relief();
+	void video_start_relief();
 	uint32_t screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

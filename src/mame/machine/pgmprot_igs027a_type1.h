@@ -62,7 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(kov);
 	DECLARE_DRIVER_INIT(kovboot);
 	DECLARE_DRIVER_INIT(oldsplus);
-	DECLARE_MACHINE_START(pgm_arm_type1);
+	void machine_start_pgm_arm_type1();
 
 	DECLARE_READ32_MEMBER( pgm_arm7_type1_protlatch_r );
 	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_protlatch_w );

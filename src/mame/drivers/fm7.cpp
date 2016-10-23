@@ -1897,7 +1897,7 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	m_fm77av_vsync_timer = timer_alloc(TIMER_FM77AV_VSYNC);
 }
 
-MACHINE_START_MEMBER(fm7_state,fm7)
+void fm7_state::machine_start_fm7()
 {
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
@@ -1912,7 +1912,7 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 	m_beeper->set_state(0);
 }
 
-MACHINE_START_MEMBER(fm7_state,fm77av)
+void fm7_state::machine_start_fm77av()
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 	uint8_t* ROM = memregion("init")->base();
@@ -1932,7 +1932,7 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 	m_beeper->set_state(0);
 }
 
-MACHINE_START_MEMBER(fm7_state,fm11)
+void fm7_state::machine_start_fm11()
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 	uint8_t* ROM = memregion("init")->base();
@@ -1944,7 +1944,7 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 }
 
-MACHINE_START_MEMBER(fm7_state,fm16)
+void fm7_state::machine_start_fm16()
 {
 	m_type = SYS_FM16;
 	m_beeper->set_state(0);

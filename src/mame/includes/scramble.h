@@ -89,8 +89,8 @@ public:
 	DECLARE_DRIVER_INIT(hustler);
 	DECLARE_DRIVER_INIT(hustlerd);
 	DECLARE_DRIVER_INIT(billiard);
-	DECLARE_MACHINE_RESET(scramble);
-	DECLARE_MACHINE_RESET(explorer);
+	void machine_reset_scramble();
+	void machine_reset_explorer();
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 	void cavelon_banksw();
 	inline int bit(int i,int n);

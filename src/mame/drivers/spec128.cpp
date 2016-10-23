@@ -236,7 +236,7 @@ static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
+void spectrum_state::machine_reset_spectrum_128()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	membank("bank3")->set_base(messram + (2<<14));
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;

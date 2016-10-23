@@ -123,12 +123,12 @@ public:
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(flstory);
-	DECLARE_VIDEO_START(flstory);
-	DECLARE_VIDEO_START(victnine);
-	DECLARE_MACHINE_RESET(rumba);
-	DECLARE_VIDEO_START(rumba);
-	DECLARE_MACHINE_RESET(ta7630);
+	void machine_reset_flstory();
+	void video_start_flstory();
+	void video_start_victnine();
+	void machine_reset_rumba();
+	void video_start_rumba();
+	void machine_reset_ta7630();
 	uint32_t screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

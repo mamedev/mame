@@ -130,11 +130,11 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	DECLARE_MACHINE_START(jpmimpct);
-	DECLARE_MACHINE_RESET(jpmimpct);
-	DECLARE_VIDEO_START(jpmimpct);
-	DECLARE_MACHINE_START(impctawp);
-	DECLARE_MACHINE_RESET(impctawp);
+	void machine_start_jpmimpct();
+	void machine_reset_jpmimpct();
+	void video_start_jpmimpct();
+	void machine_start_impctawp();
+	void machine_reset_impctawp();
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
 	void update_irqs();
 	required_device<cpu_device> m_maincpu;

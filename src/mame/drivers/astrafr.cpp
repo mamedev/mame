@@ -122,10 +122,10 @@ public:
 	DECLARE_DRIVER_INIT(astradec);
 	DECLARE_DRIVER_INIT(astradec_dual);
 	DECLARE_DRIVER_INIT(astradec_sml_dual);
-	DECLARE_MACHINE_START(astra_common);
-	DECLARE_MACHINE_START(astra_2e);
-	DECLARE_MACHINE_START(astra_37);
-	DECLARE_MACHINE_START(astra_57);
+	void machine_start_astra_common();
+	void machine_start_astra_2e();
+	void machine_start_astra_37();
+	void machine_start_astra_57();
 };
 
 
@@ -266,7 +266,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( astrafr )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(astrafr_state,astra_common)
+void astrafr_state::machine_start_astra_common()
 {
 	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
 	m_cpuregion_size = memregion( "maincpu" )->bytes()/4;
@@ -283,20 +283,20 @@ MACHINE_START_MEMBER(astrafr_state,astra_common)
 }
 
 /* the FPGA area read/write addresses move around ... */
-MACHINE_START_MEMBER(astrafr_state,astra_37)
+void astrafr_state::machine_start_astra_37()
 {
 	fgpa_after_rom_write_addr = 0x30;
 	fgpa_first_read_addr = 0x33;
 	fgpa_rom_write_addr = 0x37;
-	MACHINE_START_CALL_MEMBER(astra_common);
+	machine_start_astra_common();
 }
 
-MACHINE_START_MEMBER(astrafr_state,astra_2e)
+void astrafr_state::machine_start_astra_2e()
 {
 	fgpa_after_rom_write_addr = 0x20;
 	fgpa_first_read_addr = 0x23;
 	fgpa_rom_write_addr = 0x2e;
-	MACHINE_START_CALL_MEMBER(astra_common);
+	machine_start_astra_common();
 }
 
 
@@ -346,12 +346,12 @@ static MACHINE_CONFIG_DERIVED( astra_single_2e, astra_single )
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_2e )
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(astrafr_state,astra_57)
+void astrafr_state::machine_start_astra_57()
 {
 //  fgpa_after_rom_write_addr = 0x20;
 //  fgpa_first_read_addr = 0x23;
 	fgpa_rom_write_addr = 0x57;
-	MACHINE_START_CALL_MEMBER(astra_common);
+	machine_start_astra_common();
 }
 
 

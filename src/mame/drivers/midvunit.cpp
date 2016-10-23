@@ -73,7 +73,7 @@ void midvunit_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(midvunit_state,midvplus)
+void midvunit_state::machine_reset_midvplus()
 {
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);

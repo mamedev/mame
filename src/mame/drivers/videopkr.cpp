@@ -362,7 +362,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(videopkr);
-	DECLARE_VIDEO_START(vidadcba);
+	void video_start_vidadcba();
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -522,7 +522,7 @@ void videopkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(videopkr_state,vidadcba)
+void videopkr_state::video_start_vidadcba()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }

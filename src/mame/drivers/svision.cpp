@@ -495,7 +495,7 @@ void svision_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(svision_state,tvlink)
+void svision_state::machine_reset_tvlink()
 {
 	svision_state::machine_reset();
 	m_tvlink.palette_on = false;

@@ -95,8 +95,8 @@ public:
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
 	DECLARE_DRIVER_INIT(megaplay);
-	DECLARE_VIDEO_START(megplay);
-	DECLARE_MACHINE_RESET(megaplay);
+	void video_start_megplay();
+	void machine_reset_megaplay();
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -645,12 +645,12 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(mplay_state,megaplay)
+void mplay_state::machine_reset_megaplay()
 {
 	m_bios_mode = MP_ROM;
 	m_bios_bank_addr = 0;
 	m_readpos = 1;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	machine_reset_megadriv();
 }
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )

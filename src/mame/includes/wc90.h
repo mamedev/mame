@@ -77,7 +77,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(wc90t);
+	void video_start_wc90t();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

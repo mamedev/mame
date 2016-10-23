@@ -620,7 +620,7 @@ DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 	}
 }
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum)
+void spectrum_state::machine_reset_spectrum()
 {
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;

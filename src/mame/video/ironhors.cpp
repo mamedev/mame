@@ -254,7 +254,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START_MEMBER(ironhors_state,farwest)
+void ironhors_state::video_start_farwest()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ironhors_state::farwest_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 

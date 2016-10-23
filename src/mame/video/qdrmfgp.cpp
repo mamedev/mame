@@ -26,7 +26,7 @@ K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp2_tile_callback)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp)
+void qdrmfgp_state::video_start_qdrmfgp()
 {
 	m_k056832->set_layer_association(0);
 
@@ -36,7 +36,7 @@ VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp)
 	m_k056832->set_layer_offs(3, 8, 0);
 }
 
-VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
+void qdrmfgp_state::video_start_qdrmfgp2()
 {
 	m_k056832->set_layer_association(0);
 

@@ -567,14 +567,14 @@ void yunsun16_state::machine_reset()
 	m_sprites_scrolldy = -0x0f;
 }
 
-MACHINE_START_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_start_shocking()
 {
 	machine_start();
 	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
 	membank("okibank")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_reset_shocking()
 {
 	machine_reset();
 	membank("okibank")->set_entry(0);

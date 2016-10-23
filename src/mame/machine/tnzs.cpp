@@ -610,7 +610,7 @@ INTERRUPT_GEN_MEMBER(tnzs_state::arknoid2_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(tnzs_state,tnzs)
+void tnzs_state::machine_reset_tnzs()
 {
 	/* initialize the mcu simulation */
 	switch (m_mcu_type)
@@ -631,13 +631,13 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 	m_insertcoin = 0;       // this might belong to mcu_reset
 }
 
-MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
+void tnzs_state::machine_reset_jpopnics()
 {
 	m_mcu_type = -1;
 }
 
 
-MACHINE_START_MEMBER(tnzs_state,tnzs_common)
+void tnzs_state::machine_start_tnzs_common()
 {
 	uint8_t *SUB = memregion("sub")->base();
 
@@ -650,9 +650,9 @@ MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 	save_item(NAME(m_bank2));
 }
 
-MACHINE_START_MEMBER(tnzs_state,tnzs)
+void tnzs_state::machine_start_tnzs()
 {
-	MACHINE_START_CALL_MEMBER( tnzs_common );
+	machine_start_tnzs_common();
 
 	save_item(NAME(m_kageki_csport_sel));
 	save_item(NAME(m_input_select));

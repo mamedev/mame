@@ -40,14 +40,14 @@ void atarig1_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_start_atarig1()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_which_input));
 }
 
 
-MACHINE_RESET_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_reset_atarig1()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);

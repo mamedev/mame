@@ -155,8 +155,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(trs80m4);
-	DECLARE_MACHINE_RESET(lnw80);
+	void machine_reset_trs80m4();
+	void machine_reset_lnw80();
 	DECLARE_PALETTE_INIT(lnw80);
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

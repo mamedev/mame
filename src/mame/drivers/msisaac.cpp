@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(msisaac_state,ta7630)
+void msisaac_state::machine_reset_ta7630()
 {
 	int i;
 
@@ -441,7 +441,7 @@ void msisaac_state::machine_start()
 
 void msisaac_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	machine_reset_ta7630();
 
 	/* video */
 	m_bg2_textbank = 0;

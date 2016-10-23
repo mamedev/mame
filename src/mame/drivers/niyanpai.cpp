@@ -85,7 +85,7 @@ READ16_MEMBER(niyanpai_state::dipsw_r)
 	return ((dipsw_a << 8) | dipsw_b);
 }
 
-MACHINE_START_MEMBER(niyanpai_state, musobana)
+void niyanpai_state::machine_start_musobana()
 {
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_musobana_inputport));

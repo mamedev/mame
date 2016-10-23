@@ -604,8 +604,8 @@ public:
 
 
 
-	DECLARE_MACHINE_START(sc4);
-	DECLARE_MACHINE_RESET(sc4);
+	void machine_start_sc4();
+	void machine_reset_sc4();
 
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
@@ -635,7 +635,7 @@ public:
 
 	DECLARE_READ32_MEMBER(adder4_mem_r);
 	DECLARE_WRITE32_MEMBER(adder4_mem_w);
-	DECLARE_MACHINE_START(adder4);
+	void machine_start_adder4();
 
 	// devices
 	required_device<m68340cpu_device> m_adder4cpu;

@@ -1934,7 +1934,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(cave_state,cave)
+void cave_state::machine_start_cave()
 {
 	save_item(NAME(m_soundbuf_len));
 	save_item(NAME(m_soundbuf_data));
@@ -1945,7 +1945,7 @@ MACHINE_START_MEMBER(cave_state,cave)
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
-MACHINE_RESET_MEMBER(cave_state,cave)
+void cave_state::machine_reset_cave()
 {
 	memset(m_soundbuf_data, 0, 32);
 	m_soundbuf_len = 0;
@@ -2607,11 +2607,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(cave_state,sailormn)
+void cave_state::machine_reset_sailormn()
 {
 	timer_device *startup = machine().device<timer_device>("startup");
 	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
-	MACHINE_RESET_CALL_MEMBER(cave);
+	machine_reset_cave();
 }
 
 static MACHINE_CONFIG_START( sailormn, cave_state )

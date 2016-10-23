@@ -245,7 +245,7 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 
 /*****************************************************************************/
 
-VIDEO_START_MEMBER(m92_state,m92)
+void m92_state::video_start_m92()
 {
 	int laynum;
 
@@ -299,11 +299,11 @@ VIDEO_START_MEMBER(m92_state,m92)
 	save_item(NAME(m_paletteram));
 }
 
-VIDEO_START_MEMBER(m92_state,ppan)
+void m92_state::video_start_ppan()
 {
 	int laynum;
 
-	VIDEO_START_CALL_MEMBER(m92);
+	video_start_m92();
 
 	for (laynum = 0; laynum < 3; laynum++)
 	{

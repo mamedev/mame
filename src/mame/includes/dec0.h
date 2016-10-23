@@ -91,9 +91,9 @@ public:
 	DECLARE_DRIVER_INIT(ffantasybl);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(slyspy);
-	DECLARE_VIDEO_START(dec0);
-	DECLARE_VIDEO_START(dec0_nodma);
+	void machine_reset_slyspy();
+	void video_start_dec0();
+	void video_start_dec0_nodma();
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

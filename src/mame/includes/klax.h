@@ -19,8 +19,8 @@ public:
 		, m_p1(*this, "P1")
 	{ }
 
-	DECLARE_MACHINE_START(klax);
-	DECLARE_MACHINE_RESET(klax);
+	void machine_start_klax();
+	void machine_reset_klax();
 
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 
@@ -29,7 +29,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(klax_latch_w);
 
-	DECLARE_VIDEO_START(klax);
+	void video_start_klax();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

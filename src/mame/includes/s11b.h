@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 
-	DECLARE_MACHINE_RESET(s11b);
+	void machine_reset_s11b();
 	DECLARE_DRIVER_INIT(s11b);
 	DECLARE_DRIVER_INIT(s11b_invert);
 

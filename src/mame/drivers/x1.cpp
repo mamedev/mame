@@ -223,7 +223,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(x1_state,x1)
+void x1_state::video_start_x1()
 {
 	m_avram = make_unique_clear<uint8_t[]>(0x800);
 	m_tvram = make_unique_clear<uint8_t[]>(0x800);
@@ -2334,7 +2334,7 @@ TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //roll over
 }
 
-MACHINE_RESET_MEMBER(x1_state,x1)
+void x1_state::machine_reset_x1()
 {
 	//uint8_t *ROM = memregion("x1_cpu")->base();
 	int i;
@@ -2378,9 +2378,9 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 //  m_old_vpos = -1;
 }
 
-MACHINE_RESET_MEMBER(x1_state,x1turbo)
+void x1_state::machine_reset_x1turbo()
 {
-	MACHINE_RESET_CALL_MEMBER( x1 );
+	machine_reset_x1();
 	m_is_turbo = 1;
 	m_ex_bank = 0x10;
 
@@ -2398,7 +2398,7 @@ static const gfx_layout x1_pcg_8x8 =
 	8*8
 };
 
-MACHINE_START_MEMBER(x1_state,x1)
+void x1_state::machine_start_x1()
 {
 	/* set up RTC */
 	{

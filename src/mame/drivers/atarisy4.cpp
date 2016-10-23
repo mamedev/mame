@@ -98,7 +98,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_MACHINE_RESET(airrace);
+	void machine_reset_airrace();
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void image_mem_to_screen( bool clip);
@@ -1034,7 +1034,7 @@ void atarisy4_state::machine_reset()
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(atarisy4_state,airrace)
+void atarisy4_state::machine_reset_airrace()
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

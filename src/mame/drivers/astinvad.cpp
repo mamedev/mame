@@ -93,11 +93,11 @@ public:
 	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
 	DECLARE_DRIVER_INIT(kamikaze);
 	DECLARE_DRIVER_INIT(spcking2);
-	DECLARE_MACHINE_START(kamikaze);
-	DECLARE_MACHINE_RESET(kamikaze);
-	DECLARE_MACHINE_START(spaceint);
-	DECLARE_MACHINE_RESET(spaceint);
-	DECLARE_VIDEO_START(spaceint);
+	void machine_start_kamikaze();
+	void machine_reset_kamikaze();
+	void machine_start_spaceint();
+	void machine_reset_spaceint();
+	void video_start_spaceint();
 	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
@@ -115,7 +115,7 @@ protected:
  *
  *************************************/
 
-VIDEO_START_MEMBER(astinvad_state,spaceint)
+void astinvad_state::video_start_spaceint()
 {
 	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::machine_start_kamikaze()
 {
 	m_int_timer = timer_alloc(TIMER_INT_GEN);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
@@ -262,7 +262,7 @@ MACHINE_START_MEMBER(astinvad_state,kamikaze)
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::machine_reset_kamikaze()
 {
 	m_screen_flip = 0;
 	m_screen_red = 0;
@@ -271,13 +271,13 @@ MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,spaceint)
+void astinvad_state::machine_start_spaceint()
 {
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,spaceint)
+void astinvad_state::machine_reset_spaceint()
 {
 	m_screen_flip = 0;
 	m_sound_state[0] = 0;

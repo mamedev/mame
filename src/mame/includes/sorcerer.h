@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
-	DECLARE_MACHINE_START(sorcererd);
+	void machine_start_sorcererd();
 	DECLARE_DRIVER_INIT(sorcerer);
 	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);

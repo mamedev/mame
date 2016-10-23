@@ -104,7 +104,7 @@ void m90_state::video_start()
 	save_item(NAME(m_last_pf2));
 }
 
-VIDEO_START_MEMBER(m90_state,bomblord)
+void m90_state::video_start_bomblord()
 {
 	m_pf1_layer =      &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::bomblord_get_pf1_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_pf1_wide_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::bomblord_get_pf1w_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
@@ -119,7 +119,7 @@ VIDEO_START_MEMBER(m90_state,bomblord)
 	save_item(NAME(m_video_control_data));
 }
 
-VIDEO_START_MEMBER(m90_state,dynablsb)
+void m90_state::video_start_dynablsb()
 {
 	m_pf1_layer =      &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::dynablsb_get_pf1_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_pf1_wide_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::dynablsb_get_pf1w_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);

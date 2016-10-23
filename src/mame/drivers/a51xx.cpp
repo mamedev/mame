@@ -24,8 +24,8 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(a5130);
-	DECLARE_VIDEO_START(a5130);
+	void machine_reset_a5130();
+	void video_start_a5130();
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -79,11 +79,11 @@ static INPUT_PORTS_START( a5130 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(a51xx_state,a5130)
+void a51xx_state::machine_reset_a5130()
 {
 }
 
-VIDEO_START_MEMBER(a51xx_state,a5130)
+void a51xx_state::video_start_a5130()
 {
 }
 

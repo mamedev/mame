@@ -249,7 +249,7 @@ class aes_state : public neogeo_state
 
 	DECLARE_READ16_MEMBER(aes_in2_r);
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-	DECLARE_MACHINE_START(aes);
+	void machine_start_aes();
 
 protected:
 	required_ioport m_io_in2;

@@ -37,7 +37,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(micral);
-	DECLARE_MACHINE_RESET(micral);
+	void machine_reset_micral();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -238,7 +238,7 @@ DRIVER_INIT_MEMBER( micral_state, micral )
 	//membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-MACHINE_RESET_MEMBER( micral_state, micral )
+void micral_state::machine_reset_micral()
 {
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram

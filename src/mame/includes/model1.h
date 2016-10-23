@@ -40,9 +40,9 @@ public:
 	}
 
 	// Machine
-	DECLARE_MACHINE_START(model1);
-	DECLARE_MACHINE_RESET(model1);
-	DECLARE_MACHINE_RESET(model1_vr);
+	void machine_start_model1();
+	void machine_reset_model1();
+	void machine_reset_model1_vr();
 
 	DECLARE_READ16_MEMBER(network_ctl_r);
 	DECLARE_WRITE16_MEMBER(network_ctl_w);
@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
 
 	// Rendering
-	DECLARE_VIDEO_START(model1);
+	void video_start_model1();
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 

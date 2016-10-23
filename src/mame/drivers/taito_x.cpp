@@ -770,13 +770,13 @@ GFXDECODE_END
 /**************************************************************************/
 
 
-MACHINE_START_MEMBER(taitox_state,taitox)
+void taitox_state::machine_start_taitox()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 }
 
-MACHINE_START_MEMBER(taitox_state,superman)
+void taitox_state::machine_start_superman()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);

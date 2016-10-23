@@ -94,7 +94,7 @@ DRIVER_INIT_MEMBER(pce_state,sgx)
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-MACHINE_START_MEMBER(pce_state,pce)
+void pce_state::machine_start_pce()
 {
 	if (m_cd)
 		m_cd->late_setup();
@@ -108,7 +108,7 @@ MACHINE_START_MEMBER(pce_state,pce)
 	save_item(NAME(m_joy_6b_packet));
 }
 
-MACHINE_RESET_MEMBER(pce_state,mess_pce)
+void pce_state::machine_reset_mess_pce()
 {
 	for (auto & elem : m_joy_6b_packet)
 		elem = 0;

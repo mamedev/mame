@@ -162,8 +162,8 @@ public:
 	DECLARE_DRIVER_INIT(solvalou);
 	DECLARE_DRIVER_INIT(cybsled);
 	DECLARE_DRIVER_INIT(aircomb);
-	DECLARE_MACHINE_START(namcos21);
-	DECLARE_VIDEO_START(namcos21);
+	void machine_start_namcos21();
+	void video_start_namcos21();
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();

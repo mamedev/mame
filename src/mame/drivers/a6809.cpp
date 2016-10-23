@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
 	DECLARE_WRITE8_MEMBER(a6809_register_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_MACHINE_RESET(a6809);
+	void machine_reset_a6809();
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( a6809_state, a6809)
+void a6809_state::machine_reset_a6809()
 {
 	m_via->write_pb0(0);
 	m_via->write_pb1(0);

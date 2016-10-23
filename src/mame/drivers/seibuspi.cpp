@@ -1821,7 +1821,7 @@ void seibuspi_state::machine_start()
 	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
-MACHINE_RESET_MEMBER(seibuspi_state,spi)
+void seibuspi_state::machine_reset_spi()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_END
 
 /* single boards */
 
-MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
+void seibuspi_state::machine_reset_sxx2e()
 {
 	membank("bank1")->set_entry(0);
 	m_z80_lastbank = 0;

@@ -1741,7 +1741,7 @@ static GFXDECODE_START( hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER(snowbros_state,semiprot)
+void snowbros_state::machine_reset_semiprot()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1750,7 +1750,7 @@ MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-MACHINE_RESET_MEMBER(snowbros_state,finalttr)
+void snowbros_state::machine_reset_finalttr()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;

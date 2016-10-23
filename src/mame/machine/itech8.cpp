@@ -514,7 +514,7 @@ WRITE8_MEMBER(itech8_state::slikshot_z80_control_w )
 
 
 
-VIDEO_START_MEMBER(itech8_state,slikshot)
+void itech8_state::video_start_slikshot()
 {
 	itech8_state::video_start();
 

@@ -106,9 +106,9 @@ static const uint8_t drgw2_source_data[0x08][0xec] =
 	{ 0, }  // Region 7, not used
 };
 
-MACHINE_RESET_MEMBER(pgm_012_025_state,drgw2)
+void pgm_012_025_state::machine_reset_drgw2()
 {
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 
 
 }

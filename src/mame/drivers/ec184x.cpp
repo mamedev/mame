@@ -43,7 +43,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_MACHINE_RESET(ec1841);
+	void machine_reset_ec1841();
 	DECLARE_DRIVER_INIT(ec1841);
 
 	struct {
@@ -160,7 +160,7 @@ DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 	}
 }
 
-MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
+void ec184x_state::machine_reset_ec1841()
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled

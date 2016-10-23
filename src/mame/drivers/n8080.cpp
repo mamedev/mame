@@ -467,32 +467,32 @@ void n8080_state::machine_start()
 	save_item(NAME(m_inte));
 }
 
-MACHINE_RESET_MEMBER(n8080_state,n8080)
+void n8080_state::machine_reset_n8080()
 {
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,spacefev)
+void n8080_state::machine_reset_spacefev()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_spacefev_red_screen = 0;
 	m_spacefev_red_cannon = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,sheriff)
+void n8080_state::machine_reset_sheriff()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,helifire)
+void n8080_state::machine_reset_helifire()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;

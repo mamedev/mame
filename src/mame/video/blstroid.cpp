@@ -69,7 +69,7 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(blstroid_state,blstroid)
+void blstroid_state::video_start_blstroid()
 {
 }
 

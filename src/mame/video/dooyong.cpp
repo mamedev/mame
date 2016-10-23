@@ -608,7 +608,7 @@ uint32_t dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap
 
 
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
+void dooyong_z80_ym2203_state::video_start_lastday()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_sprites_disabled));
@@ -616,7 +616,7 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
+void dooyong_z80_ym2203_state::video_start_gulfstrm()
 {
 	m_palette_bank = 0;
 
@@ -626,7 +626,7 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
+void dooyong_z80_ym2203_state::video_start_pollux()
 {
 	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -639,11 +639,11 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, bluehawk)
+void dooyong_z80_state::video_start_bluehawk()
 {
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
+void dooyong_z80_state::video_start_flytiger()
 {
 	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -655,7 +655,7 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 	save_item(NAME(m_flytiger_pri));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, primella)
+void dooyong_z80_state::video_start_primella()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_tx_pri));
@@ -757,7 +757,7 @@ uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-VIDEO_START_MEMBER(rshark_state, rshark)
+void rshark_state::video_start_rshark()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_bg2_priority));
@@ -789,7 +789,7 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 	return 0;
 }
 
-VIDEO_START_MEMBER(popbingo_state, popbingo)
+void popbingo_state::video_start_popbingo()
 {
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 	m_screen->register_screen_bitmap(m_bg2_bitmap);

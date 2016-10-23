@@ -82,9 +82,9 @@ public:
 	DECLARE_DRIVER_INIT(nomnlnd);
 	DECLARE_DRIVER_INIT(cosmica);
 	DECLARE_DRIVER_INIT(panic);
-	DECLARE_MACHINE_START(cosmic);
-	DECLARE_MACHINE_RESET(cosmic);
-	DECLARE_MACHINE_RESET(cosmicg);
+	void machine_start_cosmic();
+	void machine_reset_cosmic();
+	void machine_reset_cosmicg();
 	DECLARE_PALETTE_INIT(cosmicg);
 	DECLARE_PALETTE_INIT(panic);
 	DECLARE_PALETTE_INIT(cosmica);

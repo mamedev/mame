@@ -198,9 +198,9 @@ static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16, pgm_arm_type1_state )
 ADDRESS_MAP_END
 
 
-MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
+void pgm_arm_type1_state::machine_start_pgm_arm_type1()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
+	machine_start_pgm();
 	save_item(NAME(m_value0));
 	save_item(NAME(m_value1));
 	save_item(NAME(m_valuekey));

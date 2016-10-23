@@ -126,11 +126,11 @@ public:
 	DECLARE_DRIVER_INIT(kageki);
 	DECLARE_DRIVER_INIT(chukatai);
 	DECLARE_DRIVER_INIT(tnzsb);
-	DECLARE_MACHINE_START(tnzs);
-	DECLARE_MACHINE_RESET(tnzs);
+	void machine_start_tnzs();
+	void machine_reset_tnzs();
 	DECLARE_PALETTE_INIT(arknoid2);
-	DECLARE_MACHINE_START(tnzs_common);
-	DECLARE_MACHINE_RESET(jpopnics);
+	void machine_start_tnzs_common();
+	void machine_reset_jpopnics();
 
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tnzs(screen_device &screen, bool state);

@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 
 
-VIDEO_START_MEMBER(blueprnt_state,blueprnt)
+void blueprnt_state::video_start_blueprnt()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);

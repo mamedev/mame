@@ -125,17 +125,17 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(funworld_state, funworld)
+void funworld_state::video_start_funworld()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
-VIDEO_START_MEMBER(funworld_state, magicrd2)
+void funworld_state::video_start_magicrd2()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
 }
 
-VIDEO_START_MEMBER(funworld_state, chinatow)
+void funworld_state::video_start_chinatow()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }

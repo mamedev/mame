@@ -329,7 +329,7 @@ void rallyx_state::rallyx_video_start_common(  )
 	m_drawmode_table[3] = DRAWMODE_NONE;
 }
 
-VIDEO_START_MEMBER(rallyx_state,rallyx)
+void rallyx_state::video_start_rallyx()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -343,7 +343,7 @@ VIDEO_START_MEMBER(rallyx_state,rallyx)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,jungler)
+void rallyx_state::video_start_jungler()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -355,7 +355,7 @@ VIDEO_START_MEMBER(rallyx_state,jungler)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,locomotn)
+void rallyx_state::video_start_locomotn()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(rallyx_state,locomotn)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,commsega)
+void rallyx_state::video_start_commsega()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);

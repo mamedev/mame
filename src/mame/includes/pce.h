@@ -74,8 +74,8 @@ public:
 	DECLARE_DRIVER_INIT(tg16);
 	DECLARE_DRIVER_INIT(mess_pce);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_MACHINE_START(pce);
-	DECLARE_MACHINE_RESET(mess_pce);
+	void machine_start_pce();
+	void machine_reset_mess_pce();
 };
 
 #endif /* PCE_H_ */

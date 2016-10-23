@@ -30,7 +30,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(alto2);
-	DECLARE_MACHINE_RESET(alto2);
+	void machine_reset_alto2();
 
 protected:
 	required_device<cpu_device> m_maincpu;

@@ -280,9 +280,9 @@ public:
 	emu_timer *m_keyboard_timer;
 	emu_timer *m_6ms_timer;
 
-	DECLARE_MACHINE_START(cat);
-	DECLARE_MACHINE_RESET(cat);
-	DECLARE_VIDEO_START(cat);
+	void machine_start_cat();
+	void machine_reset_cat();
+	void video_start_cat();
 	DECLARE_DRIVER_INIT(cat);
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -907,7 +907,7 @@ IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
-MACHINE_START_MEMBER(cat_state,cat)
+void cat_state::machine_start_cat()
 {
 	m_duart_ktobf_ff = 0; // reset doesn't touch this
 	m_duart_prn_ack_prev_state = 1; // technically uninitialized
@@ -920,7 +920,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(cat_state,cat)
+void cat_state::machine_reset_cat()
 {
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
@@ -928,7 +928,7 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
 }
 
-VIDEO_START_MEMBER(cat_state,cat)
+void cat_state::video_start_cat()
 {
 }
 

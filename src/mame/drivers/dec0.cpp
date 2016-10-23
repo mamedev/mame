@@ -1568,7 +1568,7 @@ static MACHINE_CONFIG_DERIVED( ffantasybl, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(dec0_state,slyspy)
+void dec0_state::machine_reset_slyspy()
 {
 	// set initial memory map
 	m_slyspy_state = 0;

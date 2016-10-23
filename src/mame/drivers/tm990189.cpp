@@ -145,10 +145,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
 	DECLARE_WRITE8_MEMBER( xmit_callback );
-	DECLARE_MACHINE_START(tm990_189);
-	DECLARE_MACHINE_RESET(tm990_189);
-	DECLARE_MACHINE_START(tm990_189_v);
-	DECLARE_MACHINE_RESET(tm990_189_v);
+	void machine_start_tm990_189();
+	void machine_reset_tm990_189();
+	void machine_start_tm990_189_v();
+	void machine_reset_tm990_189_v();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
 	TIMER_CALLBACK_MEMBER(clear_load);
@@ -167,19 +167,19 @@ private:
 
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
+void tm990189_state::machine_reset_tm990_189()
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
 	hold_load();
 }
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189)
+void tm990189_state::machine_start_tm990_189()
 {
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_state::machine_start_tm990_189_v()
 {
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -189,7 +189,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_state::machine_reset_tm990_189_v()
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);

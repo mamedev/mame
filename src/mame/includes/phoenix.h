@@ -38,8 +38,8 @@ public:
 	DECLARE_DRIVER_INIT(vautourza);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_RESET(phoenix);
-	DECLARE_VIDEO_START(phoenix);
+	void machine_reset_phoenix();
+	void video_start_phoenix();
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);

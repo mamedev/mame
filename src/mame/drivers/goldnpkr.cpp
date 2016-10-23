@@ -1150,10 +1150,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldnpkr);
 	DECLARE_PALETTE_INIT(witchcrd);
-	DECLARE_VIDEO_START(wcrdxtnd);
+	void video_start_wcrdxtnd();
 	DECLARE_PALETTE_INIT(wcrdxtnd);
-	DECLARE_MACHINE_START(mondial);
-	DECLARE_MACHINE_RESET(mondial);
+	void machine_start_mondial();
+	void machine_reset_mondial();
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
@@ -1220,7 +1220,7 @@ void goldnpkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::video_start_wcrdxtnd()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -4003,13 +4003,13 @@ DISCRETE_SOUND_END
 *          Machine Start & Reset          *
 ******************************************/
 
-MACHINE_START_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_start_mondial()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
 
-MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_reset_mondial()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);

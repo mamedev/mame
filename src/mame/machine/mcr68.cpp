@@ -46,7 +46,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_3_r)
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr68_state,mcr68)
+void mcr68_state::machine_start_mcr68()
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -97,7 +97,7 @@ void mcr68_state::mcr68_common_init()
 }
 
 
-MACHINE_RESET_MEMBER(mcr68_state,mcr68)
+void mcr68_state::machine_reset_mcr68()
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init();
@@ -109,13 +109,13 @@ MACHINE_RESET_MEMBER(mcr68_state,mcr68)
 }
 
 
-MACHINE_START_MEMBER(mcr68_state,zwackery)
+void mcr68_state::machine_start_zwackery()
 {
-	MACHINE_START_CALL_MEMBER(mcr68);
+	machine_start_mcr68();
 }
 
 
-MACHINE_RESET_MEMBER(mcr68_state,zwackery)
+void mcr68_state::machine_reset_zwackery()
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init();

@@ -105,9 +105,9 @@ public:
 	DECLARE_DRIVER_INIT(gslgr94j);
 	DECLARE_DRIVER_INIT(outfxies);
 	DECLARE_DRIVER_INIT(gslgr94u);
-	DECLARE_MACHINE_RESET(namconb);
-	DECLARE_VIDEO_START(namconb1);
-	DECLARE_VIDEO_START(namconb2);
+	void machine_reset_namconb();
+	void video_start_namconb1();
+	void video_start_namconb2();
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ);
 	uint32_t screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

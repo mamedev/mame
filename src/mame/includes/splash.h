@@ -110,11 +110,11 @@ public:
 	DECLARE_DRIVER_INIT(rebus);
 	DECLARE_DRIVER_INIT(funystrp);
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(splash);
-	DECLARE_MACHINE_START(roldfrog);
-	DECLARE_MACHINE_START(funystrp);
-	DECLARE_MACHINE_RESET(splash);
-	DECLARE_MACHINE_RESET(funystrp);
+	void machine_start_splash();
+	void machine_start_roldfrog();
+	void machine_start_funystrp();
+	void machine_reset_splash();
+	void machine_reset_funystrp();
 
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);

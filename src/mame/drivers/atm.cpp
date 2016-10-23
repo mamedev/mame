@@ -38,7 +38,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DIRECT_UPDATE_MEMBER(atm_direct);
-	DECLARE_MACHINE_RESET(atm);
+	void machine_reset_atm();
 
 protected:
 	required_memory_bank m_bank1;
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(atm_state,atm)
+void atm_state::machine_reset_atm()
 {
 	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

@@ -70,7 +70,7 @@ WRITE16_MEMBER(bbusters_state::pf2_w)
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(bbusters_state,bbuster)
+void bbusters_state::video_start_bbuster()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
@@ -82,7 +82,7 @@ VIDEO_START_MEMBER(bbusters_state,bbuster)
 	save_item(NAME(m_scale_line_count));
 }
 
-VIDEO_START_MEMBER(bbusters_state,mechatt)
+void bbusters_state::video_start_mechatt()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);

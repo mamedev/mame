@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_MACHINE_RESET(dagz80);
+	void machine_reset_dagz80();
 	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_p_ram;
@@ -122,7 +122,7 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(selz80_state, dagz80)
+void selz80_state::machine_reset_dagz80()
 {
 	uint8_t* rom = memregion("user1")->base();
 	uint16_t size = memregion("user1")->bytes();

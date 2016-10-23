@@ -475,7 +475,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
-	DECLARE_VIDEO_START(7mezzo);
+	void video_start_7mezzo();
 	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -557,7 +557,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START_MEMBER(magicfly_state, 7mezzo)
+void magicfly_state::video_start_7mezzo()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }

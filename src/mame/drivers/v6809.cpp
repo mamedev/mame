@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_MACHINE_RESET(v6809);
+	void machine_reset_v6809();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( v6809_state, v6809)
+void v6809_state::machine_reset_v6809()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("videoram")->base();

@@ -69,7 +69,7 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 }
 
 
-MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::machine_reset_skullxbo()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);

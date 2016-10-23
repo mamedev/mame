@@ -225,21 +225,21 @@ public:
 	uint8_t m_mjflove_irq_cause;
 	uint8_t m_daimyojn_palette_sel;
 
-	DECLARE_MACHINE_START(ddenlovr);
-	DECLARE_MACHINE_RESET(ddenlovr);
-	DECLARE_VIDEO_START(ddenlovr);
-	DECLARE_MACHINE_START(rongrong);
-	DECLARE_MACHINE_START(mmpanic);
-	DECLARE_VIDEO_START(mmpanic);
-	DECLARE_MACHINE_START(hanakanz);
-	DECLARE_VIDEO_START(hanakanz);
-	DECLARE_MACHINE_START(sryudens);
-	DECLARE_VIDEO_START(mjflove);
-	DECLARE_MACHINE_START(seljan2);
-	DECLARE_MACHINE_START(mjflove);
-	DECLARE_MACHINE_START(funkyfig);
-	DECLARE_MACHINE_START(mjmyster);
-	DECLARE_MACHINE_START(hparadis);
+	void machine_start_ddenlovr();
+	void machine_reset_ddenlovr();
+	void video_start_ddenlovr();
+	void machine_start_rongrong();
+	void machine_start_mmpanic();
+	void video_start_mmpanic();
+	void machine_start_hanakanz();
+	void video_start_hanakanz();
+	void machine_start_sryudens();
+	void video_start_mjflove();
+	void machine_start_seljan2();
+	void machine_start_mjflove();
+	void machine_start_funkyfig();
+	void machine_start_mjmyster();
+	void machine_start_hparadis();
 	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -420,8 +420,8 @@ public:
 	DECLARE_READ8_MEMBER(htengoku_coin_r);
 	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
 	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
-	DECLARE_MACHINE_START(htengoku);
-	DECLARE_VIDEO_START(htengoku);
+	void machine_start_htengoku();
+	void video_start_htengoku();
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
 	DECLARE_WRITE8_MEMBER( quizchq_oki_bank_w );
@@ -458,7 +458,7 @@ public:
 	uint8_t hgokou_player_r( int player );
 };
 
-VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
+void ddenlovr_state::video_start_ddenlovr()
 {
 	int i;
 
@@ -555,24 +555,24 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
 }
 
-VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
+void ddenlovr_state::video_start_mmpanic()
 {
-	VIDEO_START_CALL_MEMBER(ddenlovr);
+	video_start_ddenlovr();
 
 	m_extra_layers = 1;
 }
 
-VIDEO_START_MEMBER(ddenlovr_state,hanakanz)
+void ddenlovr_state::video_start_hanakanz()
 {
-	VIDEO_START_CALL_MEMBER(ddenlovr);
+	video_start_ddenlovr();
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
 }
 
-VIDEO_START_MEMBER(ddenlovr_state,mjflove)
+void ddenlovr_state::video_start_mjflove()
 {
-	VIDEO_START_CALL_MEMBER(ddenlovr);
+	video_start_ddenlovr();
 
 	m_ddenlovr_blit_commands = mjflove_commands;
 }
@@ -4210,10 +4210,10 @@ ADDRESS_MAP_END
 ***************************************************************************/
 // htengoku uses the mixer chip from ddenlovr
 
-VIDEO_START_MEMBER(ddenlovr_state,htengoku)
+void ddenlovr_state::video_start_htengoku()
 {
-	VIDEO_START_CALL_MEMBER(ddenlovr);
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_ddenlovr();
+	video_start_hnoridur();
 }
 
 uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -4235,13 +4235,13 @@ uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_in
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,htengoku)
+void ddenlovr_state::machine_start_htengoku()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(dynax);
+	machine_start_dynax();
 }
 
 WRITE8_MEMBER(ddenlovr_state::htengoku_select_w)
@@ -9588,7 +9588,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
+void ddenlovr_state::machine_start_ddenlovr()
 {
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
@@ -9613,7 +9613,7 @@ MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_palram));
 }
 
-MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
+void ddenlovr_state::machine_reset_ddenlovr()
 {
 	m_input_sel = 0;
 	m_dsw_sel = 0;
@@ -9640,75 +9640,75 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,rongrong)
+void ddenlovr_state::machine_start_rongrong()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
+void ddenlovr_state::machine_start_mmpanic()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
+void ddenlovr_state::machine_start_funkyfig()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
+void ddenlovr_state::machine_start_hanakanz()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
+void ddenlovr_state::machine_start_mjmyster()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,hparadis)
+void ddenlovr_state::machine_start_hparadis()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,mjflove)
+void ddenlovr_state::machine_start_mjflove()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,sryudens)
+void ddenlovr_state::machine_start_sryudens()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
 /***************************************************************************
@@ -10612,7 +10612,7 @@ MACHINE_CONFIG_END
                              Return Of Sel Jan II
 ***************************************************************************/
 
-MACHINE_START_MEMBER(ddenlovr_state,seljan2)
+void ddenlovr_state::machine_start_seljan2()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -10623,7 +10623,7 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
 
-	MACHINE_START_CALL_MEMBER(ddenlovr);
+	machine_start_ddenlovr();
 }
 
 static MACHINE_CONFIG_START( seljan2, ddenlovr_state )

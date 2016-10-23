@@ -368,7 +368,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(galivan_state,galivan)
+void galivan_state::machine_start_galivan()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -382,7 +382,7 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	save_item(NAME(m_layers));
 }
 
-MACHINE_START_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_start_ninjemak()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -395,7 +395,7 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 	save_item(NAME(m_ninjemak_dispdisable));
 }
 
-MACHINE_RESET_MEMBER(galivan_state,galivan)
+void galivan_state::machine_reset_galivan()
 {
 	m_maincpu->reset();
 
@@ -406,7 +406,7 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
 }
 
-MACHINE_RESET_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_reset_ninjemak()
 {
 	m_maincpu->reset();
 

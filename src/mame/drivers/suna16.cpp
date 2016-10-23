@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_SHARE("spriteram2")    // Sprites (Chip 2)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(suna16_state,bestbest)
+void suna16_state::machine_start_bestbest()
 {
 	save_item(NAME(m_prot));
 }
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
                             Back Street Soccer
 ***************************************************************************/
 
-MACHINE_START_MEMBER(suna16_state, bssoccer)
+void suna16_state::machine_start_bssoccer()
 {
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
@@ -379,14 +379,14 @@ static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_start_uballoon()
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
 
 	save_item(NAME(m_prot));
 }
 
-MACHINE_RESET_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_reset_uballoon()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);

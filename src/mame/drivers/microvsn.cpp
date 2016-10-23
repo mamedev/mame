@@ -42,8 +42,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(microvision);
-	DECLARE_MACHINE_START(microvision);
-	DECLARE_MACHINE_RESET(microvision);
+	void machine_start_microvision();
+	void machine_reset_microvision();
 
 	void screen_vblank(screen_device &screen, bool state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
@@ -142,7 +142,7 @@ PALETTE_INIT_MEMBER(microvision_state,microvision)
 }
 
 
-MACHINE_START_MEMBER(microvision_state, microvision)
+void microvision_state::machine_start_microvision()
 {
 	m_paddle_timer = timer_alloc(TIMER_PADDLE);
 
@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 }
 
 
-MACHINE_RESET_MEMBER(microvision_state, microvision)
+void microvision_state::machine_reset_microvision()
 {
 	for(auto & elem : m_lcd_latch)
 	{

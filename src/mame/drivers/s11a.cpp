@@ -135,9 +135,9 @@ static INPUT_PORTS_START( s11a )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( s11a_state, s11a )
+void s11a_state::machine_reset_s11a()
 {
-	MACHINE_RESET_CALL_MEMBER(s11);
+	machine_reset_s11();
 	membank("bgbank")->set_entry(0);
 }
 

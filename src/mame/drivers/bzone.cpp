@@ -231,7 +231,7 @@ void bzone_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(bzone_state,redbaron)
+void bzone_state::machine_start_redbaron()
 {
 	save_item(NAME(m_analog_data));
 	save_item(NAME(m_rb_input_select));

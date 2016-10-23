@@ -543,12 +543,12 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(route16_state, speakres)
+void route16_state::machine_start_speakres()
 {
 	save_item(NAME(m_speakres_vrx));
 }
 
-MACHINE_START_MEMBER(route16_state, ttmahjng)
+void route16_state::machine_start_ttmahjng()
 {
 	save_item(NAME(m_ttmahjng_port_select));
 }

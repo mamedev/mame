@@ -55,10 +55,10 @@ public:
 	DECLARE_WRITE8_MEMBER(redalert_ay8910_latch_2_w);
 	DECLARE_WRITE8_MEMBER(redalert_voice_command_w);
 	DECLARE_WRITE8_MEMBER(demoneye_audio_command_w);
-	DECLARE_VIDEO_START(redalert);
-	DECLARE_VIDEO_START(ww3);
-	DECLARE_SOUND_START(redalert);
-	DECLARE_SOUND_START(demoneye);
+	void video_start_redalert();
+	void video_start_ww3();
+	void sound_start_redalert();
+	void sound_start_demoneye();
 	uint32_t screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

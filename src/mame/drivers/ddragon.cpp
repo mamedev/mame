@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start_ddragon()
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -143,7 +143,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset_ddragon()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;

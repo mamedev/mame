@@ -198,7 +198,7 @@ public:
 	DECLARE_READ16_MEMBER( nevada_sec_r );
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
 
-	DECLARE_MACHINE_START(nevada);
+	void machine_start_nevada();
 	DECLARE_DRIVER_INIT(nevada);
 };
 
@@ -579,7 +579,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start_nevada()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }

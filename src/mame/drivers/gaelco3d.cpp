@@ -186,7 +186,7 @@ void gaelco3d_state::machine_start()
 }
 
 
-MACHINE_RESET_MEMBER(gaelco3d_state,common)
+void gaelco3d_state::machine_reset_common()
 {
 	uint16_t *src;
 	int i;
@@ -221,14 +221,14 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 
 void gaelco3d_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	machine_reset_common();
 	m_tms_offset_xor = 0;
 }
 
 
-MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
+void gaelco3d_state::machine_reset_gaelco3d2()
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	machine_reset_common();
 	m_tms_offset_xor = BYTE_XOR_BE(0);
 }
 

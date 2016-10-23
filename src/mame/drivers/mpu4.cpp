@@ -441,7 +441,7 @@ void mpu4_state::update_meters()
 }
 
 /* called if board is reset */
-MACHINE_RESET_MEMBER(mpu4_state,mpu4)
+void mpu4_state::machine_reset_mpu4()
 {
 	m_vfd->reset();
 
@@ -2159,7 +2159,7 @@ void mpu4_state::mpu4_config_common()
 	m_lamp_strobe_ext_persistence = 0;
 }
 
-MACHINE_START_MEMBER(mpu4_state,mod2)
+void mpu4_state::machine_start_mod2()
 {
 	mpu4_config_common();
 
@@ -2167,7 +2167,7 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 	m_mod_number=2;
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4yam)
+void mpu4_state::machine_start_mpu4yam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2177,7 +2177,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 	mpu4_install_mod4yam_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4oki)
+void mpu4_state::machine_start_mpu4oki()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2187,7 +2187,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
+void mpu4_state::machine_start_mpu4bwb()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2197,7 +2197,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 	mpu4_install_mod4bwb_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4cry)
+void mpu4_state::machine_start_mpu4cry()
 {
 	mpu4_config_common();
 

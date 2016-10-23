@@ -189,8 +189,8 @@ public:
 	/* devices */
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(input_w);
-	DECLARE_MACHINE_START(skattv);
-	DECLARE_MACHINE_RESET(skattv);
+	void machine_start_skattv();
+	void machine_reset_skattv();
 	DECLARE_PALETTE_INIT(adp);
 	DECLARE_PALETTE_INIT(fstation);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
@@ -227,12 +227,12 @@ WRITE_LINE_MEMBER(adp_state::duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
 }
 
-MACHINE_START_MEMBER(adp_state,skattv)
+void adp_state::machine_start_skattv()
 {
 	save_item(NAME(m_mux_data));
 }
 
-MACHINE_RESET_MEMBER(adp_state,skattv)
+void adp_state::machine_reset_skattv()
 {
 	m_mux_data = 0;
 }

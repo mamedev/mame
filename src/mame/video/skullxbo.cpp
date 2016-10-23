@@ -78,7 +78,7 @@ const atari_motion_objects_config skullxbo_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::video_start_skullxbo()
 {
 }
 

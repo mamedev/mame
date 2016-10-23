@@ -63,8 +63,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vtech2);
-	DECLARE_MACHINE_RESET(laser500);
-	DECLARE_MACHINE_RESET(laser700);
+	void machine_reset_laser500();
+	void machine_reset_laser700();
 	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
 

@@ -643,7 +643,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(combatsc_state,combatsc)
+void combatsc_state::machine_start_combatsc()
 {
 	uint8_t *MEM = memregion("maincpu")->base() + 0x38000;
 
@@ -665,9 +665,9 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_sign));
 }
 
-MACHINE_START_MEMBER(combatsc_state,combatscb)
+void combatsc_state::machine_start_combatscb()
 {
-	MACHINE_START_CALL_MEMBER( combatsc );
+	machine_start_combatsc();
 	membank("bl_abank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 

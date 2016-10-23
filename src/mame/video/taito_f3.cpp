@@ -522,7 +522,7 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 	}
 }
 
-VIDEO_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::video_start_f3()
 {
 	const struct F3config *pCFG=&f3_config_table[0];
 	int i;

@@ -115,12 +115,12 @@ Non-Bugs (happen on real PCB)
 
 
 
-MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
+void kaneko16_state::machine_reset_gtmr()
 {
 	m_VIEW2_2_pri = 1;
 }
 
-MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
+void kaneko16_state::machine_reset_mgcrystl()
 {
 	m_VIEW2_2_pri = 0;
 }

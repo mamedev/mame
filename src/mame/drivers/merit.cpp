@@ -126,7 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(key_2);
 	DECLARE_DRIVER_INIT(dtrvwz5);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(casino5);
+	void machine_start_casino5();
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -1346,7 +1346,7 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
-MACHINE_START_MEMBER(merit_state,casino5)
+void merit_state::machine_start_casino5()
 {
 	merit_state::machine_start();
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x2000);

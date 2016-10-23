@@ -1169,7 +1169,7 @@ static GFXDECODE_START( bigtwinb )
 	GFXDECODE_ENTRY( "gfx1", 0x40000, hotmind_charlayout,  0x200, 16 )    /* colors 0x200-0x2ff */
 GFXDECODE_END
 
-MACHINE_START_MEMBER(playmark_state,playmark)
+void playmark_state::machine_start_playmark()
 {
 	save_item(NAME(m_bgscrollx));
 	save_item(NAME(m_bgscrolly));
@@ -1187,7 +1187,7 @@ MACHINE_START_MEMBER(playmark_state,playmark)
 	save_item(NAME(m_dispenser_latch));
 }
 
-MACHINE_RESET_MEMBER(playmark_state,playmark)
+void playmark_state::machine_reset_playmark()
 {
 	m_bgscrollx = 0;
 	m_bgscrolly = 0;

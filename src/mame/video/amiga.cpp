@@ -112,7 +112,7 @@ PALETTE_INIT_MEMBER(amiga_state,amiga)
  *
  *************************************/
 
-VIDEO_START_MEMBER( amiga_state, amiga )
+void amiga_state::video_start_amiga()
 {
 	int j;
 

@@ -936,7 +936,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cvs_state,cvs)
+void cvs_state::machine_start_cvs()
 {
 	/* allocate memory */
 	if (m_gfxdecode->gfx(1) != nullptr)
@@ -960,7 +960,7 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	save_item(NAME(m_stars_scroll));
 }
 
-MACHINE_RESET_MEMBER(cvs_state,cvs)
+void cvs_state::machine_reset_cvs()
 {
 	m_character_banking_mode = 0;
 	m_character_ram_page_start = 0;

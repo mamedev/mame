@@ -133,16 +133,16 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "includes/megasys1.h"
 
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1)
+void megasys1_state::machine_reset_megasys1()
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
 	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 }
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
+void megasys1_state::machine_reset_megasys1_hachoo()
 {
-	MACHINE_RESET_CALL_MEMBER(megasys1);
+	machine_reset_megasys1();
 	m_ignore_oki_status = 0;    /* strangely hachoo need real oki status */
 }
 

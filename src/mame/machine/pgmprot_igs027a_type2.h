@@ -25,7 +25,7 @@ public:
 	DECLARE_DRIVER_INIT(ddp2);
 	DECLARE_DRIVER_INIT(dw2001);
 	DECLARE_DRIVER_INIT(dwpc);
-	DECLARE_MACHINE_START(pgm_arm_type2);
+	void machine_start_pgm_arm_type2();
 	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
 	DECLARE_READ32_MEMBER( arm7_shareram_r );

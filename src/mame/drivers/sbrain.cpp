@@ -70,7 +70,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_DRIVER_INIT(sbrain);
-	DECLARE_MACHINE_RESET(sbrain);
+	void machine_reset_sbrain();
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
@@ -268,7 +268,7 @@ static SLOT_INTERFACE_START( sbrain_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_RESET_MEMBER( sbrain_state, sbrain )
+void sbrain_state::machine_reset_sbrain()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_bankr0->set_entry(1); // point at rom

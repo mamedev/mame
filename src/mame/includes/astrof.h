@@ -74,11 +74,11 @@ public:
 	DECLARE_DRIVER_INIT(sstarbtl);
 	DECLARE_DRIVER_INIT(acombat3);
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(astrof);
-	DECLARE_MACHINE_START(abattle);
-	DECLARE_MACHINE_RESET(abattle);
-	DECLARE_MACHINE_START(spfghmk2);
-	DECLARE_MACHINE_START(tomahawk);
+	void machine_start_astrof();
+	void machine_start_abattle();
+	void machine_reset_abattle();
+	void machine_start_spfghmk2();
+	void machine_start_tomahawk();
 	uint32_t screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_callback);

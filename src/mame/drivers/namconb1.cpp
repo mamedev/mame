@@ -1118,7 +1118,7 @@ GFXDECODE_END /* gfxdecodeinfo2 */
 
 /***************************************************************/
 
-MACHINE_RESET_MEMBER(namconb1_state, namconb)
+void namconb1_state::machine_reset_namconb()
 {
 	m_pos_irq_level = 0;
 	m_unk_irq_level = 0;

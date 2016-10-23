@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s8);
+	void machine_reset_s8();
 	DECLARE_DRIVER_INIT(s8);
 private:
 	uint8_t m_sound_data;
@@ -290,7 +290,7 @@ void s8_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-MACHINE_RESET_MEMBER( s8_state, s8 )
+void s8_state::machine_reset_s8()
 {
 }
 

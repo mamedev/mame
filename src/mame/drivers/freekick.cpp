@@ -577,7 +577,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(freekick_state,freekick)
+void freekick_state::machine_start_freekick()
 {
 	save_item(NAME(m_romaddr));
 	save_item(NAME(m_spinner));
@@ -585,7 +585,7 @@ MACHINE_START_MEMBER(freekick_state,freekick)
 	save_item(NAME(m_ff_data));
 }
 
-MACHINE_RESET_MEMBER(freekick_state,freekick)
+void freekick_state::machine_reset_freekick()
 {
 	m_romaddr = 0;
 	m_spinner = 0;
@@ -593,25 +593,25 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 	m_ff_data = 0;
 }
 
-MACHINE_START_MEMBER(freekick_state,pbillrd)
+void freekick_state::machine_start_pbillrd()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000);
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_START_MEMBER(freekick_state,oigas)
+void freekick_state::machine_start_oigas()
 {
 	save_item(NAME(m_inval));
 	save_item(NAME(m_outval));
 	save_item(NAME(m_cnt));
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_RESET_MEMBER(freekick_state,oigas)
+void freekick_state::machine_reset_oigas()
 {
-	MACHINE_RESET_CALL_MEMBER(freekick);
+	machine_reset_freekick();
 
 	m_inval = 0;
 	m_outval = 0;

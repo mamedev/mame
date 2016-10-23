@@ -293,7 +293,7 @@ WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(cclimber_state,cclimber)
+void cclimber_state::machine_reset_cclimber()
 {
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
 	m_nmi_mask = 0;

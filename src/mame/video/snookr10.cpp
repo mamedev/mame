@@ -246,12 +246,12 @@ void snookr10_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-VIDEO_START_MEMBER(snookr10_state, apple10)
+void snookr10_state::video_start_apple10()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-VIDEO_START_MEMBER(snookr10_state, crystalc)
+void snookr10_state::video_start_crystalc()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::crystalc_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }

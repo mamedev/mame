@@ -87,7 +87,7 @@ WRITE8_MEMBER(dooyong_z80_state::bankswitch_w)
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
-MACHINE_START_MEMBER(dooyong_z80_state, cpu_z80)
+void dooyong_z80_state::machine_start_cpu_z80()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
@@ -97,7 +97,7 @@ WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-MACHINE_RESET_MEMBER(dooyong_z80_ym2203_state, sound_ym2203)
+void dooyong_z80_ym2203_state::machine_reset_sound_ym2203()
 {
 	m_interrupt_line_1 = 0;
 	m_interrupt_line_2 = 0;

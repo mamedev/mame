@@ -370,13 +370,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[tnum] = 0;
 }
 
-MACHINE_START_MEMBER(model2_state,model2)
+void model2_state::machine_start_model2()
 {
 	m_copro_fifoin_data = make_unique_clear<uint32_t[]>(COPRO_FIFOIN_SIZE);
 	m_copro_fifoout_data = make_unique_clear<uint32_t[]>(COPRO_FIFOOUT_SIZE);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_common)
+void model2_state::machine_reset_model2_common()
 {
 	int i;
 
@@ -405,9 +405,9 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 		m_timers[i]->reset();
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2o)
+void model2_state::machine_reset_model2o()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
+	machine_reset_model2_common();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -415,7 +415,7 @@ MACHINE_RESET_MEMBER(model2_state,model2o)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_scsp)
+void model2_state::machine_reset_model2_scsp()
 {
 	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
 	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
@@ -426,10 +426,10 @@ MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 	m_scsp->set_ram_base(m_soundram);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2)
+void model2_state::machine_reset_model2()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -437,10 +437,10 @@ MACHINE_RESET_MEMBER(model2_state,model2)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2b)
+void model2_state::machine_reset_model2b()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -452,10 +452,10 @@ MACHINE_RESET_MEMBER(model2_state,model2b)
 	m_dsp_type = DSP_TYPE_SHARC;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2c)
+void model2_state::machine_reset_model2c()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 

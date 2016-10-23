@@ -95,8 +95,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(sngkace);
-	DECLARE_VIDEO_START(psikyo);
+	void video_start_sngkace();
+	void video_start_psikyo();
 	uint32_t screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psikyo(screen_device &screen, bool state);

@@ -258,13 +258,13 @@ public:
 		m_cart(*this, "cartleft"),
 		m_cart2(*this, "cartright") { }
 
-	DECLARE_MACHINE_START(a400);
-	DECLARE_MACHINE_START(a800);
-	DECLARE_MACHINE_START(a800xl);
-	DECLARE_MACHINE_START(a5200);
+	void machine_start_a400();
+	void machine_start_a800();
+	void machine_start_a800xl();
+	void machine_start_a5200();
 	DECLARE_PALETTE_INIT(a400);
 
-	DECLARE_MACHINE_RESET(a400);
+	void machine_reset_a400();
 
 	DECLARE_WRITE8_MEMBER(gtia_cb);
 
@@ -1980,14 +1980,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-MACHINE_RESET_MEMBER( a400_state, a400 )
+void a400_state::machine_reset_a400()
 {
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
 }
 
 
-MACHINE_START_MEMBER( a400_state, a400 )
+void a400_state::machine_start_a400()
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2000,7 +2000,7 @@ MACHINE_START_MEMBER( a400_state, a400 )
 }
 
 
-MACHINE_START_MEMBER( a400_state, a800 )
+void a400_state::machine_start_a800()
 {
 	setup_ram(0, m_ram->size());
 	setup_ram(1, m_ram->size());
@@ -2013,7 +2013,7 @@ MACHINE_START_MEMBER( a400_state, a800 )
 	save_item(NAME(m_last_offs));
 }
 
-MACHINE_START_MEMBER( a400_state, a800xl )
+void a400_state::machine_start_a800xl()
 {
 	m_mmu = 0xfd;
 	m_ext_bank = 0x03;  // only used by a130xe
@@ -2027,7 +2027,7 @@ MACHINE_START_MEMBER( a400_state, a800xl )
 }
 
 
-MACHINE_START_MEMBER( a400_state, a5200 )
+void a400_state::machine_start_a5200()
 {
 	setup_cart(m_cart);
 

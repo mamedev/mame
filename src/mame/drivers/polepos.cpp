@@ -424,7 +424,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 }
 
 
-MACHINE_RESET_MEMBER(polepos_state,polepos)
+void polepos_state::machine_reset_polepos()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;

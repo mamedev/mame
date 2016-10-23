@@ -265,7 +265,7 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
  *
  *************************************/
 
-VIDEO_START_MEMBER(gameplan_state,common)
+void gameplan_state::video_start_common()
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
@@ -277,21 +277,21 @@ VIDEO_START_MEMBER(gameplan_state,common)
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,gameplan)
+void gameplan_state::video_start_gameplan()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,leprechn)
+void gameplan_state::video_start_leprechn()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,trvquest)
+void gameplan_state::video_start_trvquest()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
@@ -302,7 +302,7 @@ VIDEO_START_MEMBER(gameplan_state,trvquest)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(gameplan_state,gameplan)
+void gameplan_state::video_reset_gameplan()
 {
 	m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 }

@@ -296,7 +296,7 @@ DRIVER_INIT_MEMBER(midxunit_state,revx)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midxunit_state,midxunit)
+void midxunit_state::machine_reset_midxunit()
 {
 	int i;
 

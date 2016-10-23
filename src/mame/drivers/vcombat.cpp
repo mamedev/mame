@@ -126,8 +126,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 	DECLARE_DRIVER_INIT(shadfgtr);
 	DECLARE_DRIVER_INIT(vcombat);
-	DECLARE_MACHINE_RESET(vcombat);
-	DECLARE_MACHINE_RESET(shadfgtr);
+	void machine_reset_vcombat();
+	void machine_reset_shadfgtr();
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, vcombat_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(vcombat_state,vcombat)
+void vcombat_state::machine_reset_vcombat()
 {
 	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	m_vid_1->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
@@ -423,7 +423,7 @@ MACHINE_RESET_MEMBER(vcombat_state,vcombat)
 	m_crtc_select = 0;
 }
 
-MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
+void vcombat_state::machine_reset_shadfgtr()
 {
 	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 

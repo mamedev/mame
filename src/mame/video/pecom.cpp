@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 	m_dma = !m_dma;
 }
 
-VIDEO_START_MEMBER(pecom_state,pecom)
+void pecom_state::video_start_pecom()
 {
 	/* allocate memory */
 	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);

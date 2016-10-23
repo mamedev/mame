@@ -25,7 +25,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(rd100);
-	DECLARE_MACHINE_RESET(rd100);
+	void machine_reset_rd100();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -81,7 +81,7 @@ DRIVER_INIT_MEMBER( rd100_state, rd100 )
 {
 }
 
-MACHINE_RESET_MEMBER( rd100_state, rd100 )
+void rd100_state::machine_reset_rd100()
 {
 }
 

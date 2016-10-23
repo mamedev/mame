@@ -403,7 +403,7 @@ void bking_state::machine_start()
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-MACHINE_START_MEMBER(bking_state,bking3)
+void bking_state::machine_start_bking3()
 {
 	bking_state::machine_start();
 
@@ -438,7 +438,7 @@ void bking_state::machine_reset()
 	m_sound_nmi_enable = 1;
 }
 
-MACHINE_RESET_MEMBER(bking_state,bking3)
+void bking_state::machine_reset_bking3()
 {
 	m_mcu->set_input_line(0, CLEAR_LINE);
 

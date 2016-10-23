@@ -506,7 +506,7 @@ static GFXDECODE_START( ladybug )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::machine_start_ladybug()
 {
 }
 

@@ -2200,7 +2200,7 @@ static INPUT_PORTS_START( samurai )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(vicdual_state,samurai)
+void vicdual_state::machine_start_samurai()
 {
 	m_samurai_protection_data = 0;
 	save_item(NAME(m_samurai_protection_data));
@@ -2366,7 +2366,7 @@ static INPUT_PORTS_START( nsub )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(vicdual_state,nsub)
+void vicdual_state::machine_start_nsub()
 {
 	m_nsub_play_counter = 0;
 	save_item(NAME(m_nsub_coin_counter));
@@ -2379,7 +2379,7 @@ MACHINE_START_MEMBER(vicdual_state,nsub)
 	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
 }
 
-MACHINE_RESET_MEMBER(vicdual_state,nsub)
+void vicdual_state::machine_reset_nsub()
 {
 	m_nsub_coin_counter = m_coinage->read() & 7;
 

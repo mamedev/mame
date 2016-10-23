@@ -25,7 +25,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	DECLARE_VIDEO_START(bosco);
+	void video_start_bosco();
 	DECLARE_PALETTE_INIT(bosco);
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bosco(screen_device &screen, bool state);

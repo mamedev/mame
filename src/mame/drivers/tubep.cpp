@@ -354,7 +354,7 @@ void tubep_state::tubep_setup_save_state()
 
 
 
-MACHINE_START_MEMBER(tubep_state,tubep)
+void tubep_state::machine_start_tubep()
 {
 	/* Create interrupt timer */
 	m_interrupt_timer = timer_alloc(TIMER_TUBEP_SCANLINE);
@@ -363,7 +363,7 @@ MACHINE_START_MEMBER(tubep_state,tubep)
 }
 
 
-MACHINE_RESET_MEMBER(tubep_state,tubep)
+void tubep_state::machine_reset_tubep()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
@@ -517,7 +517,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 }
 
 
-MACHINE_START_MEMBER(tubep_state,rjammer)
+void tubep_state::machine_start_rjammer()
 {
 	/* Create interrupt timer */
 	m_interrupt_timer = timer_alloc(TIMER_RJAMMER_SCANLINE);
@@ -525,7 +525,7 @@ MACHINE_START_MEMBER(tubep_state,rjammer)
 	tubep_setup_save_state();
 }
 
-MACHINE_RESET_MEMBER(tubep_state,rjammer)
+void tubep_state::machine_reset_rjammer()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }

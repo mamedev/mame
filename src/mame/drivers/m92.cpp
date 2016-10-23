@@ -243,12 +243,12 @@ psoldier dip locations still need verification.
 
 /*****************************************************************************/
 
-MACHINE_START_MEMBER(m92_state,m92)
+void m92_state::machine_start_m92()
 {
 	save_item(NAME(m_sound_status));
 }
 
-MACHINE_RESET_MEMBER(m92_state,m92)
+void m92_state::machine_reset_m92()
 {
 	m_sprite_buffer_busy = 1;
 }

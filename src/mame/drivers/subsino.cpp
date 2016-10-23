@@ -317,11 +317,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_stbsub_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_stbsub_reel3_tile_info);
-	DECLARE_VIDEO_START(subsino);
+	void video_start_subsino();
 	DECLARE_PALETTE_INIT(subsino_2proms);
 	DECLARE_PALETTE_INIT(subsino_3proms);
-	DECLARE_VIDEO_START(subsino_reels);
-	DECLARE_VIDEO_START(stbsub);
+	void video_start_subsino_reels();
+	void video_start_stbsub();
 	uint32_t screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -377,7 +377,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 }
 
 
-VIDEO_START_MEMBER(subsino_state,subsino)
+void subsino_state::video_start_subsino()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	m_tmap->set_transparent_pen(0 );
@@ -472,9 +472,9 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
 }
 
 
-VIDEO_START_MEMBER(subsino_state,subsino_reels)
+void subsino_state::video_start_subsino_reels()
 {
-	VIDEO_START_CALL_MEMBER( subsino );
+	video_start_subsino();
 
 	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
@@ -486,7 +486,7 @@ VIDEO_START_MEMBER(subsino_state,subsino_reels)
 
 }
 
-VIDEO_START_MEMBER(subsino_state,stbsub)
+void subsino_state::video_start_stbsub()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	m_tmap->set_transparent_pen(0 );

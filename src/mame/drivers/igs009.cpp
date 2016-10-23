@@ -112,7 +112,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(gp98);
+	void video_start_gp98();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -278,7 +278,7 @@ void igs009_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(igs009_state,gp98)
+void igs009_state::video_start_gp98()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);

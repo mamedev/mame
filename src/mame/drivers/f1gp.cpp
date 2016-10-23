@@ -363,7 +363,7 @@ static GFXDECODE_START( f1gp2 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(f1gp_state,f1gpb)
+void f1gp_state::machine_start_f1gpb()
 {
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_roz_bank));
@@ -372,14 +372,14 @@ MACHINE_START_MEMBER(f1gp_state,f1gpb)
 	save_item(NAME(m_scroll));
 }
 
-MACHINE_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_start_f1gp()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
-	MACHINE_START_CALL_MEMBER(f1gpb);
+	machine_start_f1gpb();
 }
 
-MACHINE_RESET_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_reset_f1gp()
 {
 	m_pending_command = 0;
 	m_roz_bank = 0;

@@ -224,7 +224,7 @@ public:
 		return data;
 	}
 
-	DECLARE_MACHINE_START(ecoinf2);
+	void machine_start_ecoinf2();
 
 };
 

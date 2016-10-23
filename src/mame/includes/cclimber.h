@@ -76,13 +76,13 @@ public:
 	DECLARE_DRIVER_INIT(cannonb);
 	DECLARE_DRIVER_INIT(dking);
 	DECLARE_DRIVER_INIT(rpatrol);
-	DECLARE_MACHINE_RESET(cclimber);
-	DECLARE_VIDEO_START(cclimber);
+	void machine_reset_cclimber();
+	void video_start_cclimber();
 	DECLARE_PALETTE_INIT(cclimber);
-	DECLARE_VIDEO_START(swimmer);
+	void video_start_swimmer();
 	DECLARE_PALETTE_INIT(swimmer);
 	DECLARE_PALETTE_INIT(yamato);
-	DECLARE_VIDEO_START(toprollr);
+	void video_start_toprollr();
 	DECLARE_PALETTE_INIT(toprollr);
 
 	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);

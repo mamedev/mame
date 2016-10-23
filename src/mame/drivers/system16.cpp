@@ -2434,7 +2434,7 @@ static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
+void segas1x_bootleg_state::machine_reset_ddcrewbl()
 {
 	// set up the initial banks for this game
 	// because it doesn't appear to actually program banks 0-3.

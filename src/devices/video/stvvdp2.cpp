@@ -6122,7 +6122,7 @@ int saturn_state::stv_vdp2_start ( void )
 }
 
 /* maybe we should move this to video/stv.c */
-VIDEO_START_MEMBER(saturn_state,stv_vdp2)
+void saturn_state::video_start_stv_vdp2()
 {
 	int i;
 	machine().first_screen()->register_screen_bitmap(m_tmpbitmap);

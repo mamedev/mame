@@ -40,7 +40,7 @@ void xybots_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(xybots_state,xybots)
+void xybots_state::machine_reset_xybots()
 {
 	atarigen_state::machine_reset();
 }

@@ -989,7 +989,7 @@ void superqix_state::machine_init_common()
 	// superqix specific stuff
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_show_bitmap));
-	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
+	// the following are saved in void superqix_state::video_start_superqix():
 	//save_item(NAME(*m_fg_bitmap[0]));
 	//save_item(NAME(*m_fg_bitmap[1]));
 
@@ -998,7 +998,7 @@ void superqix_state::machine_init_common()
 	save_item(NAME(m_sign));
 }
 
-MACHINE_START_MEMBER(superqix_state,superqix)
+void superqix_state::machine_start_superqix()
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -1006,7 +1006,7 @@ MACHINE_START_MEMBER(superqix_state,superqix)
 	machine_init_common();
 }
 
-MACHINE_START_MEMBER(superqix_state,pbillian)
+void superqix_state::machine_start_pbillian()
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);

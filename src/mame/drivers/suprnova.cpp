@@ -820,31 +820,31 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(skns_state,sknsa)
+void skns_state::machine_reset_sknsa()
 {
 	m_region = 'A';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsj)
+void skns_state::machine_reset_sknsj()
 {
 	m_region = 'J';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsu)
+void skns_state::machine_reset_sknsu()
 {
 	m_region = 'U';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknse)
+void skns_state::machine_reset_sknse()
 {
 	m_region = 'E';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsk)
+void skns_state::machine_reset_sknsk()
 {
 	m_region = 'K';
 	skns_state::machine_reset();

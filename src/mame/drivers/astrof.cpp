@@ -464,7 +464,7 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
  *
  *************************************/
 
-MACHINE_START_MEMBER(astrof_state,astrof)
+void astrof_state::machine_start_astrof()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
@@ -482,16 +482,16 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,abattle)
+void astrof_state::machine_start_abattle()
 {
 	/* register for state saving */
 	save_item(NAME(m_abattle_count));
 
-	MACHINE_START_CALL_MEMBER(astrof);
+	machine_start_astrof();
 }
 
 
-MACHINE_START_MEMBER(astrof_state,spfghmk2)
+void astrof_state::machine_start_spfghmk2()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
@@ -507,7 +507,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,tomahawk)
+void astrof_state::machine_start_tomahawk()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
@@ -526,7 +526,7 @@ MACHINE_START_MEMBER(astrof_state,tomahawk)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(astrof_state,abattle)
+void astrof_state::machine_reset_abattle()
 {
 	m_abattle_count = 0;
 }

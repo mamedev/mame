@@ -176,8 +176,8 @@ public:
 		: fromance_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_START(pipedrm);
-	DECLARE_MACHINE_RESET(pipedrm);
+	void machine_start_pipedrm();
+	void machine_reset_pipedrm();
 	DECLARE_DRIVER_INIT(pipedrm);
 	DECLARE_DRIVER_INIT(hatris);
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
@@ -575,7 +575,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_start_pipedrm()
 {
 	/* initialize main Z80 bank */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
@@ -592,7 +592,7 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_reset_pipedrm()
 {
 	int i;
 

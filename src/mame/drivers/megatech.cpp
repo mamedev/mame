@@ -123,7 +123,7 @@ public:
 
 	DECLARE_DRIVER_INIT(mt_crt);
 	DECLARE_DRIVER_INIT(mt_slot);
-	DECLARE_MACHINE_RESET(megatech);
+	void machine_reset_megatech();
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
@@ -641,10 +641,10 @@ void mtech_state::screen_eof_main(screen_device &screen, bool state)
 		screen_eof_megadriv(screen, state);
 }
 
-MACHINE_RESET_MEMBER(mtech_state, megatech)
+void mtech_state::machine_reset_megatech()
 {
 	m_mt_bank_addr = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	machine_reset_megadriv();
 
 	std::string region_tag;
 	if (m_cart1->get_rom_size() > 0)

@@ -65,10 +65,10 @@ public:
 	int m_lcd_digit[6];
 	DECLARE_DRIVER_INIT(ut88);
 	DECLARE_DRIVER_INIT(ut88mini);
-	DECLARE_MACHINE_RESET(ut88);
-	DECLARE_VIDEO_START(ut88);
-	DECLARE_MACHINE_START(ut88mini);
-	DECLARE_MACHINE_RESET(ut88mini);
+	void machine_reset_ut88();
+	void video_start_ut88();
+	void machine_start_ut88mini();
+	void machine_reset_ut88mini();
 	uint32_t screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

@@ -158,15 +158,15 @@ public:
 
 	void machine_start() override;
 	void machine_reset() override;
-	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(xmultipl);
-	DECLARE_VIDEO_START(hharry);
-	DECLARE_VIDEO_START(rtype2);
-	DECLARE_VIDEO_START(m82);
-	DECLARE_VIDEO_START(hharryu);
-	DECLARE_VIDEO_START(poundfor);
-	DECLARE_MACHINE_START(kengo);
-	DECLARE_MACHINE_RESET(kengo);
+	void video_start_m72();
+	void video_start_xmultipl();
+	void video_start_hharry();
+	void video_start_rtype2();
+	void video_start_m82();
+	void video_start_hharryu();
+	void video_start_poundfor();
+	void machine_start_kengo();
+	void machine_reset_kengo();
 	DECLARE_DRIVER_INIT(dkgenm72);
 	DECLARE_DRIVER_INIT(bchopper);
 	DECLARE_DRIVER_INIT(gallop);

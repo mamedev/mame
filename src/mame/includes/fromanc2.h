@@ -103,11 +103,11 @@ public:
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l1_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l2_tile_info);
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(fromanc2);
-	DECLARE_VIDEO_START(fromanc2);
-	DECLARE_VIDEO_START(fromancr);
-	DECLARE_MACHINE_START(fromanc4);
-	DECLARE_VIDEO_START(fromanc4);
+	void machine_start_fromanc2();
+	void video_start_fromanc2();
+	void video_start_fromancr();
+	void machine_start_fromanc4();
+	void video_start_fromanc4();
 	uint32_t screen_update_fromanc2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fromanc2_interrupt);

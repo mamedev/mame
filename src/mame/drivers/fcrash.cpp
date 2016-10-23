@@ -1419,7 +1419,7 @@ static INPUT_PORTS_START( sgyxz )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(cps_state,fcrash)
+void cps_state::machine_start_fcrash()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1443,16 +1443,16 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state,sgyxz)
+void cps_state::machine_start_sgyxz()
 {
-	MACHINE_START_CALL_MEMBER(kodb);
+	machine_start_kodb();
 	m_layer_scroll1x_offset = 0x40;
 	m_layer_scroll2x_offset = 0x40;
 	m_layer_scroll3x_offset = 0x40;
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(cps_state,kodb)
+void cps_state::machine_start_kodb()
 {
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -1467,9 +1467,9 @@ MACHINE_START_MEMBER(cps_state,kodb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, cawingbl)
+void cps_state::machine_start_cawingbl()
 {
-	MACHINE_START_CALL_MEMBER(fcrash);
+	machine_start_fcrash();
 
 	m_layer_enable_reg = 0x0c;
 	m_layer_mask_reg[0] = 0x0a;
@@ -1482,7 +1482,7 @@ MACHINE_START_MEMBER(cps_state, cawingbl)
 	m_sprite_base = 0x1000;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2mdt)
+void cps_state::machine_start_sf2mdt()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1506,7 +1506,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state, knightsb)
+void cps_state::machine_start_knightsb()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1525,7 +1525,7 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2m1)
+void cps_state::machine_start_sf2m1()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1544,7 +1544,7 @@ MACHINE_START_MEMBER(cps_state, sf2m1)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_RESET_MEMBER(cps_state,fcrash)
+void cps_state::machine_reset_fcrash()
 {
 	m_sample_buffer1 = 0;
 	m_sample_buffer2 = 0;
@@ -2079,7 +2079,7 @@ DRIVER_INIT_MEMBER(cps_state, cawingbl)
 
 // ************************************************************************* DINOPIC, DINOPIC2
 
-MACHINE_START_MEMBER(cps_state, dinopic)
+void cps_state::machine_start_dinopic()
 {
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
@@ -2333,7 +2333,7 @@ ROM_END
 
 // ************************************************************************* PUNIPIC, PUNIPIC2, PUNIPIC3
 
-MACHINE_START_MEMBER(cps_state, punipic)
+void cps_state::machine_start_punipic()
 {
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
@@ -2860,7 +2860,7 @@ DRIVER_INIT_MEMBER(cps_state, sf2b)
 
 // ************************************************************************* SLAMPIC
 
-MACHINE_START_MEMBER(cps_state, slampic)
+void cps_state::machine_start_slampic()
 {
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[0] = 0x00;

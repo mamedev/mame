@@ -127,8 +127,8 @@ public:
 	DECLARE_DRIVER_INIT(mslider);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(gdfs);
-	DECLARE_VIDEO_START(eaglshot);
+	void video_start_gdfs();
+	void video_start_eaglshot();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

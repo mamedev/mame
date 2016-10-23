@@ -127,7 +127,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(cpokerpk);
+	void video_start_cpokerpk();
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
@@ -220,7 +220,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 	return 0;
 }
 
-VIDEO_START_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::video_start_cpokerpk()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }

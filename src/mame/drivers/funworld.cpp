@@ -2948,13 +2948,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_start_lunapark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_reset_lunapark()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);

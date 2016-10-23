@@ -51,7 +51,7 @@ public:
 	}
 
 	DECLARE_DRIVER_INIT(dmax8000);
-	DECLARE_MACHINE_RESET(dmax8000);
+	void machine_reset_dmax8000();
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( dmax8000 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::machine_reset_dmax8000()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram

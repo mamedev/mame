@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(flstory_state,ta7630)
+void flstory_state::machine_reset_ta7630()
 {
 	int i;
 
@@ -1008,9 +1008,9 @@ void flstory_state::machine_start()
 	save_item(NAME(m_mcu_select));
 }
 
-MACHINE_RESET_MEMBER(flstory_state,flstory)
+void flstory_state::machine_reset_flstory()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	machine_reset_ta7630();
 
 	/* video */
 	m_gfxctrl = 0;
@@ -1231,9 +1231,9 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(flstory_state,rumba)
+void flstory_state::machine_reset_rumba()
 {
-	MACHINE_RESET_CALL_MEMBER(flstory);
+	machine_reset_flstory();
 	m_mcu_cmd = 0;
 }
 

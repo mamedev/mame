@@ -196,8 +196,8 @@ public:
 	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
 	DECLARE_READ16_MEMBER( c355_obj_position_r );
 	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
-	DECLARE_MACHINE_START(namcos2);
-	DECLARE_MACHINE_RESET(namcos2);
+	void machine_start_namcos2();
+	void machine_reset_namcos2();
 protected:
 	// C355 Motion Object internals
 	template<class _BitmapClass>
