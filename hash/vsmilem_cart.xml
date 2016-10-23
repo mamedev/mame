@@ -291,7 +291,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
         <year>200?</year>
         <publisher>VTech</publisher>
         <info name="serial" value="80-084164(GE)" />
-        <part name="cart" interface="vsmile_cart">
+        <part name="cart" interface="vsmilem_cart">
             <dataarea name="rom" size="8388608">
                 <rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
             </dataarea>
