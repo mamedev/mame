@@ -11,7 +11,7 @@
 		<info name="serial" value="F001" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_word_swap" name="Formosa Duel (Taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" offset="0" />
+				<rom loadflag="load16_word_swap" name="formosa duel (taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" offset="0" />
 			</dataarea>
 		</part>
 	</software>

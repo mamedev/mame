@@ -138,7 +138,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="Action Fighter (TW).sms" size="131072" crc="8418f438" sha1="4f514dc568466f6b0424086edeb3fa0014f9c887" offset="000000" />
+				<rom name="action fighter (tw).sms" size="131072" crc="8418f438" sha1="4f514dc568466f6b0424086edeb3fa0014f9c887" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2151,7 +2151,7 @@
 		<info name="serial" value="7042"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="E-SWAT [Proto 0].sms" size="262144" crc="4f20694a" sha1="855c2f54b700663cedd6484aab396d849dcb5290" offset="000000" />
+				<rom name="e-swat [proto 0].sms" size="262144" crc="4f20694a" sha1="855c2f54b700663cedd6484aab396d849dcb5290" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2163,7 +2163,7 @@
 		<info name="serial" value="7042"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="E-SWAT [Proto 1].sms" size="262144" crc="f7ca9801" sha1="12c5005f8a0d78c75704b61bf87961875b9d29d4" offset="000000" />
+				<rom name="e-swat [proto 1].sms" size="262144" crc="f7ca9801" sha1="12c5005f8a0d78c75704b61bf87961875b9d29d4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2175,7 +2175,7 @@
 		<info name="serial" value="7042"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="E-SWAT [Proto 2].sms" size="262144" crc="fd91cc7e" sha1="63fa1fcbf941b0e0ce601b3094c6c31f997c95d8" offset="000000" />
+				<rom name="e-swat [proto 2].sms" size="262144" crc="fd91cc7e" sha1="63fa1fcbf941b0e0ce601b3094c6c31f997c95d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5839,7 +5839,7 @@
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="Super Columns (KR).sms" size="32768" crc="6ce7f694" sha1="9d696b6eda1d13b8d439509beeb64210987e308e" offset="000000" />
+				<rom name="super columns (kr).sms" size="32768" crc="6ce7f694" sha1="9d696b6eda1d13b8d439509beeb64210987e308e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -132,7 +132,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "87136">
-				<rom name="Adventures In Math [1983] [5.25] [1 of 1].td0" size="87136" crc="37c2c084" sha1="87d6d6e3bb5a1ad44cdff8f1a349acb2d743bf6b" offset="0"/>
+				<rom name="adventures in math [1983] [5.25] [1 of 1].td0" size="87136" crc="37c2c084" sha1="87d6d6e3bb5a1ad44cdff8f1a349acb2d743bf6b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1029,7 +1029,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Hayden Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Inca [DC] (1985)(Hayden Software) [Adventure, Interactive Fiction].img" size="368640" crc="1f9fe250" sha1="e9d213695501f9d163d402310b3f5e34f1c4ff88" offset="0"/>
+				<rom name="inca [dc] (1985)(hayden software) [adventure, interactive fiction].img" size="368640" crc="1f9fe250" sha1="e9d213695501f9d163d402310b3f5e34f1c4ff88" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1869,7 +1869,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Silent Service [1985] [MicroProse Software] [1 of 1].img" size="737280" crc="47e12110" sha1="23dc97774af28197331e102315a6ab42b9ae7ed5" offset="0"/>
+				<rom name="silent service [1985] [microprose software] [1 of 1].img" size="737280" crc="47e12110" sha1="23dc97774af28197331e102315a6ab42b9ae7ed5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2339,7 +2339,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Wizball [DC] (1987)(Ocean Software Ltd.) [Action].img" size="368640" crc="ecf3812f" sha1="da1041836f68c1fd231b3d05371bc6468f29441e" offset="0"/>
+				<rom name="wizball [dc] (1987)(ocean software ltd.) [action].img" size="368640" crc="ecf3812f" sha1="da1041836f68c1fd231b3d05371bc6468f29441e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2474,13 +2474,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size = "357775">
-				<rom name="Bad Dudes [1988] [5.25] [1 of 2].td0" size="357775" crc="4a19fc60" sha1="4d0a52c62b64a709d9ce5a42137418595a675f63" offset="0"/>
+				<rom name="bad dudes [1988] [5.25] [1 of 2].td0" size="357775" crc="4a19fc60" sha1="4d0a52c62b64a709d9ce5a42137418595a675f63" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size = "362884">
-				<rom name="Bad Dudes [1988] [5.25] [2 of 2].td0" size="362884" crc="2425c6a0" sha1="4fbb64b9da9d726fba670423815361f4928380ca" offset="0"/>
+				<rom name="bad dudes [1988] [5.25] [2 of 2].td0" size="362884" crc="2425c6a0" sha1="4fbb64b9da9d726fba670423815361f4928380ca" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2531,13 +2531,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Demo Disk 1" />
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk01.img" size="368640" crc="33247300" sha1="c9d1acb0c19d64af3ac604c1e108252fa5bffb43" offset="0"/>
+				<rom name="disk01.img" size="368640" crc="33247300" sha1="c9d1acb0c19d64af3ac604c1e108252fa5bffb43" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Demo Disk 2" />
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk02.img" size="368640" crc="c8e12da7" sha1="428e0dd0eafee1575c847674c34cb4144ab87291" offset="0"/>
+				<rom name="disk02.img" size="368640" crc="c8e12da7" sha1="428e0dd0eafee1575c847674c34cb4144ab87291" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2877,7 +2877,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>CRL Group</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Academy - Tau Ceti 2 [1987] [CRL Group] [5.25] [1 of 1].img" size="368640" crc="d9047aa4" sha1="09198868eb826dc1be90b941f66c336d21f5df92" offset="0"/>
+				<rom name="academy - tau ceti 2 [1987] [crl group] [5.25] [1 of 1].img" size="368640" crc="d9047aa4" sha1="09198868eb826dc1be90b941f66c336d21f5df92" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2889,7 +2889,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Artech" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Ace of Aces [Accolade] [1987] [3.5].img" size="737280" crc="9f5d1734" sha1="db70bf0ede554db32c8bf3142b199e627f7ecebd" offset="0"/>
+				<rom name="ace of aces [accolade] [1987] [3.5].img" size="737280" crc="9f5d1734" sha1="db70bf0ede554db32c8bf3142b199e627f7ecebd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2935,12 +2935,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Bar Games [Accolade] [1989] [5.25] [1].img" size="368640" crc="deb3e64c" sha1="727ae13bd59b19feee0269e08dc831e1393c4a71" offset="0"/>
+				<rom name="bar games [accolade] [1989] [5.25] [1].img" size="368640" crc="deb3e64c" sha1="727ae13bd59b19feee0269e08dc831e1393c4a71" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Bar Games [Accolade] [1989] [5.25] [2].img" size="368640" crc="684dbc8b" sha1="667d77f7a441e461160545dfb16602898c2e1b2d" offset="0"/>
+				<rom name="bar games [accolade] [1989] [5.25] [2].img" size="368640" crc="684dbc8b" sha1="667d77f7a441e461160545dfb16602898c2e1b2d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2953,13 +2953,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
+				<rom name="the bard's tale 1 - tales of the unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Picture Disk" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [2 of 2].img" size="368640" crc="a90bd7ec" sha1="68c4d04fb2625766018dcb4a34e27d8348fb817d" offset="0"/>
+				<rom name="the bard's tale 1 - tales of the unknown [1987] [5.25] [2 of 2].img" size="368640" crc="a90bd7ec" sha1="68c4d04fb2625766018dcb4a34e27d8348fb817d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2972,13 +2972,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
+				<rom name="the bard's tale 1 - tales of the unknown [1987] [5.25] [1 of 2].img" size="368640" crc="40918452" sha1="8cb08b1a090bb7e2b4021a28db27b8f2f9c9df71" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Picture Disk" />
 			<dataarea name="flop" size = "309512">
-				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [5.25] [2 of 2] [a2].img" size="309512" crc="57028b32" sha1="326dffb09cc63531b7ce25b1a19368ece9744804" offset="0"/>
+				<rom name="the bard's tale 1 - tales of the unknown [1987] [5.25] [2 of 2] [a2].img" size="309512" crc="57028b32" sha1="326dffb09cc63531b7ce25b1a19368ece9744804" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2990,7 +2990,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Interplay Productions" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="The Bard's Tale 1 - Tales of the Unknown [1987] [3.5] [1 of 1].img" size="737280" crc="a0c0a15f" sha1="43a7487172fbce2de1284702f4e52b162582952c" offset="0"/>
+				<rom name="the bard's tale 1 - tales of the unknown [1987] [3.5] [1 of 1].img" size="737280" crc="a0c0a15f" sha1="43a7487172fbce2de1284702f4e52b162582952c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3003,13 +3003,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [5.25] [1 of 2].img" size="368640" crc="15066d22" sha1="9903ff47fa92d24a0f757a86956081be33794acd" offset="0"/>
+				<rom name="the bard's tale 2 - the destiny knight [1988] [5.25] [1 of 2].img" size="368640" crc="15066d22" sha1="9903ff47fa92d24a0f757a86956081be33794acd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Picture Disk" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [5.25] [2 of 2].img" size="368640" crc="447f403e" sha1="b37b5aa185c4ed60fbc03c9234bd52bb8ca4f836" offset="0"/>
+				<rom name="the bard's tale 2 - the destiny knight [1988] [5.25] [2 of 2].img" size="368640" crc="447f403e" sha1="b37b5aa185c4ed60fbc03c9234bd52bb8ca4f836" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3021,7 +3021,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Interplay Productions" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="The Bard's Tale 2 - The Destiny Knight [1988] [3.5] [1 of 1].img" size="737280" crc="65dc8cfe" sha1="24f1883d3f24abd8d313a9f99e1604350bb128e9" offset="0"/>
+				<rom name="the bard's tale 2 - the destiny knight [1988] [3.5] [1 of 1].img" size="737280" crc="65dc8cfe" sha1="24f1883d3f24abd8d313a9f99e1604350bb128e9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3034,19 +3034,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [1 of 3].img" size="368640" crc="5cd9891f" sha1="7df8f6751b31905701611668fc6a9e01958f476e" offset="0"/>
+				<rom name="the bard's tale 3 - thief of fate [1990] [5.25] [1 of 3].img" size="368640" crc="5cd9891f" sha1="7df8f6751b31905701611668fc6a9e01958f476e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [2 of 3].img" size="368640" crc="ad726a56" sha1="ab5a0ae06a067521e30a15630efe55ff168a8ce0" offset="0"/>
+				<rom name="the bard's tale 3 - thief of fate [1990] [5.25] [2 of 3].img" size="368640" crc="ad726a56" sha1="ab5a0ae06a067521e30a15630efe55ff168a8ce0" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "368640">
-				<rom name="The Bard's Tale 3 - Thief of Fate [1990] [5.25] [3 of 3].img" size="368640" crc="cc9d1779" sha1="e046f2459c38b67520490b9febec51e1a34aa2ca" offset="0"/>
+				<rom name="the bard's tale 3 - thief of fate [1990] [5.25] [3 of 3].img" size="368640" crc="cc9d1779" sha1="e046f2459c38b67520490b9febec51e1a34aa2ca" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3057,7 +3057,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Budokan - The Martial Spirit [Electronic Arts] [1989] [3.5] [1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f" offset="0"/>
+				<rom name="budokan - the martial spirit [electronic arts] [1989] [3.5] [1 of 1].img" size="737280" crc="fea46e33" sha1="bf874ea08695344cc9c3db8bc1b2db2e0b62ca9f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3069,7 +3069,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Frédéric Sénégas" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Armorik le Viking (Fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
+				<rom name="armorik le viking (fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3081,7 +3081,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Datasoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="The Hunt for Red October [Datasoft] [1988] [3.5].img" size="737280" crc="1a943c80" sha1="99a52ddcfeae6785afa46eceea061d64020a9e05" offset="0"/>
+				<rom name="the hunt for red october [datasoft] [1988] [3.5].img" size="737280" crc="1a943c80" sha1="99a52ddcfeae6785afa46eceea061d64020a9e05" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3092,12 +3092,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [1 of 2].img" size="368640" crc="5d8f3b23" sha1="c3abf7a4cbc444ee1d60c5de278812502e529932" offset="0"/>
+				<rom name="indianapolis 500 - the simulation [1989] [5.25] [1 of 2].img" size="368640" crc="5d8f3b23" sha1="c3abf7a4cbc444ee1d60c5de278812502e529932" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Indianapolis 500 - The Simulation [1989] [5.25] [2 of 2].img" size="368640" crc="ca21e0ee" sha1="875c81518345d100444457b610873d36061c3602" offset="0"/>
+				<rom name="indianapolis 500 - the simulation [1989] [5.25] [2 of 2].img" size="368640" crc="ca21e0ee" sha1="875c81518345d100444457b610873d36061c3602" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3119,7 +3119,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Mastertronic Group</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "327680">
-				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1] [a2].img" size="327680" crc="24730354" sha1="0278ca7aae1c254aaf362940f5a67479cf9638ea" offset="0"/>
+				<rom name="shogun [1987] [mastertronic group] [5.25] [1 of 1] [a2].img" size="327680" crc="24730354" sha1="0278ca7aae1c254aaf362940f5a67479cf9638ea" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3130,7 +3130,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Mastertronic Group</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
-				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1].img" size="184320" crc="87dec0fb" sha1="4158a195e267687639bc0540638f3ce4f48e6226" offset="0"/>
+				<rom name="shogun [1987] [mastertronic group] [5.25] [1 of 1].img" size="184320" crc="87dec0fb" sha1="4158a195e267687639bc0540638f3ce4f48e6226" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3141,7 +3141,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Mastertronic Group</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
-				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1] [a1].img" size="184320" crc="4a4daf48" sha1="337c9934218a351bce352996c84ae14f45435485" offset="0"/>
+				<rom name="shogun [1987] [mastertronic group] [5.25] [1 of 1] [a1].img" size="184320" crc="4a4daf48" sha1="337c9934218a351bce352996c84ae14f45435485" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3153,7 +3153,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "211218">
-				<rom name="Karateka [1986] [5.25] [1 of 1].td0" size="211218" crc="deef4ce2" sha1="8e4b167469c0d1dae9a63a652ac9358019e68d2a" offset="0"/>
+				<rom name="karateka [1986] [5.25] [1 of 1].td0" size="211218" crc="deef4ce2" sha1="8e4b167469c0d1dae9a63a652ac9358019e68d2a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3164,7 +3164,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Brøderbund Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="Karateka - IBM Beta (1986-03-03) (ID 952).img" size="368640" crc="bae37409" sha1="2997a137038e9cd98ad95931cbf22b03cb6c6ad7" offset="0" />
+				<rom name="karateka - ibm beta (1986-03-03) (id 952).img" size="368640" crc="bae37409" sha1="2997a137038e9cd98ad95931cbf22b03cb6c6ad7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3244,7 +3244,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Exxos/ERE Informatique" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e" offset="0"/>
+				<rom name="kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3255,7 +3255,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Activision</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "327680">
-				<rom name="Laser Surgeon - The Microscopic Mission [1987] [Activision] [5.25] [1 of 1].img" size="327680" crc="728e2c05" sha1="f5293c2860fa6dea89d89d00d2d63cdc4c8f8e6b" offset="0"/>
+				<rom name="laser surgeon - the microscopic mission [1987] [activision] [5.25] [1 of 1].img" size="327680" crc="728e2c05" sha1="f5293c2860fa6dea89d89d00d2d63cdc4c8f8e6b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3266,7 +3266,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Leather Goddesses of Phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154" offset="0"/>
+				<rom name="leather goddesses of phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3277,7 +3277,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+				<rom name="the lurking horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3289,12 +3289,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Epyx</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "354497">
-				<rom name="Purple Saturn Day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652" offset="0"/>
+				<rom name="purple saturn day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "339570">
-				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+				<rom name="purple saturn day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3305,12 +3305,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Skate or Die [1988] [Electronic Arts] [5.25] [1 of 2].img" size="368640" crc="20788bdf" sha1="45f13ce79ef36c019cb2870faacab6d64ab0a26a" offset="0"/>
+				<rom name="skate or die [1988] [electronic arts] [5.25] [1 of 2].img" size="368640" crc="20788bdf" sha1="45f13ce79ef36c019cb2870faacab6d64ab0a26a" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Skate or Die [1988] [Electronic Arts] [5.25] [2 of 2].img" size="368640" crc="f6595453" sha1="48add340eec8961f6b14395a252d9c7e4d59bf5f" offset="0"/>
+				<rom name="skate or die [1988] [electronic arts] [5.25] [2 of 2].img" size="368640" crc="f6595453" sha1="48add340eec8961f6b14395a252d9c7e4d59bf5f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3321,7 +3321,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Skate or Die [1988] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="ad1fb4e3" sha1="60a315b8f744258d66c221538830808ae7184f47" offset="0"/>
+				<rom name="skate or die [1988] [electronic arts] [3.5] [1 of 1].img" size="737280" crc="ad1fb4e3" sha1="60a315b8f744258d66c221538830808ae7184f47" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3334,13 +3334,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "346788">
-				<rom name="Starflight 2 - Trade Routes Of The Cloud Nebula [1989] [5.25] [1 of 2].td0" size="346788" crc="f5dbaa16" sha1="7598cf40e631cd762501030f98b43fa284be8cf3" offset="0"/>
+				<rom name="starflight 2 - trade routes of the cloud nebula [1989] [5.25] [1 of 2].td0" size="346788" crc="f5dbaa16" sha1="7598cf40e631cd762501030f98b43fa284be8cf3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "347616">
-				<rom name="Starflight 2 - Trade Routes Of The Cloud Nebula [1989] [5.25] [2 of 2].td0" size="347616" crc="ca35b501" sha1="bcd941785a84b5fb36b23077a7c41686ed2cb188" offset="0"/>
+				<rom name="starflight 2 - trade routes of the cloud nebula [1989] [5.25] [2 of 2].td0" size="347616" crc="ca35b501" sha1="bcd941785a84b5fb36b23077a7c41686ed2cb188" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3352,7 +3352,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Keypunch Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Strike Force.img" size="368640" crc="285ff956" sha1="d7d364682d17ca3958f100cb82f544af5807ca43" offset="0"/>
+				<rom name="strike force.img" size="368640" crc="285ff956" sha1="d7d364682d17ca3958f100cb82f544af5807ca43" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3363,7 +3363,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Spectrum Holobyte</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "249700">
-				<rom name="Tetris [1987] [5.25] [1 of 1].td0" size="249700" crc="52cc8d82" sha1="36fbecba43a112c600595fe2c0a4b009379c63f5" offset="0"/>
+				<rom name="tetris [1987] [5.25] [1 of 1].td0" size="249700" crc="52cc8d82" sha1="36fbecba43a112c600595fe2c0a4b009379c63f5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3374,7 +3374,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Spectrum Holobyte</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "242382">
-				<rom name="Tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9" offset="0"/>
+				<rom name="tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3385,7 +3385,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Weird Dreams [MicroProse] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c" offset="0"/>
+				<rom name="weird dreams [microprose] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3396,7 +3396,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Access Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
+				<rom name="world class leader board [1988] [access software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
