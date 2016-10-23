@@ -899,7 +899,7 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
 
 	// 74259 Q2: book rom A14
-	membank("bank1")->set_entry(m_led_select >> 2 & 1);
+	membank("bank1")->set_entry(~m_led_select >> 2 & 1);
 
 	// 74259 Q3: lcd common, update on rising edge
 	if (~q3_old & m_led_select & 8)
