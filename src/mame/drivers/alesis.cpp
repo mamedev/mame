@@ -464,7 +464,7 @@ ROM_START( sr16 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(alesis_state,hr16)
+void alesis_state::init_hr16()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();

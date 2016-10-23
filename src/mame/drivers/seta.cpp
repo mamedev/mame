@@ -11392,7 +11392,7 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,twineagl)
+void seta_state::init_twineagl()
 {
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
@@ -11425,7 +11425,7 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-DRIVER_INIT_MEMBER(seta_state,downtown)
+void seta_state::init_downtown()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
@@ -11445,13 +11445,13 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,arbalest)
+void seta_state::init_arbalest()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,metafox)
+void seta_state::init_metafox()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11464,7 +11464,7 @@ DRIVER_INIT_MEMBER(seta_state,metafox)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,blandia)
+void seta_state::init_blandia()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
@@ -11495,20 +11495,20 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,eightfrc)
+void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,zombraid)
+void seta_state::init_zombraid()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,kiwame)
+void seta_state::init_kiwame()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11520,12 +11520,12 @@ DRIVER_INIT_MEMBER(seta_state,kiwame)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,rezon)
+void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-DRIVER_INIT_MEMBER(seta_state,wiggie)
+void seta_state::init_wiggie()
 {
 	uint8_t *src;
 	int len;
@@ -11559,7 +11559,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 
 }
 
-DRIVER_INIT_MEMBER(seta_state,crazyfgt)
+void seta_state::init_crazyfgt()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11569,14 +11569,14 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 	// fixed priorities?
 	m_vregs.allocate(3);
 
-	DRIVER_INIT_CALL(blandia);
+	init_blandia();
 }
 
 /***************************************************************************
                              International Toote
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(seta_state,inttoote)
+void seta_state::init_inttoote()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -11590,7 +11590,7 @@ DRIVER_INIT_MEMBER(seta_state,inttoote)
 	ROM[0x368a/2] = 0x50f9; // betting count down
 }
 
-DRIVER_INIT_MEMBER(seta_state,inttootea)
+void seta_state::init_inttootea()
 {
 	//uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 

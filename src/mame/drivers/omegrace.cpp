@@ -246,7 +246,7 @@ public:
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
-	DECLARE_DRIVER_INIT(omegrace);
+	void init_omegrace();
 	virtual void machine_reset() override;
 };
 
@@ -607,7 +607,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(omegrace_state,omegrace)
+void omegrace_state::init_omegrace()
 {
 	int i, len = memregion("user1")->bytes();
 	uint8_t *prom = memregion("user1")->base();

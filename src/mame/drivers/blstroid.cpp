@@ -411,7 +411,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blstroid_state,blstroid)
+void blstroid_state::init_blstroid()
 {
 }
 

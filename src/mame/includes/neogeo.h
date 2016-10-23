@@ -103,7 +103,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
 	DECLARE_READ16_MEMBER(read_lorom_kof10th);
 
-	DECLARE_DRIVER_INIT(neogeo);
+	void init_neogeo();
 
 protected:
 	void common_machine_start();
@@ -277,10 +277,10 @@ class neopcb_state : public neogeo_state
 
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 
-	DECLARE_DRIVER_INIT(ms5pcb);
-	DECLARE_DRIVER_INIT(svcpcb);
-	DECLARE_DRIVER_INIT(kf2k3pcb);
-	DECLARE_DRIVER_INIT(vliner);
+	void init_ms5pcb();
+	void init_svcpcb();
+	void init_kf2k3pcb();
+	void init_vliner();
 
 	void install_common();
 	void install_banked_bios();

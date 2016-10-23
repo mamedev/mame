@@ -442,9 +442,9 @@ void neopcb_state::install_banked_bios()
 
 }
 
-DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
+void neopcb_state::init_ms5pcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 	install_banked_bios();
 
@@ -462,9 +462,9 @@ DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
+void neopcb_state::init_svcpcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 	install_banked_bios();
 
@@ -482,9 +482,9 @@ DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
+void neopcb_state::init_kf2k3pcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 
 	m_sprgen->m_fixed_layer_bank_type = 2;

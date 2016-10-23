@@ -152,7 +152,7 @@ public:
 	DECLARE_WRITE16_MEMBER(btc_trackball_w);
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
-	DECLARE_DRIVER_INIT(simpbowl);
+	void init_simpbowl();
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
@@ -495,7 +495,7 @@ READ16_MEMBER(konamigv_state::unknown_r)
 	return 0xffff;
 }
 
-DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
+void konamigv_state::init_simpbowl()
 {
 	m_flash8[0] = machine().device<fujitsu_29f016a_device>("flash0");
 	m_flash8[1] = machine().device<fujitsu_29f016a_device>("flash1");

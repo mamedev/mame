@@ -2428,7 +2428,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarisy1_state,marble)
+void atarisy1_state::init_marble()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2437,7 +2437,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
+void atarisy1_state::init_peterpak()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2446,7 +2446,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
+void atarisy1_state::init_indytemp()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2455,7 +2455,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
+void atarisy1_state::init_roadrunn()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
@@ -2464,7 +2464,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
+void atarisy1_state::init_roadblst()
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 

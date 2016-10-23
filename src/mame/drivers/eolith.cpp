@@ -1490,7 +1490,7 @@ void eolith_state::machine_reset_eolith()
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,eolith)
+void eolith_state::init_eolith()
 {
 	init_speedup();
 
@@ -1500,18 +1500,18 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	save_item(NAME(m_sound_data));
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrk)
+void eolith_state::init_landbrk()
 {
 	m_coin_counter_bit = 0x1000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
 // the protected sets all have an extra startup check (to prevent you swapping in an external ROM?)
 // currently not fully understood, and possibly not possible to make work without the MCU dump so we patch it.
 // to work with the unprotected code.
-DRIVER_INIT_MEMBER(eolith_state,landbrka)
+void eolith_state::init_landbrka()
 {
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
@@ -1521,24 +1521,24 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch2)
+void eolith_state::init_hidctch2()
 {
 	//it fails compares in memory like in landbrka
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
-DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
+void eolith_state::init_hidnc2k()
 {
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0x17b2c/4] = (rombase[0x17b2c/4] & 0x0000ffff) | 0x03000000; /* Change BR to NOP */
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
@@ -1547,7 +1547,7 @@ DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
 
 
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch3)
+void eolith_state::init_hidctch3()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
@@ -1559,7 +1559,7 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /* Eolith Speedup Handling */

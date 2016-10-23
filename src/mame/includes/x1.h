@@ -263,7 +263,7 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_porta_w);
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
-	DECLARE_DRIVER_INIT(x1_kanji);
+	void init_x1_kanji();
 	void machine_start_x1();
 	void machine_reset_x1();
 	void video_start_x1();

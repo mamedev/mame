@@ -497,7 +497,7 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(iqblock_state,iqblock)
+void iqblock_state::init_iqblock()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -514,7 +514,7 @@ DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 	m_video_type=1;
 }
 
-DRIVER_INIT_MEMBER(iqblock_state,grndtour)
+void iqblock_state::init_grndtour()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;

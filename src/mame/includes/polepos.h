@@ -114,8 +114,8 @@ public:
 	DECLARE_READ8_MEMBER(namco_53xx_k_r);
 	DECLARE_READ8_MEMBER(steering_changed_r);
 	DECLARE_READ8_MEMBER(steering_delta_r);
-	DECLARE_DRIVER_INIT(topracern);
-	DECLARE_DRIVER_INIT(polepos2);
+	void init_topracern();
+	void init_polepos2();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	void machine_reset_polepos();

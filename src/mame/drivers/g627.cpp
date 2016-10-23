@@ -56,8 +56,8 @@ public:
 		, m_testipt(*this, "TEST.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(v115);
-	DECLARE_DRIVER_INIT(v117);
+	void init_v115();
+	void init_v117();
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
@@ -169,12 +169,12 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test 8") PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( g627_state, v115 )
+void g627_state::init_v115()
 {
 	m_type = 0;
 }
 
-DRIVER_INIT_MEMBER( g627_state, v117 )
+void g627_state::init_v117()
 {
 	m_type = 1;
 }

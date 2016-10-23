@@ -92,7 +92,7 @@ public:
 		m_uart1(*this, "uart1"),
 		m_rtc(*this, "rtc")
 	{ }
-	DECLARE_DRIVER_INIT(mwskins);
+	void init_mwskins();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -899,7 +899,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atlantis_state,mwskins)
+void atlantis_state::init_mwskins()
 {
 }
 

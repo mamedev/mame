@@ -2238,7 +2238,7 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(m92_state,m92)
+void m92_state::init_m92()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2248,13 +2248,13 @@ DRIVER_INIT_MEMBER(m92_state,m92)
 }
 
 /* different address map (no bank1) */
-DRIVER_INIT_MEMBER(m92_state,lethalth)
+void m92_state::init_lethalth()
 {
 	m_game_kludge = 0;
 }
 
 /* has bankswitching */
-DRIVER_INIT_MEMBER(m92_state,m92_bank)
+void m92_state::init_m92_bank()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2265,7 +2265,7 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 }
 
 /* has bankswitching, has eeprom, needs sprite kludge */
-DRIVER_INIT_MEMBER(m92_state,majtitl2)
+void m92_state::init_majtitl2()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2279,7 +2279,7 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 }
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
-DRIVER_INIT_MEMBER(m92_state,ppan)
+void m92_state::init_ppan()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0xa0000]);

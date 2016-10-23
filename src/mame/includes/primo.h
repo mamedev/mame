@@ -48,9 +48,9 @@ public:
 	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
 	DECLARE_WRITE8_MEMBER(primo_ki_2_w);
 	DECLARE_WRITE8_MEMBER(primo_FD_w);
-	DECLARE_DRIVER_INIT(primo48);
-	DECLARE_DRIVER_INIT(primo64);
-	DECLARE_DRIVER_INIT(primo32);
+	void init_primo48();
+	void init_primo64();
+	void init_primo32();
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void machine_reset_primob();

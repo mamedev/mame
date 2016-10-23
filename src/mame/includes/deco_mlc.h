@@ -62,8 +62,8 @@ public:
 
 
 
-	DECLARE_DRIVER_INIT(mlc);
-	DECLARE_DRIVER_INIT(avengrgs);
+	void init_mlc();
+	void init_avengrgs();
 	void machine_reset_mlc();
 	void video_start_mlc();
 	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

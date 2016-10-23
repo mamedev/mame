@@ -462,7 +462,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(thunderj_state,thunderj)
+void thunderj_state::init_thunderj()
 {
 }
 

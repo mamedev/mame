@@ -56,7 +56,7 @@ public:
 
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
-	DECLARE_DRIVER_INIT(pesadelo);
+	void init_pesadelo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(forte2_state,pesadelo)
+void forte2_state::init_pesadelo()
 {
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();

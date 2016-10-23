@@ -33,7 +33,7 @@ public:
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
 
-	DECLARE_DRIVER_INIT(europc);
+	void init_europc();
 
 	void europc_rtc_set_time();
 
@@ -321,7 +321,7 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 	}
 }
 
-DRIVER_INIT_MEMBER(europc_pc_state,europc)
+void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 

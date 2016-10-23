@@ -107,8 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_1_w);
 	DECLARE_WRITE8_MEMBER(sound_control_2_w);
 	DECLARE_WRITE8_MEMBER(sound_control_3_w);
-	DECLARE_DRIVER_INIT(undoukai);
-	DECLARE_DRIVER_INIT(40love);
+	void init_undoukai();
+	void init_40love();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortyl);

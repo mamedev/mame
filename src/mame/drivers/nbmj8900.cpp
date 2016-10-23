@@ -33,7 +33,7 @@ TODO:
 #include "sound/volt_reg.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
+void nbmj8900_state::init_ohpaipee()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();
@@ -62,7 +62,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
+void nbmj8900_state::init_togenkyo()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();

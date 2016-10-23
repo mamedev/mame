@@ -673,7 +673,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(arcadia_state,arcadia)
+void arcadia_state::init_arcadia()
 {
 	int i;
 	uint8_t *gfx=memregion("gfx1")->base();

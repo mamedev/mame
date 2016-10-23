@@ -2888,7 +2888,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaorun_state,generic)
+void segaorun_state::init_generic()
 {
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
@@ -2911,16 +2911,16 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaorun_state,outrun)
+void segaorun_state::init_outrun()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segaorun_state::outrun_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segaorun_state::outrun_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segaorun_state,outrunb)
+void segaorun_state::init_outrunb()
 {
-	DRIVER_INIT_CALL(outrun);
+	init_outrun();
 
 	// hard code a memory map
 	static const uint8_t memory_map[] = { 0x02,0x00,0x0d,0x10,0x00,0x12,0x0c,0x13,0x08,0x14,0x0f,0x20,0x00,0x00,0x00,0x00 };
@@ -2956,9 +2956,9 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
 }
 
-DRIVER_INIT_MEMBER(segaorun_state,shangon)
+void segaorun_state::init_shangon()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_shangon_video = true;
 	m_custom_io_r = read16_delegate(FUNC(segaorun_state::shangon_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segaorun_state::shangon_custom_io_w), this);

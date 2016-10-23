@@ -103,7 +103,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
-	DECLARE_DRIVER_INIT(coh1000tb);
+	void init_coh1000tb();
 	void machine_reset_coh1000c();
 	void machine_reset_glpracr();
 	void machine_reset_coh1000ta();
@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER(zn_state,coh1000tb)
+void zn_state::init_coh1000tb()
 {
 	m_fx1b_fram = std::make_unique<uint8_t[]>(0x200);
 	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);

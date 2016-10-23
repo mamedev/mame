@@ -50,7 +50,7 @@ TODO:
 #include "sound/volt_reg.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
+void nbmj8891_state::init_gionbana()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -66,7 +66,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
+void nbmj8891_state::init_omotesnd()
 {
 #if 0
 	uint8_t *prot = memregion("protection")->base();
@@ -100,7 +100,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
+void nbmj8891_state::init_telmahjn()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -116,7 +116,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
+void nbmj8891_state::init_mgmen89()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -132,7 +132,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
+void nbmj8891_state::init_mjfocus()
 {
 	uint8_t *prot = memregion("protection")->base();
 	uint8_t *ram = memregion("maincpu")->base() + 0xf800;
@@ -152,7 +152,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
+void nbmj8891_state::init_mjfocusm()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -164,7 +164,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
+void nbmj8891_state::init_scandal()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -172,7 +172,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
+void nbmj8891_state::init_mjnanpas()
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
@@ -193,7 +193,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
+void nbmj8891_state::init_pairsnb()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -209,7 +209,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
+void nbmj8891_state::init_pairsten()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;

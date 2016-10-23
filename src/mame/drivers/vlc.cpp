@@ -199,7 +199,7 @@ public:
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
 
 	void machine_start_nevada();
-	DECLARE_DRIVER_INIT(nevada);
+	void init_nevada();
 };
 
 /*
@@ -673,7 +673,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 

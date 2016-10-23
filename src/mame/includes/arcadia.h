@@ -95,7 +95,7 @@ public:
 		} d;
 	} m_reg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
-	DECLARE_DRIVER_INIT(arcadia);
+	void init_arcadia();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(arcadia);

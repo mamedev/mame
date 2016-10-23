@@ -19,7 +19,7 @@ public:
 
 	void igs025_to_igs028_callback( void );
 
-	DECLARE_DRIVER_INIT(olds);
+	void init_olds();
 	void machine_reset_olds();
 };
 

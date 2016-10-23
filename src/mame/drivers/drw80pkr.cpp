@@ -69,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
-	DECLARE_DRIVER_INIT(drw80pkr);
+	void init_drw80pkr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -410,7 +410,7 @@ GFXDECODE_END
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
+void drw80pkr_state::init_drw80pkr()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }

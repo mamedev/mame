@@ -942,7 +942,7 @@ ROM_START( jumpingi )
 		ROM_LOAD( "JP3.IC51",            0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // PAL16L8A-2CN z80 address decoder?
 ROM_END
 
-DRIVER_INIT_MEMBER(rbisland_state,rbisland)
+void rbisland_state::init_rbisland()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -951,7 +951,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 	rbisland_cchip_init(0);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,rbislande)
+void rbisland_state::init_rbislande()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -960,7 +960,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 	rbisland_cchip_init(1);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,jumping)
+void rbisland_state::init_jumping()
 {
 	m_jumping_latch = 0;
 	save_item(NAME(m_jumping_latch));

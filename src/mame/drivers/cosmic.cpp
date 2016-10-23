@@ -1542,7 +1542,7 @@ ROM_START( nomnlndg )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::init_cosmicg()
 {
 	/* Program ROMs have data pins connected different from normal */
 	offs_t offs, len;
@@ -1567,20 +1567,20 @@ DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmica)
+void cosmic_state::init_cosmica()
 {
 	m_sound_enabled = 1;
 	m_dive_bomb_b_select = 0;
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,devzone)
+void cosmic_state::init_devzone()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
+void cosmic_state::init_nomnlnd()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
@@ -1588,7 +1588,7 @@ DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
 }
 
-DRIVER_INIT_MEMBER(cosmic_state,panic)
+void cosmic_state::init_panic()
 {
 	m_sound_enabled = 1;
 }

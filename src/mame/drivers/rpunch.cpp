@@ -811,13 +811,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rpunch_state,rabiolep)
+void rpunch_state::init_rabiolep()
 {
 	m_sprite_palette = 0x300;
 }
 
 
-DRIVER_INIT_MEMBER(rpunch_state,svolley)
+void rpunch_state::init_svolley()
 {
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */

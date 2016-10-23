@@ -580,9 +580,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
 
-	DECLARE_DRIVER_INIT(sun4);
-	DECLARE_DRIVER_INIT(sun4c);
-	DECLARE_DRIVER_INIT(ss2);
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -2317,19 +2317,19 @@ ROM_START( sun_s20 )
 	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(2))
 ROM_END
 
-DRIVER_INIT_MEMBER(sun4_state, sun4)
+void sun4_state::init_sun4()
 {
 	m_arch = ARCH_SUN4;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, sun4c)
+void sun4_state::init_sun4c()
 {
 	m_ctx_mask = 0x7;
 	m_pmeg_mask = 0x7f;
 	m_arch = ARCH_SUN4C;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, ss2)
+void sun4_state::init_ss2()
 {
 	m_ctx_mask = 0xf;
 	m_pmeg_mask = 0xff;

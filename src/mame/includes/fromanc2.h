@@ -86,8 +86,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
-	DECLARE_DRIVER_INIT(fromanc4);
-	DECLARE_DRIVER_INIT(fromanc2);
+	void init_fromanc4();
+	void init_fromanc2();
 	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l0_tile_info);
 	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l1_tile_info);
 	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l2_tile_info);

@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(ci16_r);
 	DECLARE_WRITE8_MEMBER(ci16_w);
 
-	DECLARE_DRIVER_INIT(icatel);
+	void init_icatel();
 	DECLARE_PALETTE_INIT(icatel);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START(i80c31_data, AS_DATA, 8, icatel_state)
 //  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( icatel_state, icatel )
+void icatel_state::init_icatel()
 {
 }
 

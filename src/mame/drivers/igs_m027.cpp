@@ -43,20 +43,20 @@ public:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 
-	DECLARE_DRIVER_INIT(sdwx);
-	DECLARE_DRIVER_INIT(chessc2);
-	DECLARE_DRIVER_INIT(lhzb4);
-	DECLARE_DRIVER_INIT(mgfx);
-	DECLARE_DRIVER_INIT(lhzb3);
-	DECLARE_DRIVER_INIT(gonefsh2);
-	DECLARE_DRIVER_INIT(sddz);
-	DECLARE_DRIVER_INIT(hauntedh);
-	DECLARE_DRIVER_INIT(zhongguo);
-	DECLARE_DRIVER_INIT(klxyj);
-	DECLARE_DRIVER_INIT(slqz3);
-	DECLARE_DRIVER_INIT(fruitpar);
-	DECLARE_DRIVER_INIT(amazonia);
-	DECLARE_DRIVER_INIT(amazoni2);
+	void init_sdwx();
+	void init_chessc2();
+	void init_lhzb4();
+	void init_mgfx();
+	void init_lhzb3();
+	void init_gonefsh2();
+	void init_sddz();
+	void init_hauntedh();
+	void init_zhongguo();
+	void init_klxyj();
+	void init_slqz3();
+	void init_fruitpar();
+	void init_amazonia();
+	void init_amazoni2();
 
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -999,34 +999,34 @@ void igs_m027_state::pgm_create_dummy_internal_arm_region()
 
 
 /*
-DRIVER_INIT_MEMBER(igs_m027_state,igs_m027)
+void igs_m027_state::init_igs_m027()
 {
     pgm_create_dummy_internal_arm_region(machine());
 }
 */
 
-DRIVER_INIT_MEMBER(igs_m027_state,sdwx)
+void igs_m027_state::init_sdwx()
 {
 	sdwx_decrypt(machine());
 	sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,klxyj)
+void igs_m027_state::init_klxyj()
 {
 	klxyj_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,chessc2)
+void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,hauntedh)
+void igs_m027_state::init_hauntedh()
 {
 	hauntedh_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
@@ -1035,70 +1035,70 @@ DRIVER_INIT_MEMBER(igs_m027_state,hauntedh)
 
 
 
-DRIVER_INIT_MEMBER(igs_m027_state,lhzb4)
+void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,mgfx)
+void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,lhzb3)
+void igs_m027_state::init_lhzb3()
 {
 	lhzb3_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,sddz)
+void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,gonefsh2)
+void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,zhongguo)
+void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,slqz3)
+void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,fruitpar)
+void igs_m027_state::init_fruitpar()
 {
 	fruitpar_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,amazonia)
+void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
+void igs_m027_state::init_amazoni2()
 {
 	amazoni2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());

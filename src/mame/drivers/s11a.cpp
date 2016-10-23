@@ -158,7 +158,7 @@ WRITE8_MEMBER( s11a_state::bgbank_w )
 	membank("bgbank")->set_entry(data & 0x03);
 }
 
-DRIVER_INIT_MEMBER( s11a_state, s11a )
+void s11a_state::init_s11a()
 {
 	uint8_t *BGROM = memregion("bgcpu")->base();
 	membank("bgbank")->configure_entries(0, 4, &BGROM[0x10000], 0x8000);

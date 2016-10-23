@@ -35,7 +35,7 @@ INPUT_PORTS_EXTERN( mpu4jackpot8per );
 #include "m4addr.lh"
 #include "m4tenten.lh"
 
-DRIVER_INIT_MEMBER(mpu4_state,m4debug)
+void mpu4_state::init_m4debug()
 {
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
@@ -91,20 +91,20 @@ DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 	}
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_showstring)
+void mpu4_state::init_m4_showstring()
 {
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4debug);
+	init_m4default();
+	init_m4debug();
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_big)
+void mpu4_state::init_m4_showstring_big()
 {
-	DRIVER_INIT_CALL(m4default_big);
-	DRIVER_INIT_CALL(m4debug);
+	init_m4default_big();
+	init_m4debug();
 }
 /* Explanation of automatically generated descriptions
 
-DRIVER_INIT_MEMBER(mpu4_state,PARENT NAME)
+void mpu4_state::init_PARENT NAME()
 {
     //Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam - MFME layout name used
 
@@ -142,13 +142,13 @@ DRIVER_INIT_MEMBER(mpu4_state,PARENT NAME)
 }
 */
 
-DRIVER_INIT_MEMBER(mpu4_state,m4andycp)
+void mpu4_state::init_m4andycp()
 {
 	//Derived from Andy_Capp_(Barcrest)_[C05_v1-0_1024_6jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4_small_extender);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4_small_extender();
+	init_m4default_reels();
 	//PCKEY =9
 	//STKEY =0
 	//JPKEY =0
@@ -516,14 +516,14 @@ GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0
 GAME_CUSTOM( 1995, m4rhog_roc,       m4rhog,     "roadhog5p4std.bin",        0x0000, 0x010000, BAD_DUMP CRC(0ff60341) SHA1(c12d5b160d9e47a6f1aa6f378c2a70186be6bdff), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (ROC 2.0, bad)" )
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4andyge)
+void mpu4_state::init_m4andyge()
 {
 	//Derived from Andy's_Great_Escape_(Barcrest)_[C02_1024_10jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4_small_extender);
-	DRIVER_INIT_CALL(m4_five_reel_std);
-	DRIVER_INIT_CALL(m_grtecp);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4_small_extender();
+	init_m4_five_reel_std();
+	init_m_grtecp();
 
 	//PCKEY =1
 	//STKEY =3
@@ -638,12 +638,12 @@ GAME_CUSTOM( 199?, m4andyge_h3,        m4andyge,   "age_20_.8",                0
 GAME_CUSTOM( 199?, m4andyge_h4,        m4andyge,   "age20_101",                0x0000, 0x010000, CRC(7e3674f0) SHA1(351e353da24b63d2ef7cb09690b770b26505569a), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 0.3, hack?, set 2)" )
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4addr)
+void mpu4_state::init_m4addr()
 {
 	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -3593,13 +3593,13 @@ GAME_CUSTOM( 199?, m4luckst__au,   m4luckst,   "lstrikegame10-8t.bin", 0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0x020000, CRC(20447a20) SHA1(ca2ba566317ca87afcc2501e551c1326b9712526), "hack","Lucky Strike (Barcrest) (MPU4) (LSS 0.6 C, hack, set 2)" )
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4tenten)
+void mpu4_state::init_m4tenten()
 {
-	DRIVER_INIT_CALL(m4default);
-//  DRIVER_INIT_CALL(m4_showstring);
+	init_m4default();
+//  init_m4_showstring();
 	//Derived from 10_x_10_(Barcrest)_[C01_v1-0_1024_10jp].gam
-	DRIVER_INIT_CALL(m4_hopper_duart_a);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4_hopper_duart_a();
+	init_m4default_reels();
 	//PCKEY =9
 	//STKEY =3
 	//JPKEY =7
@@ -3713,13 +3713,13 @@ GAME_CUSTOM( 199?, m4tenten__a0,   m4tenten,   "tst01r.p1",    0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000, CRC(e3ba4b94) SHA1(a7b13c172e5177711ddb81ef1ea77e27e14bf470), "Barcrest","10 X 10 (Barcrest) (MPU4) (TST 0.1 Y)" )
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4andyfh)
+void mpu4_state::init_m4andyfh()
 {
 	//Derived from Andy's_Full_House_(Barcrest)_[C01_800_10jp].gam
-	DRIVER_INIT_CALL(m4default);
-//  DRIVER_INIT_CALL(m4_showstring);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+//  init_m4_showstring();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =b
 	//STKEY =2
 	//JPKEY =7
@@ -4668,12 +4668,12 @@ GAME_CUSTOM( 199?, m4shocm__h,  m4shocm,    "scmj.p1",  0x0000, 0x020000, CRC(ed
 GAME_CUSTOM( 199?, m4shocm__i,  m4shocm,    "scmy.p1",  0x0000, 0x020000, CRC(044a0065) SHA1(e5deb75e7d05787f1e820352aec99abebd3530b6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 Y)" )
 GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83a9209b) SHA1(011ecd85c435c02b4868ed74012e16c73beb6e99), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 K)" )
 
-DRIVER_INIT_MEMBER(mpu4_state,m4actbnk)
+void mpu4_state::init_m4actbnk()
 {
 	//Derived from Action_Bank_(Barcrest)_[C04_1024_8jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =a
 	//STKEY =2
 	//JPKEY =6
@@ -5332,13 +5332,13 @@ GAME_CUSTOM( 199?, m4typcl__b,  m4typcl,    "ctp13f.p1",    0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CRC(6063e27d) SHA1(c99599fbc7146d8fcf62432994098dd51250b17b), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (NTP 0.2)" )
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4andybt)
+void mpu4_state::init_m4andybt()
 {
-	DRIVER_INIT_CALL(m4default_big);
+	init_m4default_big();
 	//Derived from Andy's_Big_Time_(Barcrest)_[C03_800_250jp]_[c].gam
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4_large_extender_b);
-	DRIVER_INIT_CALL(m4_five_reel_rev);
+	init_m4_hopper_tubes();
+	init_m4_large_extender_b();
+	init_m4_five_reel_rev();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0

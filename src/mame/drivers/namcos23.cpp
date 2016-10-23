@@ -1553,7 +1553,7 @@ public:
 	DECLARE_READ16_MEMBER(iob_analog_r);
 	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
-	DECLARE_DRIVER_INIT(s23);
+	void init_s23();
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	void video_start_s23();
 	void machine_reset_gmen();
@@ -3463,7 +3463,7 @@ void namcos23_state::machine_reset_gmen()
 
 
 
-DRIVER_INIT_MEMBER(namcos23_state,s23)
+void namcos23_state::init_s23()
 {
 	m_ptrom  = (const uint32_t *)memregion("pointrom")->base();
 	m_tmlrom = (const uint16_t *)memregion("textilemapl")->base();

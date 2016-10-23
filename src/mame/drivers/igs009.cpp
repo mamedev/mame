@@ -106,8 +106,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void decrypt_jingbell();
-	DECLARE_DRIVER_INIT(jingbell);
-	DECLARE_DRIVER_INIT(jingbelli);
+	void init_jingbell();
+	void init_jingbelli();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1079,7 +1079,7 @@ void igs009_state::decrypt_jingbell()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbelli)
+void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
@@ -1088,7 +1088,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	rom[0x01f19] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbell)
+void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 

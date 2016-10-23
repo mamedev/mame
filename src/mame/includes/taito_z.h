@@ -98,8 +98,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
-	DECLARE_DRIVER_INIT(taitoz);
-	DECLARE_DRIVER_INIT(bshark);
+	void init_taitoz();
+	void init_bshark();
 	void machine_start_taitoz();
 	void machine_reset_taitoz();
 	void video_start_taitoz();

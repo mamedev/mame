@@ -80,7 +80,7 @@ public:
 	int m_cur_screen;
 	uint8_t* m_rom;
 
-	DECLARE_DRIVER_INIT(hp48);
+	void init_hp48();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(hp48);
 	void machine_start_hp49g();

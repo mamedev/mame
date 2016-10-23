@@ -181,9 +181,9 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	DECLARE_DRIVER_INIT(multigmt);
-	DECLARE_DRIVER_INIT(multigam);
-	DECLARE_DRIVER_INIT(multigm3);
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1387,7 +1387,7 @@ ROM_START( supergm3 )
 	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
 ROM_END
 
-DRIVER_INIT_MEMBER(multigam_state,multigam)
+void multigam_state::init_multigam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
@@ -1402,7 +1402,7 @@ void multigam_state::multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* 
 	}
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigm3)
+void multigam_state::init_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1416,7 +1416,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigmt)
+void multigam_state::init_multigmt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

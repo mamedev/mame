@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp1_w) {};
 	DECLARE_WRITE8_MEMBER(lamp2_w) {};
-	DECLARE_DRIVER_INIT(jp);
+	void init_jp();
 private:
 	bool m_clock_bit;
 	uint8_t m_row;
@@ -263,7 +263,7 @@ void jp_state::machine_reset()
 	output().set_digit_value(99, 0x3f);
 }
 
-DRIVER_INIT_MEMBER( jp_state, jp )
+void jp_state::init_jp()
 {
 }
 

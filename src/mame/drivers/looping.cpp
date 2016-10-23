@@ -151,7 +151,7 @@ public:
 	DECLARE_WRITE8_MEMBER(looping_sound_sw);
 	DECLARE_WRITE8_MEMBER(ay_enable_w);
 	DECLARE_WRITE8_MEMBER(speech_enable_w);
-	DECLARE_DRIVER_INIT(looping);
+	void init_looping();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -890,7 +890,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(looping_state,looping)
+void looping_state::init_looping()
 {
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();

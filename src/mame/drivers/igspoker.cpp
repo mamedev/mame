@@ -113,16 +113,16 @@ public:
 	DECLARE_READ8_MEMBER(exp_rom_r);
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	DECLARE_DRIVER_INIT(igs_ncs);
-	DECLARE_DRIVER_INIT(number10);
-	DECLARE_DRIVER_INIT(pktet346);
-	DECLARE_DRIVER_INIT(cpokert);
-	DECLARE_DRIVER_INIT(chleague);
-	DECLARE_DRIVER_INIT(cska);
-	DECLARE_DRIVER_INIT(cpoker);
-	DECLARE_DRIVER_INIT(igs_ncs2);
-	DECLARE_DRIVER_INIT(cpokerpk);
-	DECLARE_DRIVER_INIT(kungfu);
+	void init_igs_ncs();
+	void init_number10();
+	void init_pktet346();
+	void init_cpokert();
+	void init_chleague();
+	void init_cska();
+	void init_cpoker();
+	void init_igs_ncs2();
+	void init_cpokerpk();
+	void init_kungfu();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
@@ -1932,7 +1932,7 @@ ROM_END
 /*  Decode a simple PAL encryption
  */
 
-DRIVER_INIT_MEMBER(igspoker_state,cpoker)
+void igspoker_state::init_cpoker()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1947,7 +1947,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokert)
+void igspoker_state::init_cpokert()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -1976,7 +1976,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cska)
+void igspoker_state::init_cska()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1993,7 +1993,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 }
 
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
+void igspoker_state::init_igs_ncs()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2155,7 +2155,7 @@ Clocks
 
 */
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
+void igspoker_state::init_igs_ncs2()
 {
 	uint8_t *src = (uint8_t *) (memregion("maincpu")->base());
 	int i;
@@ -2228,7 +2228,7 @@ ROM_START( igs_ncs2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,chleague)
+void igspoker_state::init_chleague()
 {
 	int A;
 	int length;
@@ -2438,7 +2438,7 @@ ROM_START( chleagxb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,number10)
+void igspoker_state::init_number10()
 {
 	int A;
 	int length;
@@ -2518,7 +2518,7 @@ ROM_START( numbr10l )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::init_cpokerpk()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2586,7 +2586,7 @@ ROM_START( pktet346 )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state,pktet346)
+void igspoker_state::init_pktet346()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2665,7 +2665,7 @@ ROM_START( kungfu )
 	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state, kungfu)
+void igspoker_state::init_kungfu()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();

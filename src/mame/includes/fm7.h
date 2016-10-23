@@ -165,7 +165,7 @@ public:
 		m_avbank16(*this, "av_bank16")
 	{
 	}
-	DECLARE_DRIVER_INIT(fm7);
+	void init_fm7();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

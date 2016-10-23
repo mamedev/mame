@@ -164,7 +164,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_DRIVER_INIT(sol20);
+	void init_sol20();
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -611,7 +611,7 @@ void sol20_state::machine_reset()
 	timer_set(attotime::from_usec(9), TIMER_SOL20_BOOT);
 }
 
-DRIVER_INIT_MEMBER(sol20_state,sol20)
+void sol20_state::init_sol20()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);

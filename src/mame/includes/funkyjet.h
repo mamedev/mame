@@ -37,7 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
-	DECLARE_DRIVER_INIT(funkyjet);
+	void init_funkyjet();
 	virtual void machine_start() override;
 	uint32_t screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

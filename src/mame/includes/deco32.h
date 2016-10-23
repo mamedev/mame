@@ -155,10 +155,10 @@ public:
 	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
-	DECLARE_DRIVER_INIT(captaven);
-	DECLARE_DRIVER_INIT(fghthist);
+	void init_tattass();
+	void init_nslasher();
+	void init_captaven();
+	void init_fghthist();
 	void machine_reset_deco32();
 	void video_start_captaven();
 	void video_start_fghthist();
@@ -220,9 +220,9 @@ public:
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
 	void video_start_dragngun();
 	void video_start_lockload();
 	void dragngun_init_common();

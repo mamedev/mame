@@ -292,23 +292,23 @@ READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 	return dc_ram[0x2302f8/8];
 }
 
-DRIVER_INIT_MEMBER(dc_cons_state,dc)
+void dc_cons_state::init_dc()
 {
 	dreamcast_atapi_init();
 }
 
-DRIVER_INIT_MEMBER(dc_cons_state,dcus)
+void dc_cons_state::init_dcus()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
 
-	DRIVER_INIT_CALL(dc);
+	init_dc();
 }
 
-DRIVER_INIT_MEMBER(dc_cons_state,dcjp)
+void dc_cons_state::init_dcjp()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
 
-	DRIVER_INIT_CALL(dc);
+	init_dc();
 }
 
 READ64_MEMBER(dc_cons_state::dc_pdtra_r )

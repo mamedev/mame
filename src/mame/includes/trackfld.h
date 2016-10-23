@@ -63,11 +63,11 @@ public:
 	DECLARE_READ8_MEMBER(trackfld_speech_r);
 	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
 
-	DECLARE_DRIVER_INIT(trackfld);
-	DECLARE_DRIVER_INIT(atlantol);
-	DECLARE_DRIVER_INIT(wizzquiz);
-	DECLARE_DRIVER_INIT(mastkin);
-	DECLARE_DRIVER_INIT(trackfldnz);
+	void init_trackfld();
+	void init_atlantol();
+	void init_wizzquiz();
+	void init_mastkin();
+	void init_trackfldnz();
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };

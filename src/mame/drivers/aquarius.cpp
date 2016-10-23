@@ -186,7 +186,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(aquarius_state,aquarius)
+void aquarius_state::init_aquarius()
 {
 	/* install expansion memory if available */
 	if (m_ram->size() > 0x1000)

@@ -3226,7 +3226,7 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dkong_state,herodk)
+void dkong_state::init_herodk()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -3245,7 +3245,7 @@ DRIVER_INIT_MEMBER(dkong_state,herodk)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,drakton)
+void dkong_state::init_drakton()
 {
 	int bs[4][8] = {
 			{7,6,1,3,0,4,2,5},
@@ -3267,7 +3267,7 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,strtheat)
+void dkong_state::init_strtheat()
 {
 	int bs[4][8] = {
 			{0,6,1,7,3,4,2,5},
@@ -3292,7 +3292,7 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,dkongx)
+void dkong_state::init_dkongx()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3314,7 +3314,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	membank("bank2")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(dkong_state,dkingjr)
+void dkong_state::init_dkingjr()
 {
 	uint8_t *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)

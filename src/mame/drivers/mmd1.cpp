@@ -171,7 +171,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
 	uint8_t m_return_code;
 	uint8_t m_digit;
-	DECLARE_DRIVER_INIT(mmd2);
+	void init_mmd2();
 	void machine_reset_mmd1();
 	void machine_reset_mmd2();
 	required_device<cpu_device> m_maincpu;
@@ -442,7 +442,7 @@ void mmd1_state::machine_reset_mmd2()
 	membank("bank8")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(mmd1_state,mmd2)
+void mmd1_state::init_mmd2()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.

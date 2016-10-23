@@ -96,7 +96,7 @@ public:
 	DECLARE_READ8_MEMBER(discoboy_port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(discoboy);
+	void init_discoboy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -584,7 +584,7 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u49",   0x190000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
-DRIVER_INIT_MEMBER(discoboy_state,discoboy)
+void discoboy_state::init_discoboy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *AUDIO = memregion("audiocpu")->base();

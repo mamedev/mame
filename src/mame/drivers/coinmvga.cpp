@@ -241,8 +241,8 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<uint16_t> m_vram;
-	DECLARE_DRIVER_INIT(colorama);
-	DECLARE_DRIVER_INIT(cmrltv75);
+	void init_colorama();
+	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -867,11 +867,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmvga_state,colorama)
+void coinmvga_state::init_colorama()
 {
 }
 
-DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
+void coinmvga_state::init_cmrltv75()
 {
 }
 

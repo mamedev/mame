@@ -80,8 +80,8 @@ public:
 	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
-	DECLARE_DRIVER_INIT(multiped);
-	DECLARE_DRIVER_INIT(bullsdrt);
+	void init_multiped();
+	void init_bullsdrt();
 	TILE_GET_INFO_MEMBER(centiped_get_tile_info);
 	TILE_GET_INFO_MEMBER(warlords_get_tile_info);
 	TILE_GET_INFO_MEMBER(milliped_get_tile_info);

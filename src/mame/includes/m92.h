@@ -86,11 +86,11 @@ public:
 	DECLARE_WRITE16_MEMBER(m92_master_control_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
-	DECLARE_DRIVER_INIT(majtitl2);
-	DECLARE_DRIVER_INIT(ppan);
-	DECLARE_DRIVER_INIT(lethalth);
-	DECLARE_DRIVER_INIT(m92);
-	DECLARE_DRIVER_INIT(m92_bank);
+	void init_majtitl2();
+	void init_ppan();
+	void init_lethalth();
+	void init_m92();
+	void init_m92_bank();
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	void machine_start_m92();
 	void machine_reset_m92();

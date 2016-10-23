@@ -771,7 +771,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 }
 
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+void swtpc09_state::init_swtpc09()
 {
 	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
@@ -793,7 +793,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
+void swtpc09_state::init_swtpc09i()
 {
 	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
@@ -815,7 +815,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
+void swtpc09_state::init_swtpc09u()
 {
 	int i;
 	m_pia_counter = 0;  //init ptm/pia counter to 0
@@ -837,7 +837,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
+void swtpc09_state::init_swtpc09d3()
 {
 	int i;
 	m_pia_counter = 0;  //init ptm/pia counter to 0

@@ -667,7 +667,7 @@ ROM_START( opwolf3u )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(slapshot_state,slapshot)
+void slapshot_state::init_slapshot()
 {
 	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx2")->base();

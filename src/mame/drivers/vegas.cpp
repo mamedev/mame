@@ -500,17 +500,17 @@ public:
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	DECLARE_DRIVER_INIT(gauntleg);
-	DECLARE_DRIVER_INIT(cartfury);
-	DECLARE_DRIVER_INIT(tenthdeg);
-	DECLARE_DRIVER_INIT(nbashowt);
-	DECLARE_DRIVER_INIT(warfa);
-	DECLARE_DRIVER_INIT(roadburn);
-	DECLARE_DRIVER_INIT(sf2049te);
-	DECLARE_DRIVER_INIT(gauntdl);
-	DECLARE_DRIVER_INIT(nbanfl);
-	DECLARE_DRIVER_INIT(sf2049);
-	DECLARE_DRIVER_INIT(sf2049se);
+	void init_gauntleg();
+	void init_cartfury();
+	void init_tenthdeg();
+	void init_nbashowt();
+	void init_warfa();
+	void init_roadburn();
+	void init_sf2049te();
+	void init_gauntdl();
+	void init_nbanfl();
+	void init_sf2049();
+	void init_sf2049se();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2757,7 +2757,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(vegas_state,gauntleg)
+void vegas_state::init_gauntleg()
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x80015430, 0x8CC38060, 250);     /* confirmed */
@@ -2767,7 +2767,7 @@ DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,gauntdl)
+void vegas_state::init_gauntdl()
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
@@ -2777,14 +2777,14 @@ DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,warfa)
+void vegas_state::init_warfa()
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x8009436C, 0x0C031663, 250);     /* confirmed */
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
+void vegas_state::init_tenthdeg()
 {
 	/* speedups */
 	m_maincpu->mips3drc_add_hotspot(0x80051CD8, 0x0C023C15, 250);     /* confirmed */
@@ -2794,37 +2794,37 @@ DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,roadburn)
+void vegas_state::init_roadburn()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,nbashowt)
+void vegas_state::init_nbashowt()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,nbanfl)
+void vegas_state::init_nbanfl()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,sf2049)
+void vegas_state::init_sf2049()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,sf2049se)
+void vegas_state::init_sf2049se()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,sf2049te)
+void vegas_state::init_sf2049te()
 {
 }
 
 
-DRIVER_INIT_MEMBER(vegas_state,cartfury)
+void vegas_state::init_cartfury()
 {
 }
 

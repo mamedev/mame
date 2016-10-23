@@ -162,7 +162,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
-	DECLARE_DRIVER_INIT(mbc55x);
+	void init_mbc55x();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

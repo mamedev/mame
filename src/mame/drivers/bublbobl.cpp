@@ -1835,7 +1835,7 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::init_bublbobl()
 {
 	configure_banks();
 
@@ -1843,7 +1843,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 	m_video_enable = 0;
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::init_tokio()
 {
 	configure_banks();
 
@@ -1852,14 +1852,14 @@ DRIVER_INIT_MEMBER(bublbobl_state,tokio)
 	m_video_enable = 1;
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,tokiob)
+void bublbobl_state::init_tokiob()
 {
-	DRIVER_INIT_CALL(tokio);
+	init_tokio();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,dland)
+void bublbobl_state::init_dland()
 {
 	// rearrange gfx to original format
 	int i;
@@ -1870,7 +1870,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 	for (i = 0x40000; i < 0x80000; i++)
 		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(bublbobl);
+	init_bublbobl();
 }
 
 

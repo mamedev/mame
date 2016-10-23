@@ -238,7 +238,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
-	DECLARE_DRIVER_INIT(vk100);
+	void init_vk100();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
@@ -977,7 +977,7 @@ WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 	m_ACTS = state;
 }
 
-DRIVER_INIT_MEMBER(vk100_state,vk100)
+void vk100_state::init_vk100()
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);

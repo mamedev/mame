@@ -450,16 +450,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(md_cons_state, mess_md_common)
+void md_cons_state::init_mess_md_common()
 {
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_cons_state::mess_md_io_read_data_port),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_cons_state::mess_md_io_write_data_port),this);
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, genesis)
+void md_cons_state::init_genesis()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -478,10 +478,10 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_eur)
+void md_cons_state::init_md_eur()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -500,10 +500,10 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 		m_version_hi_nibble |= 0x20;
 }
 
-DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
+void md_cons_state::init_md_jpn()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	if (m_32x)
 	{

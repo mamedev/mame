@@ -269,7 +269,7 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
+void smsbootleg_state::init_sms_supergame()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();

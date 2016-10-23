@@ -325,11 +325,11 @@ public:
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
 
-	DECLARE_DRIVER_INIT( hangonjr );
-	DECLARE_DRIVER_INIT( astrofl );
-	DECLARE_DRIVER_INIT( ridleofp );
-	DECLARE_DRIVER_INIT( opaopa );
-	DECLARE_DRIVER_INIT( fantzn2 );
+	void init_hangonjr();
+	void init_astrofl();
+	void init_ridleofp();
+	void init_opaopa();
+	void init_fantzn2();
 
 	// Devices
 	required_device<cpu_device>          m_maincpu;
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_DERIVED( systemeb, systeme )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(systeme_state, hangonjr)
+void systeme_state::init_hangonjr()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::hangonjr_port_f8_read), this));
 	m_maincpu->space(AS_IO).install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::hangonjr_port_fa_write), this));
@@ -1052,14 +1052,14 @@ DRIVER_INIT_MEMBER(systeme_state, hangonjr)
 
 
 
-DRIVER_INIT_MEMBER(systeme_state, ridleofp)
+void systeme_state::init_ridleofp()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::ridleofp_port_f8_read), this));
 	m_maincpu->space(AS_IO).install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::ridleofp_port_fa_write), this));
 }
 
 
-DRIVER_INIT_MEMBER(systeme_state, opaopa)
+void systeme_state::init_opaopa()
 {
 	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
@@ -1069,7 +1069,7 @@ DRIVER_INIT_MEMBER(systeme_state, opaopa)
 }
 
 
-DRIVER_INIT_MEMBER(systeme_state, fantzn2)
+void systeme_state::init_fantzn2()
 {
 	mc8123_decode(m_maincpu_region->base(), m_decrypted_opcodes, memregion("key")->base(), 0x8000);
 }

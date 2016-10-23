@@ -82,7 +82,7 @@ public:
 	virtual void machine_reset() override;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
-	DECLARE_DRIVER_INIT(hr16);
+	void init_hr16();
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( mmt8_led_w );
 	DECLARE_READ8_MEMBER( mmt8_led_r );

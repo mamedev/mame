@@ -706,12 +706,12 @@ ROM_START( djboyj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(djboy_state,djboy)
+void djboy_state::init_djboy()
 {
 	m_bankxor = 0x00;
 }
 
-DRIVER_INIT_MEMBER(djboy_state,djboyj)
+void djboy_state::init_djboyj()
 {
 	m_bankxor = 0x1f;
 }

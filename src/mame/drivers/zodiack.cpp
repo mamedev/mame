@@ -702,12 +702,12 @@ ROM_START( bounty )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::init_zodiack()
 {
 	m_percuss_hardware = false;
 }
 
-DRIVER_INIT_MEMBER(zodiack_state,percuss)
+void zodiack_state::init_percuss()
 {
 	m_percuss_hardware = true;
 }

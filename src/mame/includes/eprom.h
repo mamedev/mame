@@ -37,9 +37,9 @@ public:
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
 	DECLARE_READ16_MEMBER(sync_r);
 	DECLARE_WRITE16_MEMBER(sync_w);
-	DECLARE_DRIVER_INIT(klaxp);
-	DECLARE_DRIVER_INIT(guts);
-	DECLARE_DRIVER_INIT(eprom);
+	void init_klaxp();
+	void init_guts();
+	void init_eprom();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(guts_get_playfield_tile_info);

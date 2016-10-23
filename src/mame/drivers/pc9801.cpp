@@ -730,7 +730,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
 	inline void set_dma_channel(int channel, int state);
 	virtual void device_reset_after_children() override;
 };
@@ -3783,7 +3783,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
+void pc9801_state::init_pc9801_kanji()
 {
 	#define copy_kanji_strip(_dst,_src,_fill_type) \
 	for(i=_dst,k=_src;i<_dst+0x20;i++,k++) \

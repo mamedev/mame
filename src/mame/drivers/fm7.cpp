@@ -1887,7 +1887,7 @@ static INPUT_PORTS_START( fm8 )
 	PORT_DIPSETTING(0x02,"BASIC")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(fm7_state,fm7)
+void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = std::make_unique<uint8_t[]>(0x18000);  // 2 pages on some systems

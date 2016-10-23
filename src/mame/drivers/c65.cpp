@@ -81,8 +81,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
-	DECLARE_DRIVER_INIT(c65);
-	DECLARE_DRIVER_INIT(c65pal);
+	void init_c65();
+	void init_c65pal();
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 protected:
@@ -653,13 +653,13 @@ ROM_START( c64dx )
 	ROM_LOAD( "910429.bin", 0x0000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(c65_state,c65)
+void c65_state::init_c65()
 {
 //  m_dma.version = 2;
 //  c65_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(c65_state,c65pal)
+void c65_state::init_c65pal()
 {
 //  m_dma.version = 1;
 //  c65_common_driver_init();

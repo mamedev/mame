@@ -266,7 +266,7 @@ static const uint8_t lut_pos[0x20] = {
 };
 
 
-DRIVER_INIT_MEMBER(m79amb_state,m79amb)
+void m79amb_state::init_m79amb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i, j;

@@ -51,7 +51,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-		DECLARE_DRIVER_INIT(os214);
+		void init_os214();
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -71,7 +71,7 @@ static MACHINE_CONFIG_START( os214, os214_state )
 	MCFG_CPU_IO_MAP(os214_io_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( os214_state, os214 )
+void os214_state::init_os214()
 {
 }
 

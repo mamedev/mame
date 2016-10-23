@@ -330,21 +330,21 @@ public:
 	int recdata(int changed, int data);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
-	DECLARE_DRIVER_INIT(sltsbelg);
-	DECLARE_DRIVER_INIT(pyramid);
-	DECLARE_DRIVER_INIT(gldncrwn);
-	DECLARE_DRIVER_INIT(bbrkfst);
-	DECLARE_DRIVER_INIT(ofah);
-	DECLARE_DRIVER_INIT(quintoon);
-	DECLARE_DRIVER_INIT(drwhon);
-	DECLARE_DRIVER_INIT(adder_dutch);
-	DECLARE_DRIVER_INIT(bfmcgslm);
-	DECLARE_DRIVER_INIT(luvjub);
-	DECLARE_DRIVER_INIT(prom);
-	DECLARE_DRIVER_INIT(cpeno1);
-	DECLARE_DRIVER_INIT(focus);
-	DECLARE_DRIVER_INIT(drwho);
-	DECLARE_DRIVER_INIT(drwho_common);
+	void init_sltsbelg();
+	void init_pyramid();
+	void init_gldncrwn();
+	void init_bbrkfst();
+	void init_ofah();
+	void init_quintoon();
+	void init_drwhon();
+	void init_adder_dutch();
+	void init_bfmcgslm();
+	void init_luvjub();
+	void init_prom();
+	void init_cpeno1();
+	void init_focus();
+	void init_drwho();
+	void init_drwho_common();
 	void machine_start_bfm_sc2();
 	void machine_reset_init();
 	void machine_reset_awp_init();
@@ -2343,7 +2343,7 @@ void bfm_sc2_state::adder2_common_init()
 
 // UK quintoon initialisation ////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,quintoon)
+void bfm_sc2_state::init_quintoon()
 {
 	sc2_common_init( 1);
 
@@ -2362,7 +2362,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,quintoon)
 
 // dutch pyramid intialisation //////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,pyramid)
+void bfm_sc2_state::init_pyramid()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2378,7 +2378,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,pyramid)
 }
 // belgian slots initialisation /////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,sltsbelg)
+void bfm_sc2_state::init_sltsbelg()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2391,7 +2391,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,sltsbelg)
 
 // other dutch adder games ////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,adder_dutch)
+void bfm_sc2_state::init_adder_dutch()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2408,7 +2408,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,adder_dutch)
 
 // golden crown //////////////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,gldncrwn)
+void bfm_sc2_state::init_gldncrwn()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -3799,7 +3799,7 @@ void bfm_sc2_state::sc2awpdmd_common_init(int reels, int decrypt)
 
 
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,bbrkfst)
+void bfm_sc2_state::init_bbrkfst()
 {
 	sc2awp_common_init(5, 1);
 
@@ -3818,7 +3818,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,bbrkfst)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,drwho_common)
+void bfm_sc2_state::init_drwho_common()
 {
 	m_has_hopper = 0;
 
@@ -3834,26 +3834,26 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,drwho_common)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,drwho)
+void bfm_sc2_state::init_drwho()
 {
 	sc2awp_common_init(6, 1);
-	DRIVER_INIT_CALL(drwho_common);
+	init_drwho_common();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,drwhon)
+void bfm_sc2_state::init_drwhon()
 {
 	sc2awp_common_init(4, 0);
-	DRIVER_INIT_CALL(drwho_common);
+	init_drwho_common();
 }
 
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,focus)
+void bfm_sc2_state::init_focus()
 {
 	sc2awp_common_init(6, 1);
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,cpeno1)
+void bfm_sc2_state::init_cpeno1()
 {
 	sc2awpdmd_common_init(6, 1);
 
@@ -3896,7 +3896,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,cpeno1)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,ofah)
+void bfm_sc2_state::init_ofah()
 {
 	sc2awpdmd_common_init(4, 1);
 
@@ -3913,7 +3913,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,ofah)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,prom)
+void bfm_sc2_state::init_prom()
 {
 	sc2awpdmd_common_init(6, 1);
 
@@ -3930,14 +3930,14 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,prom)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,bfmcgslm)
+void bfm_sc2_state::init_bfmcgslm()
 {
 	sc2awp_common_init(6, 1);
 	m_has_hopper = 0;
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
+void bfm_sc2_state::init_luvjub()
 {
 	sc2awpdmd_common_init(6, 1);
 

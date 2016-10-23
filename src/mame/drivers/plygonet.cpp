@@ -714,7 +714,7 @@ INPUT_PORTS_END
 
 
 /**********************************************************************************/
-DRIVER_INIT_MEMBER(polygonet_state,polygonet)
+void polygonet_state::init_polygonet()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 

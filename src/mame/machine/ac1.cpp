@@ -99,7 +99,7 @@ WRITE8_MEMBER(ac1_state::ac1_port_b_w)
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(ac1_state,ac1)
+void ac1_state::init_ac1()
 {
 }
 

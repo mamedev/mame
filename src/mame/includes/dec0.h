@@ -81,14 +81,14 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_priority_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
 
-	DECLARE_DRIVER_INIT(robocop);
-	DECLARE_DRIVER_INIT(hippodrm);
-	DECLARE_DRIVER_INIT(hbarrel);
-	DECLARE_DRIVER_INIT(slyspy);
-	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(baddudes);
-	DECLARE_DRIVER_INIT(midresb);
-	DECLARE_DRIVER_INIT(ffantasybl);
+	void init_robocop();
+	void init_hippodrm();
+	void init_hbarrel();
+	void init_slyspy();
+	void init_birdtry();
+	void init_baddudes();
+	void init_midresb();
+	void init_ffantasybl();
 
 	virtual void machine_start() override;
 	void machine_reset_slyspy();

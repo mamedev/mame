@@ -15,7 +15,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(special_state,special)
+void special_state::init_special()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -342,7 +342,7 @@ void special_state::erik_set_bank()
 	}
 }
 
-DRIVER_INIT_MEMBER(special_state,erik)
+void special_state::init_erik()
 {
 	m_erik_color_1 = 0;
 	m_erik_color_2 = 0;

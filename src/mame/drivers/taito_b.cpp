@@ -3678,7 +3678,7 @@ ROM_START( realpunc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitob_state,taito_b)
+void taitob_state::init_taito_b()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }

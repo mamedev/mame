@@ -483,7 +483,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
+void pbaction_state::init_pbactio3()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();

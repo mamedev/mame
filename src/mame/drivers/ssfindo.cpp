@@ -271,10 +271,10 @@ public:
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(ssfindo);
-	DECLARE_DRIVER_INIT(ppcar);
-	DECLARE_DRIVER_INIT(tetfight);
+	void init_common();
+	void init_ssfindo();
+	void init_ppcar();
+	void init_tetfight();
 	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -885,7 +885,7 @@ ROM_START( tetfight )
 	ROM_LOAD( "u15",        0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ssfindo_state,common)
+void ssfindo_state::init_common()
 {
 	m_speedup = nullptr;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
@@ -895,9 +895,9 @@ DRIVER_INIT_MEMBER(ssfindo_state,common)
 	save_item(NAME(m_PS7500_FIFO));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
+void ssfindo_state::init_ssfindo()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_flashType=0;
 	m_speedup = &ssfindo_state::ssfindo_speedups;
 	m_iocr_hack=0;
@@ -908,16 +908,16 @@ DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
 	save_item(NAME(m_flashN));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ppcar)
+void ssfindo_state::init_ppcar()
 {
-	DRIVER_INIT_CALL(ssfindo);
+	init_ssfindo();
 	m_flashType=1;
 	m_speedup = &ssfindo_state::ppcar_speedups;
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
+void ssfindo_state::init_tetfight()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_flashType=0;
 	m_iocr_hack=1;
 }

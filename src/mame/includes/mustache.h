@@ -33,7 +33,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(mustache);
+	void init_mustache();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mustache);
 

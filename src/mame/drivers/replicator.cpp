@@ -181,7 +181,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(replicator);
+	void init_replicator();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
 };
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::init_replicator()
 {
 }
 

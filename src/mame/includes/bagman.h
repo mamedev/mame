@@ -68,7 +68,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(bagman);
-	DECLARE_DRIVER_INIT(bagman);
+	void init_bagman();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 

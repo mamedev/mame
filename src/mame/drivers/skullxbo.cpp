@@ -594,7 +594,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::init_skullxbo()
 {
 	memset(memregion("gfx1")->base() + 0x170000, 0, 0x20000);
 }

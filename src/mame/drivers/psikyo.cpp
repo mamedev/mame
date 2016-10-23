@@ -1805,7 +1805,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(psikyo_state,sngkace)
+void psikyo_state::init_sngkace()
 {
 	{
 		uint8_t *RAM = memregion("ymsnd")->base();
@@ -1868,7 +1868,7 @@ void psikyo_state::s1945_mcu_init(  )
 	save_item(NAME(m_s1945_mcu_bctrl));
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,tengai)
+void psikyo_state::init_tengai()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
@@ -1889,7 +1889,7 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,gunbird)
+void psikyo_state::init_gunbird()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
@@ -1905,7 +1905,7 @@ DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 }
 
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945)
+void psikyo_state::init_s1945()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
@@ -1926,7 +1926,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945a)
+void psikyo_state::init_s1945a()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
@@ -1947,7 +1947,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945j)
+void psikyo_state::init_s1945j()
 {
 	/* input ports*/
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
@@ -1968,7 +1968,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
+void psikyo_state::init_s1945jn()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
@@ -1983,7 +1983,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
+void psikyo_state::init_s1945bl()
 {
 	/* input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));

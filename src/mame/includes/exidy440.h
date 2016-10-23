@@ -70,11 +70,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(showdown);
-	DECLARE_DRIVER_INIT(topsecex);
-	DECLARE_DRIVER_INIT(yukon);
-	DECLARE_DRIVER_INIT(exidy440);
-	DECLARE_DRIVER_INIT(claypign);
+	void init_showdown();
+	void init_topsecex();
+	void init_yukon();
+	void init_exidy440();
+	void init_claypign();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_exidy440();

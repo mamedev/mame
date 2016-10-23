@@ -335,12 +335,12 @@ void spectrum_state::machine_reset_spectrum_plus3()
 	spectrum_plus3_update_memory();
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus3)
+void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus2)
+void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
 }

@@ -127,9 +127,9 @@ public:
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram0_w);
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram1_w);
 	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
-	DECLARE_DRIVER_INIT(roundup5);
-	DECLARE_DRIVER_INIT(apache3);
-	DECLARE_DRIVER_INIT(cyclwarr);
+	void init_roundup5();
+	void init_apache3();
+	void init_cyclwarr();
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);

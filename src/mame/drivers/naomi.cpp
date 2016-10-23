@@ -9001,7 +9001,7 @@ ROM_END
 // EN cartridges have this area empty (FF-filled), i.e. AW-NET features not used.
 // JP cartridges have it filled with unique ID, which also means dumps of several JP cartridges will differ by this few bytes.
 
-DRIVER_INIT_MEMBER(naomi_state,atomiswave)
+void naomi_state::init_atomiswave()
 {
 	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
 
@@ -9026,9 +9026,9 @@ READ64_MEMBER(naomi_state::xtrmhnt2_hack_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(naomi_state,xtrmhnt2)
+void naomi_state::init_xtrmhnt2()
 {
-	DRIVER_INIT_CALL(atomiswave);
+	init_atomiswave();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(FUNC(naomi_state::xtrmhnt2_hack_r), this));
 }
 

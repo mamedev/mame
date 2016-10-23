@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(taitowlf);
+	void init_taitowlf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	#if !ENABLE_VGA
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	#endif
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
+void taitowlf_state::init_taitowlf()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 

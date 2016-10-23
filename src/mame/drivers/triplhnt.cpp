@@ -15,7 +15,7 @@ Atari Triple Hunt Driver
 
 
 
-DRIVER_INIT_MEMBER(triplhnt_state,triplhnt)
+void triplhnt_state::init_triplhnt()
 {
 	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }

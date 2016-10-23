@@ -45,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(gamate_video_r);
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
 	DECLARE_WRITE8_MEMBER(gamate_video_w);
-	DECLARE_DRIVER_INIT(gamate);
+	void init_gamate();
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);
 	TIMER_CALLBACK_MEMBER(gamate_timer);
@@ -315,7 +315,7 @@ uint32_t gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(gamate_state,gamate)
+void gamate_state::init_gamate()
 {
 	memset(&video, 0, sizeof(video));/* memset(m_ram, 0, sizeof(m_ram));*/
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));

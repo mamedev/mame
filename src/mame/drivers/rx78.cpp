@@ -81,7 +81,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(rx78);
+	void init_rx78();
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -498,7 +498,7 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(rx78_state,rx78)
+void rx78_state::init_rx78()
 {
 	uint32_t ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);

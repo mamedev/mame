@@ -73,7 +73,7 @@ public:
 	DECLARE_READ8_MEMBER( mc10_port2_r );
 	DECLARE_WRITE8_MEMBER( mc10_port2_w );
 	DECLARE_READ8_MEMBER( mc6847_videoram_r );
-	DECLARE_DRIVER_INIT(mc10);
+	void init_mc10();
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 };
 
@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mc10_state,mc10)
+void mc10_state::init_mc10()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 

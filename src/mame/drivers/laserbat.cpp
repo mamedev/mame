@@ -415,7 +415,7 @@ INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }
 
-DRIVER_INIT_MEMBER(laserbat_state_base, laserbat)
+void laserbat_state_base::init_laserbat()
 {
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 

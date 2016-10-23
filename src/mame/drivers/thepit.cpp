@@ -1254,7 +1254,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 	return 0; // the value read from the configuration reads is discarded
 }
 
-DRIVER_INIT_MEMBER(thepit_state,rtriv)
+void thepit_state::init_rtriv()
 {
 	// Set-up the weirdest questions read ever done
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));

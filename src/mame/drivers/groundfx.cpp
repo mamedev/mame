@@ -411,7 +411,7 @@ READ32_MEMBER(groundfx_state::irq_speedup_r_groundfx)
 }
 
 
-DRIVER_INIT_MEMBER(groundfx_state,groundfx)
+void groundfx_state::init_groundfx()
 {
 	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx3")->base();

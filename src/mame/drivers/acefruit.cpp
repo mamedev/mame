@@ -47,7 +47,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
-	DECLARE_DRIVER_INIT(sidewndr);
+	void init_sidewndr();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(acefruit);
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
+void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */

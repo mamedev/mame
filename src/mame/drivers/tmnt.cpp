@@ -4162,7 +4162,7 @@ static void chunky_to_planar(memory_region *rgn)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, mia)
+void tmnt_state::init_mia()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4187,7 +4187,7 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 }
 
 
-DRIVER_INIT_MEMBER(tmnt_state, tmnt)
+void tmnt_state::init_tmnt()
 {
 	chunky_to_planar(memregion("k052109"));
 	chunky_to_planar(memregion("k051960"));
@@ -4249,7 +4249,7 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::init_cuebrick()
 {
 	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
 

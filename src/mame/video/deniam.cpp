@@ -25,7 +25,7 @@ void deniam_state::deniam_common_init(  )
 	}
 }
 
-DRIVER_INIT_MEMBER(deniam_state,logicpro)
+void deniam_state::init_logicpro()
 {
 	deniam_common_init();
 
@@ -35,7 +35,7 @@ DRIVER_INIT_MEMBER(deniam_state,logicpro)
 	m_fg_scrolly_offs = 0x000;
 }
 
-DRIVER_INIT_MEMBER(deniam_state,karianx)
+void deniam_state::init_karianx()
 {
 	deniam_common_init();
 

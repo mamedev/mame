@@ -54,7 +54,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
+	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
@@ -425,7 +425,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();

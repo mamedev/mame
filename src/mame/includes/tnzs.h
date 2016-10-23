@@ -116,16 +116,16 @@ public:
 
 	SAMPLES_START_CB_MEMBER(kageki_init_samples);
 
-	DECLARE_DRIVER_INIT(arknoid2);
-	DECLARE_DRIVER_INIT(extrmatn);
-	DECLARE_DRIVER_INIT(drtoppel);
-	DECLARE_DRIVER_INIT(kabukiz);
-	DECLARE_DRIVER_INIT(plumpop);
-	DECLARE_DRIVER_INIT(insectx);
-	DECLARE_DRIVER_INIT(tnzs);
-	DECLARE_DRIVER_INIT(kageki);
-	DECLARE_DRIVER_INIT(chukatai);
-	DECLARE_DRIVER_INIT(tnzsb);
+	void init_arknoid2();
+	void init_extrmatn();
+	void init_drtoppel();
+	void init_kabukiz();
+	void init_plumpop();
+	void init_insectx();
+	void init_tnzs();
+	void init_kageki();
+	void init_chukatai();
+	void init_tnzsb();
 	void machine_start_tnzs();
 	void machine_reset_tnzs();
 	DECLARE_PALETTE_INIT(arknoid2);

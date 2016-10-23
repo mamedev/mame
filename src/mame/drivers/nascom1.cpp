@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	DECLARE_DRIVER_INIT(nascom);
+	void init_nascom();
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
@@ -112,8 +112,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
-	DECLARE_DRIVER_INIT(nascom2);
-	DECLARE_DRIVER_INIT(nascom2c);
+	void init_nascom2();
+	void init_nascom2c();
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
@@ -332,7 +332,7 @@ void nascom_state::machine_reset()
 	m_hd6402->set_input_pin(AY31015_CS, 1);
 }
 
-DRIVER_INIT_MEMBER( nascom_state, nascom )
+void nascom_state::init_nascom()
 {
 	// install extra memory
 	if (m_ram->size() > 0)
@@ -350,9 +350,9 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2 )
+void nascom2_state::init_nascom2()
 {
-	DRIVER_INIT_CALL(nascom);
+	init_nascom();
 
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom2c )
+void nascom2_state::init_nascom2c()
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());

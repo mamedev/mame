@@ -140,12 +140,12 @@ public:
 	DECLARE_READ32_MEMBER(generic_speedup_r);
 	DECLARE_READ32_MEMBER(midvunit_output_r);
 	DECLARE_WRITE32_MEMBER(midvunit_output_w);
-	DECLARE_DRIVER_INIT(crusnu40);
-	DECLARE_DRIVER_INIT(crusnu21);
-	DECLARE_DRIVER_INIT(crusnwld);
-	DECLARE_DRIVER_INIT(wargods);
-	DECLARE_DRIVER_INIT(offroadc);
-	DECLARE_DRIVER_INIT(crusnusa);
+	void init_crusnu40();
+	void init_crusnu21();
+	void init_crusnwld();
+	void init_wargods();
+	void init_offroadc();
+	void init_crusnusa();
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);

@@ -1017,19 +1017,19 @@ void gstriker_state::mcu_init()
 	save_item(NAME(m_prot_reg));
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
+void gstriker_state::init_twrldc94()
 {
 	m_gametype = 1;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twrldc94a)
+void gstriker_state::init_twrldc94a()
 {
 	m_gametype = 2;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
+void gstriker_state::init_vgoalsoc()
 {
 	m_gametype = 3;
 	mcu_init();

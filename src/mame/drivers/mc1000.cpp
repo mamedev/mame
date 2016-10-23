@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
 
-	DECLARE_DRIVER_INIT(mc1000);
+	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 };
 
@@ -584,7 +584,7 @@ DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(mc1000_state,mc1000)
+void mc1000_state::init_mc1000()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
 }

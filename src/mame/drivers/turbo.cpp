@@ -1768,13 +1768,13 @@ void turbo_state::turbo_rom_decode()
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
+void turbo_state::init_turbo_enc()
 {
 	save_item(NAME(m_alt_spriteram));
 	turbo_rom_decode();
 }
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
+void turbo_state::init_turbo_noenc()
 {
 	save_item(NAME(m_alt_spriteram));
 }

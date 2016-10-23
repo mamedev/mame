@@ -42,7 +42,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
-	DECLARE_DRIVER_INIT(ampro);
+	void init_ampro();
 	void machine_reset_ampro();
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
@@ -147,7 +147,7 @@ void ampro_state::machine_reset_ampro()
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ampro_state, ampro )
+void ampro_state::init_ampro()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

@@ -45,9 +45,9 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(st_mp200);
-	DECLARE_DRIVER_INIT(st_mp201);
-	DECLARE_DRIVER_INIT(st_mp202);
+	void init_st_mp200();
+	void init_st_mp201();
+	void init_st_mp202();
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -533,17 +533,17 @@ void st_mp200_state::machine_reset()
 	m_u11b = 0;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
+void st_mp200_state::init_st_mp200()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
+void st_mp200_state::init_st_mp201()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
+void st_mp200_state::init_st_mp202()
 {
 	m_7d = 0;
 }

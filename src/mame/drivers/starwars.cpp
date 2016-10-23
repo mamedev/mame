@@ -515,7 +515,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(starwars_state,starwars)
+void starwars_state::init_starwars()
 {
 	/* prepare the mathbox */
 	m_is_esb = 0;
@@ -527,7 +527,7 @@ DRIVER_INIT_MEMBER(starwars_state,starwars)
 }
 
 
-DRIVER_INIT_MEMBER(starwars_state,esb)
+void starwars_state::init_esb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

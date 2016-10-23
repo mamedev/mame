@@ -717,14 +717,14 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(shangha3_state,shangha3)
+void shangha3_state::init_shangha3()
 {
 	m_do_shadows = 1;
 
 	save_item(NAME(m_prot_count));
 }
 
-DRIVER_INIT_MEMBER(shangha3_state,heberpop)
+void shangha3_state::init_heberpop()
 {
 	m_do_shadows = 0;
 }

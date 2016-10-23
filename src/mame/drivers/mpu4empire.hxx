@@ -7,13 +7,13 @@ INPUT_PORTS_EXTERN( mpu4 );
 
 #include "m4apachg.lh"
 
-DRIVER_INIT_MEMBER(mpu4_state,m4apachg)
+void mpu4_state::init_m4apachg()
 {
-	DRIVER_INIT_CALL(m4default);
+	init_m4default();
 	//Derived from Apache_Gold_(Empire)_[C02_800_25jp].gam
-	DRIVER_INIT_CALL(m4_hopper_duart_a);
-	DRIVER_INIT_CALL(m4_large_extender_b);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4_hopper_duart_a();
+	init_m4_large_extender_b();
+	init_m4default_reels();
 	//PCKEY =b
 	//STKEY =4
 	//JPKEY =a

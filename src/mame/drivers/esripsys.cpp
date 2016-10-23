@@ -614,7 +614,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(esripsys_state,esripsys)
+void esripsys_state::init_esripsys()
 {
 	uint8_t *rom = memregion("sound_data")->base();
 

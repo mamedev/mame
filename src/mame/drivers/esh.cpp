@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	DECLARE_DRIVER_INIT(esh);
+	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -460,7 +460,7 @@ ROM_START( eshb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(esh_state,esh)
+void esh_state::init_esh()
 {
 }
 

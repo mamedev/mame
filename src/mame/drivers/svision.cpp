@@ -437,14 +437,14 @@ INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 	m_sound->sound_decrement();
 }
 
-DRIVER_INIT_MEMBER(svision_state, svision)
+void svision_state::init_svision()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = false;
 }
 
-DRIVER_INIT_MEMBER(svision_state, svisions)
+void svision_state::init_svisions()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();

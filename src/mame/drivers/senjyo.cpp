@@ -912,24 +912,24 @@ ROM_START( baluba )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(senjyo_state,starforc)
+void senjyo_state::init_starforc()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
-DRIVER_INIT_MEMBER(senjyo_state,starfore)
+void senjyo_state::init_starfore()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 0;
 }
 
-DRIVER_INIT_MEMBER(senjyo_state,starfora)
+void senjyo_state::init_starfora()
 {
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
 
-DRIVER_INIT_MEMBER(senjyo_state,senjyo)
+void senjyo_state::init_senjyo()
 {
 	m_is_senjyo = 1;
 	m_scrollhack = 0;

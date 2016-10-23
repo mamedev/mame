@@ -4508,7 +4508,7 @@ void pgm_state::pgm_basic_init( bool set_bank)
 	m_rowscrollram = &m_videoram[0x7000/2];
 }
 
-DRIVER_INIT_MEMBER(pgm_state,pgm)
+void pgm_state::init_pgm()
 {
 	pgm_basic_init();
 }

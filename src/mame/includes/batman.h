@@ -26,7 +26,7 @@ public:
 
 	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(batman);
+	void init_batman();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);

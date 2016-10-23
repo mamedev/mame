@@ -50,7 +50,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ti630_io_w);
 	DECLARE_READ8_MEMBER(ti630_io_r);
-	DECLARE_DRIVER_INIT(ti630);
+	void init_ti630();
 	DECLARE_PALETTE_INIT(ti630);
 private:
 	virtual void machine_start() override;
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, ti630_state)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( ti630_state, ti630 )
+void ti630_state::init_ti630()
 {
 }
 

@@ -12,13 +12,13 @@ public:
 
 	int m_protcount;
 
-	DECLARE_DRIVER_INIT(aladmdb);
-	DECLARE_DRIVER_INIT(mk3mdb);
-	DECLARE_DRIVER_INIT(ssf2mdb);
-	DECLARE_DRIVER_INIT(srmdb);
-	DECLARE_DRIVER_INIT(topshoot);
-	DECLARE_DRIVER_INIT(puckpkmn);
-	DECLARE_DRIVER_INIT(hshavoc);
+	void init_aladmdb();
+	void init_mk3mdb();
+	void init_ssf2mdb();
+	void init_srmdb();
+	void init_topshoot();
+	void init_puckpkmn();
+	void init_hshavoc();
 	DECLARE_WRITE16_MEMBER(bl_710000_w);
 	DECLARE_READ16_MEMBER(bl_710000_r);
 	DECLARE_WRITE16_MEMBER(aladmdb_w);

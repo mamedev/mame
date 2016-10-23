@@ -1046,7 +1046,7 @@ ROM_END
 /**********************************************************************************/
 
 
-DRIVER_INIT_MEMBER(dassault_state,dassault)
+void dassault_state::init_dassault()
 {
 	const uint8_t *src = memregion("gfx1")->base();
 	uint8_t *dst = memregion("gfx2")->base();
@@ -1061,7 +1061,7 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 }
 
-DRIVER_INIT_MEMBER(dassault_state,thndzone)
+void dassault_state::init_thndzone()
 {
 	const uint8_t *src = memregion("gfx1")->base();
 	uint8_t *dst = memregion("gfx2")->base();

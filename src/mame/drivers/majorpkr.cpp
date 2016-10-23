@@ -500,7 +500,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(pulses_w);
-	DECLARE_DRIVER_INIT(majorpkr);
+	void init_majorpkr();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
@@ -1166,7 +1166,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
+void majorpkr_state::init_majorpkr()
 {
 	uint8_t * ROM = (uint8_t *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);

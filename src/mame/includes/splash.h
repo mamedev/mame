@@ -104,11 +104,11 @@ public:
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
-	DECLARE_DRIVER_INIT(splash10);
-	DECLARE_DRIVER_INIT(roldfrog);
-	DECLARE_DRIVER_INIT(splash);
-	DECLARE_DRIVER_INIT(rebus);
-	DECLARE_DRIVER_INIT(funystrp);
+	void init_splash10();
+	void init_roldfrog();
+	void init_splash();
+	void init_rebus();
+	void init_funystrp();
 	virtual void video_start() override;
 	void machine_start_splash();
 	void machine_start_roldfrog();

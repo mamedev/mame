@@ -984,7 +984,7 @@ ROM_START( squaitsa )
 	ROM_LOAD( "mmi6331.3r",    0x0020, 0x0020,CRC(86c1e7db) SHA1(5c974b51d770a555ddab5c23f03a666c6f286cbf) )
 ROM_END
 
-DRIVER_INIT_MEMBER(bagman_state,bagman)
+void bagman_state::init_bagman()
 {
 	/* Unmap video enable register, not available on earlier hardware revision(s)
 	   Bagman is supposed to have glitches during screen transitions */

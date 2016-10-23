@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(bigbord2);
+	void init_bigbord2();
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -471,7 +471,7 @@ void bigbord2_state::machine_reset()
 	m_banka->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
+void bigbord2_state::init_bigbord2()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);

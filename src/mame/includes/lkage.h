@@ -86,9 +86,9 @@ public:
 	DECLARE_READ8_MEMBER(lkage_mcu_r);
 	DECLARE_READ8_MEMBER(lkage_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
-	DECLARE_DRIVER_INIT(bygone);
-	DECLARE_DRIVER_INIT(lkage);
-	DECLARE_DRIVER_INIT(lkageb);
+	void init_bygone();
+	void init_lkage();
+	void init_lkageb();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

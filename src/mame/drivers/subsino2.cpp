@@ -160,16 +160,16 @@ public:
 	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
-	DECLARE_DRIVER_INIT(bishjan);
-	DECLARE_DRIVER_INIT(new2001);
-	DECLARE_DRIVER_INIT(humlan);
-	DECLARE_DRIVER_INIT(xtrain);
-	DECLARE_DRIVER_INIT(expcard);
-	DECLARE_DRIVER_INIT(wtrnymph);
-	DECLARE_DRIVER_INIT(mtrain);
-	DECLARE_DRIVER_INIT(saklove);
-	DECLARE_DRIVER_INIT(xplan);
-	DECLARE_DRIVER_INIT(ptrain);
+	void init_bishjan();
+	void init_new2001();
+	void init_humlan();
+	void init_xtrain();
+	void init_expcard();
+	void init_wtrnymph();
+	void init_mtrain();
+	void init_saklove();
+	void init_xplan();
+	void init_ptrain();
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	void video_start_subsino2();
@@ -2568,7 +2568,7 @@ ROM_START( bishjan )
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,bishjan)
+void subsino2_state::init_bishjan()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -2638,7 +2638,7 @@ ROM_START( new2001 )
 	ROM_LOAD( "new_2001_italy_2_v200.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,new2001)
+void subsino2_state::init_new2001()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -2678,7 +2678,7 @@ ROM_START( humlan )
 	ROM_LOAD( "subsino__qb-v1.u9", 0x000000, 0x40000, CRC(c5dfed44) SHA1(3f5effb85de10c0804efee9bce769d916268bfc9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,humlan)
+void subsino2_state::init_humlan()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -2742,7 +2742,7 @@ ROM_START( expcard )
 	ROM_LOAD( "top_card-ve1.u7", 0x00000, 0x80000, CRC(0ca9bd18) SHA1(af791c78ae321104afa738564bc23f520f37e7d5) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,expcard)
+void subsino2_state::init_expcard()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2837,7 +2837,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(subsino2_state,mtrain)
+void subsino2_state::init_mtrain()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
@@ -2894,7 +2894,7 @@ ROM_START( saklove )
 	ROM_LOAD( "2.u10", 0x00000, 0x80000, CRC(4f70125c) SHA1(edd5e6bd47b9a4fa3c4057cb4a85544241fe483d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,saklove)
+void subsino2_state::init_saklove()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2954,7 +2954,7 @@ ROM_START( xplan )
 	ROM_LOAD( "x-plan_rom_2_v100.u7", 0x00000, 0x80000, CRC(c742b5c8) SHA1(646960508be738824bfc578c1b21355c17e05010) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,xplan)
+void subsino2_state::init_xplan()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3014,7 +3014,7 @@ ROM_START( xtrain )
 	ROM_LOAD( "x-train_rom_2_v1.2.u7", 0x00000, 0x80000, CRC(aae563ff) SHA1(97db845d7e3d343bd70352371cb27b16faacca7f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,xtrain)
+void subsino2_state::init_xtrain()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3077,7 +3077,7 @@ ROM_START( ptrain )
 	ROM_LOAD( "panda-novam_2-v1.4.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,ptrain)
+void subsino2_state::init_ptrain()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3119,7 +3119,7 @@ ROM_START( wtrnymph )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino2_state,wtrnymph)
+void subsino2_state::init_wtrnymph()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
 

@@ -3258,7 +3258,7 @@ ROM_START( bouldashj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(dec0_state,midresb)
+void dec0_state::init_midresb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
@@ -3279,7 +3279,7 @@ READ16_MEMBER(dec0_state::ffantasybl_242024_r)
 	return 0xffff;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
+void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 

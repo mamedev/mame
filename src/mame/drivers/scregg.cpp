@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	DECLARE_DRIVER_INIT(rockduck);
+	void init_rockduck();
 	void machine_start_scregg();
 	void machine_reset_scregg();
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
@@ -407,7 +407,7 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;

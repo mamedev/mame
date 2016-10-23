@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(dmax8000);
+	void init_dmax8000();
 	void machine_reset_dmax8000();
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
@@ -138,7 +138,7 @@ void dmax8000_state::machine_reset_dmax8000()
 	m_maincpu->set_input_line_vector(0, 0xee); // fdc vector
 }
 
-DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::init_dmax8000()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

@@ -44,7 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	void machine_reset_ec1841();
-	DECLARE_DRIVER_INIT(ec1841);
+	void init_ec1841();
 
 	struct {
 		uint8_t enable[4];
@@ -135,7 +135,7 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
+void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);

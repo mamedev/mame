@@ -21,7 +21,7 @@ public:
 		m_palette(*this, "palette")  { }
 
 	uint8_t m_key_row;
-	DECLARE_DRIVER_INIT(kramermc);
+	void init_kramermc();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -995,18 +995,18 @@ static MACHINE_CONFIG_DERIVED( namcona2w, namcona2 )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { m_gametype = NAMCO_BKRTMAQ; }
-DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { m_gametype = NAMCO_CGANGPZL; }
-DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { m_gametype = NAMCO_EMERALDA; } /* NA-2 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { m_gametype = NAMCO_EMERALDA; } /* NA-1 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,exbania)   { m_gametype = NAMCO_EXBANIA; }
-DRIVER_INIT_MEMBER(namcona1_state,fa)        { m_gametype = NAMCO_FA; }
-DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { m_gametype = NAMCO_KNCKHEAD; }
-DRIVER_INIT_MEMBER(namcona1_state,numanath)  { m_gametype = NAMCO_NUMANATH; }
-DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { m_gametype = NAMCO_QUIZTOU; }
-DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { m_gametype = NAMCO_SWCOURT; }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
-DRIVER_INIT_MEMBER(namcona1_state,xday2)     { m_gametype = NAMCO_XDAY2; }
+void namcona1_state::init_bkrtmaq()   { m_gametype = NAMCO_BKRTMAQ; }
+void namcona1_state::init_cgangpzl()  { m_gametype = NAMCO_CGANGPZL; }
+void namcona1_state::init_emeralda()  { m_gametype = NAMCO_EMERALDA; } /* NA-2 Hardware */
+void namcona1_state::init_emeraldj()  { m_gametype = NAMCO_EMERALDA; } /* NA-1 Hardware */
+void namcona1_state::init_exbania()   { m_gametype = NAMCO_EXBANIA; }
+void namcona1_state::init_fa()        { m_gametype = NAMCO_FA; }
+void namcona1_state::init_knckhead()  { m_gametype = NAMCO_KNCKHEAD; }
+void namcona1_state::init_numanath()  { m_gametype = NAMCO_NUMANATH; }
+void namcona1_state::init_quiztou()   { m_gametype = NAMCO_QUIZTOU; }
+void namcona1_state::init_swcourt()   { m_gametype = NAMCO_SWCOURT; }
+void namcona1_state::init_tinklpit()  { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
+void namcona1_state::init_xday2()     { m_gametype = NAMCO_XDAY2; }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0x200000, "maincpu", 0 )

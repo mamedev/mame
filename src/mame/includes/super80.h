@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
-	DECLARE_DRIVER_INIT(super80);
+	void init_super80();
 	void machine_reset_super80();
 	void machine_reset_super80r();
 	void video_start_super80();

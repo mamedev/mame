@@ -147,20 +147,20 @@ public:
 	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
 	DECLARE_READ16_MEMBER(slqz2_magic_r);
 	DECLARE_READ8_MEMBER(mgcs_keys_r);
-	DECLARE_DRIVER_INIT(iqblocka);
-	DECLARE_DRIVER_INIT(mgdh);
-	DECLARE_DRIVER_INIT(slqz2);
-	DECLARE_DRIVER_INIT(lhzb2);
-	DECLARE_DRIVER_INIT(starzan);
-	DECLARE_DRIVER_INIT(mgcs);
-	DECLARE_DRIVER_INIT(tjsb);
-	DECLARE_DRIVER_INIT(spkrform);
-	DECLARE_DRIVER_INIT(iqblockf);
-	DECLARE_DRIVER_INIT(sdmg2);
-	DECLARE_DRIVER_INIT(tarzan);
-	DECLARE_DRIVER_INIT(tarzana);
-	DECLARE_DRIVER_INIT(lhzb2a);
-	DECLARE_DRIVER_INIT(mgdha);
+	void init_iqblocka();
+	void init_mgdh();
+	void init_slqz2();
+	void init_lhzb2();
+	void init_starzan();
+	void init_mgcs();
+	void init_tjsb();
+	void init_spkrform();
+	void init_iqblockf();
+	void init_sdmg2();
+	void init_tarzan();
+	void init_tarzana();
+	void init_lhzb2a();
+	void init_mgdha();
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
@@ -330,7 +330,7 @@ void igs017_state::iqblocka_patch_rom()
 //  rom[0x385b1] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs017_state,iqblocka)
+void igs017_state::init_iqblocka()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 	iqblocka_patch_rom();
@@ -338,7 +338,7 @@ DRIVER_INIT_MEMBER(igs017_state,iqblocka)
 
 // iqblockf
 
-DRIVER_INIT_MEMBER(igs017_state,iqblockf)
+void igs017_state::init_iqblockf()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 //  iqblockf_patch_rom();
@@ -371,7 +371,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tjsb)
+void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
@@ -479,7 +479,7 @@ void igs017_state::mgcs_patch_rom()
 //  rom[0x4e036/2] = 0x6006;    // 04E036: 6306    bls     $4e03e
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgcs)
+void igs017_state::init_mgcs()
 {
 	mgcs_decrypt_program_rom();
 	mgcs_patch_rom();
@@ -551,13 +551,13 @@ void igs017_state::tarzana_decrypt_program_rom()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
 	tarzan_decrypt_tiles();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
 //  tarzana_decrypt_tiles();    // to do
@@ -615,7 +615,7 @@ void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,starzan)
+void igs017_state::init_starzan()
 {
 	int size = 0x040000;
 
@@ -632,7 +632,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 
 // sdmg2
 
-DRIVER_INIT_MEMBER(igs017_state,sdmg2)
+void igs017_state::init_sdmg2()
 {
 	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 
 // mgdh, mgdha
 
-DRIVER_INIT_MEMBER(igs017_state,mgdha)
+void igs017_state::init_mgdha()
 {
 	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
@@ -723,9 +723,9 @@ DRIVER_INIT_MEMBER(igs017_state,mgdha)
 	mgcs_flip_sprites();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgdh)
+void igs017_state::init_mgdh()
 {
-	DRIVER_INIT_CALL(mgdha);
+	init_mgdha();
 
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -796,7 +796,7 @@ void igs017_state::igs025_to_igs022_callback( void )
 
 
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2)
+void igs017_state::init_lhzb2()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -897,7 +897,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 //lhzb2a
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
+void igs017_state::init_lhzb2a()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -988,7 +988,7 @@ void igs017_state::slqz2_decrypt_tiles()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,slqz2)
+void igs017_state::init_slqz2()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -1098,7 +1098,7 @@ void igs017_state::spkrform_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,spkrform)
+void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 

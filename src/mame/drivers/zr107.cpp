@@ -248,9 +248,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(zr107);
-	DECLARE_DRIVER_INIT(jetwave);
+	void init_common();
+	void init_zr107();
+	void init_jetwave();
 	void video_start_zr107();
 	void video_start_jetwave();
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -906,7 +906,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(zr107_state,common)
+void zr107_state::init_common()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
@@ -915,12 +915,12 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_dsp->enable_recompiler();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,zr107)
+void zr107_state::init_zr107()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,jetwave)
+void zr107_state::init_jetwave()
 {
 	init_common();
 }

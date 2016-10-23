@@ -95,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdrom_data_w);
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
-	DECLARE_DRIVER_INIT(cops);
+	void init_cops();
 	int m_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;
@@ -903,7 +903,7 @@ void cops_state::machine_reset()
 }
 
 
-DRIVER_INIT_MEMBER(cops_state,cops)
+void cops_state::init_cops()
 {
 	//The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
 	//For documentation's sake, here's the init

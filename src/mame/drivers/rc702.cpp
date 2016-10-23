@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(rc702);
+	void init_rc702();
 	void machine_reset_rc702();
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -237,7 +237,7 @@ static const rgb_t our_palette[3] = {
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
 
-DRIVER_INIT_MEMBER( rc702_state, rc702 )
+void rc702_state::init_rc702()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

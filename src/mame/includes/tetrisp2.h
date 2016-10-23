@@ -111,11 +111,11 @@ public:
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
-	DECLARE_DRIVER_INIT(rockn2);
-	DECLARE_DRIVER_INIT(rockn1);
-	DECLARE_DRIVER_INIT(rockn);
-	DECLARE_DRIVER_INIT(rockn3);
-	DECLARE_DRIVER_INIT(rocknms);
+	void init_rockn2();
+	void init_rockn1();
+	void init_rockn();
+	void init_rockn3();
+	void init_rocknms();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rot);
@@ -155,7 +155,7 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_soundlatch_word_w);
 	DECLARE_WRITE16_MEMBER(stepstag_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
-	DECLARE_DRIVER_INIT(stepstag);
+	void init_stepstag();
 	void video_start_stepstag();
 	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

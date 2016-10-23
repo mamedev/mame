@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(metalmx_state,metalmx)
+void metalmx_state::init_metalmx()
 {
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 

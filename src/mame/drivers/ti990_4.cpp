@@ -64,8 +64,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
-	DECLARE_DRIVER_INIT(ti990_4);
-	DECLARE_DRIVER_INIT(ti990_4v);
+	void init_ti990_4();
+	void init_ti990_4v();
 
 	void machine_reset_ti990_4();
 
@@ -276,7 +276,7 @@ void ti990_4_state::machine_reset_ti990_4()
 	m_maincpu->set_ready(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
+void ti990_4_state::init_ti990_4()
 {
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }

@@ -57,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_c_w);
 
-	DECLARE_DRIVER_INIT(pengadvb);
+	void init_pengadvb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
@@ -296,7 +296,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 	}
 }
 
-DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
+void pengadvb_state::init_pengadvb()
 {
 	pengadvb_decrypt("maincpu");
 	pengadvb_decrypt("game");

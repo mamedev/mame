@@ -110,7 +110,7 @@ public:
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
 	DECLARE_WRITE16_MEMBER(oki2_bank_w);
-	DECLARE_DRIVER_INIT(pasha2);
+	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -476,7 +476,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 	return m_wram[(0x95744 / 2) + offset];
 }
 
-DRIVER_INIT_MEMBER(pasha2_state,pasha2)
+void pasha2_state::init_pasha2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 

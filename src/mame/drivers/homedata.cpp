@@ -2007,7 +2007,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(homedata_state,jogakuen)
+void homedata_state::init_jogakuen()
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
 	   but with just these two addresses swapped. Instead of creating a new
@@ -2016,24 +2016,24 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mjikaga)
+void homedata_state::init_mjikaga()
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::init_reikaids()
 {
 	m_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(homedata_state,battlcry)
+void homedata_state::init_battlcry()
 {
 	m_priority = 1; /* priority and initial value for bank write */
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::init_mirderby()
 {
 }
 

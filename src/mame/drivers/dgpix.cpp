@@ -182,12 +182,12 @@ public:
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
 
-	DECLARE_DRIVER_INIT(elfin);
-	DECLARE_DRIVER_INIT(jumpjump);
-	DECLARE_DRIVER_INIT(xfiles);
-	DECLARE_DRIVER_INIT(xfilesk);
-	DECLARE_DRIVER_INIT(kdynastg);
-	DECLARE_DRIVER_INIT(fmaniac3);
+	void init_elfin();
+	void init_jumpjump();
+	void init_xfiles();
+	void init_xfilesk();
+	void init_kdynastg();
+	void init_fmaniac3();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -602,7 +602,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(dgpix_state,elfin)
+void dgpix_state::init_elfin()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -616,7 +616,7 @@ DRIVER_INIT_MEMBER(dgpix_state,elfin)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
+void dgpix_state::init_jumpjump()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -630,7 +630,7 @@ DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,xfiles)
+void dgpix_state::init_xfiles()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -644,7 +644,7 @@ DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,xfilesk)
+void dgpix_state::init_xfilesk()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -661,7 +661,7 @@ DRIVER_INIT_MEMBER(dgpix_state,xfilesk)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
+void dgpix_state::init_kdynastg()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -681,7 +681,7 @@ DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
 	m_flash_roms = 4;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
+void dgpix_state::init_fmaniac3()
 {
 	m_flash_roms = 2;
 }

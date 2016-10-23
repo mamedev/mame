@@ -115,7 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
-	DECLARE_DRIVER_INIT(re900);
+	void init_re900();
 };
 
 
@@ -429,7 +429,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(re900_state,re900)
+void re900_state::init_re900()
 {
 	m_player = 1;
 	m_stat_a = 1;

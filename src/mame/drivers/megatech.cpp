@@ -121,8 +121,8 @@ public:
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
 
-	DECLARE_DRIVER_INIT(mt_crt);
-	DECLARE_DRIVER_INIT(mt_slot);
+	void init_mt_crt();
+	void init_mt_slot();
 	void machine_reset_megatech();
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
@@ -593,20 +593,20 @@ ADDRESS_MAP_END
 
 
 
-DRIVER_INIT_MEMBER(mtech_state,mt_slot)
+void mtech_state::init_mt_slot()
 {
 	m_banked_ram = std::make_unique<uint8_t[]>(0x1000*8);
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 
 	// this gets set in DEVICE_IMAGE_LOAD
 	memset(m_cart_is_genesis, 0, sizeof(m_cart_is_genesis));
 }
 
-DRIVER_INIT_MEMBER(mtech_state,mt_crt)
+void mtech_state::init_mt_crt()
 {
 	uint8_t* pin = memregion("sms_pin")->base();
-	DRIVER_INIT_CALL(mt_slot);
+	init_mt_slot();
 
 	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }

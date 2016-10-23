@@ -149,7 +149,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
-	DECLARE_DRIVER_INIT(socrates);
+	void init_socrates();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(socrates);
@@ -336,7 +336,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-DRIVER_INIT_MEMBER(socrates_state,socrates)
+void socrates_state::init_socrates()
 {
 	uint8_t *gfx = memregion("vram")->base();
 

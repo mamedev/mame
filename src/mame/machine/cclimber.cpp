@@ -27,7 +27,7 @@ void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
 	}
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,cclimber)
+void cclimber_state::init_cclimber()
 {
 	static const uint8_t convtable[8][16] =
 	{
@@ -45,7 +45,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimber)
 	cclimber_decode(convtable);
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
+void cclimber_state::init_cclimberj()
 {
 	static const uint8_t convtable[8][16] =
 	{
@@ -62,7 +62,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
 	cclimber_decode(convtable);
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,ckongb)
+void cclimber_state::init_ckongb()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -85,7 +85,7 @@ void ::cannonb_patch()
 }
 #endif
 
-DRIVER_INIT_MEMBER(cclimber_state,cannonb)
+void cclimber_state::init_cannonb()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -110,7 +110,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cannonb)
 #endif
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,cannonb2)
+void cclimber_state::init_cannonb2()
 {
 #if CANNONB_HACK
 	cannonb_patch(machine());

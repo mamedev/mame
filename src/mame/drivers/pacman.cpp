@@ -6817,7 +6817,7 @@ void pacman_state::maketrax_rom_decode()
 	m_patched_opcodes[0x3aef] = 0xb0;
 }
 
-DRIVER_INIT_MEMBER(pacman_state,maketrax)
+void pacman_state::init_maketrax()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
@@ -6846,7 +6846,7 @@ void pacman_state::korosuke_rom_decode()
 	m_patched_opcodes[0x3af3] = 0xb0;
 }
 
-DRIVER_INIT_MEMBER(pacman_state,korosuke)
+void pacman_state::init_korosuke()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),this));
@@ -6855,7 +6855,7 @@ DRIVER_INIT_MEMBER(pacman_state,korosuke)
 	korosuke_rom_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,ponpoko)
+void pacman_state::init_ponpoko()
 {
 	/* The gfx data is swapped wrt the other Pac-Man hardware games. */
 	/* Here we revert it to the usual format. */
@@ -6907,7 +6907,7 @@ void pacman_state::eyes_decode(uint8_t *data)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,eyes)
+void pacman_state::init_eyes()
 {
 	int i, len;
 	uint8_t *RAM;
@@ -6990,7 +6990,7 @@ void pacman_state::mspacman_install_patches(uint8_t *ROM)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacman)
+void pacman_state::init_mspacman()
 {
 	int i;
 	uint8_t *ROM, *DROM;
@@ -7040,12 +7040,12 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 	membank("bank1")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(pacman_state, mschamp)
+void pacman_state::init_mschamp()
 {
 	save_item(NAME(m_counter));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,woodpek)
+void pacman_state::init_woodpek()
 {
 	int i, len;
 	uint8_t *RAM;
@@ -7059,17 +7059,17 @@ DRIVER_INIT_MEMBER(pacman_state,woodpek)
 		eyes_decode(&RAM[i]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,pacplus)
+void pacman_state::init_pacplus()
 {
 	pacplus_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,jumpshot)
+void pacman_state::init_jumpshot()
 {
 	jumpshot_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
+void pacman_state::init_drivfrcp()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0 * 0x2000]);
@@ -7078,7 +7078,7 @@ DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,8bpm)
+void pacman_state::init_8bpm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -7095,7 +7095,7 @@ DRIVER_INIT_MEMBER(pacman_state,8bpm)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,porky)
+void pacman_state::init_porky()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -7117,7 +7117,7 @@ DRIVER_INIT_MEMBER(pacman_state,porky)
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
+void pacman_state::init_rocktrv2()
 {
 	/* hack to pass the rom check for the bad rom */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -7131,7 +7131,7 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 /* The encrpytion is provided by a 74298 sitting on top of the rom at 6f.
 The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
-DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
+void pacman_state::init_mspacmbe()
 {
 	uint8_t temp;
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -7156,13 +7156,13 @@ READ8_MEMBER(pacman_state::mspacii_protection_r)
 	return (data & 0xef) | (offset << 4 & 0x10);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacii)
+void pacman_state::init_mspacii()
 {
 	// protection
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), this));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,superabc)
+void pacman_state::init_superabc()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();
@@ -7216,7 +7216,7 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 }
 
 
-DRIVER_INIT_MEMBER(pacman_state,cannonbp)
+void pacman_state::init_cannonbp()
 {
 	/* extra memory */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4800, 0x4bff);

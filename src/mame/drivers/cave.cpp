@@ -4763,7 +4763,7 @@ void cave_state::init_cave()
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,agallet)
+void cave_state::init_agallet()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	init_cave();
@@ -4783,7 +4783,7 @@ DRIVER_INIT_MEMBER(cave_state,agallet)
 	unpack_sprites("sprites0");
 }
 
-DRIVER_INIT_MEMBER(cave_state,dfeveron)
+void cave_state::init_dfeveron()
 {
 	init_cave();
 
@@ -4791,7 +4791,7 @@ DRIVER_INIT_MEMBER(cave_state,dfeveron)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,feversos)
+void cave_state::init_feversos()
 {
 	init_cave();
 
@@ -4799,7 +4799,7 @@ DRIVER_INIT_MEMBER(cave_state,feversos)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ddonpach)
+void cave_state::init_ddonpach()
 {
 	init_cave();
 
@@ -4808,7 +4808,7 @@ DRIVER_INIT_MEMBER(cave_state,ddonpach)
 	m_time_vblank_irq = 90;
 }
 
-DRIVER_INIT_MEMBER(cave_state,donpachi)
+void cave_state::init_donpachi()
 {
 	init_cave();
 
@@ -4818,7 +4818,7 @@ DRIVER_INIT_MEMBER(cave_state,donpachi)
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,esprade)
+void cave_state::init_esprade()
 {
 	init_cave();
 
@@ -4833,7 +4833,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 #endif
 }
 
-DRIVER_INIT_MEMBER(cave_state,gaia)
+void cave_state::init_gaia()
 {
 	init_cave();
 
@@ -4844,7 +4844,7 @@ DRIVER_INIT_MEMBER(cave_state,gaia)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,guwange)
+void cave_state::init_guwange()
 {
 	init_cave();
 
@@ -4852,7 +4852,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,hotdogst)
+void cave_state::init_hotdogst()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -4869,7 +4869,7 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,mazinger)
+void cave_state::init_mazinger()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	uint8_t *src = memregion("sprites0")->base();
@@ -4898,7 +4898,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	m_time_vblank_irq = 2100;
 }
 
-DRIVER_INIT_MEMBER(cave_state,metmqstr)
+void cave_state::init_metmqstr()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -4920,7 +4920,7 @@ DRIVER_INIT_MEMBER(cave_state,metmqstr)
 	m_time_vblank_irq = 17376;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ppsatan)
+void cave_state::init_ppsatan()
 {
 	init_cave();
 
@@ -4935,7 +4935,7 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 	save_item(NAME(m_ppsatan_io_mux));
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
+void cave_state::init_pwrinst2j()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	uint8_t *src = memregion("sprites0")->base();
@@ -4965,11 +4965,11 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2)
+void cave_state::init_pwrinst2()
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
 	   problem? does the Japan set need it or not? */
-	DRIVER_INIT_CALL(pwrinst2j);
+	init_pwrinst2j();
 
 #if 1       //ROM PATCH
 	{
@@ -4980,7 +4980,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 }
 
-DRIVER_INIT_MEMBER(cave_state,sailormn)
+void cave_state::init_sailormn()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	uint8_t *src = memregion("sprites0")->base();
@@ -5018,7 +5018,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	save_item(NAME(m_sailormn_tilebank));
 }
 
-DRIVER_INIT_MEMBER(cave_state,tjumpman)
+void cave_state::init_tjumpman()
 {
 	init_cave();
 
@@ -5031,7 +5031,7 @@ DRIVER_INIT_MEMBER(cave_state,tjumpman)
 	save_item(NAME(m_hopper));
 }
 
-DRIVER_INIT_MEMBER(cave_state,uopoko)
+void cave_state::init_uopoko()
 {
 	init_cave();
 
@@ -5040,7 +5040,7 @@ DRIVER_INIT_MEMBER(cave_state,uopoko)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,korokoro)
+void cave_state::init_korokoro()
 {
 	init_cave();
 

@@ -44,7 +44,7 @@ void gaelco2_state::gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(gaelco2_state,alighunt)
+void gaelco2_state::init_alighunt()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -78,7 +78,7 @@ DRIVER_INIT_MEMBER(gaelco2_state,alighunt)
 }
 
 
-DRIVER_INIT_MEMBER(gaelco2_state,touchgo)
+void gaelco2_state::init_touchgo()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -106,7 +106,7 @@ DRIVER_INIT_MEMBER(gaelco2_state,touchgo)
 }
 
 
-DRIVER_INIT_MEMBER(gaelco2_state,snowboar)
+void gaelco2_state::init_snowboar()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -179,7 +179,7 @@ WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
 ***************************************************************************/
 
 
-DRIVER_INIT_MEMBER(bang_state,bang)
+void bang_state::init_bang()
 {
 	m_clr_gun_int = 0;
 }

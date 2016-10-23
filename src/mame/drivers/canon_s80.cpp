@@ -27,7 +27,7 @@ public:
 			: driver_device(mconfig, type, tag)
 			{ }
 
-	DECLARE_DRIVER_INIT(canons80);
+	void init_canons80();
 };
 
 
@@ -42,7 +42,7 @@ static MACHINE_CONFIG_START( canons80, canons80_state )
 	MCFG_CPU_PROGRAM_MAP(canons80_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(canons80_state, canons80)
+void canons80_state::init_canons80()
 {}
 
 ROM_START( canons80 )

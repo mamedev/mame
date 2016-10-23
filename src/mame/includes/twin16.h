@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(upd_reset_w);
 	DECLARE_WRITE8_MEMBER(upd_start_w);
 
-	DECLARE_DRIVER_INIT(twin16);
+	void init_twin16();
 
 	TILE_GET_INFO_MEMBER(fix_tile_info);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
@@ -103,7 +103,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_DRIVER_INIT(fround);
+	void init_fround();
 
 protected:
 	virtual void video_start() override;
@@ -121,7 +121,7 @@ public:
 	{}
 
 	DECLARE_WRITE8_MEMBER(nvram_bank_w);
-	DECLARE_DRIVER_INIT(cuebrickj);
+	void init_cuebrickj();
 
 private:
 	uint16_t m_nvram[0x400 * 0x20 / 2];

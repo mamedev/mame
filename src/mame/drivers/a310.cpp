@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
-	DECLARE_DRIVER_INIT(a310);
+	void init_a310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
@@ -138,7 +138,7 @@ WRITE32_MEMBER(a310_state::a310_psy_wram_w)
 }
 
 
-DRIVER_INIT_MEMBER(a310_state,a310)
+void a310_state::init_a310()
 {
 	uint32_t ram_size = m_ram->size();
 

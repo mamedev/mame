@@ -49,8 +49,8 @@ public:
 	DECLARE_READ16_MEMBER(mainram_r);
 	DECLARE_WRITE16_MEMBER(mainram_w);
 
-	DECLARE_DRIVER_INIT(glass);
-	DECLARE_DRIVER_INIT(glassp);
+	void init_glass();
+	void init_glassp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

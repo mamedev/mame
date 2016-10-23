@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(write_prtc);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_DRIVER_INIT(dealer);
+	void init_dealer();
 	virtual void machine_reset() override;
 	void machine_start_epos();
 	void machine_start_dealer();

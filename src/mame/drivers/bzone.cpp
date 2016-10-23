@@ -860,7 +860,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);

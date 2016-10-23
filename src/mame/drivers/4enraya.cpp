@@ -513,7 +513,7 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
+void _4enraya_state::init_unkpacg()
 {
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();

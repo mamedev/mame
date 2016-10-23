@@ -25,7 +25,7 @@ public:
 	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
 	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
 	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
-	DECLARE_DRIVER_INIT(m79amb);
+	void init_m79amb();
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 	DECLARE_WRITE8_MEMBER(m79amb_8000_w);

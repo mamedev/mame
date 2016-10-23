@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_DRIVER_INIT(exctsccr);
-	DECLARE_DRIVER_INIT(champbas);
+	void init_exctsccr();
+	void init_champbas();
 
 	DECLARE_PALETTE_INIT(champbas);
 	DECLARE_PALETTE_INIT(exctsccr);

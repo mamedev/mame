@@ -990,7 +990,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::init_combatsc()
 {
 	/* joystick instead of trackball */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0404, 0x0404, "IN1");

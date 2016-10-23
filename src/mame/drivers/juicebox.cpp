@@ -50,7 +50,7 @@ public:
 	#endif
 	DECLARE_READ32_MEMBER(juicebox_nand_r);
 	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
-	DECLARE_DRIVER_INIT(juicebox);
+	void init_juicebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(juicebox_state,juicebox)
+void juicebox_state::init_juicebox()
 {
 	// do nothing
 }

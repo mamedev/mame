@@ -478,7 +478,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rampart_state,rampart)
+void rampart_state::init_rampart()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

@@ -14,7 +14,7 @@ public:
 	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
 	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(kyustrkr);
+	void init_kyustrkr();
 	void machine_start_taitox();
 	void machine_start_superman();
 

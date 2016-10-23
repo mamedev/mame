@@ -397,7 +397,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();

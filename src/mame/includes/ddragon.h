@@ -126,9 +126,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
-	DECLARE_DRIVER_INIT(toffy);
-	DECLARE_DRIVER_INIT(darktowr);
-	DECLARE_DRIVER_INIT(ddragon2);
-	DECLARE_DRIVER_INIT(ddragon);
-	DECLARE_DRIVER_INIT(ddragon6809);
+	void init_toffy();
+	void init_darktowr();
+	void init_ddragon2();
+	void init_ddragon();
+	void init_ddragon6809();
 };

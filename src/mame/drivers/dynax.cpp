@@ -5469,7 +5469,7 @@ ROM_START( blktouch )
 	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,blktouch)
+void dynax_state::init_blktouch()
 {
 	// fearsome encryption ;-)
 	uint8_t   *src = (uint8_t *)memregion("maincpu")->base();
@@ -5491,7 +5491,7 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state, maya_common)
+void dynax_state::init_maya_common()
 {
 	/* Address lines scrambling on 1 z80 rom */
 	uint8_t   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
@@ -5507,9 +5507,9 @@ DRIVER_INIT_MEMBER(dynax_state, maya_common)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+void dynax_state::init_maya()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
 	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
@@ -5524,9 +5524,9 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,mayac)
+void dynax_state::init_mayac()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
 	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
 	int i;
@@ -6447,7 +6447,7 @@ ROM_START( intrgirl )
 ROM_END
 
 // Decrypted by yong
-DRIVER_INIT_MEMBER(dynax_state,mjelct3)
+void dynax_state::init_mjelct3()
 {
 	int i;
 	uint8_t   *rom = memregion("maincpu")->base();
@@ -6459,7 +6459,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
 }
 
-DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
+void dynax_state::init_mjelct3a()
 {
 	int i, j;
 	uint8_t   *rom = memregion("maincpu")->base();
@@ -6495,7 +6495,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		rom[j] = rom1[i];
 	}
 
-	DRIVER_INIT_CALL(mjelct3);
+	init_mjelct3();
 }
 
 
@@ -6837,7 +6837,7 @@ ROM_START( mjreach )
 	ROM_RELOAD(          0x80000, 0x80000 )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,mjreach)
+void dynax_state::init_mjreach()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x10060, 0x10060, write8_delegate(FUNC(dynax_state::yarunara_flipscreen_w),this));
 }

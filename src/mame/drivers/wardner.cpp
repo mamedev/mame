@@ -147,7 +147,7 @@ public:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
+	void init_wardner();
 
 protected:
 	virtual void driver_start() override;

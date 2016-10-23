@@ -82,7 +82,7 @@ public:
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_READ8_MEMBER(hitpoker_pic_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
-	DECLARE_DRIVER_INIT(hitpoker);
+	void init_hitpoker();
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hitpoker_irq);
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(hitpoker_state,hitpoker)
+void hitpoker_state::init_hitpoker()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

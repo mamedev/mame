@@ -1388,7 +1388,7 @@ void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,wecleman)
+void wecleman_state::init_wecleman()
 {
 	int i, len;
 	uint8_t *RAM;
@@ -1696,7 +1696,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,hotchase)
+void wecleman_state::init_hotchase()
 {
 //  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test

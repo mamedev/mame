@@ -979,7 +979,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(route16_state,route16)
+void route16_state::init_route16()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
@@ -993,10 +993,10 @@ DRIVER_INIT_MEMBER(route16_state,route16)
 	ROM[0x072b] = 0x00;
 	ROM[0x072c] = 0x00;
 
-	DRIVER_INIT_CALL(route16c);
+	init_route16c();
 }
 
-DRIVER_INIT_MEMBER(route16_state,route16c)
+void route16_state::init_route16c()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
@@ -1011,7 +1011,7 @@ DRIVER_INIT_MEMBER(route16_state,route16c)
 }
 
 
-DRIVER_INIT_MEMBER(route16_state,route16a)
+void route16_state::init_route16a()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */

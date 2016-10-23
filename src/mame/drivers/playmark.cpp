@@ -2052,7 +2052,7 @@ void playmark_state::playmark_decode_pic_hex_dump(void)
 }
 
 
-DRIVER_INIT_MEMBER(playmark_state,pic_decode)
+void playmark_state::init_pic_decode()
 {
 	playmark_decode_pic_hex_dump();
 }

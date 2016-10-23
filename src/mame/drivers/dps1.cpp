@@ -41,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(dps1);
+	void init_dps1();
 	void machine_reset_dps1();
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
@@ -189,7 +189,7 @@ void dps1_state::machine_reset_dps1()
 	floppy->mon_w(0);
 }
 
-DRIVER_INIT_MEMBER( dps1_state, dps1 )
+void dps1_state::init_dps1()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

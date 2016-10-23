@@ -91,7 +91,7 @@ private:
 	uint8_t m_sound_data;
 
 public:
-	DECLARE_DRIVER_INIT(de_3);
+	void init_de_3();
 };
 
 
@@ -387,7 +387,7 @@ void de_3_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(de_3_state,de_3)
+void de_3_state::init_de_3()
 {
 }
 

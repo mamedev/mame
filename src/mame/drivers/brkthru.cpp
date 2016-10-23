@@ -639,7 +639,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(brkthru_state,brkthru)
+void brkthru_state::init_brkthru()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);

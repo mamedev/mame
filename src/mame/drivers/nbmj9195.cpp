@@ -221,7 +221,7 @@ void nbmj9195_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
+void nbmj9195_state::init_nbmj9195()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 

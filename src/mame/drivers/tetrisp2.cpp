@@ -1278,25 +1278,25 @@ void tetrisp2_state::init_rockn_timer()
 	save_item(NAME(m_rocknms_sub2main));
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
+void tetrisp2_state::init_rockn()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn1)
+void tetrisp2_state::init_rockn1()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn2)
+void tetrisp2_state::init_rockn2()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 2;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
+void tetrisp2_state::init_rocknms()
 {
 	init_rockn_timer();
 
@@ -1307,13 +1307,13 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn3)
+void tetrisp2_state::init_rockn3()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 4;
 }
 
-DRIVER_INIT_MEMBER(stepstag_state,stepstag)
+void stepstag_state::init_stepstag()
 {
 	init_rockn_timer();        // used
 	m_rockn_protectdata = 1;    // unused?

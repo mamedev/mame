@@ -1983,7 +1983,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(djmain_state,beatmania)
+void djmain_state::init_beatmania()
 {
 	m_ata_master_password = nullptr;
 	m_ata_user_password = nullptr;
@@ -1998,7 +1998,7 @@ static const uint8_t beatmania_master_password[2 + 32] =
 	0x53, 0x45, 0x52, 0x45, 0x45, 0x56, 0x2e, 0x44
 };
 
-DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
+void djmain_state::init_hmcompmx()
 {
 	static const uint8_t hmcompmx_user_password[2 + 32] =
 	{
@@ -2009,13 +2009,13 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
 		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = hmcompmx_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
+void djmain_state::init_bm4thmix()
 {
 	static const uint8_t bm4thmix_user_password[2 + 32] =
 	{
@@ -2026,12 +2026,12 @@ DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
 		0x18, 0x06, 0x1e, 0x07, 0x77, 0x1a, 0x7d, 0x77
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_user_password = bm4thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
+void djmain_state::init_bm5thmix()
 {
 	static const uint8_t bm5thmix_user_password[2 + 32] =
 	{
@@ -2042,13 +2042,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
 		0x6b, 0x1a, 0x1e, 0x06, 0x04, 0x01, 0x7d, 0x1f
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm5thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
+void djmain_state::init_bmclubmx()
 {
 	static const uint8_t bmclubmx_user_password[2 + 32] =
 	{
@@ -2059,14 +2059,14 @@ DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
 		0x0a, 0x1a, 0x71, 0x07, 0x1e, 0x19, 0x7d, 0x02
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmclubmx_user_password;
 }
 
 
-DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
+void djmain_state::init_bmcompm2()
 {
 	static const uint8_t bmcompm2_user_password[2 + 32] =
 	{
@@ -2077,13 +2077,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
 		0x6b, 0x0d, 0x71, 0x0f, 0x1d, 0x10, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmcompm2_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
+void djmain_state::init_hmcompm2()
 {
 	static const uint8_t hmcompm2_user_password[2 + 32] =
 	{
@@ -2094,13 +2094,13 @@ DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
 		0x09, 0x68, 0x71, 0x0b, 0x77, 0x15, 0x17, 0x1e
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = hmcompm2_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmdct)
+void djmain_state::init_bmdct()
 {
 	static const uint8_t bmdct_user_password[2 + 32] =
 	{
@@ -2111,13 +2111,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmdct)
 		0x0e, 0x0a, 0x05, 0x0f, 0x13, 0x74, 0x09, 0x19
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmdct_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
+void djmain_state::init_bmcorerm()
 {
 	static const uint8_t bmcorerm_user_password[2 + 32] =
 	{
@@ -2128,13 +2128,13 @@ DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
 		0x05, 0x09, 0x14, 0x0d, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmcorerm_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
+void djmain_state::init_bm6thmix()
 {
 	static const uint8_t bm6thmix_user_password[2 + 32] =
 	{
@@ -2145,13 +2145,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
 		0x02, 0x06, 0x09, 0x0f, 0x7a, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm6thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
+void djmain_state::init_bm7thmix()
 {
 	static const uint8_t bm7thmix_user_password[2 + 32] =
 	{
@@ -2162,13 +2162,13 @@ DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
 		0x0c, 0x06, 0x7c, 0x6e, 0x77, 0x74, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bm7thmix_user_password;
 }
 
-DRIVER_INIT_MEMBER(djmain_state,bmfinal)
+void djmain_state::init_bmfinal()
 {
 	static const uint8_t bmfinal_user_password[2 + 32] =
 	{
@@ -2179,7 +2179,7 @@ DRIVER_INIT_MEMBER(djmain_state,bmfinal)
 		0x0c, 0x06, 0x71, 0x6e, 0x77, 0x79, 0x7d, 0x7a
 	};
 
-	DRIVER_INIT_CALL(beatmania);
+	init_beatmania();
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = bmfinal_user_password;

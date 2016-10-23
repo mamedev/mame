@@ -68,7 +68,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_DRIVER_INIT(brailab4);
+	void init_brailab4();
 	void video_start_homelab2();
 	void machine_reset_homelab3();
 	void video_start_homelab3();
@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(homelab_state,brailab4)
+void homelab_state::init_brailab4()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);

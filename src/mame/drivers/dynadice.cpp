@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(dynadice);
+	void init_dynadice();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -289,7 +289,7 @@ ROM_START( dynadice )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynadice_state,dynadice)
+void dynadice_state::init_dynadice()
 {
 	int i, j;
 	uint8_t *usr1 = memregion("user1")->base();

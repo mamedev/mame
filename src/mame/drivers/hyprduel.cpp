@@ -772,7 +772,7 @@ ROM_START( magerror )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::init_hyprduel()
 {
 	m_int_num = 0x02;
 
@@ -783,7 +783,7 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-DRIVER_INIT_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));

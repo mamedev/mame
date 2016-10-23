@@ -79,7 +79,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nc_state, nc_pcmcia_card )
 	m_card_size = 0;
 }
 
-DRIVER_INIT_MEMBER( nc_state, nc )
+void nc_state::init_nc()
 {
 	// set card not present state
 	set_card_present_state(0);

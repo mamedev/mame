@@ -2628,7 +2628,7 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT_MEMBER(x1_state,x1_kanji)
+void x1_state::init_x1_kanji()
 {
 	uint32_t i,j,k,l;
 	uint8_t *kanji = memregion("kanji")->base();

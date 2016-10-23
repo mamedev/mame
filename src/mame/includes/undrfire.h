@@ -69,8 +69,8 @@ public:
 	DECLARE_READ32_MEMBER(cbombers_adc_r);
 	DECLARE_WRITE8_MEMBER(cbombers_adc_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
-	DECLARE_DRIVER_INIT(undrfire);
-	DECLARE_DRIVER_INIT(cbombers);
+	void init_undrfire();
+	void init_cbombers();
 	virtual void video_start() override;
 	uint32_t screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

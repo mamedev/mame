@@ -61,7 +61,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
-	DECLARE_DRIVER_INIT(dorodon);
+	void init_dorodon();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 	void machine_start_ladybug();

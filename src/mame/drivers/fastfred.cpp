@@ -1011,40 +1011,40 @@ ROM_START( imagoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboy)
+void fastfred_state::init_flyboy()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
+void fastfred_state::init_flyboyb()
 {
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,fastfred)
+void fastfred_state::init_fastfred()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
+void fastfred_state::init_jumpcoas()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
+void fastfred_state::init_boggy84b()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84)
+void fastfred_state::init_boggy84()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
@@ -1052,7 +1052,7 @@ DRIVER_INIT_MEMBER(fastfred_state,boggy84)
 }
 
 
-DRIVER_INIT_MEMBER(fastfred_state,imago)
+void fastfred_state::init_imago()
 {
 	m_hardware_type = 3;
 }

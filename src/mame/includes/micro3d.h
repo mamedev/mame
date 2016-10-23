@@ -171,8 +171,8 @@ public:
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
 	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
-	DECLARE_DRIVER_INIT(micro3d);
-	DECLARE_DRIVER_INIT(botss);
+	void init_micro3d();
+	void init_botss();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;

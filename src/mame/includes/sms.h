@@ -198,15 +198,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
 	DECLARE_READ32_MEMBER(sms_pixel_color);
 
-	DECLARE_DRIVER_INIT(sg1000m3);
-	DECLARE_DRIVER_INIT(gamegear);
-	DECLARE_DRIVER_INIT(gamegeaj);
-	DECLARE_DRIVER_INIT(sms1krfm);
-	DECLARE_DRIVER_INIT(sms1kr);
-	DECLARE_DRIVER_INIT(smskr);
-	DECLARE_DRIVER_INIT(smsj);
-	DECLARE_DRIVER_INIT(sms1);
-	DECLARE_DRIVER_INIT(sms);
+	void init_sg1000m3();
+	void init_gamegear();
+	void init_gamegeaj();
+	void init_sms1krfm();
+	void init_sms1kr();
+	void init_smskr();
+	void init_smsj();
+	void init_sms1();
+	void init_sms();
 	void machine_start_sms();
 	void machine_reset_sms();
 	void video_start_gamegear();
@@ -242,7 +242,7 @@ public:
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
-	DECLARE_DRIVER_INIT(smssdisp);
+	void init_smssdisp();
 
 	DECLARE_READ8_MEMBER(store_cart_peek);
 

@@ -131,10 +131,10 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
-	DECLARE_DRIVER_INIT(driveout);
-	DECLARE_DRIVER_INIT(cameltry);
-	DECLARE_DRIVER_INIT(mjnquest);
-	DECLARE_DRIVER_INIT(finalb);
+	void init_driveout();
+	void init_cameltry();
+	void init_mjnquest();
+	void init_finalb();
 	void machine_start_f2();
 	void video_start_taitof2_default();
 	void machine_start_common();

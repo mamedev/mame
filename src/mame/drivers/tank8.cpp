@@ -460,7 +460,7 @@ ROM_START( tank8 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tank8_state,decode)
+void tank8_state::init_decode()
 {
 	const uint8_t* DECODE = memregion("user1")->base();
 

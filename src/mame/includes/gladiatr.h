@@ -90,8 +90,8 @@ public:
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 
-	DECLARE_DRIVER_INIT(gladiatr);
-	DECLARE_DRIVER_INIT(ppking);
+	void init_gladiatr();
+	void init_ppking();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);

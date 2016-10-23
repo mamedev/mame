@@ -180,7 +180,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_DRIVER_INIT(wildpkr);
+	void init_wildpkr();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
@@ -382,7 +382,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
+void wildpkr_state::init_wildpkr()
 {
 }
 

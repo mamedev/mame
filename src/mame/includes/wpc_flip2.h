@@ -17,7 +17,7 @@ public:
 		: wpc_flip1_state(mconfig, type, tag)
 	{ }
 public:
-	DECLARE_DRIVER_INIT(wpc_flip2);
+	void init_wpc_flip2();
 };
 
 #endif /* WPC_FLIP2_H_ */

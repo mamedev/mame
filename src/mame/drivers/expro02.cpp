@@ -242,7 +242,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(expro02);
+	void init_expro02();
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 
@@ -1773,7 +1773,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(expro02_state,expro02)
+void expro02_state::init_expro02()
 {
 	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
 	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();

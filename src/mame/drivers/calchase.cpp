@@ -163,8 +163,8 @@ public:
 	DECLARE_READ16_MEMBER(calchase_iocard5_r);
 	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
 	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	DECLARE_DRIVER_INIT(calchase);
-	DECLARE_DRIVER_INIT(hostinv);
+	void init_calchase();
+	void init_hostinv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -710,7 +710,7 @@ WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 	COMBINE_DATA(&m_idle_skip_ram);
 }
 
-DRIVER_INIT_MEMBER(calchase_state,calchase)
+void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
@@ -719,7 +719,7 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
 }
 
-DRIVER_INIT_MEMBER(calchase_state, hostinv)
+void calchase_state::init_hostinv()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 

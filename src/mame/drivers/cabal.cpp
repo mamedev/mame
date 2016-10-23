@@ -874,13 +874,13 @@ ROM_START( cabalbl2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cabal_state,cabal)
+void cabal_state::init_cabal()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
+void cabal_state::init_cabalbl2()
 {
 	uint8_t *decrypt = m_seibu_sound->get_custom_decrypt();
 	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);

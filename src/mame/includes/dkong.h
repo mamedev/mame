@@ -243,11 +243,11 @@ public:
 	DECLARE_WRITE8_MEMBER(dkong_z80dma_rdy_w);
 	DECLARE_READ8_MEMBER(braze_eeprom_r);
 	DECLARE_WRITE8_MEMBER(braze_eeprom_w);
-	DECLARE_DRIVER_INIT(strtheat);
-	DECLARE_DRIVER_INIT(herodk);
-	DECLARE_DRIVER_INIT(dkingjr);
-	DECLARE_DRIVER_INIT(drakton);
-	DECLARE_DRIVER_INIT(dkongx);
+	void init_strtheat();
+	void init_herodk();
+	void init_dkingjr();
+	void init_drakton();
+	void init_dkongx();
 	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
 	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
 	void machine_start_dkong2b();

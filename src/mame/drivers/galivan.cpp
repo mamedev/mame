@@ -1156,7 +1156,7 @@ WRITE8_MEMBER(galivan_state::youmab_86_w)
 	m_shift_scroll = 0;
 }
 
-DRIVER_INIT_MEMBER(galivan_state,youmab)
+void galivan_state::init_youmab()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),this)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");

@@ -60,8 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 
-	DECLARE_DRIVER_INIT(cabal);
-	DECLARE_DRIVER_INIT(cabalbl2);
+	void init_cabal();
+	void init_cabalbl2();
 	void machine_start_cabal();
 	void machine_start_cabalbl();
 	void machine_reset_cabalbl();

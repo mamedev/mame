@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_PALETTE_INIT(hunter2);
-	DECLARE_DRIVER_INIT(hunter2);
+	void init_hunter2();
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
@@ -322,7 +322,7 @@ void hunter2_state::machine_reset()
 }
 
 // it is presumed that writing to rom will go nowhere
-DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
+void hunter2_state::init_hunter2()
 {
 	uint8_t *ram = m_ram->base();
 

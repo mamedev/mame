@@ -7,7 +7,7 @@ class smsbootleg_state : public sms_state
 			: sms_state(mconfig, type, tag)
 			{}
 
-	DECLARE_DRIVER_INIT(sms_supergame);
+	void init_sms_supergame();
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port18_w);
 

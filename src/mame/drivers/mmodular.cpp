@@ -182,7 +182,7 @@ public:
 	DECLARE_READ16_MEMBER(read_unknown3);
 	DECLARE_READ32_MEMBER(read_1800000);
 	DECLARE_WRITE32_MEMBER(write_1000000);
-	DECLARE_DRIVER_INIT(polgar);
+	void init_polgar();
 	void machine_start_polgar();
 	void machine_reset_polgar();
 	void machine_start_sfortea();
@@ -1834,7 +1834,7 @@ ROM_START( lond030 )
 	ROM_LOAD("lond030.bin", 0x00000, 0x40000,CRC(853BAA4E) SHA1(946951081D4E91E5BDD9E93D0769568A7FE79BAD))
 ROM_END
 
-DRIVER_INIT_MEMBER(polgar_state,polgar)
+void polgar_state::init_polgar()
 {
 	led_status=0;
 }

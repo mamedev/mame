@@ -88,7 +88,7 @@ public:
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_DRIVER_INIT(lgp);
+	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
@@ -604,7 +604,7 @@ ROM_START( lgpalt )
 	DISK_IMAGE_READONLY( "lgp", 0, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(lgp_state,lgp)
+void lgp_state::init_lgp()
 {
 }
 

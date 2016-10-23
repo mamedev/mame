@@ -92,7 +92,7 @@ public:
 		m_adpcm(*this, "adpcm") { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_DRIVER_INIT(chinagat);
+	void init_chinagat();
 	void machine_start_chinagat();
 	void machine_reset_chinagat();
 	void video_start_chinagat();
@@ -897,7 +897,7 @@ ROM_START( saiyugoub2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chinagat_state,chinagat)
+void chinagat_state::init_chinagat()
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SUB = memregion("sub")->base();

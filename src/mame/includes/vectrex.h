@@ -99,7 +99,7 @@ public:
 	DECLARE_READ8_MEMBER(vectrex_via_r);
 	DECLARE_WRITE8_MEMBER(vectrex_via_w);
 	DECLARE_WRITE8_MEMBER(raaspec_led_w);
-	DECLARE_DRIVER_INIT(vectrex);
+	void init_vectrex();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	void video_start_raaspec();

@@ -1997,7 +1997,7 @@ MACHINE_CONFIG_END
 
 /* SYS386F */
 
-DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
+void seibuspi_state::init_sys386f()
 {
 	int i, j;
 	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
@@ -2051,50 +2051,50 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(seibuspi_state,senkyu)
+void seibuspi_state::init_senkyu()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,senkyua)
+void seibuspi_state::init_senkyua()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,batlball)
+void seibuspi_state::init_batlball()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1)
+void seibuspi_state::init_viprp1()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1o)
+void seibuspi_state::init_viprp1o()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,ejanhs)
+void seibuspi_state::init_ejanhs()
 {
 //  idle skip doesn't work properly?
 //  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rdft)
+void seibuspi_state::init_rdft()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
+void seibuspi_state::init_rdft2()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
 
@@ -2104,7 +2104,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 	init_spi_common();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
+void seibuspi_state::init_rfjet()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
 

@@ -1014,19 +1014,19 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(lethalj_state,ripribit)
+void lethalj_state::init_ripribit()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cfarm)
+void lethalj_state::init_cfarm()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cclownz)
+void lethalj_state::init_cclownz()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }

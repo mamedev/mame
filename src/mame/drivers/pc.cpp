@@ -48,7 +48,7 @@ public:
 
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(bondwell);
+	void init_bondwell();
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 
@@ -98,7 +98,7 @@ INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
 	m_maincpu->set_clock_scale((newval & 2) ? 1 : m_turbo_off_speed);
 }
 
-DRIVER_INIT_MEMBER(pc_state,bondwell)
+void pc_state::init_bondwell()
 {
 	m_turbo_off_speed = 4.77/12;
 }

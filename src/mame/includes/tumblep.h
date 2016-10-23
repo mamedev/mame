@@ -39,7 +39,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(tumblep_sound_w);
 	DECLARE_READ16_MEMBER(tumblepop_controls_r);
-	DECLARE_DRIVER_INIT(tumblep);
+	void init_tumblep();
 	virtual void machine_start() override;
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

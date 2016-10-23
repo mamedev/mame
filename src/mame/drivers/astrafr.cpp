@@ -118,10 +118,10 @@ public:
 	required_device<m68340cpu_device> m_maincpu;
 	optional_device<m68340cpu_device> m_slavecpu;
 
-	DECLARE_DRIVER_INIT(astradec_sml);
-	DECLARE_DRIVER_INIT(astradec);
-	DECLARE_DRIVER_INIT(astradec_dual);
-	DECLARE_DRIVER_INIT(astradec_sml_dual);
+	void init_astradec_sml();
+	void init_astradec();
+	void init_astradec_dual();
+	void init_astradec_sml_dual();
 	void machine_start_astra_common();
 	void machine_start_astra_2e();
 	void machine_start_astra_37();
@@ -2115,25 +2115,25 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 }
 
 
-DRIVER_INIT_MEMBER(astrafr_state,astradec)
+void astrafr_state::init_astradec()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 }
 
 
 
-DRIVER_INIT_MEMBER(astrafr_state,astradec_dual)
+void astrafr_state::init_astradec_dual()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 	astra_addresslines( (uint16_t*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 0 );
 }
 
-DRIVER_INIT_MEMBER(astrafr_state,astradec_sml)
+void astrafr_state::init_astradec_sml()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
 }
 
-DRIVER_INIT_MEMBER(astrafr_state,astradec_sml_dual)
+void astrafr_state::init_astradec_sml_dual()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
 	astra_addresslines( (uint16_t*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 1 );

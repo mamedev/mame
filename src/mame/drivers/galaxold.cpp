@@ -2779,7 +2779,7 @@ ROM_START( ckongmc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
+void galaxold_state::init_ckonggx()
 {
 	uint16_t ckonggx_remap[88] = {
 		0x5000, 0x0d00, 0x0e00, 0x0f00, 0x0c00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800, 0x0900, 0x0a00, 0x0b00,
@@ -3481,7 +3481,7 @@ ROM_START( bullsdrtg )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(16b19bfa) SHA1(a0e9217f9bc5b06212d5f22dcc3dc4b2838788ba) )
 ROM_END
 
-DRIVER_INIT_MEMBER(galaxold_state,guttangt)
+void galaxold_state::init_guttangt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );

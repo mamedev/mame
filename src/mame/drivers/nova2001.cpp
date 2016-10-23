@@ -1001,12 +1001,12 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::init_pkunwar()
 {
 	lineswap_gfx_roms("gfx1", 13);
 }
 
-DRIVER_INIT_MEMBER(nova2001_state,raiders5)
+void nova2001_state::init_raiders5()
 {
 	lineswap_gfx_roms("gfx1", 13);
 	lineswap_gfx_roms("gfx2", 13);

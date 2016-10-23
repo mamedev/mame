@@ -36,8 +36,8 @@ public:
 	DECLARE_READ16_MEMBER(bankrom_r);
 	DECLARE_READ16_MEMBER(spritecache_count_r);
 	DECLARE_READ16_MEMBER(unknown_verify_r);
-	DECLARE_DRIVER_INIT(offtwall);
-	DECLARE_DRIVER_INIT(offtwalc);
+	void init_offtwall();
+	void init_offtwalc();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	void machine_start_offtwall();
 	void machine_reset_offtwall();

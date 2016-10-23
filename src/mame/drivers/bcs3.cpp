@@ -73,10 +73,10 @@ public:
 	DECLARE_READ8_MEMBER(zx_r);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_DRIVER_INIT(bcs3a);
-	DECLARE_DRIVER_INIT(bcs3b);
-	DECLARE_DRIVER_INIT(bcs3c);
-	DECLARE_DRIVER_INIT(bcs3d);
+	void init_bcs3a();
+	void init_bcs3b();
+	void init_bcs3c();
+	void init_bcs3d();
 	uint32_t screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -340,7 +340,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
+void bcs3_state::init_bcs3a()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -348,7 +348,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
+void bcs3_state::init_bcs3b()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
 	s_cols = 40;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
+void bcs3_state::init_bcs3c()
 {
 	s_curs = 0x08;
 	s_init = 0xa0;
@@ -364,7 +364,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
+void bcs3_state::init_bcs3d()
 {
 	s_curs = 0x08;
 	s_init = 0xb4;

@@ -83,10 +83,10 @@ public:
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(stoneage);
-	DECLARE_DRIVER_INIT(mutantf);
-	DECLARE_DRIVER_INIT(cninja);
-	DECLARE_DRIVER_INIT(cninjabl2);
+	void init_stoneage();
+	void init_mutantf();
+	void init_cninja();
+	void init_cninjabl2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_stoneage();

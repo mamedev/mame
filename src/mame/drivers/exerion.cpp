@@ -507,7 +507,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exerion_state,exerion)
+void exerion_state::init_exerion()
 {
 	uint32_t oldaddr, newaddr, length;
 	uint8_t *src, *dst;
@@ -554,7 +554,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 }
 
 
-DRIVER_INIT_MEMBER(exerion_state,exerionb)
+void exerion_state::init_exerionb()
 {
 	uint8_t *ram = memregion("maincpu")->base();
 	int addr;
@@ -564,7 +564,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerionb)
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	DRIVER_INIT_CALL(exerion);
+	init_exerion();
 }
 
 

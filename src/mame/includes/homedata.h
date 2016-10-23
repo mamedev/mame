@@ -91,11 +91,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
-	DECLARE_DRIVER_INIT(reikaids);
-	DECLARE_DRIVER_INIT(mjikaga);
-	DECLARE_DRIVER_INIT(jogakuen);
-	DECLARE_DRIVER_INIT(battlcry);
-	DECLARE_DRIVER_INIT(mirderby);
+	void init_reikaids();
+	void init_mjikaga();
+	void init_jogakuen();
+	void init_battlcry();
+	void init_mirderby();
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info1_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_1);

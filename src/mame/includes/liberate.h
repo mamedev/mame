@@ -62,9 +62,9 @@ public:
 	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
 	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
 	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
-	DECLARE_DRIVER_INIT(yellowcb);
-	DECLARE_DRIVER_INIT(liberate);
-	DECLARE_DRIVER_INIT(prosport);
+	void init_yellowcb();
+	void init_liberate();
+	void init_prosport();
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILEMAP_MAPPER_MEMBER(fix_scan);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

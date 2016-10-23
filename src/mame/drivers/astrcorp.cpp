@@ -78,9 +78,9 @@ public:
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
-	DECLARE_DRIVER_INIT(astoneag);
-	DECLARE_DRIVER_INIT(showhanc);
-	DECLARE_DRIVER_INIT(showhand);
+	void init_astoneag();
+	void init_showhanc();
+	void init_showhand();
 	void video_start_astrocorp();
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
@@ -1173,7 +1173,7 @@ ROM_START( dinodino )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(astrocorp_state,showhand)
+void astrocorp_state::init_showhand()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
@@ -1189,7 +1189,7 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhand)
 #endif
 }
 
-DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
+void astrocorp_state::init_showhanc()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
@@ -1202,7 +1202,7 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #endif
 }
 
-DRIVER_INIT_MEMBER(astrocorp_state,astoneag)
+void astrocorp_state::init_astoneag()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();

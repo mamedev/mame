@@ -99,9 +99,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	DECLARE_DRIVER_INIT(kuniokun);
-	DECLARE_DRIVER_INIT(kuniokunb);
-	DECLARE_DRIVER_INIT(renegade);
+	void init_kuniokun();
+	void init_kuniokunb();
+	void init_renegade();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

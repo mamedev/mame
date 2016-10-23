@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DRIVER_INIT(irobot);
+	void init_irobot();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(irobot);

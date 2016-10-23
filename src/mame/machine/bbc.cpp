@@ -1633,7 +1633,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
    Machine Initialisation functions
 ***************************************/
 
-DRIVER_INIT_MEMBER(bbc_state,bbc)
+void bbc_state::init_bbc()
 {
 	m_os01 = false;
 

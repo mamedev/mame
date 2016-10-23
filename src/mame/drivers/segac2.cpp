@@ -130,31 +130,31 @@ public:
 	/* sound-related variables */
 	uint8_t       m_sound_banks;      /* number of sound banks */
 
-	DECLARE_DRIVER_INIT(c2boot);
-	DECLARE_DRIVER_INIT(bloxeedc);
-	DECLARE_DRIVER_INIT(columns);
-	DECLARE_DRIVER_INIT(columns2);
-	DECLARE_DRIVER_INIT(tfrceac);
-	DECLARE_DRIVER_INIT(tfrceacb);
-	DECLARE_DRIVER_INIT(borench);
-	DECLARE_DRIVER_INIT(twinsqua);
-	DECLARE_DRIVER_INIT(ribbit);
-	DECLARE_DRIVER_INIT(puyo);
-	DECLARE_DRIVER_INIT(tantr);
-	DECLARE_DRIVER_INIT(tantrkor);
-	DECLARE_DRIVER_INIT(potopoto);
-	DECLARE_DRIVER_INIT(stkclmns);
-	DECLARE_DRIVER_INIT(stkclmnj);
-	DECLARE_DRIVER_INIT(ichir);
-	DECLARE_DRIVER_INIT(ichirk);
-	DECLARE_DRIVER_INIT(ichirj);
-	DECLARE_DRIVER_INIT(ichirjbl);
-	DECLARE_DRIVER_INIT(puyopuy2);
-	DECLARE_DRIVER_INIT(zunkyou);
-	DECLARE_DRIVER_INIT(pclub);
-	DECLARE_DRIVER_INIT(pclubjv2);
-	DECLARE_DRIVER_INIT(pclubjv4);
-	DECLARE_DRIVER_INIT(pclubjv5);
+	void init_c2boot();
+	void init_bloxeedc();
+	void init_columns();
+	void init_columns2();
+	void init_tfrceac();
+	void init_tfrceacb();
+	void init_borench();
+	void init_twinsqua();
+	void init_ribbit();
+	void init_puyo();
+	void init_tantr();
+	void init_tantrkor();
+	void init_potopoto();
+	void init_stkclmns();
+	void init_stkclmnj();
+	void init_ichir();
+	void init_ichirk();
+	void init_ichirj();
+	void init_ichirjbl();
+	void init_puyopuy2();
+	void init_zunkyou();
+	void init_pclub();
+	void init_pclubjv2();
+	void init_pclubjv4();
+	void init_pclubjv5();
 	void segac2_common_init(segac2_prot_delegate prot_func);
 	void video_start_segac2_new();
 	void machine_start_segac2();
@@ -2060,7 +2060,7 @@ it should be, otherwise I don't see how the formula could be computed.
 
 void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 {
-	DRIVER_INIT_CALL(megadriv_c2);
+	init_megadriv_c2();
 	m_prot_func = prot_func;
 
 	if (m_upd7759 != nullptr)
@@ -2295,94 +2295,94 @@ int segac2_state::prot_func_pclubjv5(int in)
 
 
 
-DRIVER_INIT_MEMBER(segac2_state,c2boot)
+void segac2_state::init_c2boot()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,bloxeedc)
+void segac2_state::init_bloxeedc()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,columns)
+void segac2_state::init_columns()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_columns),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,columns2)
+void segac2_state::init_columns2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_columns2),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tfrceac)
+void segac2_state::init_tfrceac()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tfrceac),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
+void segac2_state::init_tfrceacb()
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x800000, 0x800001);
 }
 
-DRIVER_INIT_MEMBER(segac2_state,borench)
+void segac2_state::init_borench()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_borench),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,twinsqua)
+void segac2_state::init_twinsqua()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_twinsqua),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ribbit)
+void segac2_state::init_ribbit()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ribbit),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,puyo)
+void segac2_state::init_puyo()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_puyo),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tantr)
+void segac2_state::init_tantr()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tantr),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tantrkor)
+void segac2_state::init_tantrkor()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tantrkor),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,potopoto)
+void segac2_state::init_potopoto()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_potopoto),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,stkclmns)
+void segac2_state::init_stkclmns()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_stkclmns),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,stkclmnj)
+void segac2_state::init_stkclmnj()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_stkclmnj),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichir)
+void segac2_state::init_ichir()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichir),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirk)
+void segac2_state::init_ichirk()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichirk),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirj)
+void segac2_state::init_ichirj()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichirj),this));
 }
@@ -2392,25 +2392,25 @@ READ16_MEMBER(segac2_state::ichirjbl_prot_r )
 	return 0x00f5;
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
+void segac2_state::init_ichirjbl()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(FUNC(segac2_state::ichirjbl_prot_r),this) );
 }
 
-DRIVER_INIT_MEMBER(segac2_state,puyopuy2)
+void segac2_state::init_puyopuy2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_puyopuy2),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,zunkyou)
+void segac2_state::init_zunkyou()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_zunkyou),this));
 }
 
 
-DRIVER_INIT_MEMBER(segac2_state,pclub)
+void segac2_state::init_pclub()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclub),this));
 
@@ -2419,7 +2419,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclub)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
+void segac2_state::init_pclubjv2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv2),this));
 
@@ -2428,7 +2428,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
+void segac2_state::init_pclubjv4()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv4),this));
 
@@ -2437,7 +2437,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
+void segac2_state::init_pclubjv5()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv5),this));
 

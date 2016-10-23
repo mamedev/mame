@@ -6226,7 +6226,7 @@ void metro_state::metro_common(  )
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,metro)
+void metro_state::init_metro()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6238,7 +6238,7 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 	metro_sound_rombank_w(space, 0, 0x00);
 }
 
-DRIVER_INIT_MEMBER(metro_state,karatour)
+void metro_state::init_karatour()
 {
 	m_vram_0.allocate(0x20000/2);
 	m_vram_1.allocate(0x20000/2);
@@ -6250,10 +6250,10 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 		m_vram_2[i] = machine().rand();
 	}
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
-DRIVER_INIT_MEMBER(metro_state,daitorid)
+void metro_state::init_daitorid()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -6267,7 +6267,7 @@ DRIVER_INIT_MEMBER(metro_state,daitorid)
 
 
 /* Unscramble the GFX ROMs */
-DRIVER_INIT_MEMBER(metro_state,balcube)
+void metro_state::init_balcube()
 {
 	uint8_t *ROM         = memregion("gfx1")->base();
 	const unsigned len = memregion("gfx1")->bytes();
@@ -6282,7 +6282,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,dharmak)
+void metro_state::init_dharmak()
 {
 	uint8_t *src = memregion( "gfx1" )->base();
 	int i;
@@ -6299,16 +6299,16 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 		src[i + 3] = dat;
 	}
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
-DRIVER_INIT_MEMBER(metro_state,blzntrnd)
+void metro_state::init_blzntrnd()
 {
 	metro_common();
 	m_irq_line = 1;
 }
 
-DRIVER_INIT_MEMBER(metro_state,mouja)
+void metro_state::init_mouja()
 {
 	metro_common();
 	m_irq_line = -1;    /* split interrupt handlers */
@@ -6317,7 +6317,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 	membank("okibank")->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 
-DRIVER_INIT_MEMBER(metro_state,gakusai)
+void metro_state::init_gakusai()
 {
 	metro_common();
 	m_irq_line = -1;
@@ -6325,7 +6325,7 @@ DRIVER_INIT_MEMBER(metro_state,gakusai)
 	m_blitter_bit = 3;
 }
 
-DRIVER_INIT_MEMBER(metro_state,puzzlet)
+void metro_state::init_puzzlet()
 {
 	metro_common();
 	m_irq_line = 0;

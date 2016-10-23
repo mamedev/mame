@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_DRIVER_INIT(konamigq);
+	void init_konamigq();
 	void machine_start_konamigq();
 	void machine_reset_konamigq();
 	INTERRUPT_GEN_MEMBER(tms_sync);
@@ -291,7 +291,7 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 {
 }
 
-DRIVER_INIT_MEMBER(konamigq_state,konamigq)
+void konamigq_state::init_konamigq()
 {
 	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }

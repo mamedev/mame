@@ -73,5 +73,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(blktigerb3);
+	void init_blktigerb3();
 };

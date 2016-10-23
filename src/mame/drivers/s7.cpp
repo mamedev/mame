@@ -111,7 +111,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 	void machine_reset_s7();
-	DECLARE_DRIVER_INIT(s7);
+	void init_s7();
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -412,7 +412,7 @@ void s7_state::machine_reset_s7()
 {
 }
 
-DRIVER_INIT_MEMBER( s7_state, s7 )
+void s7_state::init_s7()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);

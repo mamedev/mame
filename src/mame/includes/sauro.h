@@ -57,7 +57,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 
-	DECLARE_DRIVER_INIT(tecfri);
+	void init_tecfri();
 	void video_start_trckydoc();
 	void video_start_sauro();
 

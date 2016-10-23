@@ -74,7 +74,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
@@ -246,7 +246,7 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(mirage_state,mirage)
+void mirage_state::init_mirage()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;

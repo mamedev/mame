@@ -68,7 +68,7 @@ public:
 
 public:
 	const uint8_t *m_p_chargen;
-	DECLARE_DRIVER_INIT(zorba);
+	void init_zorba();
 	void machine_reset_zorba();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -203,7 +203,7 @@ WRITE8_MEMBER( zorba_state::intmask_w )
 static INPUT_PORTS_START( zorba )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( zorba_state, zorba )
+void zorba_state::init_zorba()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

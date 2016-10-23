@@ -109,7 +109,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
-	DECLARE_DRIVER_INIT(fi6845);
+	void init_fi6845();
 
 };
 
@@ -691,7 +691,7 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
+void fastinvaders_state::init_fi6845()
 {
 const uint8_t *prom = memregion("prom")->base();
 	int i;

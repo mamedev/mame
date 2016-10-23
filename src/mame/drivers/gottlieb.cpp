@@ -2590,47 +2590,47 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gottlieb_state,ramtiles)
+void gottlieb_state::init_ramtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 0;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
+void gottlieb_state::init_romtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbert)
+void gottlieb_state::init_qbert()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbert_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbertqub)
+void gottlieb_state::init_qbertqub()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbertqub_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,stooges)
+void gottlieb_state::init_stooges()
 {
-	DRIVER_INIT_CALL(ramtiles);
+	init_ramtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,screwloo)
+void gottlieb_state::init_screwloo()
 {
 	m_gfxcharlo = 0;
 	m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
+void gottlieb_state::init_vidvince()
 {
 	m_gfxcharlo = 1;
 	m_gfxcharhi = 0;

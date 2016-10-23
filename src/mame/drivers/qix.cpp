@@ -1362,7 +1362,7 @@ int qix_state::kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-DRIVER_INIT_MEMBER(qix_state,kram3)
+void qix_state::init_kram3()
 {
 	//const uint8_t *patch;
 	uint8_t *rom, *decrypted;
@@ -1427,7 +1427,7 @@ WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,zookeep)
+void qix_state::init_zookeep()
 {
 	/* configure the banking */
 	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
@@ -1436,7 +1436,7 @@ DRIVER_INIT_MEMBER(qix_state,zookeep)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,slither)
+void qix_state::init_slither()
 {
 }
 

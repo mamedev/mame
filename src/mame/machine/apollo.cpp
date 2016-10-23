@@ -1205,7 +1205,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_terminal )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(apollo_state,apollo)
+void apollo_state::init_apollo()
 {
 	MLOG1(("driver_init_apollo"));
 }

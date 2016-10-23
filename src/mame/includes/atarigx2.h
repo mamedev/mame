@@ -56,9 +56,9 @@ public:
 	DECLARE_WRITE32_MEMBER(atarigx2_protection_w);
 	DECLARE_READ32_MEMBER(atarigx2_protection_r);
 	DECLARE_READ32_MEMBER(rrreveng_prot_r);
-	DECLARE_DRIVER_INIT(spclords);
-	DECLARE_DRIVER_INIT(rrreveng);
-	DECLARE_DRIVER_INIT(motofren);
+	void init_spclords();
+	void init_rrreveng();
+	void init_motofren();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);

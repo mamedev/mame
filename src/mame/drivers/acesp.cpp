@@ -33,8 +33,8 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(ace_sp);
-	DECLARE_DRIVER_INIT(ace_cr);
+	void init_ace_sp();
+	void init_ace_cr();
 };
 
 
@@ -3867,12 +3867,12 @@ static void descramble_crystal( uint8_t* region, int start, int end, uint8_t ext
 		region[i] = x ^ extra_xor;
 	}
 }
-DRIVER_INIT_MEMBER(ace_sp_state,ace_cr)
+void ace_sp_state::init_ace_cr()
 {
 	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
-DRIVER_INIT_MEMBER(ace_sp_state,ace_sp)
+void ace_sp_state::init_ace_sp()
 {
 }
 

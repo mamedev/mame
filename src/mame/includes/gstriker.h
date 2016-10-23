@@ -70,9 +70,9 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(twrldc94a);
-	DECLARE_DRIVER_INIT(vgoalsoc);
-	DECLARE_DRIVER_INIT(twrldc94);
+	void init_twrldc94a();
+	void init_vgoalsoc();
+	void init_twrldc94();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

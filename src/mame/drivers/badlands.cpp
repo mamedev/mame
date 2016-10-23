@@ -589,7 +589,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(badlands_state,badlands)
+void badlands_state::init_badlands()
 {
 	/* initialize the audio system */
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);

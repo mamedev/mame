@@ -45,8 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
 	DECLARE_WRITE8_MEMBER(popeye_portB_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
-	DECLARE_DRIVER_INIT(skyskipr);
-	DECLARE_DRIVER_INIT(popeye);
+	void init_skyskipr();
+	void init_popeye();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(popeye);

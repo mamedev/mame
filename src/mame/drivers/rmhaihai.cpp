@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 
-	DECLARE_DRIVER_INIT(rmhaihai);
+	void init_rmhaihai();
 	virtual void video_start() override;
 	void machine_start_themj();
 	void machine_reset_themj();
@@ -674,7 +674,7 @@ ROM_START( themj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
+void rmhaihai_state::init_rmhaihai()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int size = memregion("gfx1")->bytes();

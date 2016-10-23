@@ -820,13 +820,13 @@ void cps3_state::init_crypt(uint32_t key1, uint32_t key2, int altEncryption)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
-DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_crypt(0x02203ee3, 0x01301972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_crypt(0xa55432b4, 0x0c129981, 0); }
-DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_crypt(0x23323ee3, 0x03021972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,cps3boot)  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
+void cps3_state::init_redearth()  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
+void cps3_state::init_sfiii()     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
+void cps3_state::init_sfiii2()    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
+void cps3_state::init_jojo()      { init_crypt(0x02203ee3, 0x01301972, 0); }
+void cps3_state::init_sfiii3()    { init_crypt(0xa55432b4, 0x0c129981, 0); }
+void cps3_state::init_jojoba()    { init_crypt(0x23323ee3, 0x03021972, 0); }
+void cps3_state::init_cps3boot()  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
 
 
 

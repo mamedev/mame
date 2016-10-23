@@ -105,8 +105,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
-	DECLARE_DRIVER_INIT(splndrbt);
-	DECLARE_DRIVER_INIT(equites);
+	void init_splndrbt();
+	void init_equites();
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);

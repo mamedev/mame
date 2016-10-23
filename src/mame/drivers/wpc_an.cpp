@@ -41,7 +41,7 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_an);
+	void init_wpc_an();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -294,7 +294,7 @@ void wpc_an_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
+void wpc_an_state::init_wpc_an()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *fixed = memregion("fixed")->base();

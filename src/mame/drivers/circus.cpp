@@ -559,20 +559,20 @@ ROM_START( ripcord )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(circus_state,circus)
+void circus_state::init_circus()
 {
 	m_game_id = 1;
 }
 
-DRIVER_INIT_MEMBER(circus_state,robotbwl)
+void circus_state::init_robotbwl()
 {
 	m_game_id = 2;
 }
-DRIVER_INIT_MEMBER(circus_state,crash)
+void circus_state::init_crash()
 {
 	m_game_id = 3;
 }
-DRIVER_INIT_MEMBER(circus_state,ripcord)
+void circus_state::init_ripcord()
 {
 	m_game_id = 4;
 }

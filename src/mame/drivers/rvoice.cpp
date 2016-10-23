@@ -84,7 +84,7 @@ public:
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
-	DECLARE_DRIVER_INIT(rvoicepc);
+	void init_rvoicepc();
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(null_kbd_put);
 	required_device<cpu_device> m_maincpu;
@@ -93,7 +93,7 @@ public:
 
 /* Devices */
 
-DRIVER_INIT_MEMBER(rvoice_state,rvoicepc)
+void rvoice_state::init_rvoicepc()
 {
 }
 

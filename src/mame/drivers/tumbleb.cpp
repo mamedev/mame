@@ -3457,7 +3457,7 @@ void tumbleb_state::tumblepb_gfx_rearrange(int rgn)
 	}
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
+void tumbleb_state::init_tumblepb()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3466,13 +3466,13 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
 	#endif
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumblepba)
+void tumbleb_state::init_tumblepba()
 {
 	// rearrange the bg data instead of the sprite data on this one!
 	tumblepb_gfx_rearrange(2);
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
+void tumbleb_state::init_tumbleb2()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3483,7 +3483,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
+void tumbleb_state::init_jumpkids()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3492,7 +3492,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
 	#endif
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
+void tumbleb_state::init_fncywld()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3514,14 +3514,14 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 	else return ioport("SYSTEM")->read();
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
+void tumbleb_state::init_bcstory()
 {
 	tumblepb_gfx_rearrange(1);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
 }
 
 
-DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
+void tumbleb_state::init_htchctch()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i, len = memregion("user1")->bytes();
@@ -3568,15 +3568,15 @@ void tumbleb_state::suprtrio_decrypt_gfx()
 	}
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)
+void tumbleb_state::init_suprtrio()
 {
 	suprtrio_decrypt_code();
 	suprtrio_decrypt_gfx();
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
+void tumbleb_state::init_chokchok()
 {
-	DRIVER_INIT_CALL(htchctch);
+	init_htchctch();
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(palette_device::write), m_palette.target()));
@@ -3585,15 +3585,15 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,carket)
+void tumbleb_state::init_carket()
 {
-	DRIVER_INIT_CALL(htchctch);
+	init_htchctch();
 
 	/* slightly different banking */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
+void tumbleb_state::init_wlstar()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3603,13 +3603,13 @@ DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 	m_protbase = 0x0000;
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,wondl96)
+void tumbleb_state::init_wondl96()
 {
-	DRIVER_INIT_CALL(wlstar);
+	init_wlstar();
 	m_protbase = 0x0200;
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
+void tumbleb_state::init_dquizgo()
 {
 	tumblepb_gfx_rearrange(1);
 }

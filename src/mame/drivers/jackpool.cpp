@@ -41,7 +41,7 @@ public:
 	DECLARE_READ16_MEMBER(jackpool_ff_r);
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
-	DECLARE_DRIVER_INIT(jackpool);
+	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
@@ -307,7 +307,7 @@ ROM_START( jackpool )
 	ROM_LOAD( "jpc7", 0xc0000, 0x40000,  CRC(b1d40623) SHA1(fb76ae6b53474bd4bee19dbce9537da0f2b63ff4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(jackpool_state,jackpool)
+void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 

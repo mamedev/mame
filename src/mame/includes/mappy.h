@@ -123,14 +123,14 @@ public:
 	TIMER_CALLBACK_MEMBER(mappy_io_run);
 	TIMER_CALLBACK_MEMBER(digdug2_io_run);
 	TIMER_CALLBACK_MEMBER(motos_io_run);
-	DECLARE_DRIVER_INIT(superpac);
-	DECLARE_DRIVER_INIT(pacnpal);
-	DECLARE_DRIVER_INIT(grobda);
-	DECLARE_DRIVER_INIT(phozon);
-	DECLARE_DRIVER_INIT(mappy);
-	DECLARE_DRIVER_INIT(druaga);
-	DECLARE_DRIVER_INIT(digdug2);
-	DECLARE_DRIVER_INIT(motos);
+	void init_superpac();
+	void init_pacnpal();
+	void init_grobda();
+	void init_phozon();
+	void init_mappy();
+	void init_druaga();
+	void init_digdug2();
+	void init_motos();
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 

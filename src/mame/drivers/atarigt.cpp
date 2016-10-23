@@ -1303,7 +1303,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 }
 
-DRIVER_INIT_MEMBER(atarigt_state,tmek)
+void atarigt_state::init_tmek()
 {
 	m_is_primrage = 0;
 
@@ -1316,7 +1316,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 }
 
 
-DRIVER_INIT_MEMBER(atarigt_state,primrage)
+void atarigt_state::init_primrage()
 {
 	m_is_primrage = 1;
 

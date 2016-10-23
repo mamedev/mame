@@ -101,7 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(cntsteer_adx_r);
 	DECLARE_WRITE8_MEMBER(nmimask_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(zerotrgt);
+	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void machine_start_cntsteer();
@@ -1198,7 +1198,7 @@ void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 }
 
 #if 0
-DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
+void cntsteer_state::init_cntsteer()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 
@@ -1211,7 +1211,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 }
 #endif
 
-DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::init_zerotrgt()
 {
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }

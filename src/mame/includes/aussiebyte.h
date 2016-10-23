@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	void machine_reset_aussiebyte();
-	DECLARE_DRIVER_INIT(aussiebyte);
+	void init_aussiebyte();
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);

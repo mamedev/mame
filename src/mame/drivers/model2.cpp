@@ -5849,46 +5849,46 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-DRIVER_INIT_MEMBER(model2_state,genprot)
+void model2_state::init_genprot()
 {
 	//std::string key = parameter(":315_5881:key");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,pltkids)
+void model2_state::init_pltkids()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,zerogun)
+void model2_state::init_zerogun()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,daytonam)
+void model2_state::init_daytonam()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,sgt24h)
+void model2_state::init_sgt24h()
 {
-//  DRIVER_INIT_CALL(genprot);
+//  init_genprot();
 
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,doa)
+void model2_state::init_doa()
 {
 	m_0229crypt->install_doa_protection();
 
@@ -5897,12 +5897,12 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 	ROM[0x808/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,rchase2)
+void model2_state::init_rchase2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,srallyc)
+void model2_state::init_srallyc()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),this));
 }

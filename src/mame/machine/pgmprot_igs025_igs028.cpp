@@ -162,7 +162,7 @@ void pgm_028_025_state::machine_reset_olds()
 	machine_reset_pgm();
 }
 
-DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 

@@ -676,14 +676,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(policetr_state,policetr)
+void policetr_state::init_policetr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028ac;
 	m_speedup_data = m_rambase + 0xfc8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,plctr13b)
+void policetr_state::init_plctr13b()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028bc;
@@ -691,14 +691,14 @@ DRIVER_INIT_MEMBER(policetr_state,plctr13b)
 }
 
 
-DRIVER_INIT_MEMBER(policetr_state,sshooter)
+void policetr_state::init_sshooter()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc03470;
 	m_speedup_data = m_rambase + 0x18fd8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,sshoot12)
+void policetr_state::init_sshoot12()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc033e0;

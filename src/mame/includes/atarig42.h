@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
 	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
-	DECLARE_DRIVER_INIT(roadriot);
-	DECLARE_DRIVER_INIT(guardian);
+	void init_roadriot();
+	void init_guardian();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);

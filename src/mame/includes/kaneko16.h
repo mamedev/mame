@@ -83,8 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
-	DECLARE_DRIVER_INIT(kaneko16);
-	DECLARE_DRIVER_INIT(samplebank);
+	void init_kaneko16();
+	void init_samplebank();
 
 
 	void machine_reset_gtmr();
@@ -124,7 +124,7 @@ public:
 	DECLARE_READ16_MEMBER(gtmr_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
-	DECLARE_DRIVER_INIT(gtmr);
+	void init_gtmr();
 
 };
 
@@ -163,7 +163,7 @@ public:
 	DECLARE_READ16_MEMBER(berlwall_spriteregs_r);
 	DECLARE_WRITE16_MEMBER(berlwall_spriteregs_w);
 
-	DECLARE_DRIVER_INIT(berlwall);
+	void init_berlwall();
 	DECLARE_PALETTE_INIT(berlwall);
 	void video_start_berlwall();
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -184,8 +184,8 @@ public:
 	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
 
-	DECLARE_DRIVER_INIT(shogwarr);
-	DECLARE_DRIVER_INIT(brapboys);
+	void init_shogwarr();
+	void init_brapboys();
 };
 
 #endif

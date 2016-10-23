@@ -333,7 +333,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
+void cbasebal_state::init_cbasebal()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();

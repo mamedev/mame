@@ -412,11 +412,11 @@ public:
 	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
 	DECLARE_WRITE16_MEMBER( gunmania_w );
 	DECLARE_READ16_MEMBER( gunmania_r );
-	DECLARE_DRIVER_INIT( salarymc );
-	DECLARE_DRIVER_INIT( pnchmn );
-	DECLARE_DRIVER_INIT( ddr );
-	DECLARE_DRIVER_INIT( hyperbbc );
-	DECLARE_DRIVER_INIT( drmn );
+	void init_salarymc();
+	void init_pnchmn();
+	void init_ddr();
+	void init_hyperbbc();
+	void init_drmn();
 	void machine_reset_konami573();
 	WRITE_LINE_MEMBER( h8_clk_w );
 	DECLARE_READ_LINE_MEMBER( h8_d0_r );
@@ -1161,7 +1161,7 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 	}
 }
 
-DRIVER_INIT_MEMBER( ksys573_state, ddr )
+void ksys573_state::init_ddr()
 {
 	m_stage_mask = 0xffffffff;
 	gx700pwfbf_init( &ksys573_state::ddr_output_callback );
@@ -1312,7 +1312,7 @@ WRITE8_MEMBER( ksys573_state::drmn_output_callback )
 	}
 }
 
-DRIVER_INIT_MEMBER( ksys573_state,drmn )
+void ksys573_state::init_drmn()
 {
 	gx700pwfbf_init( &ksys573_state::drmn_output_callback );
 }
@@ -1522,7 +1522,7 @@ static MACHINE_CONFIG_FRAGMENT( salarymc_cassette_install )
 	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_d ) )
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( ksys573_state, salarymc )
+void ksys573_state::init_salarymc()
 {
 	m_salarymc_lamp_bits = 0;
 	m_salarymc_lamp_shift = 0;
@@ -1616,7 +1616,7 @@ static MACHINE_CONFIG_FRAGMENT( hypbbc2p_cassette_install )
 	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_red ) )
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( ksys573_state, hyperbbc )
+void ksys573_state::init_hyperbbc()
 {
 	m_hyperbbc_lamp_red = 0;
 	m_hyperbbc_lamp_green = 0;
@@ -1852,7 +1852,7 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 	popmessage( "%s", pad );
 }
 
-DRIVER_INIT_MEMBER( ksys573_state,pnchmn )
+void ksys573_state::init_pnchmn()
 {
 	gx700pwfbf_init( &ksys573_state::punchmania_output_callback );
 }

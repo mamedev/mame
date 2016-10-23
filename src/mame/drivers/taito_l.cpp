@@ -2559,7 +2559,7 @@ ROM_END
 
 
 // bits 7..0 => bits 0..7
-DRIVER_INIT_MEMBER(taitol_state,plottinga)
+void taitol_state::init_plottinga()
 {
 	uint8_t tab[256];
 	uint8_t *p;

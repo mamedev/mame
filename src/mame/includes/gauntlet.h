@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mixer_w);
 	void swap_memory(void *ptr1, void *ptr2, int bytes);
 	void common_init(int vindctr2);
-	DECLARE_DRIVER_INIT(gauntlet);
-	DECLARE_DRIVER_INIT(vindctr2);
+	void init_gauntlet();
+	void init_vindctr2();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	void machine_start_gauntlet();

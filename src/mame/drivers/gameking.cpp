@@ -43,7 +43,7 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_DRIVER_INIT(gameking);
+	void init_gameking();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(gameking);
@@ -203,7 +203,7 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 }
 
 
-DRIVER_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::init_gameking()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));

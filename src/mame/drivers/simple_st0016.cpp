@@ -691,23 +691,23 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(st0016_state,renju)
+void st0016_state::init_renju()
 {
 	m_maincpu->set_st0016_game_flag(0);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,nratechu)
+void st0016_state::init_nratechu()
 {
 	m_maincpu->set_st0016_game_flag(1);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
+void st0016_state::init_mayjinsn()
 {
 	m_maincpu->set_st0016_game_flag(4 /*| 0x80*/);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
+void st0016_state::init_mayjisn2()
 {
 	m_maincpu->set_st0016_game_flag(4);
 	membank("bank2")->set_base(memregion("user1")->base());

@@ -5353,14 +5353,14 @@ ROM_START( racingbj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitoz_state,taitoz)
+void taitoz_state::init_taitoz()
 {
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::parse_cpu_control), this));
 }
 
-DRIVER_INIT_MEMBER(taitoz_state,bshark)
+void taitoz_state::init_bshark()
 {
-	DRIVER_INIT_CALL(taitoz);
+	init_taitoz();
 
 	m_eep_latch = 0;
 

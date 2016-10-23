@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
-	DECLARE_DRIVER_INIT(taito_b);
+	void init_taito_b();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_taitob_color_order0();

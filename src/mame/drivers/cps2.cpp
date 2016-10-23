@@ -9703,17 +9703,17 @@ void cps_state::init_digital_volume()
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2)
+void cps_state::init_cps2()
 {
 	/* Decrypt the game - see machine/cps2crypt.cpp */
-	DRIVER_INIT_CALL(cps2crypt);
-	DRIVER_INIT_CALL(cps2nc);
+	init_cps2crypt();
+	init_cps2nc();
 }
 
-DRIVER_INIT_MEMBER(cps_state, cps2nc)
+void cps_state::init_cps2nc()
 {
 	/* Initialize some video elements */
-	DRIVER_INIT_CALL(cps2_video);
+	init_cps2_video();
 
 	m_cps2networkpresent = 0;
 
@@ -9723,9 +9723,9 @@ DRIVER_INIT_MEMBER(cps_state, cps2nc)
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,ssf2tb)
+void cps_state::init_ssf2tb()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_cps2networkpresent = 0;
 
@@ -9735,9 +9735,9 @@ DRIVER_INIT_MEMBER(cps_state,ssf2tb)
 
 }
 
-DRIVER_INIT_MEMBER(cps_state,pzloop2)
+void cps_state::init_pzloop2()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_readpaddle = 0;
 	m_cps2_dial_type = 1;
@@ -9747,9 +9747,9 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps_state::joy_or_paddle_r), this));
 }
 
-DRIVER_INIT_MEMBER(cps_state,singbrd)
+void cps_state::init_singbrd()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	/* the single board games don't have a digital volume switch */
 	m_cps2disabledigitalvolume = 1;
@@ -9781,13 +9781,13 @@ void cps_state::gigaman2_gfx_reorder()
 	}
 }
 
-DRIVER_INIT_MEMBER(cps_state,gigaman2)
+void cps_state::init_gigaman2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	gigaman2_gfx_reorder();
 
-	DRIVER_INIT_CALL(cps2nc);
+	init_cps2nc();
 
 	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram.get()), 0x20000 / 2);
@@ -9800,9 +9800,9 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-DRIVER_INIT_MEMBER(cps_state,ecofghtr)
+void cps_state::init_ecofghtr()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_readpaddle = 0;
 	m_cps2_dial_type = 2;

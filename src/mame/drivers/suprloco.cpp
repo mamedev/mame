@@ -267,7 +267,7 @@ ROM_START( suprlocoo )
 	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) ) /* unknown */
 ROM_END
 
-DRIVER_INIT_MEMBER(suprloco_state,suprloco)
+void suprloco_state::init_suprloco()
 {
 	/* convert graphics to 4bpp from 3bpp */
 

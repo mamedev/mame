@@ -38,8 +38,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
 	DECLARE_WRITE16_MEMBER(m90_video_control_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
-	DECLARE_DRIVER_INIT(bomblord);
-	DECLARE_DRIVER_INIT(quizf1);
+	void init_bomblord();
+	void init_quizf1();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1w_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);

@@ -83,7 +83,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(pyl601);
+	void init_pyl601();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
@@ -469,7 +469,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 
 
 
-DRIVER_INIT_MEMBER(pyl601_state,pyl601)
+void pyl601_state::init_pyl601()
 {
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }

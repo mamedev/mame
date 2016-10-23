@@ -143,7 +143,7 @@ public:
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
 
-	DECLARE_DRIVER_INIT(hp9k);
+	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( hp9k )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(hp9k_state,hp9k)
+void hp9k_state::init_hp9k()
 {
 }
 

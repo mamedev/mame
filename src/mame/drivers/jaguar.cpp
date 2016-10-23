@@ -1937,7 +1937,7 @@ void jaguar_state::fix_endian( uint32_t addr, uint32_t size )
 	}
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,jaguar)
+void jaguar_state::init_jaguar()
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
@@ -1955,7 +1955,7 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguar)
 	}
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,jaguarcd)
+void jaguar_state::init_jaguarcd()
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
@@ -2554,7 +2554,7 @@ void jaguar_state::cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51a)
+void jaguar_state::init_area51a()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x5c4, 0x5a0);
@@ -2567,7 +2567,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51a)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51)
+void jaguar_state::init_area51()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2579,7 +2579,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51)
 #endif
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,maxforce)
+void jaguar_state::init_maxforce()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2596,7 +2596,7 @@ DRIVER_INIT_MEMBER(jaguar_state,maxforce)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51mx)
+void jaguar_state::init_area51mx()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2612,7 +2612,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51mx)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
+void jaguar_state::init_a51mxr3k()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2629,7 +2629,7 @@ DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,fishfren)
+void jaguar_state::init_fishfren()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x578, 0x554);
@@ -2659,14 +2659,14 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 #endif
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,freezeat) { m_hacks_enabled = true; init_freeze_common(0x1001a9f4); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat2) { m_hacks_enabled = true; init_freeze_common(0x1001a8c4); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat3) { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat4) { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat5) { m_hacks_enabled = true; init_freeze_common(0x10019b34); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat6) { m_hacks_enabled = true; init_freeze_common(0x10019684); }
+void jaguar_state::init_freezeat() { m_hacks_enabled = true; init_freeze_common(0x1001a9f4); }
+void jaguar_state::init_freezeat2() { m_hacks_enabled = true; init_freeze_common(0x1001a8c4); }
+void jaguar_state::init_freezeat3() { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
+void jaguar_state::init_freezeat4() { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
+void jaguar_state::init_freezeat5() { m_hacks_enabled = true; init_freeze_common(0x10019b34); }
+void jaguar_state::init_freezeat6() { m_hacks_enabled = true; init_freeze_common(0x10019684); }
 
-DRIVER_INIT_MEMBER(jaguar_state,vcircle)
+void jaguar_state::init_vcircle()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x5c0, 0x5a0);

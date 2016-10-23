@@ -119,7 +119,7 @@ public:
 	void video_start_spinlbrk();
 	void video_start_turbofrc();
 	void video_start_wbbc97();
-	DECLARE_DRIVER_INIT(banked_oki);
+	void init_banked_oki();
 	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

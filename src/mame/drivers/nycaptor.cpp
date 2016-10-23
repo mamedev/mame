@@ -1327,17 +1327,17 @@ ROM_START( colt )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nycaptor_state,nycaptor)
+void nycaptor_state::init_nycaptor()
 {
 	m_gametype = 0;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,cyclshtg)
+void nycaptor_state::init_cyclshtg()
 {
 	m_gametype = 1;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,bronx)
+void nycaptor_state::init_bronx()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1348,7 +1348,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 	m_gametype = 1;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,colt)
+void nycaptor_state::init_colt()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();

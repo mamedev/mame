@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(umi_counters_w);
 	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
-	DECLARE_DRIVER_INIT(umipoker);
-	DECLARE_DRIVER_INIT(saiyukip);
+	void init_umipoker();
+	void init_saiyukip();
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
@@ -742,12 +742,12 @@ ROM_END
 *              Driver Init                *
 ******************************************/
 
-DRIVER_INIT_MEMBER(umipoker_state,umipoker)
+void umipoker_state::init_umipoker()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), this));
 }
 
-DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
+void umipoker_state::init_saiyukip()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), this));

@@ -1480,7 +1480,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
+void zaxxon_state::init_zaxxonj()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1553,7 +1553,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 
 
-DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::init_razmataz()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 

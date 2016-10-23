@@ -114,7 +114,7 @@ public:
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
-	DECLARE_DRIVER_INIT(cliff);
+	void init_cliff();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
@@ -766,7 +766,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
+void cliffhgr_state::init_cliff()
 {
 }
 

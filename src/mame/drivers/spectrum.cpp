@@ -607,7 +607,7 @@ INPUT_PORTS_END
 
 /* Machine initialization */
 
-DRIVER_INIT_MEMBER(spectrum_state,spectrum)
+void spectrum_state::init_spectrum()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

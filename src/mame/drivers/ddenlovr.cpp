@@ -412,8 +412,8 @@ public:
 	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
-	DECLARE_DRIVER_INIT(rongrong);
-	DECLARE_DRIVER_INIT(momotaro);
+	void init_rongrong();
+	void init_momotaro();
 	DECLARE_WRITE8_MEMBER(htengoku_select_w);
 	DECLARE_WRITE8_MEMBER(htengoku_coin_w);
 	DECLARE_READ8_MEMBER(htengoku_input_r);
@@ -11442,7 +11442,7 @@ ROM_START( ddenlovrb )
 	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(ba4723e8) SHA1(fd32b33bd43773fed083990b59a3994f4a631b04) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ddenlovr_state,rongrong)
+void ddenlovr_state::init_rongrong()
 {
 	/* Rong Rong seems to have a protection that works this way:
 	    - write 01 to port c2
@@ -12937,7 +12937,7 @@ ROM_START( seljan2 )
 	ROM_LOAD( "5571.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // = 50201.1c (sryudens)
 ROM_END
 
-DRIVER_INIT_MEMBER(ddenlovr_state,momotaro)
+void ddenlovr_state::init_momotaro()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(ddenlovr_state::momotaro_protection_r),this));
 }

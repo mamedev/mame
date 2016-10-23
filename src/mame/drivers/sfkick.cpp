@@ -199,7 +199,7 @@ public:
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
-	DECLARE_DRIVER_INIT(sfkick);
+	void init_sfkick();
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(sfkick_state,sfkick)
+void sfkick_state::init_sfkick()
 {
 	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
 }

@@ -65,8 +65,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(exerion_porta_r);
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
-	DECLARE_DRIVER_INIT(exerion);
-	DECLARE_DRIVER_INIT(exerionb);
+	void init_exerion();
+	void init_exerionb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

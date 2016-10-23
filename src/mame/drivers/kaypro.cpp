@@ -327,7 +327,7 @@ static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( kaypro_state, kaypro )
+void kaypro_state::init_kaypro()
 {
 	uint8_t *main = memregion("roms")->base();
 	uint8_t *ram = memregion("rambank")->base();

@@ -571,7 +571,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
+void gberet_state::init_mrgoemon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);

@@ -97,9 +97,9 @@ public:
 		, m_timer_s_freq(*this, "timer_s_freq")
 	{ }
 
-	DECLARE_DRIVER_INIT(by35_6);
-	DECLARE_DRIVER_INIT(by35_7);
-	DECLARE_DRIVER_INIT(playboy);
+	void init_by35_6();
+	void init_by35_7();
+	void init_playboy();
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -894,7 +894,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_6 )
+void by35_state::init_by35_6()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -937,7 +937,7 @@ DRIVER_INIT_MEMBER( by35_state, by35_6 )
 	m_7d = 0;
 }
 
-DRIVER_INIT_MEMBER( by35_state, playboy )
+void by35_state::init_playboy()
 {
 	static const uint8_t solenoid_features_playboy[20][4] =
 	{
@@ -966,7 +966,7 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 	};
 
 
-	DRIVER_INIT_CALL( by35_6 );
+	init_by35_6();
 
 	for (int i=0; i<20; i++)
 	{
@@ -979,9 +979,9 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 }
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_7 )
+void by35_state::init_by35_7()
 {
-	DRIVER_INIT_CALL(by35_6);
+	init_by35_6();
 
 	m_7d = 1;
 }

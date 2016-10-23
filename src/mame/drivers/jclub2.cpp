@@ -145,7 +145,7 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 	DECLARE_WRITE32_MEMBER(jclub2o_eeprom_w);
-	DECLARE_DRIVER_INIT(darkhors);
+	void init_darkhors();
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	void video_start_darkhors();
@@ -1295,7 +1295,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )

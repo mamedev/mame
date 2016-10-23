@@ -194,8 +194,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_DRIVER_INIT(wilytowr);
-	DECLARE_DRIVER_INIT(fghtbskt);
+	void init_wilytowr();
+	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void machine_start_m63();
@@ -1013,12 +1013,12 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb_b.11e",     0x0200, 0x0100, CRC(fca5bf0e) SHA1(5846f43aa2906cac58e300fdab197b99f896e3ef) )
 ROM_END
 
-DRIVER_INIT_MEMBER(m63_state,wilytowr)
+void m63_state::init_wilytowr()
 {
 	m_sy_offset = 238;
 }
 
-DRIVER_INIT_MEMBER(m63_state,fghtbskt)
+void m63_state::init_fghtbskt()
 {
 	m_sy_offset = 240;
 }

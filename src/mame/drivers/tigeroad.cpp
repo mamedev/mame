@@ -1179,18 +1179,18 @@ ROM_START( bballsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tigeroad_state,f1dream)
+void tigeroad_state::init_f1dream()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),this));
 }
 
-DRIVER_INIT_MEMBER(tigeroad_state,pushman)
+void tigeroad_state::init_pushman()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::pushman_68705_r),this), write16_delegate(FUNC(tigeroad_state::pushman_68705_w),this)   );
 	m_has_coinlock = 0;
 }
 
-DRIVER_INIT_MEMBER(tigeroad_state,bballs)
+void tigeroad_state::init_bballs()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::bballs_68705_r),this), write16_delegate(FUNC(tigeroad_state::bballs_68705_w),this)   );
 	m_has_coinlock = 0;

@@ -61,8 +61,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);
 	DECLARE_WRITE16_MEMBER(powerbls_bg_tileram_w);
 	DECLARE_WRITE8_MEMBER(sslam_snd_w);
-	DECLARE_DRIVER_INIT(sslam);
-	DECLARE_DRIVER_INIT(powerbls);
+	void init_sslam();
+	void init_powerbls();
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);

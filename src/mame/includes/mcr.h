@@ -99,18 +99,18 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(dpoker_coin_in_hit);
 
-	DECLARE_DRIVER_INIT(mcr_91490);
-	DECLARE_DRIVER_INIT(kroozr);
-	DECLARE_DRIVER_INIT(solarfox);
-	DECLARE_DRIVER_INIT(kick);
-	DECLARE_DRIVER_INIT(dpoker);
-	DECLARE_DRIVER_INIT(twotiger);
-	DECLARE_DRIVER_INIT(demoderb);
-	DECLARE_DRIVER_INIT(wacko);
-	DECLARE_DRIVER_INIT(mcr_90010);
-	DECLARE_DRIVER_INIT(dotrone);
-	DECLARE_DRIVER_INIT(nflfoot);
-	DECLARE_DRIVER_INIT(journey);
+	void init_mcr_91490();
+	void init_kroozr();
+	void init_solarfox();
+	void init_kick();
+	void init_dpoker();
+	void init_twotiger();
+	void init_demoderb();
+	void init_wacko();
+	void init_mcr_90010();
+	void init_dotrone();
+	void init_nflfoot();
+	void init_journey();
 
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);

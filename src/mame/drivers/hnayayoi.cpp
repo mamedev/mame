@@ -649,7 +649,7 @@ ROM_START( untoucha )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
+void hnayayoi_state::init_hnfubuki()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();

@@ -28,20 +28,20 @@
 #define MACHINE_IS_SPRINT2   (m_game == 2)
 #define MACHINE_IS_DOMINOS   (m_game == 3)
 
-DRIVER_INIT_MEMBER(sprint2_state,sprint1)
+void sprint2_state::init_sprint1()
 {
 	m_game = 1;
 }
-DRIVER_INIT_MEMBER(sprint2_state,sprint2)
+void sprint2_state::init_sprint2()
 {
 	m_game = 2;
 }
-DRIVER_INIT_MEMBER(sprint2_state,dominos)
+void sprint2_state::init_dominos()
 {
 	m_game = 3;
 }
 
-DRIVER_INIT_MEMBER(sprint2_state,dominos4)
+void sprint2_state::init_dominos4()
 {
 	m_game = 3;
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0880, 0x0880, "SELFTTEST");

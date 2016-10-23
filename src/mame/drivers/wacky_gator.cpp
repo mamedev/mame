@@ -47,7 +47,7 @@ public:
 	required_device<ticket_dispenser_device> m_ticket;
 	required_memory_region m_samples;
 
-	DECLARE_DRIVER_INIT(wackygtr);
+	void init_wackygtr();
 	void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
@@ -91,7 +91,7 @@ private:
 };
 
 
-DRIVER_INIT_MEMBER(wackygtr_state, wackygtr)
+void wackygtr_state::init_wackygtr()
 {
 }
 

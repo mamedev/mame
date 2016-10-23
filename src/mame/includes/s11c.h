@@ -19,7 +19,7 @@ public:
 	{ }
 
 	void machine_reset_s11c();
-	DECLARE_DRIVER_INIT(s11c);
+	void init_s11c();
 
 protected:
 

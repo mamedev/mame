@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(speedbal_state,speedbal)
+void speedbal_state::init_speedbal()
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
 	uint8_t* rom = memregion("sprites")->base();
@@ -357,7 +357,7 @@ ROM_START( musicbal )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speedbal_state,musicbal)
+void speedbal_state::init_musicbal()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 
@@ -379,7 +379,7 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 		rom[i] = BITSWAP8(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
 	}
 
-	DRIVER_INIT_CALL(speedbal);
+	init_speedbal();
 }
 
 

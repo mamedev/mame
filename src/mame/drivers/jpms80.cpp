@@ -58,7 +58,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(jpms80);
+	void init_jpms80();
 };
 
 static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
@@ -104,7 +104,7 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(jpms80_state,jpms80)
+void jpms80_state::init_jpms80()
 {
 }
 

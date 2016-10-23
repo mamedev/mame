@@ -60,10 +60,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
 	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
-	DECLARE_DRIVER_INIT(invasn);
-	DECLARE_DRIVER_INIT(mk4);
-	DECLARE_DRIVER_INIT(thegrid);
-	DECLARE_DRIVER_INIT(crusnexo);
+	void init_invasn();
+	void init_mk4();
+	void init_thegrid();
+	void init_crusnexo();
 	void machine_start_midzeus();
 	void machine_reset_midzeus();
 	void video_start_midzeus();

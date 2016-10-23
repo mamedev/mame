@@ -334,8 +334,8 @@ public:
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_DRIVER_INIT(qc);
-	DECLARE_DRIVER_INIT(dwarfd);
+	void init_qc();
+	void init_dwarfd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dwarfd);
@@ -1051,7 +1051,7 @@ ROM_START( qc )
 	ROM_LOAD( "colors.bin",0x00, 0x20, BAD_DUMP CRC(3adeee7c) SHA1(f118ee62f84b0384316c12fc22356d43b2cfd876) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
+void dwarfd_state::init_dwarfd()
 {
 	/* expand gfx roms */
 	uint8_t *dst = memregion("gfx2")->base();
@@ -1091,9 +1091,9 @@ DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 
 }
 
-DRIVER_INIT_MEMBER(dwarfd_state,qc)
+void dwarfd_state::init_qc()
 {
-	DRIVER_INIT_CALL(dwarfd);
+	init_dwarfd();
 
 	// hacks for program to proceed
 	memregion("maincpu")->base()[0x6564] = 0x00;

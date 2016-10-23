@@ -38,7 +38,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(k8915);
+	void init_k8915();
 };
 
 READ8_MEMBER( k8915_state::k8915_52_r )
@@ -87,7 +87,7 @@ void k8915_state::machine_reset()
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(k8915_state,k8915)
+void k8915_state::init_k8915()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);

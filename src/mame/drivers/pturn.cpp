@@ -127,7 +127,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(pturn);
+	void init_pturn();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -567,7 +567,7 @@ ROM_START( pturn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pturn_state,pturn)
+void pturn_state::init_pturn()
 {
 	/*
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0dd, 0xc0dd, read8_delegate(FUNC(pturn_state::protection_r), this));

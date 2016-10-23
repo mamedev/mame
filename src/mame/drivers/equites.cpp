@@ -1947,13 +1947,13 @@ void equites_state::unpack_region(const char *region)
 }
 
 
-DRIVER_INIT_MEMBER(equites_state,equites)
+void equites_state::init_equites()
 {
 	unpack_region("gfx2");
 	unpack_region("gfx3");
 }
 
-DRIVER_INIT_MEMBER(equites_state,splndrbt)
+void equites_state::init_splndrbt()
 {
 	unpack_region("gfx3");
 }

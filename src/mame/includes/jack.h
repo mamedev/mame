@@ -59,11 +59,11 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_READ8_MEMBER(timer_r);
 
-	DECLARE_DRIVER_INIT(zzyzzyxx);
-	DECLARE_DRIVER_INIT(striv);
-	DECLARE_DRIVER_INIT(treahunt);
-	DECLARE_DRIVER_INIT(loverboy);
-	DECLARE_DRIVER_INIT(jack);
+	void init_zzyzzyxx();
+	void init_striv();
+	void init_treahunt();
+	void init_loverboy();
+	void init_jack();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);

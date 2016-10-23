@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	DECLARE_DRIVER_INIT(redclash);
+	void init_redclash();
 	void machine_start_sraider();
 	void machine_reset_sraider();
 	void video_start_sraider();

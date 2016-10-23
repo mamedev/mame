@@ -491,7 +491,7 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dbz_state,dbz)
+void dbz_state::init_dbz()
 {
 	uint16_t *ROM;
 
@@ -524,7 +524,7 @@ DRIVER_INIT_MEMBER(dbz_state,dbz)
 	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbza)
+void dbz_state::init_dbza()
 {
 	uint16_t *ROM;
 
@@ -547,7 +547,7 @@ DRIVER_INIT_MEMBER(dbz_state,dbza)
 	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbz2)
+void dbz_state::init_dbz2()
 {
 	uint16_t *ROM;
 

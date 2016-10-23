@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(pegasus);
+	void init_pegasus();
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
@@ -473,7 +473,7 @@ void pegasus_state::machine_reset()
 	m_control_bits = 0;
 }
 
-DRIVER_INIT_MEMBER(pegasus_state, pegasus)
+void pegasus_state::init_pegasus()
 {
 	// decrypt monitor
 	uint8_t *base = memregion("maincpu")->base() + 0xf000;

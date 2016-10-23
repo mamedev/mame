@@ -733,17 +733,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(eprom_state,eprom)
+void eprom_state::init_eprom()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,klaxp)
+void eprom_state::init_klaxp()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,guts)
+void eprom_state::init_guts()
 {
 }
 

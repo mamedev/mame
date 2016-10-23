@@ -331,17 +331,17 @@ private:
 
 	void i2c_update();
 public:
-	DECLARE_DRIVER_INIT(knpuzzle);
-	DECLARE_DRIVER_INIT(panikuru);
-	DECLARE_DRIVER_INIT(mrdrilr2);
-	DECLARE_DRIVER_INIT(startrgn);
-	DECLARE_DRIVER_INIT(gunbalna);
-	DECLARE_DRIVER_INIT(nflclsfb);
-	DECLARE_DRIVER_INIT(gjspace);
-	DECLARE_DRIVER_INIT(gamshara);
-	DECLARE_DRIVER_INIT(mrdrilrg);
-	DECLARE_DRIVER_INIT(chocovdr);
-	DECLARE_DRIVER_INIT(konotako);
+	void init_knpuzzle();
+	void init_panikuru();
+	void init_mrdrilr2();
+	void init_startrgn();
+	void init_gunbalna();
+	void init_nflclsfb();
+	void init_gjspace();
+	void init_gamshara();
+	void init_mrdrilrg();
+	void init_chocovdr();
+	void init_konotako();
 	void machine_reset_namcos10();
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
@@ -667,7 +667,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
+void namcos10_state::init_mrdrilr2()
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
 
@@ -676,7 +676,7 @@ DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gjspace)
+void namcos10_state::init_gjspace()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
@@ -685,14 +685,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gjspace)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilrg)
+void namcos10_state::init_mrdrilrg()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
+void namcos10_state::init_knpuzzle()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
@@ -701,7 +701,7 @@ DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,startrgn)
+void namcos10_state::init_startrgn()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -710,7 +710,7 @@ DRIVER_INIT_MEMBER(namcos10_state,startrgn)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gamshara)
+void namcos10_state::init_gamshara()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
@@ -719,14 +719,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gamshara)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gunbalna)
+void namcos10_state::init_gunbalna()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
+void namcos10_state::init_chocovdr()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
@@ -735,14 +735,14 @@ DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,panikuru)
+void namcos10_state::init_panikuru()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
+void namcos10_state::init_nflclsfb()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -751,7 +751,7 @@ DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,konotako)
+void namcos10_state::init_konotako()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);

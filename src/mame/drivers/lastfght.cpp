@@ -126,7 +126,7 @@ public:
 	DECLARE_WRITE16_MEMBER(lastfght_c00006_w);
 	DECLARE_READ16_MEMBER(lastfght_sound_r);
 	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
-	DECLARE_DRIVER_INIT(lastfght);
+	void init_lastfght();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -599,7 +599,7 @@ ROM_START( lastfght )
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastfght_state,lastfght)
+void lastfght_state::init_lastfght()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 

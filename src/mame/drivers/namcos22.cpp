@@ -5472,44 +5472,44 @@ void namcos22_state::namcos22_init(int game_type)
 	m_credits1 = m_credits2 = 0;
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,ridgeraj)
+void namcos22_state::init_ridgeraj()
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER);
 	install_c74_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,ridger2j)
+void namcos22_state::init_ridger2j()
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER2);
 	install_c74_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,acedrvr)
+void namcos22_state::init_acedrvr()
 {
 	namcos22_init(NAMCOS22_ACE_DRIVER);
 	install_c74_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,victlap)
+void namcos22_state::init_victlap()
 {
 	namcos22_init(NAMCOS22_VICTORY_LAP);
 	install_c74_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,raveracw)
+void namcos22_state::init_raveracw()
 {
 	namcos22_init(NAMCOS22_RAVE_RACER);
 	install_c74_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,cybrcomm)
+void namcos22_state::init_cybrcomm()
 {
 	namcos22_init(NAMCOS22_CYBER_COMMANDO);
 	install_c74_speedup();
 }
 
 
-DRIVER_INIT_MEMBER(namcos22_state,alpiner)
+void namcos22_state::init_alpiner()
 {
 	namcos22_init(NAMCOS22_ALPINE_RACER);
 	install_130_speedup();
@@ -5517,7 +5517,7 @@ DRIVER_INIT_MEMBER(namcos22_state,alpiner)
 	m_motor_status = 2;
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,alpiner2)
+void namcos22_state::init_alpiner2()
 {
 	namcos22_init(NAMCOS22_ALPINE_RACER_2);
 	install_130_speedup();
@@ -5525,7 +5525,7 @@ DRIVER_INIT_MEMBER(namcos22_state,alpiner2)
 	m_motor_status = 2;
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,alpinesa)
+void namcos22_state::init_alpinesa()
 {
 	namcos22_init(NAMCOS22_ALPINE_SURFER);
 	install_141_speedup();
@@ -5533,13 +5533,13 @@ DRIVER_INIT_MEMBER(namcos22_state,alpinesa)
 	m_motor_status = 2;
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,airco22)
+void namcos22_state::init_airco22()
 {
 	namcos22_init(NAMCOS22_AIR_COMBAT22);
 	install_130_speedup(); // S22-BIOS ver1.20 namco all rights reserved 94/12/21
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,propcycl)
+void namcos22_state::init_propcycl()
 {
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
@@ -5563,37 +5563,37 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 	install_141_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,cybrcyc)
+void namcos22_state::init_cybrcyc()
 {
 	namcos22_init(NAMCOS22_CYBER_CYCLES);
 	install_130_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,timecris)
+void namcos22_state::init_timecris()
 {
 	namcos22_init(NAMCOS22_TIME_CRISIS);
 	install_130_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
+void namcos22_state::init_tokyowar()
 {
 	namcos22_init(NAMCOS22_TOKYO_WARS);
 	install_141_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,aquajet)
+void namcos22_state::init_aquajet()
 {
 	namcos22_init(NAMCOS22_AQUA_JET);
 	install_141_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,adillor)
+void namcos22_state::init_adillor()
 {
 	namcos22_init(NAMCOS22_ARMADILLO_RACING);
 	install_141_speedup();
 }
 
-DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
+void namcos22_state::init_dirtdash()
 {
 	namcos22_init(NAMCOS22_DIRT_DASH);
 	install_141_speedup();

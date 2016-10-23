@@ -152,9 +152,9 @@ public:
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
-	DECLARE_DRIVER_INIT(pico);
-	DECLARE_DRIVER_INIT(picou);
-	DECLARE_DRIVER_INIT(picoj);
+	void init_pico();
+	void init_picou();
+	void init_picoj();
 };
 
 class pico_state : public pico_base_state
@@ -444,26 +444,26 @@ ROM_START( picoj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pico_base_state, pico)
+void pico_base_state::init_pico()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x60; // Export PAL
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picou)
+void pico_base_state::init_picou()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x40; // Export NTSC
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picoj)
+void pico_base_state::init_picoj()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x00; // JPN NTSC
 }

@@ -248,7 +248,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
-	DECLARE_DRIVER_INIT(megat3te);
+	void init_megat3te();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void machine_start_meritm_crt250_questions();
@@ -2285,7 +2285,7 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(meritm_state,megat3te)
+void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 }

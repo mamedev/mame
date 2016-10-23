@@ -182,7 +182,7 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 }
 
 
-DRIVER_INIT_MEMBER(nes_state,famicom)
+void nes_state::init_famicom()
 {
 	// setup alt input handlers for additional FC input devices
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);

@@ -283,7 +283,7 @@ public:
 	void machine_start_cat();
 	void machine_reset_cat();
 	void video_start_cat();
-	DECLARE_DRIVER_INIT(cat);
+	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -356,7 +356,7 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
     int i;

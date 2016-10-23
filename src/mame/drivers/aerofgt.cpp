@@ -2803,7 +2803,7 @@ ROM_START( wbbc97 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
+void aerofgt_state::init_banked_oki()
 {
 	membank("okibank")->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }

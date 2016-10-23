@@ -2160,13 +2160,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(centiped_state,bullsdrt)
+void centiped_state::init_bullsdrt()
 {
 	m_dsw_select = 0;
 }
 
 
-DRIVER_INIT_MEMBER(centiped_state,multiped)
+void centiped_state::init_multiped()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();

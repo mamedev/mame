@@ -34,7 +34,7 @@ public:
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
 	DECLARE_WRITE16_MEMBER(audio_volume_w);
-	DECLARE_DRIVER_INIT(relief);
+	void init_relief();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	void machine_start_relief();

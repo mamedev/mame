@@ -788,14 +788,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(fromanc2_state,fromanc2)
+void fromanc2_state::init_fromanc2()
 {
 	m_subcpu_nmi_flag = 1;
 	m_subcpu_int_flag = 1;
 	m_sndcpu_nmi_flag = 1;
 }
 
-DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
+void fromanc2_state::init_fromanc4()
 {
 	m_sndcpu_nmi_flag = 1;
 }

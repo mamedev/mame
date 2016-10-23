@@ -149,7 +149,7 @@ number 0 on each voice. That sample is 00000-00000.
 	}
 }
 
-DRIVER_INIT_MEMBER(yunsun16_state,magicbub)
+void yunsun16_state::init_magicbub()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x800180, 0x800181);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800188, 0x800189, write16_delegate(FUNC(yunsun16_state::magicbub_sound_command_w), this));

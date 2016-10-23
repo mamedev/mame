@@ -73,9 +73,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_DRIVER_INIT(wallc);
-	DECLARE_DRIVER_INIT(wallca);
-	DECLARE_DRIVER_INIT(sidam);
+	void init_wallc();
+	void init_wallca();
+	void init_sidam();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wallc);
@@ -265,7 +265,7 @@ static GFXDECODE_START( wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(wallc_state,wallc)
+void wallc_state::init_wallc()
 {
 	uint8_t c;
 	uint32_t i;
@@ -280,7 +280,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallc)
 	}
 }
 
-DRIVER_INIT_MEMBER(wallc_state,wallca)
+void wallc_state::init_wallca()
 {
 	uint8_t c;
 	uint32_t i;
@@ -443,7 +443,7 @@ ROM_START( sidampkr )
 	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state,sidam)
+void wallc_state::init_sidam()
 {
 	uint8_t c;
 	uint32_t i;

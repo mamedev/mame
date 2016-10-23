@@ -116,7 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER(champwr_msm5205_stop_w);
 	DECLARE_WRITE8_MEMBER(champwr_msm5205_volume_w);
 	DECLARE_WRITE8_MEMBER(portA_w);
-	DECLARE_DRIVER_INIT(plottinga);
+	void init_plottinga();
 	TILE_GET_INFO_MEMBER(get_bg18_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg19_tile_info);
 	TILE_GET_INFO_MEMBER(get_ch1a_tile_info);

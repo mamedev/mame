@@ -158,7 +158,7 @@ void wpc_dot_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
+void wpc_dot_state::init_wpc_dot()
 {
 	uint8_t *fixed = memregion("code")->base();
 	uint32_t codeoff = memregion("code")->bytes() - 0x8000;

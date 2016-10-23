@@ -600,7 +600,7 @@ ROM_START( bigevglfj )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-DRIVER_INIT_MEMBER(bigevglf_state,bigevglf)
+void bigevglf_state::init_bigevglf()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);

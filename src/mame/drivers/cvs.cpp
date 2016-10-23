@@ -1534,7 +1534,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cvs_state,huncholy)
+void cvs_state::init_huncholy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1554,7 +1554,7 @@ DRIVER_INIT_MEMBER(cvs_state,huncholy)
 }
 
 
-DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
+void cvs_state::init_hunchbaka()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1566,7 +1566,7 @@ DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 }
 
 
-DRIVER_INIT_MEMBER(cvs_state,superbik)
+void cvs_state::init_superbik()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1594,7 +1594,7 @@ DRIVER_INIT_MEMBER(cvs_state,superbik)
 }
 
 
-DRIVER_INIT_MEMBER(cvs_state,hero)
+void cvs_state::init_hero()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1616,7 +1616,7 @@ DRIVER_INIT_MEMBER(cvs_state,hero)
 }
 
 
-DRIVER_INIT_MEMBER(cvs_state,raiders)
+void cvs_state::init_raiders()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

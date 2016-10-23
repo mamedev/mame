@@ -119,7 +119,7 @@ WRITE8_MEMBER(beezer_state::b_via_1_pb_w)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }
 
-DRIVER_INIT_MEMBER(beezer_state,beezer)
+void beezer_state::init_beezer()
 {
 	m_pbus = 0;
 	m_banklatch = 0;

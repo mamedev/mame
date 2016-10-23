@@ -144,7 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
-	DECLARE_DRIVER_INIT(mirax);
+	void init_mirax();
 	DECLARE_PALETTE_INIT(mirax);
 	virtual void machine_start() override;
 
@@ -566,7 +566,7 @@ ROM_START( miraxa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mirax_state,mirax)
+void mirax_state::init_mirax()
 {
 	uint8_t *DATA = memregion("data_code")->base();
 	uint8_t *ROM = memregion("maincpu")->base();

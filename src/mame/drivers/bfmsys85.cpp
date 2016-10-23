@@ -119,8 +119,8 @@ public:
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(decode);
-	DECLARE_DRIVER_INIT(nodecode);
+	void init_decode();
+	void init_nodecode();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
@@ -743,13 +743,13 @@ int bfmsys85_state::b85_find_project_string( )
 }
 
 
-DRIVER_INIT_MEMBER(bfmsys85_state,decode)
+void bfmsys85_state::init_decode()
 {
 	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 	b85_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfmsys85_state,nodecode)
+void bfmsys85_state::init_nodecode()
 {
 	b85_find_project_string();
 }

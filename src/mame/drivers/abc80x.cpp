@@ -1606,7 +1606,7 @@ DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc800c_state,driver_init)
+void abc800c_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
 }
@@ -1640,7 +1640,7 @@ DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc800m_state,driver_init)
+void abc800m_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
 }
@@ -1664,7 +1664,7 @@ DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc802_state,driver_init)
+void abc802_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
 }
@@ -1698,7 +1698,7 @@ DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc806_state,driver_init)
+void abc806_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
 }

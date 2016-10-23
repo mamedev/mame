@@ -3154,7 +3154,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
+void atarisy2_state::init_paperboy()
 {
 	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
@@ -3174,7 +3174,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,720)
+void atarisy2_state::init_720()
 {
 	m_slapstic->slapstic_init();
 
@@ -3183,7 +3183,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
+void atarisy2_state::init_ssprint()
 {
 	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
@@ -3198,7 +3198,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,csprint)
+void atarisy2_state::init_csprint()
 {
 	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
@@ -3213,7 +3213,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,apb)
+void atarisy2_state::init_apb()
 {
 	m_slapstic->slapstic_init();
 

@@ -344,7 +344,7 @@ void pgm_022_025_state::igs025_to_igs022_callback( void )
 
 
 
-DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
+void pgm_022_025_state::init_killbld()
 {
 	pgm_basic_init();
 	pgm_killbld_decrypt();
@@ -355,7 +355,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
-DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
+void pgm_022_025_state::init_drgw3()
 {
 	pgm_basic_init();
 	pgm_dw3_decrypt();

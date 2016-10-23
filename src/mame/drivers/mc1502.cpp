@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

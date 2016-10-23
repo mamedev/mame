@@ -33,7 +33,7 @@ public:
 	uint32_t individual_leds;
 	uint8_t latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
 
-	DECLARE_DRIVER_INIT(stratos);
+	void init_stratos();
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -50,7 +50,7 @@ public:
 	virtual void machine_reset() override;
 };
 
-DRIVER_INIT_MEMBER( stratos_state, stratos )
+void stratos_state::init_stratos()
 {
 	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);

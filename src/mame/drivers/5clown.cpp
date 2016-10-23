@@ -498,7 +498,7 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	DECLARE_DRIVER_INIT(fclown);
+	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -1166,7 +1166,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(_5clown_state,fclown)
+void _5clown_state::init_fclown()
 {
 	/* Decrypting main program */
 

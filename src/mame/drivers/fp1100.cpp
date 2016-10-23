@@ -96,7 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(fp1100_vblank_irq);
-	DECLARE_DRIVER_INIT(fp1100);
+	void init_fp1100();
 	void machine_reset_fp1100();
 	MC6845_UPDATE_ROW(fp1100_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
@@ -629,7 +629,7 @@ void fp1100_state::machine_reset_fp1100()
 	m_upd7801.portc = 0;
 }
 
-DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
+void fp1100_state::init_fp1100()
 {
 	uint8_t *main = memregion("ipl")->base();
 	uint8_t *wram = memregion("wram")->base();

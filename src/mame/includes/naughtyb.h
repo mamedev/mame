@@ -48,8 +48,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	DECLARE_DRIVER_INIT(trvmstr);
-	DECLARE_DRIVER_INIT(popflame);
+	void init_trvmstr();
+	void init_popflame();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(naughtyb);
 

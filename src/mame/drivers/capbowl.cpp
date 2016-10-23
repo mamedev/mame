@@ -460,7 +460,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(capbowl_state,capbowl)
+void capbowl_state::init_capbowl()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

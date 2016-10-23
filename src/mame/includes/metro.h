@@ -170,15 +170,15 @@ public:
 	DECLARE_WRITE8_MEMBER(vmetal_control_w);
 	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
 
-	DECLARE_DRIVER_INIT(karatour);
-	DECLARE_DRIVER_INIT(daitorid);
-	DECLARE_DRIVER_INIT(blzntrnd);
-	DECLARE_DRIVER_INIT(mouja);
-	DECLARE_DRIVER_INIT(balcube);
-	DECLARE_DRIVER_INIT(gakusai);
-	DECLARE_DRIVER_INIT(dharmak);
-	DECLARE_DRIVER_INIT(puzzlet);
-	DECLARE_DRIVER_INIT(metro);
+	void init_karatour();
+	void init_daitorid();
+	void init_blzntrnd();
+	void init_mouja();
+	void init_balcube();
+	void init_gakusai();
+	void init_dharmak();
+	void init_puzzlet();
+	void init_metro();
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);

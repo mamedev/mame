@@ -1024,7 +1024,7 @@ void hp48_port_image_device::device_config_complete()
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp48_state,hp48)
+void hp48_state::init_hp48()
 {
 	int i;
 	LOG(( "hp48: driver init called\n" ));

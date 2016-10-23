@@ -27,7 +27,7 @@ public:
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(thunderj);
+	void init_thunderj();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);

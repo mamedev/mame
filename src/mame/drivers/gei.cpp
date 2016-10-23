@@ -142,8 +142,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_READ8_MEMBER(portC_r);
-	DECLARE_DRIVER_INIT(geimulti);
-	DECLARE_DRIVER_INIT(setbank);
+	void init_geimulti();
+	void init_setbank();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
@@ -1877,12 +1877,12 @@ ROM_START( sprtauth )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(gei_state,setbank)
+void gei_state::init_setbank()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x2000);
 }
 
-DRIVER_INIT_MEMBER(gei_state,geimulti)
+void gei_state::init_geimulti()
 {
 	membank("bank1")->set_base(memregion("bank")->base() + 0x0000);
 }

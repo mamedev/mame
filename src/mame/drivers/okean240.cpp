@@ -92,7 +92,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(okean240);
+	void init_okean240();
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -411,7 +411,7 @@ WRITE8_MEMBER( okean240_state::kbd_put )
 	m_term_data = data;
 }
 
-DRIVER_INIT_MEMBER(okean240_state,okean240)
+void okean240_state::init_okean240()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);

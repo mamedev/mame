@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 
-	DECLARE_DRIVER_INIT(hideseek);
+	void init_hideseek();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -149,7 +149,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(hideseek_state,hideseek)
+void hideseek_state::init_hideseek()
 {
 }
 

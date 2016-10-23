@@ -134,7 +134,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cop_w);
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_DRIVER_INIT(speglsht);
+	void init_speglsht();
 	void machine_reset_speglsht();
 	virtual void machine_start() override;
 	void video_start_speglsht();
@@ -442,7 +442,7 @@ ROM_START( speglsht )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speglsht_state,speglsht)
+void speglsht_state::init_speglsht()
 {
 	m_maincpu->set_st0016_game_flag(3);
 }

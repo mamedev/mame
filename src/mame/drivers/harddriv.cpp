@@ -5023,7 +5023,7 @@ void harddriv_state::init_racedrivb1(void)
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x002000, 0x5fffff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x640000, 0xfff7ff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 
-	DRIVER_INIT_CALL(racedriv);
+	init_racedriv();
 }
 
 READ32_MEMBER(harddriv_state::rddsp_unmap_r)

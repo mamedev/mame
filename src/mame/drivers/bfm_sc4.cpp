@@ -1758,7 +1758,7 @@ INPUT_PORTS_END
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4)
+void sc4_state::init_sc4()
 {
 	uint8_t *src = memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
@@ -1794,9 +1794,9 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
+void sc4_state::init_sc4mbus()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	find_mbus(rom);
 }
@@ -25127,14 +25127,14 @@ ROM_END
 
 GAMEL( 200?, sc4tst      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pstat)
+void sc4_state::init_sc4pstat()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pstat_mbus)
+void sc4_state::init_sc4pstat_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 
@@ -25217,9 +25217,9 @@ GAMEL( 200?, sc4pstato   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, R
 GAMEL( 200?, sc4pstatq   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cvani)
+void sc4_state::init_sc4cvani()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cvani ) // this structure is generated
@@ -25281,14 +25281,14 @@ GAMEL( 200?, sc4cvanih   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani,
 GAMEL( 200?, sc4cvanii   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cvanif )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cvclb)
+void sc4_state::init_sc4cvclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cvclb_mbus)
+void sc4_state::init_sc4cvclb_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4cvclb ) // this structure is generated
@@ -25355,14 +25355,14 @@ GAMEL( 200?, sc4cvclbg   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb_
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gcclb)
+void sc4_state::init_sc4gcclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gcclb_mbus)
+void sc4_state::init_sc4gcclb_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // inputs are from sc4gcclbl, the earlier(?) sets don't appear to have the structure filled in
@@ -25444,9 +25444,9 @@ GAMEL( 200?, sc4gcclbo   ,sc4gcclb,  sc4, sc4gcclbl, sc4_state, sc4gcclb_mbus, R
 GAMEL( 200?, sc4gcclbq   ,sc4gcclb,  sc4, sc4gcclbl, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4botn)
+void sc4_state::init_sc4botn()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4botn ) // this structure is generated
@@ -25500,14 +25500,14 @@ GAMEL( 200?, sc4botna    ,sc4botn,   sc4_4reel, sc4botn, sc4_state, sc4botn, ROT
 
 
 //fourth reel is tested strangely
-DRIVER_INIT_MEMBER(sc4_state,sc4bbclb)
+void sc4_state::init_sc4bbclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bbclb_mbus)
+void sc4_state::init_sc4bbclb_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bbclb ) // this structure is generated
@@ -25568,9 +25568,9 @@ GAMEL( 200?, sc4bbclbb   ,sc4bbclb,  sc4_200_std, sc4bbclb, sc4_state, sc4bbclb_
 GAMEL( 200?, sc4bbclbc   ,sc4bbclb,  sc4_200_std, sc4bbclb, sc4_state, sc4bbclb_mbus, ROT0, "Qps","Bankety Bank Club (V411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4captn)
+void sc4_state::init_sc4captn()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4captn ) // this structure is generated
@@ -25631,9 +25631,9 @@ GAMEL( 200?, sc4captne   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, R
 GAMEL( 200?, sc4captnf   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4captn )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cmous)
+void sc4_state::init_sc4cmous()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cmous ) // this structure is generated
@@ -25691,14 +25691,14 @@ GAMEL( 200?, sc4cmousc   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cad)
+void sc4_state::init_sc4cad()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cad_mbus)
+void sc4_state::init_sc4cad_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4cad ) // this structure is generated
@@ -25774,9 +25774,9 @@ GAMEL( 200?, sc4cadp     ,sc4cad,    sc4_5reel, sc4cad, sc4_state, sc4cad, ROT0,
 GAMEL( 200?, sc4cado     ,sc4cad,    sc4_5reel, sc4cad, sc4_state, sc4cad, ROT0, "Qps","Cash Adder (V043) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4cadq     ,sc4cad,    sc4_5reel, sc4cad, sc4_state, sc4cad, ROT0, "Qps","Cash Adder (V043) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cadcl)
+void sc4_state::init_sc4cadcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cadcl ) // this structure is generated
@@ -25832,9 +25832,9 @@ GAMEL( 200?, sc4cadcl    ,0,         sc4_5reel, sc4cadcl, sc4_state, sc4cadcl, R
 GAMEL( 200?, sc4cadcla   ,sc4cadcl,  sc4_5reel, sc4cadcl, sc4_state, sc4cadcl, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cr)
+void sc4_state::init_sc4cr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cr ) // this structure is generated
@@ -25900,14 +25900,14 @@ GAMEL( 200?, sc4crf      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4crcl)
+void sc4_state::init_sc4crcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4crcl_mbus)
+void sc4_state::init_sc4crcl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4crcl ) // this structure is generated
@@ -25971,9 +25971,9 @@ GAMEL( 200?, sc4crcle    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus
 GAMEL( 200?, sc4crclf    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crcla )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cashm)
+void sc4_state::init_sc4cashm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cashm ) // this structure is generated
@@ -26028,15 +26028,15 @@ GAMEL( 200?, sc4cashme   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ckxtb)
+void sc4_state::init_sc4ckxtb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ckx3p)
+void sc4_state::init_sc4ckx3p()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // the topbox sets contain no input defs
@@ -26111,9 +26111,9 @@ GAMEL( 200?, sc4ckxf     ,sc4ckx,    sc4_3reel_200, sc4ckxg, sc4_state, sc4ckx3p
 GAMEL( 200?, sc4ckxg     ,sc4ckx,    sc4_3reel_200, sc4ckxg, sc4_state, sc4ckx3p, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (Base, set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4chick)
+void sc4_state::init_sc4chick()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4chick ) // this structure is generated
@@ -26160,9 +26160,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4chick    ,0,         sc4_3reel, sc4chick, sc4_state, sc4chick, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4chick )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ccogs)
+void sc4_state::init_sc4ccogs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ccogs ) // this structure is generated
@@ -26219,14 +26219,14 @@ GAMEL( 200?, sc4ccogs    ,0,         sc4_4reel, sc4ccogs, sc4_state, sc4ccogs, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cclim)
+void sc4_state::init_sc4cclim()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cclim_mbus)
+void sc4_state::init_sc4cclim_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4cclime ) // this structure is generated
@@ -26313,15 +26313,15 @@ GAMEL( 200?, sc4cclimu   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_m
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfqps)
+void sc4_state::init_sc4cfqps()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfqps_alt)
+void sc4_state::init_sc4cfqps_alt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // Crazy Fruits sets are a bit strange compared to others..
@@ -26411,15 +26411,15 @@ GAMEL( 200?, sc4cfqpso   ,sc4cfqps,  sc4_4reel, sc4cfqpsf, sc4_state, sc4cfqps, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4crzky)
+void sc4_state::init_sc4crzky()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4crzky_mbus)
+void sc4_state::init_sc4crzky_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4crzkyi ) // this structure is generated
@@ -26509,9 +26509,9 @@ GAMEL( 200?, sc4crzkyw   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_m
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4deepi)
+void sc4_state::init_sc4deepi()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4deepi ) // this structure is generated
@@ -26567,9 +26567,9 @@ GAMEL( 200?, sc4deepid   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dblfr)
+void sc4_state::init_sc4dblfr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4dblfr ) // this structure is generated
@@ -26616,9 +26616,9 @@ GAMEL( 200?, sc4dblfrc   ,sc4dblfr,  sc4_200_4r, sc4dblfr, sc4_state, sc4dblfr, 
 GAMEL( 200?, sc4dblfrd   ,sc4dblfr,  sc4_200_4r, sc4dblfr, sc4_state, sc4dblfr, ROT0, "Qps","Double Frenzy (PR2276) (212) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4dblfre   ,sc4dblfr,  sc4_200_4r, sc4dblfr, sc4_state, sc4dblfr, ROT0, "Qps","Double Frenzy (PR2276) (212) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4darw)
+void sc4_state::init_sc4darw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4darw ) // this structure is generated
@@ -26674,9 +26674,9 @@ GAMEL( 200?, sc4darwb    ,sc4darw,   sc4_4reel_alt, sc4darw, sc4_state, sc4darw,
 GAMEL( 200?, sc4darwc    ,sc4darw,   sc4_4reel_alt, sc4darw, sc4_state, sc4darw, ROT0, "Qps","Dough & Arrow (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4duckq)
+void sc4_state::init_sc4duckq()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4duckq ) // this structure is generated
@@ -26727,9 +26727,9 @@ GAMEL( 200?, sc4duckq    ,0,         sc4_4reel_alt, sc4duckq, sc4_state, sc4duck
 GAMEL( 200?, sc4duckqa   ,sc4duckq,  sc4_4reel_alt, sc4duckq, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4duckqa )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4eascs)
+void sc4_state::init_sc4eascs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4eascs ) // this structure is generated
@@ -26804,9 +26804,9 @@ GAMEL( 200?, sc4eascsj   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, R
 GAMEL( 200?, sc4eascsk   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4eascsc )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fastf)
+void sc4_state::init_sc4fastf()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fastf ) // this structure is generated
@@ -26867,9 +26867,9 @@ GAMEL( 200?, sc4fastfb   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf,
 GAMEL( 200?, sc4fastfc   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fastfb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ffru)
+void sc4_state::init_sc4ffru()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ffru ) // this structure is generated
@@ -26929,9 +26929,9 @@ GAMEL( 200?, sc4ffrud    ,sc4ffru,   sc4_4reel, sc4ffru, sc4_state, sc4ffru, ROT
 GAMEL( 200?, sc4ffrue    ,sc4ffru,   sc4_4reel, sc4ffru, sc4_state, sc4ffru, ROT0, "Qps","Fast Fruit (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fire)
+void sc4_state::init_sc4fire()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fire ) // this structure is generated
@@ -26981,9 +26981,9 @@ GAMEL( 200?, sc4fire     ,0,         sc4_4reel_alt, sc4fire, sc4_state, sc4fire,
 GAMEL( 200?, sc4firea    ,sc4fire,   sc4_4reel_alt, sc4fire, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fire )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4frenz)
+void sc4_state::init_sc4frenz()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4frenz ) // this structure is generated
@@ -27054,9 +27054,9 @@ GAMEL( 200?, sc4frenzc   ,sc4frenz,  sc4_4reel_alt, sc4frenz, sc4_state, sc4fren
 GAMEL( 200?, sc4frenzd   ,sc4frenz,  sc4_4reel_alt, sc4frenz, sc4_state, sc4frenz, ROT0, "BFM","Fruit Frenzy (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4frenze   ,sc4frenz,  sc4_4reel_alt, sc4frenz, sc4_state, sc4frenz, ROT0, "BFM","Fruit Frenzy (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ftopi)
+void sc4_state::init_sc4ftopi()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ftopi ) // this structure is generated
@@ -27119,9 +27119,9 @@ GAMEL( 200?, sc4ftopig   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftop
 GAMEL( 200?, sc4ftopie   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ftopib )
 GAMEL( 200?, sc4ftopih   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ftopib )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fullt)
+void sc4_state::init_sc4fullt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fullt ) // this structure is generated
@@ -27188,9 +27188,9 @@ GAMEL( 200?, sc4fulltf   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, R
 GAMEL( 200?, sc4fullti   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ziggy)
+void sc4_state::init_sc4ziggy()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ziggy ) // this structure is generated
@@ -27255,9 +27255,9 @@ GAMEL( 200?, sc4ziggye   ,sc4ziggy,  sc4_200_4ra, sc4ziggy, sc4_state, sc4ziggy,
 GAMEL( 200?, sc4ziggyf   ,sc4ziggy,  sc4_200_4ra, sc4ziggy, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4ziggyg   ,sc4ziggy,  sc4_200_4ra, sc4ziggy, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gldcl)
+void sc4_state::init_sc4gldcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4gldcl ) // this structure is generated
@@ -27327,14 +27327,14 @@ GAMEL( 200?, sc4gldcla   ,sc4gldcl,  sc4_5reel, sc4gldcl, sc4_state, sc4gldcl, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ghost)
+void sc4_state::init_sc4ghost()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ghosttb)
+void sc4_state::init_sc4ghosttb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ghost ) // this structure is generated
@@ -27403,14 +27403,14 @@ GAMEL( 200?, sc4ghosth   ,sc4ghost,  sc4_3reel, sc4ghost, sc4_state, sc4ghosttb,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggrid)
+void sc4_state::init_sc4ggrid()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggrid_mbus)
+void sc4_state::init_sc4ggrid_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ggrid ) // this structure is generated
@@ -27482,14 +27482,14 @@ GAMEL( 200?, sc4ggridm   ,sc4ggrid,  sc4_4reel, sc4ggrid, sc4_state, sc4ggrid_mb
 GAMEL( 200?, sc4ggridn   ,sc4ggrid,  sc4_4reel, sc4ggrid, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggcl)
+void sc4_state::init_sc4ggcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggcl_mbus)
+void sc4_state::init_sc4ggcl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ggcl ) // this structure is generated
@@ -27550,9 +27550,9 @@ GAMEL( 200?, sc4ggcld    ,sc4ggcl,   sc4_5reel, sc4ggcl, sc4_state, sc4ggcl_mbus
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4goldw)
+void sc4_state::init_sc4goldw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4goldw ) // this structure is generated
@@ -27740,9 +27740,9 @@ GAMEL( 200?, sc4ggdlxg   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4greed)
+void sc4_state::init_sc4greed()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4greed ) // this structure is generated
@@ -27809,9 +27809,9 @@ GAMEL( 200?, sc4greed    ,0,         sc4_4reel_alt, sc4greed, sc4_state, sc4gree
 GAMEL( 200?, sc4greeda   ,sc4greed,  sc4_4reel_alt, sc4greed, sc4_state, sc4greed, ROT0, "BFM","Greedy Gonzalez (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hf)
+void sc4_state::init_sc4hf()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hf ) // this structure is generated
@@ -27881,9 +27881,9 @@ GAMEL( 200?, sc4hff      ,sc4hf,     sc4_4reel, sc4hf, sc4_state, sc4hf, ROT0, "
 GAMEL( 200?, sc4hfg      ,sc4hf,     sc4_4reel, sc4hf, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4himi)
+void sc4_state::init_sc4himi()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4himi ) // this structure is generated
@@ -27944,9 +27944,9 @@ GAMEL( 200?, sc4himid    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hi5)
+void sc4_state::init_sc4hi5()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hi5 ) // this structure is generated
@@ -28017,9 +28017,9 @@ GAMEL( 200?, sc4hi5e     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0,
 GAMEL( 200?, sc4hi5g     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hi5 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sprng)
+void sc4_state::init_sc4sprng()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4sprng ) // this structure is generated
@@ -28072,9 +28072,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4sprng    ,0,         sc4_4reel_alt, sc4sprng, sc4_state, sc4sprng, ROT0, "Mazooma","Highly Sprung (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4sprng )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hilo)
+void sc4_state::init_sc4hilo()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hilo ) // this structure is generated
@@ -28163,9 +28163,9 @@ GAMEL( 200?, sc4hilok    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hitsh)
+void sc4_state::init_sc4hitsh()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hitsh ) // this structure is generated
@@ -28247,9 +28247,9 @@ GAMEL( 200?, sc4hitshc   ,sc4hitsh,  sc4_200_4rb, sc4hitsh, sc4_state, sc4hitsh,
 GAMEL( 200?, sc4hitshd   ,sc4hitsh,  sc4_200_4rb, sc4hitsh, sc4_state, sc4hitsh, ROT0, "BFM","Hit Shot (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4hitshe   ,sc4hitsh,  sc4_200_4rb, sc4hitsh, sc4_state, sc4hitsh, ROT0, "BFM","Hit Shot (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4h6cl)
+void sc4_state::init_sc4h6cl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4h6cl ) // this structure is generated
@@ -28320,9 +28320,9 @@ GAMEL( 200?, sc4h6clc    ,sc4h6cl,   sc4, sc4h6cl, sc4_state, sc4h6cl, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ijclb)
+void sc4_state::init_sc4ijclb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ijclb ) // this structure is generated
@@ -28384,9 +28384,9 @@ INPUT_PORTS_END
 // PR2403 CLUB ITALIAN JOB         CLUB ITALIAN JOB  CLUB  CLUB ITJB SOUNDS
 GAMEL( 200?, sc4ijclb    ,0,         sc4, sc4ijclb, sc4_state, sc4ijclb, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jack)
+void sc4_state::init_sc4jack()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4jack ) // this structure is generated
@@ -28448,9 +28448,9 @@ GAMEL( 200?, sc4jackg    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jjunc)
+void sc4_state::init_sc4jjunc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4jjunc ) // this structure is generated
@@ -28529,14 +28529,14 @@ GAMEL( 2002, sc4jjunci   ,sc4jjunc,  sc4, sc4jjunc, sc4_state, sc4jjunc, ROT0, "
 
 
 //should R6 have a reel?
-DRIVER_INIT_MEMBER(sc4_state,sc4jjucl)
+void sc4_state::init_sc4jjucl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jjucl_mbus)
+void sc4_state::init_sc4jjucl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4jjucl ) // this structure is generated
@@ -28612,9 +28612,9 @@ GAMEL( 200?, sc4jjucla   ,sc4jjucl,  sc4_5reel, sc4jjucl, sc4_state, sc4jjucl, R
 GAMEL( 200?, sc4jjuclc   ,sc4jjucl,  sc4_5reel, sc4jjucl, sc4_state, sc4jjucl, ROT0, "BFM","Jackpot Junction Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jolly)
+void sc4_state::init_sc4jolly()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -28673,14 +28673,14 @@ GAMEL( 200?, sc4jollya   ,sc4jolly,  sc4_200_5r, sc4jolly, sc4_state, sc4jolly, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4juicy)
+void sc4_state::init_sc4juicy()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4juicy_mbus)
+void sc4_state::init_sc4juicy_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 
@@ -28746,9 +28746,9 @@ GAMEL( 200?, sc4juicya   ,sc4juicy,  sc4_5reel, sc4juicy, sc4_state, sc4juicy, R
 GAMEL( 200?, sc4juicyc   ,sc4juicy,  sc4_5reel, sc4juicy, sc4_state, sc4juicy, ROT0, "BFM","Juicy Jackpots Club (PR1123) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4kalei)
+void sc4_state::init_sc4kalei()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4kalei ) // this structure is generated
@@ -28809,9 +28809,9 @@ GAMEL( 200?, sc4kaleid   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kale
 GAMEL( 200?, sc4kaleie   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4kalei )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lir)
+void sc4_state::init_sc4lir()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4lir ) // this structure is generated
@@ -28872,9 +28872,9 @@ GAMEL( 200?, sc4liri     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ldvcl)
+void sc4_state::init_sc4ldvcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ldvcl ) // this structure is generated
@@ -28938,9 +28938,9 @@ INPUT_PORTS_END
 // PR2421 LITTLEDEVIL         CLUB LITTLEDEVIL  CLUB  CLILDEV SOUNDS         CLUB LITTLEDEVIL
 GAMEL( 200?, sc4ldvcl    ,0,         sc4_5reel, sc4ldvcl, sc4_state, sc4ldvcl, ROT0, "Mazooma","Little Devil Club (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lockb)
+void sc4_state::init_sc4lockb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4lockb ) // this structure is generated
@@ -29017,14 +29017,14 @@ GAMEL( 200?, sc4lockbg   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lock
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lkbcl)
+void sc4_state::init_sc4lkbcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lkbcl_mbus)
+void sc4_state::init_sc4lkbcl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4lkbcl ) // this structure is generated
@@ -29102,9 +29102,9 @@ GAMEL( 200?, sc4lkbclf   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lotrf)
+void sc4_state::init_sc4lotrf()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4lotrf ) // this structure is generated
@@ -29183,14 +29183,14 @@ GAMEL( 200?, sc4lotrta   ,sc4lotrf,  sc4_4reel_alt, sc4lotrf, sc4_state, sc4lotr
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lotr2)
+void sc4_state::init_sc4lotr2()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lotr2_mbus)
+void sc4_state::init_sc4lotr2_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4lotr2 ) // this structure is generated
@@ -29274,14 +29274,14 @@ GAMEL( 200?, sc4lotr2h   ,sc4lotr2,  sc4_200_5r, sc4lotr2, sc4_state, sc4lotr2_m
 GAMEL( 200?, sc4lotr2i   ,sc4lotr2,  sc4_200_5r, sc4lotr2, sc4_state, sc4lotr2_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ltr2c)
+void sc4_state::init_sc4ltr2c()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ltr2c_mbus)
+void sc4_state::init_sc4ltr2c_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ltr2c ) // this structure is generated
@@ -29357,9 +29357,9 @@ GAMEL( 200?, sc4ltr2ci   ,sc4ltr2c,  sc4_200_std, sc4ltr2c, sc4_state, sc4ltr2c_
 GAMEL( 200?, sc4ltr2cj   ,sc4ltr2c,  sc4_200_std, sc4ltr2c, sc4_state, sc4ltr2c_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4ltr2ck   ,sc4ltr2c,  sc4_200_std, sc4ltr2c, sc4_state, sc4ltr2c_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4magic)
+void sc4_state::init_sc4magic()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4magic ) // this structure is generated
@@ -29413,9 +29413,9 @@ GAMEL( 200?, sc4magicb   ,sc4magic,  sc4_4reel, sc4magic, sc4_state, sc4magic, R
 GAMEL( 200?, sc4magicc   ,sc4magic,  sc4_4reel, sc4magic, sc4_state, sc4magic, ROT0, "Qps","Magic Poundabout (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4maxim)
+void sc4_state::init_sc4maxim()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4maxim ) // this structure is generated
@@ -29475,9 +29475,9 @@ GAMEL( 200?, sc4maximf   ,sc4maxim,  sc4_4reel, sc4maxim, sc4_state, sc4maxim, R
 GAMEL( 200?, sc4maximg   ,sc4maxim,  sc4_4reel, sc4maxim, sc4_state, sc4maxim, ROT0, "Mazooma","Maximus Cash (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4monob)
+void sc4_state::init_sc4monob()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4monob ) // this structure is generated
@@ -29544,9 +29544,9 @@ GAMEL( 200?, sc4monobm   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4mono
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mondx)
+void sc4_state::init_sc4mondx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4mondx ) // this structure is generated
@@ -29654,9 +29654,9 @@ INPUT_PORTS_END
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mont)
+void sc4_state::init_sc4mont()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -29674,9 +29674,9 @@ GAMEL( 200?, sc4monti    ,sc4mont,   sc4, sc4mont, sc4_state, sc4mont, ROT0, "Qp
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mou)
+void sc4_state::init_sc4mou()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4mou ) // this structure is generated
@@ -29735,9 +29735,9 @@ GAMEL( 200?, sc4moua     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, R
 GAMEL( 200?, sc4moub     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mou )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4nmtj)
+void sc4_state::init_sc4nmtj()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4nmtj ) // this structure is generated
@@ -29800,9 +29800,9 @@ GAMEL( 200?, sc4nmtjb    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, R
 GAMEL( 200?, sc4nmtjd    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 2)", MACHINE_FLAGS, layout_sc4nmtj )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4oyf)
+void sc4_state::init_sc4oyf()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4oyf ) // this structure is generated
@@ -29874,9 +29874,9 @@ GAMEL( 200?, sc4oyfa     ,sc4oyf,    sc4_4reel_alt, sc4oyf, sc4_state, sc4oyf, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4opses)
+void sc4_state::init_sc4opses()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4opses ) // this structure is generated
@@ -29946,9 +29946,9 @@ GAMEL( 200?, sc4opses    ,0,         sc4_200_5r, sc4opses, sc4_state, sc4opses, 
 GAMEL( 200?, sc4opsesa   ,sc4opses,  sc4_200_5r, sc4opses, sc4_state, sc4opses, ROT0, "BFM","Open Sesame (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4paccl)
+void sc4_state::init_sc4paccl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4paccl ) // this structure is generated
@@ -30008,9 +30008,9 @@ GAMEL( 200?, sc4pacclc   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, R
 
 // REEL 4 ERR 24 (what type should be here??)
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pmani)
+void sc4_state::init_sc4pmani()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pmani ) // this structure is generated
@@ -30065,9 +30065,9 @@ GAMEL( 200?, sc4pmani    ,0,         sc4_200_4rb, sc4pmani, sc4_state, sc4pmani,
 GAMEL( 200?, sc4pmania   ,sc4pmani,  sc4_200_4rb, sc4pmani, sc4_state, sc4pmani, ROT0, "Mazooma","Pac Mania (PR2031, ANIA) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pgold)
+void sc4_state::init_sc4pgold()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4pgold ) // this structure is generated
@@ -30144,9 +30144,9 @@ GAMEL( 200?, sc4pgoldf   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ppclb)
+void sc4_state::init_sc4ppclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ppclb ) // this structure is generated
@@ -30205,9 +30205,9 @@ GAMEL( 200?, sc4ppclba   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "
 GAMEL( 200?, sc4ppclbc   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ppclb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pipe)
+void sc4_state::init_sc4pipe()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pipe ) // this structure is generated
@@ -30261,9 +30261,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4pipe     ,0,         sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pipe )
 GAMEL( 200?, sc4pipea    ,sc4pipe,   sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pipe )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4plumb)
+void sc4_state::init_sc4plumb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4plumb ) // this structure is generated
@@ -30323,9 +30323,9 @@ GAMEL( 200?, sc4plumbd   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, R
 GAMEL( 200?, sc4plumbe   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4plumb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4polic)
+void sc4_state::init_sc4polic()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4polic ) // this structure is generated
@@ -30378,9 +30378,9 @@ GAMEL( 200?, sc4policc   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4potsh)
+void sc4_state::init_sc4potsh()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4potsh ) // this structure is generated
@@ -30431,9 +30431,9 @@ GAMEL( 200?, sc4potsh    ,0,         sc4_4reel, sc4potsh, sc4_state, sc4potsh, R
 GAMEL( 200?, sc4potsha   ,sc4potsh,  sc4_4reel, sc4potsh, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4potsha )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pogbl)
+void sc4_state::init_sc4pogbl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4pogbl ) // this structure is generated
@@ -30499,9 +30499,9 @@ GAMEL( 200?, sc4pogblc   ,sc4pogbl,  sc4_5reel, sc4pogbl, sc4_state, sc4pogbl, R
 GAMEL( 200?, sc4pogbld   ,sc4pogbl,  sc4_5reel, sc4pogbl, sc4_state, sc4pogbl, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4pogble   ,sc4pogbl,  sc4_5reel, sc4pogbl, sc4_state, sc4pogbl, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pwrsg)
+void sc4_state::init_sc4pwrsg()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pwrsg ) // this structure is generated
@@ -30555,9 +30555,9 @@ GAMEL( 200?, sc4pwrsgb   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, 
 GAMEL( 200?, sc4pwrsgc   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4pwrsg )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pir)
+void sc4_state::init_sc4pir()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pir ) // this structure is generated
@@ -30633,9 +30633,9 @@ GAMEL( 200?, sc4pirf     ,sc4pir,    sc4_200_5r, sc4pir, sc4_state, sc4pir, ROT0
 GAMEL( 200?, sc4pirg     ,sc4pir,    sc4_200_5r, sc4pir, sc4_state, sc4pir, ROT0, "BFM","The Prize Is Right (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4qmodo)
+void sc4_state::init_sc4qmodo()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4qmodo ) // this structure is generated
@@ -30685,9 +30685,9 @@ GAMEL( 200?, sc4qmodod   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4quidr)
+void sc4_state::init_sc4quidr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4quidr ) // this structure is generated
@@ -30741,9 +30741,9 @@ GAMEL( 200?, sc4quidrb   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, R
 GAMEL( 200?, sc4quidrc   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4quidrb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rdrag)
+void sc4_state::init_sc4rdrag()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4rdrag ) // this structure is generated
@@ -30800,9 +30800,9 @@ GAMEL( 200?, sc4rdragc   ,sc4rdrag,  sc4_5reel, sc4rdrag, sc4_state, sc4rdrag, R
 GAMEL( 200?, sc4rdragf   ,sc4rdrag,  sc4_5reel, sc4rdrag, sc4_state, sc4rdrag, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rdrcl)
+void sc4_state::init_sc4rdrcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rdrcl ) // this structure is generated
@@ -30859,9 +30859,9 @@ GAMEL( 200?, sc4rdrclb   ,sc4rdrcl,  sc4_5reel, sc4rdrcl, sc4_state, sc4rdrcl, R
 GAMEL( 200?, sc4rdrcla   ,sc4rdrcl,  sc4_5reel, sc4rdrcl, sc4_state, sc4rdrcl, ROT0, "Qps","Red Dragon Club (412) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4relcz)
+void sc4_state::init_sc4relcz()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4relcz ) // this structure is generated
@@ -30933,9 +30933,9 @@ GAMEL( 200?, sc4relczb   ,sc4relcz,  sc4_4reel, sc4relcz, sc4_state, sc4relcz, R
 GAMEL( 200?, sc4relczc   ,sc4relcz,  sc4_4reel, sc4relcz, sc4_state, sc4relcz, ROT0, "BFM","Reely Crazy (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rotc)
+void sc4_state::init_sc4rotc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rotc ) // this structure is generated
@@ -30992,14 +30992,14 @@ GAMEL( 200?, sc4rotcc    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc,
 GAMEL( 200?, sc4rotcd    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rotc )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rttt)
+void sc4_state::init_sc4rttt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rttt_mbus)
+void sc4_state::init_sc4rttt_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4rttt ) // this structure is generated
@@ -31053,9 +31053,9 @@ GAMEL( 200?, sc4rtttc    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_
 GAMEL( 200?, sc4rtttd    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rttt )
 GAMEL( 200?, sc4rttte    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4rttt )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4roksc)
+void sc4_state::init_sc4roksc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4roksc ) // this structure is generated
@@ -31111,9 +31111,9 @@ GAMEL( 200?, sc4rokscb   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roks
 GAMEL( 200?, sc4roksca   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4roksc )
 GAMEL( 200?, sc4rokscc   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4roksc )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4blast)
+void sc4_state::init_sc4blast()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4blast ) // this structure is generated
@@ -31175,9 +31175,9 @@ GAMEL( 200?, sc4blaste   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blas
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rogds)
+void sc4_state::init_sc4rogds()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rogds ) // this structure is generated
@@ -31242,9 +31242,9 @@ GAMEL( 200?, sc4rogdsg   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rt)
+void sc4_state::init_sc4rt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rt ) // this structure is generated
@@ -31365,9 +31365,9 @@ GAMEL( 200?, sc4brollc   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rbank)
+void sc4_state::init_sc4rbank()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rbank ) // this structure is generated
@@ -31439,9 +31439,9 @@ GAMEL( 200?, sc4rbankb   ,sc4rbank,  sc4_200_5r, sc4rbank, sc4_state, sc4rbank, 
 GAMEL( 200?, sc4rbankc   ,sc4rbank,  sc4_200_5r, sc4rbank, sc4_state, sc4rbank, ROT0, "BFM","Royle Banker (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4royle)
+void sc4_state::init_sc4royle()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4royle ) // this structure is generated
@@ -31532,9 +31532,9 @@ GAMEL( 200?, sc4roylel   ,sc4royle,  sc4_200_4ra, sc4royle, sc4_state, sc4royle,
 GAMEL( 200?, sc4roylem   ,sc4royle,  sc4_200_4ra, sc4royle, sc4_state, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sidsp)
+void sc4_state::init_sc4sidsp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4sidsp ) // this structure is generated
@@ -31589,9 +31589,9 @@ GAMEL( 200?, sc4sidspb   ,sc4sidsp,  sc4_4reel_alt, sc4sidsp, sc4_state, sc4sids
 GAMEL( 200?, sc4sidspc   ,sc4sidsp,  sc4_4reel_alt, sc4sidsp, sc4_state, sc4sidsp, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4srr)
+void sc4_state::init_sc4srr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4srr ) // this structure is generated
@@ -31663,14 +31663,14 @@ GAMEL( 200?, sc4srrb     ,sc4srr,    sc4_4reel_alt, sc4srr, sc4_state, sc4srr, R
 GAMEL( 200?, sc4srrc     ,sc4srr,    sc4_4reel_alt, sc4srr, sc4_state, sc4srr, ROT0, "BFM","Snake Rattle 'n' Roll (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4slc)
+void sc4_state::init_sc4slc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4slc_mbus)
+void sc4_state::init_sc4slc_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4slc ) // this structure is generated
@@ -31752,9 +31752,9 @@ GAMEL( 2003, sc4slch     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4solgl)
+void sc4_state::init_sc4solgl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4solgl ) // this structure is generated
@@ -31830,9 +31830,9 @@ GAMEL( 200?, sc4solglb   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl,
 GAMEL( 200?, sc4solglc   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4solgl )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sace)
+void sc4_state::init_sc4sace()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4sace ) // this structure is generated
@@ -31885,9 +31885,9 @@ GAMEL( 200?, sc4sacea    ,sc4sace,   sc4_4reel_alt, sc4sace, sc4_state, sc4sace,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sbust)
+void sc4_state::init_sc4sbust()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4sbust ) // this structure is generated
@@ -31940,9 +31940,9 @@ GAMEL( 200?, sc4sbusta   ,sc4sbust,  sc4_4reel_alt, sc4sbust, sc4_state, sc4sbus
 
 
 // REEL 4 ERR 24  (what should be here?)
-DRIVER_INIT_MEMBER(sc4_state,sc4stirc)
+void sc4_state::init_sc4stirc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4stirc ) // this structure is generated
@@ -32007,9 +32007,9 @@ GAMEL( 200?, sc4stircj   ,sc4stirc,  sc4_4reel, sc4stirc, sc4_state, sc4stirc, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sahed)
+void sc4_state::init_sc4sahed()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4sahed ) // this structure is generated
@@ -32069,9 +32069,9 @@ GAMEL( 200?, sc4saheda   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed,
 GAMEL( 200?, sc4sahedb   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4sahed )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4strx)
+void sc4_state::init_sc4strx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4strx ) // this structure is generated
@@ -32144,14 +32144,14 @@ GAMEL( 200?, sc4strxc    ,sc4strx,   sc4_4reel_alt, sc4strx, sc4_state, sc4strx,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4suscl)
+void sc4_state::init_sc4suscl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4suscl_mbus)
+void sc4_state::init_sc4suscl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4suscl ) // this structure is generated
@@ -32218,14 +32218,14 @@ GAMEL( 200?, sc4suscla   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl_mb
 
 	// last reel spins forever sometimes
 
-DRIVER_INIT_MEMBER(sc4_state,sc4taekw)
+void sc4_state::init_sc4taekw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4taekw_mbus)
+void sc4_state::init_sc4taekw_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4taekw ) // this structure is generated
@@ -32290,9 +32290,9 @@ GAMEL( 200?, sc4taekwf   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4taknt)
+void sc4_state::init_sc4taknt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4taknt ) // this structure is generated
@@ -32362,14 +32362,14 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4taknt    ,0,         sc4_4reel_alt, sc4taknt, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4taknta   ,sc4taknt,  sc4_4reel_alt, sc4taknt, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4takcl)
+void sc4_state::init_sc4takcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4takcl_mbus)
+void sc4_state::init_sc4takcl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4takcl ) // this structure is generated
@@ -32444,9 +32444,9 @@ GAMEL( 200?, sc4takclc   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, R
 GAMEL( 200?, sc4takcle   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4takcl )
 GAMEL( 200?, sc4takclf   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4takcl )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tetri)
+void sc4_state::init_sc4tetri()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4tetri ) // this structure is generated
@@ -32505,9 +32505,9 @@ GAMEL( 200?, sc4tetrij   ,sc4tetri,  sc4_4reel, sc4tetri, sc4_state, sc4tetri, R
 GAMEL( 200?, sc4tetrik   ,sc4tetri,  sc4_4reel, sc4tetri, sc4_state, sc4tetri, ROT0, "Mazooma","Tetris (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tbana)
+void sc4_state::init_sc4tbana()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4tbana ) // this structure is generated
@@ -32577,9 +32577,9 @@ GAMEL( 200?, sc4tbanaa   ,sc4tbana,  sc4_200_5rb, sc4tbana, sc4_state, sc4tbana,
 
 
 // REEL 4 ERR 24  (what should be here?)
-DRIVER_INIT_MEMBER(sc4_state,sc4tgear)
+void sc4_state::init_sc4tgear()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4tgear ) // this structure is generated
@@ -32638,9 +32638,9 @@ GAMEL( 200?, sc4tgearg   ,sc4tgear,  sc4_4reel, sc4tgear, sc4_state, sc4tgear, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tload)
+void sc4_state::init_sc4tload()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4tload ) // this structure is generated
@@ -32691,9 +32691,9 @@ GAMEL( 200?, sc4tload    ,0,         sc4_4reel_alt, sc4tload, sc4_state, sc4tloa
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ttomb)
+void sc4_state::init_sc4ttomb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ttomb ) // this structure is generated
@@ -32775,9 +32775,9 @@ GAMEL( 200?, sc4ttombc   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tridn)
+void sc4_state::init_sc4tridn()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4tridn ) // this structure is generated
@@ -32827,14 +32827,14 @@ GAMEL( 200?, sc4tridna   ,sc4tridn,  sc4_5reel, sc4tridn, sc4_state, sc4tridn, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4vrgcl)
+void sc4_state::init_sc4vrgcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4vrgcl_mbus)
+void sc4_state::init_sc4vrgcl_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4vrgcl ) // this structure is generated
@@ -32916,9 +32916,9 @@ GAMEL( 200?, sc4vrgclh   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_
 GAMEL( 200?, sc4vrgcli   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4vrgclb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4leg)
+void sc4_state::init_sc4leg()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4leg ) // this structure is generated
@@ -32998,14 +32998,14 @@ GAMEL( 200?, sc4legg     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT
 GAMEL( 200?, sc4legh     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 ) // doesn't do anything?
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cleg)
+void sc4_state::init_sc4cleg()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cleg_mbus)
+void sc4_state::init_sc4cleg_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4legcb ) // this structure is generated
@@ -33081,9 +33081,9 @@ GAMEL( 200?, sc4legcbd   ,sc4legcb,  sc4_200_std, sc4legcb, sc4_state, sc4cleg_m
 GAMEL( 200?, sc4legcbe   ,sc4legcb,  sc4_200_std, sc4legcb, sc4_state, sc4cleg_mbus, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4wspin)
+void sc4_state::init_sc4wspin()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4wspin ) // this structure is generated
@@ -33135,9 +33135,9 @@ GAMEL( 200?, sc4wspinb   ,sc4wspin,  sc4_200_4rb, sc4wspin, sc4_state, sc4wspin,
 GAMEL( 200?, sc4wspind   ,sc4wspin,  sc4_200_4rb, sc4wspin, sc4_state, sc4wspin, ROT0, "Qps","Win Spinner SP Arcade (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4wwys)
+void sc4_state::init_sc4wwys()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4wwys ) // this structure is generated
@@ -33212,15 +33212,15 @@ GAMEL( 200?, sc4wwys     ,0,         sc4_200_5ra, sc4wwys, sc4_state, sc4wwys, R
 GAMEL( 200?, sc4wwysa    ,sc4wwys,   sc4_200_5ra, sc4wwys, sc4_state, sc4wwys, ROT0, "BFM","Win When Your Spinning (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4winsptb)
+void sc4_state::init_sc4winsptb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4winsp)
+void sc4_state::init_sc4winsp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4winspa ) // this structure is generated
@@ -33309,9 +33309,9 @@ GAMEL( 200?, sc4winspp   ,sc4winsp,  sc4_200_4r, sc4winspa, sc4_state, sc4winsp,
 GAMEL( 200?, sc4winspv   ,sc4winsp,  sc4_200_4r, sc4winspa, sc4_state, sc4winsp, ROT0, "Qps","Winning Spin (Arcade V062) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4wondw)
+void sc4_state::init_sc4wondw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4wondw ) // this structure is generated
@@ -33377,9 +33377,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4wondw    ,0,         sc4_200_5ra, sc4wondw, sc4_state, sc4wondw, ROT0, "BFM","Wonder Wheel (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4wondwa   ,sc4wondw,  sc4_200_5ra, sc4wondw, sc4_state, sc4wondw, ROT0, "BFM","Wonder Wheel (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4xmark)
+void sc4_state::init_sc4xmark()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4xmark ) // this structure is generated
@@ -33460,9 +33460,9 @@ GAMEL( 200?, sc4xmarka   ,sc4xmark,  sc4_200_4rb, sc4xmark, sc4_state, sc4xmark,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4blokq)
+void sc4_state::init_sc4blokq()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4blokq ) // this structure is generated
@@ -33530,9 +33530,9 @@ GAMEL( 200?, sc4bbust    ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4onup)
+void sc4_state::init_sc4onup()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4onup ) // this structure is generated
@@ -33590,9 +33590,9 @@ GAMEL( 200?, sc4onup     ,0,         sc4_200_5r, sc4onup, sc4_state, sc4onup, RO
 GAMEL( 200?, sc4onupa    ,sc4onup,   sc4_200_5r, sc4onup, sc4_state, sc4onup, ROT0, "BFM","On The Up (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hyper)
+void sc4_state::init_sc4hyper()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hyper ) // this structure is generated
@@ -33649,9 +33649,9 @@ GAMEL( 200?, sc4hyper    ,0,         sc4_5reel, sc4hyper, sc4_state, sc4hyper, R
 GAMEL( 200?, sc4hypera   ,sc4hyper,  sc4_5reel, sc4hyper, sc4_state, sc4hyper, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pglcl)
+void sc4_state::init_sc4pglcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4pglcl ) // this structure is generated
@@ -33711,14 +33711,14 @@ GAMEL( 200?, sc4pglclf   ,sc4pglcl,  sc4_5reel, sc4pglcl, sc4_state, sc4pglcl, R
 GAMEL( 200?, sc4pglclg   ,sc4pglcl,  sc4_5reel, sc4pglcl, sc4_state, sc4pglcl, ROT0, "BFM","Pharaoh's Gold Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4pglclh   ,sc4pglcl,  sc4_5reel, sc4pglcl, sc4_state, sc4pglcl, ROT0, "BFM","Pharaoh's Gold Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4po8)
+void sc4_state::init_sc4po8()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4po8_mbus)
+void sc4_state::init_sc4po8_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4po8 ) // this structure is generated
@@ -33793,9 +33793,9 @@ GAMEL( 200?, sc4po8l     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4adjb)
+void sc4_state::init_sc4adjb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4adjb ) // this structure is generated
@@ -33875,9 +33875,9 @@ GAMEL( 200?, sc4adjbh    ,sc4adjb,   sc4_5reel_alt, sc4adjb, sc4_state, sc4adjb,
 GAMEL( 200?, sc4adjbi    ,sc4adjb,   sc4_5reel_alt, sc4adjb, sc4_state, sc4adjb, ROT0, "BFM","Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4adwta)
+void sc4_state::init_sc4adwta()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4adwta ) // this structure is generated
@@ -33949,9 +33949,9 @@ GAMEL( 200?, sc4adwta    ,0,         sc4_5reel, sc4adwta, sc4_state, sc4adwta, R
 GAMEL( 200?, sc4adwtaa   ,sc4adwta,  sc4_5reel, sc4adwta, sc4_state, sc4adwta, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4a40)
+void sc4_state::init_sc4a40()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4a40 ) // this structure is generated
@@ -34007,9 +34007,9 @@ GAMEL( 200?, sc4a40a     ,sc4a40,    sc4_5reel, sc4a40, sc4_state, sc4a40, ROT0,
 GAMEL( 200?, sc4a40b     ,sc4a40,    sc4_5reel, sc4a40, sc4_state, sc4a40, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4a40c     ,sc4a40,    sc4_5reel, sc4a40, sc4_state, sc4a40, ROT0, "Mazooma","Around The Board In 40 Days (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4a40cl)
+void sc4_state::init_sc4a40cl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4a40cl ) // this structure is generated
@@ -34076,9 +34076,9 @@ GAMEL( 200?, sc4a40clb   ,sc4a40cl,  sc4_5reel, sc4a40cl, sc4_state, sc4a40cl, R
 GAMEL( 200?, sc4a40clc   ,sc4a40cl,  sc4_5reel, sc4a40cl, sc4_state, sc4a40cl, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bantm)
+void sc4_state::init_sc4bantm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bantm ) // this structure is generated
@@ -34156,9 +34156,9 @@ GAMEL( 200?, sc4bantmc   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bar7)
+void sc4_state::init_sc4bar7()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bar7 ) // this structure is generated
@@ -34284,9 +34284,9 @@ GAMEL( 200?, sc4bar7d    ,sc4bar7,   sc4_3reel, sc4bar7b, sc4_state, sc4, ROT0, 
 GAMEL( 200?, sc4bar7e    ,sc4bar7,   sc4_3reel, sc4bar7b, sc4_state, sc4, ROT0, "BFM","Bar 7's (PR1438) (Bellfruit) (Scorpion 4) (Top Box?, set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4batl)
+void sc4_state::init_sc4batl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4batl ) // this structure is generated
@@ -34357,9 +34357,9 @@ GAMEL( 200?, sc4batla    ,sc4batl,   sc4, sc4batl, sc4_state, sc4batl, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bull)
+void sc4_state::init_sc4bull()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bull ) // this structure is generated
@@ -34432,9 +34432,9 @@ GAMEL( 200?, sc4bullb    ,sc4bull,   sc4_200_4ra, sc4bull, sc4_state, sc4bull, R
 GAMEL( 200?, sc4bullc    ,sc4bull,   sc4_200_4ra, sc4bull, sc4_state, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bullcs)
+void sc4_state::init_sc4bullcs()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bulcs ) // this structure is generated
@@ -34506,9 +34506,9 @@ GAMEL( 200?, sc4bulcsb   ,sc4bulcs,  sc4_200_4ra, sc4bulcs, sc4_state, sc4bullcs
 GAMEL( 200?, sc4bulcsc   ,sc4bulcs,  sc4_200_4ra, sc4bulcs, sc4_state, sc4bullcs, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4butch)
+void sc4_state::init_sc4butch()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4butch ) // this structure is generated
@@ -34589,9 +34589,9 @@ GAMEL( 200?, sc4butchg   ,sc4butch,  sc4_4reel_alt, sc4butch, sc4_state, sc4butc
 
 
 //was sc4_200_4ra, but that spins forever, so wrong
-DRIVER_INIT_MEMBER(sc4_state,sc4cabin)
+void sc4_state::init_sc4cabin()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cabin ) // this structure is generated
@@ -34663,9 +34663,9 @@ GAMEL( 200?, sc4cabinl   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "
 GAMEL( 200?, sc4cabinm   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4cabin )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cari)
+void sc4_state::init_sc4cari()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cari ) // this structure is generated
@@ -34730,9 +34730,9 @@ GAMEL( 200?, sc4carid    ,sc4cari,   sc4_200_4ra, sc4cari, sc4_state, sc4cari, R
 GAMEL( 200?, sc4carie    ,sc4cari,   sc4_200_4ra, sc4cari, sc4_state, sc4cari, ROT0, "Mazooma","Caribbean Cash (PR2326) (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cariq)
+void sc4_state::init_sc4cariq()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cariq ) // this structure is generated
@@ -34795,9 +34795,9 @@ GAMEL( 200?, sc4cariqf   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, R
 GAMEL( 200?, sc4cariqg   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cariqd )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cblas)
+void sc4_state::init_sc4cblas()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cblas ) // this structure is generated
@@ -34870,9 +34870,9 @@ GAMEL( 200?, sc4cblasa   ,sc4cblas,  sc4_4reel_alt, sc4cblas, sc4_state, sc4cbla
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4casxt)
+void sc4_state::init_sc4casxt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4casxt ) // this structure is generated
@@ -34941,9 +34941,9 @@ GAMEL( 200?, sc4casxtd   ,sc4casxt,  sc4_3reel_200_48, sc4casxt, sc4_state, sc4c
 GAMEL( 200?, sc4casxte   ,sc4casxt,  sc4_3reel_200_48, sc4casxt, sc4_state, sc4casxt, ROT0, "Mazooma","Casino Xtravaganza (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4chavi)
+void sc4_state::init_sc4chavi()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4chavi ) // this structure is generated
@@ -35014,9 +35014,9 @@ GAMEL( 200?, sc4chavif   ,sc4chavi,  sc4, sc4chavi, sc4_state, sc4chavi, ROT0, "
 GAMEL( 200?, sc4chavig   ,sc4chavi,  sc4, sc4chavi, sc4_state, sc4chavi, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4chavy)
+void sc4_state::init_sc4chavy()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4chavy ) // this structure is generated
@@ -35078,9 +35078,9 @@ GAMEL( 200?, sc4chavyf   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chav
 GAMEL( 200?, sc4chavyg   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4chavy )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cmani)
+void sc4_state::init_sc4cmani()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cmani ) // this structure is generated
@@ -35159,9 +35159,9 @@ GAMEL( 200?, sc4cmani    ,0,         sc4_200_4rb, sc4cmani, sc4_state, sc4cmani,
 GAMEL( 200?, sc4cmania   ,sc4cmani,  sc4_200_4rb, sc4cmani, sc4_state, sc4cmani, ROT0, "BFM","Colour Mania (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cmania )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ctl)
+void sc4_state::init_sc4ctl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ctl ) // this structure is generated
@@ -35310,9 +35310,9 @@ GAMEL( 200?, sc4crscf    ,sc4crsc,   sc4, sc4crsc, sc4_state, sc4mbus, ROT0, "BF
 GAMEL( 200?, sc4crscg    ,sc4crsc,   sc4, sc4crsc, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4coro)
+void sc4_state::init_sc4coro()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4coro ) // this structure is generated
@@ -35377,16 +35377,16 @@ GAMEL( 200?, sc4corol    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro,
 GAMEL( 200?, sc4corom    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4coro )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4corod)
+void sc4_state::init_sc4corod()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4corotb)
+void sc4_state::init_sc4corotb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4coroc ) // this structure is generated
@@ -35503,9 +35503,9 @@ GAMEL( 200?, sc4coroi    ,sc4coroc,  sc4_4reel, sc4corod, sc4_state, sc4corod, R
 GAMEL( 200?, sc4corotb   ,sc4coroc,  sc4_4reel_alt, sc4, sc4_state, sc4corotb, ROT0, "Mazooma","Coronation Street Triple Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 GAMEL( 200?, sc4corotba  ,sc4coroc,  sc4_4reel_alt, sc4, sc4_state, sc4corotb, ROT0, "Mazooma","Coronation Street Triple Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4corcl)
+void sc4_state::init_sc4corcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4corcl ) // this structure is generated
@@ -35575,9 +35575,9 @@ GAMEL( 200?, sc4corcl    ,0,         sc4_5reel, sc4corcl, sc4_state, sc4corcl, R
 GAMEL( 200?, sc4corcla   ,sc4corcl,  sc4_5reel, sc4corcl, sc4_state, sc4corcl, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4count)
+void sc4_state::init_sc4count()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4count ) // this structure is generated
@@ -35647,9 +35647,9 @@ GAMEL( 200?, sc4counta   ,sc4count,  sc4_200_5ra, sc4count, sc4_state, sc4count,
 
 
 //DND has reel4 with 12 positions, and reel 5 with 16
-DRIVER_INIT_MEMBER(sc4_state,sc4dnd)
+void sc4_state::init_sc4dnd()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dnd ) // this structure is generated
@@ -35749,9 +35749,9 @@ GAMEL( 200?, sc4dndk     ,sc4dnd,    sc4, sc4dnd35, sc4_state, sc4dnd, ROT0, "BF
 GAMEL( 200?, sc4dndm     ,sc4dnd,    sc4, sc4dnd35, sc4_state, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 428
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndcs)
+void sc4_state::init_sc4dndcs()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndcs ) // this structure is generated
@@ -35832,11 +35832,11 @@ GAMEL( 200?, sc4dndcsd   ,sc4dndcs,  sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, 
 GAMEL( 200?, sc4dndcse   ,sc4dndcs,  sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 215
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndbb)
+void sc4_state::init_sc4dndbb()
 {
 	m_segment_34_encoding = true;
 
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndbb ) // this structure is generated
@@ -35935,9 +35935,9 @@ GAMEL( 200?, sc4dndbbi   ,sc4dndbb,  sc4_5reel_alt, sc4dndbb70, sc4_state, sc4dn
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndcl)
+void sc4_state::init_sc4dndcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 INPUT_PORTS_START( sc4dndcl ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -36025,9 +36025,9 @@ GAMEL( 200?, sc4dndclb   ,sc4dndcl,  sc4, sc4dndcl250, sc4_state, sc4dndcl, ROT0
 GAMEL( 200?, sc4dndclf   ,sc4dndcl,  sc4, sc4dndcl250, sc4_state, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 391 CLUB ?250
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dnddd)
+void sc4_state::init_sc4dnddd()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 INPUT_PORTS_START( sc4dnddd ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -36120,9 +36120,9 @@ GAMEL( 200?, sc4dndddg   ,sc4dnddd,  sc4_5reel_alt, sc4dnddd70, sc4_state, sc4dn
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndhf)
+void sc4_state::init_sc4dndhf()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndhf ) // this structure is generated
@@ -36218,9 +36218,9 @@ GAMEL( 200?, sc4dndhfe   ,sc4dndhf,  sc4_5reel_alt, sc4dndhf70, sc4_state, sc4dn
 GAMEL( 200?, sc4dndhfk   ,sc4dndhf,  sc4_5reel_alt, sc4dndhf70, sc4_state, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 1, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
 GAMEL( 200?, sc4dndhfl   ,sc4dndhf,  sc4_5reel_alt, sc4dndhf70, sc4_state, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 2, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndys)
+void sc4_state::init_sc4dndys()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndys ) // this structure is generated
@@ -36318,9 +36318,9 @@ GAMEL( 200?, sc4dndysb   ,sc4dndys,  sc4_200_5rc, sc4dndys70, sc4_state, sc4dndy
 GAMEL( 200?, sc4dndysa   ,sc4dndys,  sc4_200_5rc, sc4dndys35, sc4_state, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
 GAMEL( 200?, sc4dndysc   ,sc4dndys,  sc4_200_5rc, sc4dndys35, sc4_state, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndlp)
+void sc4_state::init_sc4dndlp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndlp ) // this structure is generated
@@ -36412,9 +36412,9 @@ GAMEL( 200?, sc4dndlpd   ,sc4dndlp,  sc4_5reel, sc4dndlp70, sc4_state, sc4dndlp,
 GAMEL( 200?, sc4dndlpb   ,sc4dndlp,  sc4_5reel, sc4dndlp70, sc4_state, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
 GAMEL( 200?, sc4dndlpe   ,sc4dndlp,  sc4_5reel, sc4dndlp70, sc4_state, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndra)
+void sc4_state::init_sc4dndra()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndra ) // this structure is generated
@@ -36506,11 +36506,11 @@ GAMEL( 200?, sc4dndrac   ,sc4dndra,  sc4_5reel_alt, sc4dndra70, sc4_state, sc4dn
 GAMEL( 200?, sc4dndrae   ,sc4dndra,  sc4_5reel_alt, sc4dndra70, sc4_state, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 572
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndbd)
+void sc4_state::init_sc4dndbd()
 {
 	m_segment_34_encoding = true;
 
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndbd ) // this structure is generated
@@ -36604,9 +36604,9 @@ GAMEL( 200?, sc4dndbdc   ,sc4dndbd,  sc4_5reel, sc4dndbd70, sc4_state, sc4dndbd,
 GAMEL( 200?, sc4dndbde   ,sc4dndbd,  sc4_5reel, sc4dndbd70, sc4_state, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 571
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndbr)
+void sc4_state::init_sc4dndbr()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndbr ) // this structure is generated
@@ -36699,11 +36699,11 @@ GAMEL( 200?, sc4dndbre   ,sc4dndbr,  sc4_5reel_alt, sc4dndbr70, sc4_state, sc4dn
 GAMEL( 200?, sc4dndbrg   ,sc4dndbr,  sc4_5reel_alt, sc4dndbr70, sc4_state, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 571
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndcc)
+void sc4_state::init_sc4dndcc()
 {
 	m_segment_34_encoding = true;
 
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndcc ) // this structure is generated
@@ -36797,9 +36797,9 @@ GAMEL( 200?, sc4dndcce   ,sc4dndcc,  sc4_5reel, sc4dndcc35, sc4_state, sc4dndcc,
 GAMEL( 200?, sc4dndccd   ,sc4dndcc,  sc4_5reel, sc4dndcc70, sc4_state, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
 GAMEL( 200?, sc4dndccf   ,sc4dndcc,  sc4_5reel, sc4dndcc70, sc4_state, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dnddw)
+void sc4_state::init_sc4dnddw()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 INPUT_PORTS_START( sc4dnddw ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -36893,9 +36893,9 @@ GAMEL( 200?, sc4dnddwf   ,sc4dnddw,  sc4_200_5ra, sc4dnddw35, sc4_state, sc4dndd
 GAMEL( 200?, sc4dnddwe   ,sc4dnddw,  sc4_200_5ra, sc4dnddw70, sc4_state, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
 GAMEL( 200?, sc4dnddwg   ,sc4dnddw,  sc4_200_5ra, sc4dnddw70, sc4_state, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dnddf)
+void sc4_state::init_sc4dnddf()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dnddf ) // this structure is generated
@@ -36985,11 +36985,11 @@ GAMEL( 200?, sc4dnddfc   ,sc4dnddf,  sc4_200_alt, sc4dnddf70, sc4_state, sc4dndd
 GAMEL( 200?, sc4dnddfe   ,sc4dnddf,  sc4_200_alt, sc4dnddf70, sc4_state, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 571
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndpg)
+void sc4_state::init_sc4dndpg()
 {
 	m_segment_34_encoding = true;
 
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndpg ) // this structure is generated
@@ -37083,9 +37083,9 @@ GAMEL( 200?, sc4dndpgb   ,sc4dndpg,  sc4_5reel, sc4dndpg70, sc4_state, sc4dndpg,
 GAMEL( 200?, sc4dndpge   ,sc4dndpg,  sc4_5reel, sc4dndpg70, sc4_state, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 572
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndtp)
+void sc4_state::init_sc4dndtp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 INPUT_PORTS_START( sc4dndtp ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -37174,9 +37174,9 @@ GAMEL( 200?, sc4dndtpk   ,sc4dndtp,  sc4_5reel, sc4dndtp35, sc4_state, sc4dndtp,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndww)
+void sc4_state::init_sc4dndww()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndww ) // this structure is generated
@@ -37265,9 +37265,9 @@ GAMEL( 200?, sc4dndwwe   ,sc4dndww,  sc4, sc4dndww35, sc4_state, sc4dndww, ROT0,
 GAMEL( 200?, sc4dndwwc   ,sc4dndww,  sc4, sc4dndww35, sc4_state, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
 GAMEL( 200?, sc4dndwwd   ,sc4dndww,  sc4, sc4dndww35, sc4_state, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndcw)
+void sc4_state::init_sc4dndcw()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndcw ) // this structure is generated
@@ -37354,9 +37354,9 @@ GAMEL( 200?, sc4dndcwa   ,sc4dndcw,  sc4, sc4dndcw5, sc4_state, sc4dndcw, ROT0, 
 GAMEL( 200?, sc4dndcwc   ,sc4dndcw,  sc4, sc4dndcw5, sc4_state, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 272
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndtr)
+void sc4_state::init_sc4dndtr()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndtr ) // this structure is generated
@@ -37435,9 +37435,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4dndtr    ,0,         sc4_5reel_alt, sc4dndtr70, sc4_state, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
 GAMEL( 200?, sc4dndtra   ,sc4dndtr,  sc4_5reel_alt, sc4dndtr70, sc4_state, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndwb)
+void sc4_state::init_sc4dndwb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndwb ) // this structure is generated
@@ -37527,9 +37527,9 @@ GAMEL( 200?, sc4dndwbe   ,sc4dndwb,  sc4_200_5ra, sc4dndwb35, sc4_state, sc4dndw
 GAMEL( 200?, sc4dndwbf   ,sc4dndwb,  sc4_200_5ra, sc4dndwb35, sc4_state, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
 GAMEL( 200?, sc4dndwbg   ,sc4dndwb,  sc4_200_5ra, sc4dndwb35, sc4_state, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndbe)
+void sc4_state::init_sc4dndbe()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndbe ) // this structure is generated
@@ -37626,11 +37626,11 @@ GAMEL( 200?, sc4dndbem   ,sc4dndbe,  sc4_5reel_alt, sc4dndbe35, sc4_state, sc4dn
 GAMEL( 200?, sc4dndben   ,sc4dndbe,  sc4_5reel_alt, sc4dndbe35, sc4_state, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 426
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dndbc)
+void sc4_state::init_sc4dndbc()
 {
 	m_segment_34_encoding = true;
 
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dndbc ) // this structure is generated
@@ -37714,9 +37714,9 @@ GAMEL( 200?, sc4dndbc    ,0,         sc4_5reel, sc4dndbc70, sc4_state, sc4dndbc,
 GAMEL( 200?, sc4dndbca   ,sc4dndbc,  sc4_5reel, sc4dndbc70, sc4_state, sc4dndbc, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BOXR 571
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dmine)
+void sc4_state::init_sc4dmine()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4dmine ) // this structure is generated
@@ -37791,14 +37791,14 @@ GAMEL( 200?, sc4dminee   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ddosh)
+void sc4_state::init_sc4ddosh()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ddosh_mbus)
+void sc4_state::init_sc4ddosh_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ddosh ) // this structure is generated
@@ -37960,9 +37960,9 @@ GAMEL( 200?, sc4dhhc     ,sc4dhh,    sc4, sc4dhh, sc4_state, sc4mbus, ROT0, "BFM
 GAMEL( 200?, sc4dhhd     ,sc4dhh,    sc4, sc4dhh, sc4_state, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4dhhe     ,sc4dhh,    sc4, sc4dhh, sc4_state, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4dough)
+void sc4_state::init_sc4dough()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4dough ) // this structure is generated
@@ -38033,9 +38033,9 @@ GAMEL( 200?, sc4dough    ,0,         sc4_4reel_alt, sc4dough, sc4_state, sc4doug
 GAMEL( 200?, sc4dougha   ,sc4dough,  sc4_4reel_alt, sc4dough, sc4_state, sc4dough, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4emmer)
+void sc4_state::init_sc4emmer()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4emmer ) // this structure is generated
@@ -38105,9 +38105,9 @@ GAMEL( 200?, sc4emmera   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emme
 GAMEL( 200?, sc4emmerb   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4emmerc )
 GAMEL( 200?, sc4emmerc   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4emmerc )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4evol)
+void sc4_state::init_sc4evol()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4evol ) // this structure is generated
@@ -38164,9 +38164,9 @@ GAMEL( 200?, sc4evole    ,sc4evol,   sc4_4reel_alt, sc4evol, sc4_state, sc4evol,
 GAMEL( 200?, sc4evolf    ,sc4evol,   sc4_4reel_alt, sc4evol, sc4_state, sc4evol, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4evolg    ,sc4evol,   sc4_4reel_alt, sc4evol, sc4_state, sc4evol, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fguy)
+void sc4_state::init_sc4fguy()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4fguy ) // this structure is generated
@@ -38255,9 +38255,9 @@ GAMEL( 200?, sc4fguyc    ,sc4fguy,   sc4_5reel_alt, sc4fguy70, sc4_state, sc4fgu
 GAMEL( 200?, sc4fguyd    ,sc4fguy,   sc4_5reel_alt, sc4fguy, sc4_state, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4fguye    ,sc4fguy,   sc4_5reel_alt, sc4fguy, sc4_state, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fbspn)
+void sc4_state::init_sc4fbspn()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4fbspn ) // this structure is generated
@@ -38326,9 +38326,9 @@ GAMEL( 200?, sc4fbspnc   ,sc4fbspn,  sc4_5reel, sc4fbspn, sc4_state, sc4fbspn, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fmj)
+void sc4_state::init_sc4fmj()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fmj ) // this structure is generated
@@ -38399,9 +38399,9 @@ GAMEL( 200?, sc4fmjc     ,sc4fmj,    sc4_4reel_alt, sc4fmj, sc4_state, sc4fmj, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gd)
+void sc4_state::init_sc4gd()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4gd ) // this structure is generated
@@ -38476,9 +38476,9 @@ GAMEL( 200?, sc4gde      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, 
 GAMEL( 200?, sc4gdf      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4gd )
 GAMEL( 200?, sc4gdg      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4gd )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gdclb)
+void sc4_state::init_sc4gdclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -38551,9 +38551,9 @@ GAMEL( 200?, sc4gdclbj   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb,
 GAMEL( 200?, sc4gdclbk   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4gdclb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gball)
+void sc4_state::init_sc4gball()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4gball ) // this structure is generated
@@ -38623,9 +38623,9 @@ GAMEL( 200?, sc4gballb   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gbal
 GAMEL( 200?, sc4gballc   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4gball )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gunp)
+void sc4_state::init_sc4gunp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4gunp ) // this structure is generated
@@ -38702,9 +38702,9 @@ GAMEL( 200?, sc4gunpe    ,sc4gunp,   sc4_5reel_alt, sc4gunp, sc4_state, sc4gunp,
 GAMEL( 200?, sc4gunpf    ,sc4gunp,   sc4_5reel_alt, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4gunpg    ,sc4gunp,   sc4_5reel_alt, sc4gunp, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hapnt)
+void sc4_state::init_sc4hapnt()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4hapnt ) // this structure is generated
@@ -38846,9 +38846,9 @@ GAMEL( 200?, sc4hellbi   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "B
 GAMEL( 200?, sc4hellbj   ,sc4hellb,  sc4, sc4hellb, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 // seem to be issues with reel 4
-DRIVER_INIT_MEMBER(sc4_state,sc4hill)
+void sc4_state::init_sc4hill()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4hill ) // this structure is generated
@@ -38925,9 +38925,9 @@ GAMEL( 200?, sc4hilla    ,sc4hill,   sc4, sc4hill, sc4_state, sc4hill, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hiss)
+void sc4_state::init_sc4hiss()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4hiss ) // this structure is generated
@@ -38994,9 +38994,9 @@ GAMEL( 200?, sc4hissg    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, RO
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hotrd)
+void sc4_state::init_sc4hotrd()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4hotrd ) // this structure is generated
@@ -39069,9 +39069,9 @@ GAMEL( 200?, sc4hotrd    ,0,         sc4_4reel, sc4hotrd, sc4_state, sc4hotrd, R
 GAMEL( 200?, sc4hotrda   ,sc4hotrd,  sc4_4reel, sc4hotrd, sc4_state, sc4hotrd, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hotsh)
+void sc4_state::init_sc4hotsh()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4hotsh ) // this structure is generated
@@ -39147,9 +39147,9 @@ GAMEL( 200?, sc4hotsh    ,0,         sc4, sc4hotsh, sc4_state, sc4hotsh, ROT0, "
 GAMEL( 200?, sc4hotsha   ,sc4hotsh,  sc4, sc4hotsh, sc4_state, sc4hotsh, ROT0, "BFM","Hot Shot (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hotwd)
+void sc4_state::init_sc4hotwd()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -39224,9 +39224,9 @@ GAMEL( 200?, sc4hotwdd   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotw
 GAMEL( 200?, sc4hotwde   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4hotwd )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4celeb)
+void sc4_state::init_sc4celeb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4celeb ) // this structure is generated
@@ -39298,9 +39298,9 @@ GAMEL( 200?, sc4celebc   ,sc4celeb,  sc4_4reel_alt, sc4celeb, sc4_state, sc4cele
 GAMEL( 200?, sc4celebd   ,sc4celeb,  sc4_4reel_alt, sc4celeb, sc4_state, sc4celeb, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4inspn)
+void sc4_state::init_sc4inspn()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4inspn ) // this structure is generated
@@ -39353,9 +39353,9 @@ GAMEL( 200?, sc4inspna   ,sc4inspn,  sc4_200_5ra, sc4inspn, sc4_state, sc4inspn,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ijob)
+void sc4_state::init_sc4ijob()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ijob ) // this structure is generated
@@ -39439,9 +39439,9 @@ GAMEL( 200?, sc4ijobl    ,sc4ijob,   sc4_5reel_alt, sc4ijob, sc4_state, sc4ijob,
 GAMEL( 200?, sc4ijobm    ,sc4ijob,   sc4_5reel_alt, sc4ijob, sc4_state, sc4ijob, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ldvl)
+void sc4_state::init_sc4ldvl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ldvl ) // this structure is generated
@@ -39514,9 +39514,9 @@ GAMEL( 200?, sc4ldvlc    ,sc4ldvl,   sc4_4reel_alt, sc4ldvl, sc4_state, sc4ldvl,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lotrr)
+void sc4_state::init_sc4lotrr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4lotrr ) // this structure is generated
@@ -39587,9 +39587,9 @@ GAMEL( 200?, sc4lotrrc   ,sc4lotrr,  sc4_4reel_alt, sc4lotrr, sc4_state, sc4lotr
 GAMEL( 200?, sc4lotrrd   ,sc4lotrr,  sc4_4reel_alt, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4lotrre   ,sc4lotrr,  sc4_4reel_alt, sc4lotrr, sc4_state, sc4lotrr, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4manic)
+void sc4_state::init_sc4manic()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4manic ) // this structure is generated
@@ -39664,9 +39664,9 @@ GAMEL( 200?, sc4manice   ,sc4manic,  sc4_200_5ra, sc4manic, sc4_state, sc4manic,
 GAMEL( 200?, sc4manicf   ,sc4manic,  sc4_200_5ra, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4manicg   ,sc4manic,  sc4_200_5ra, sc4manic, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mmm)
+void sc4_state::init_sc4mmm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4mmm ) // this structure is generated
@@ -39742,9 +39742,9 @@ GAMEL( 200?, sc4mmme     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, R
 GAMEL( 200?, sc4mmmf     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mmmg )
 GAMEL( 200?, sc4mmmg     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4mmmg )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mmad)
+void sc4_state::init_sc4mmad()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4mmad ) // this structure is generated
@@ -39815,9 +39815,9 @@ GAMEL( 200?, sc4mmadg    ,sc4mmad,   sc4_200_5rc, sc4mmad, sc4_state, sc4mmad, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mdm)
+void sc4_state::init_sc4mdm()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4mdm ) // this structure is generated
@@ -39888,9 +39888,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4mdm      ,0,         sc4_5reel_alt, sc4mdm, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4mdma     ,sc4mdm,    sc4_5reel_alt, sc4mdm, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mhn)
+void sc4_state::init_sc4mhn()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4mhn ) // this structure is generated
@@ -39965,9 +39965,9 @@ GAMEL( 200?, sc4mhn      ,0,         sc4_200_4r, sc4mhn, sc4_state, sc4mhn, ROT0
 GAMEL( 200?, sc4mhna     ,sc4mhn,    sc4_200_4r, sc4mhn, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mhp)
+void sc4_state::init_sc4mhp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4mhp ) // this structure is generated
@@ -40051,9 +40051,9 @@ GAMEL( 200?, sc4mhpm     ,sc4mhp,    sc4_5reel_alt, sc4mhp, sc4_state, sc4mhp, R
 GAMEL( 200?, sc4mhpn     ,sc4mhp,    sc4_5reel_alt, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 ) // 272
 GAMEL( 200?, sc4mhpo     ,sc4mhp,    sc4_5reel_alt, sc4mhp, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mmb)
+void sc4_state::init_sc4mmb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4mmb ) // this structure is generated
@@ -40119,9 +40119,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4mmb      ,0,         sc4_4reel_alt, sc4mmb, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4mmba     ,sc4mmb,    sc4_4reel_alt, sc4mmb, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mrh)
+void sc4_state::init_sc4mrh()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4mrh ) // this structure is generated
@@ -40190,9 +40190,9 @@ GAMEL( 200?, sc4mrhd     ,sc4mrh,    sc4_3reel_200_48, sc4mrh, sc4_state, sc4mrh
 GAMEL( 200?, sc4mrhe     ,sc4mrh,    sc4_3reel_200_48, sc4mrh, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mr2r)
+void sc4_state::init_sc4mr2r()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4mr2r ) // this structure is generated
@@ -40266,9 +40266,9 @@ GAMEL( 200?, sc4mr2rd    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r,
 GAMEL( 200?, sc4mr2re    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mr2rc )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4nmare)
+void sc4_state::init_sc4nmare()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4nmare ) // this structure is generated
@@ -40343,9 +40343,9 @@ GAMEL( 200?, sc4nmareb   ,sc4nmare,  sc4_5reel, sc4nmare, sc4_state, sc4nmare, R
 GAMEL( 200?, sc4nmarec   ,sc4nmare,  sc4_5reel, sc4nmare, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4potp)
+void sc4_state::init_sc4potp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4potp ) // this structure is generated
@@ -40485,9 +40485,9 @@ GAMEL( 200?, sc4ppcrj    ,sc4ppcr,   sc4, sc4ppcr, sc4_state, sc4, ROT0, "Mazoom
 GAMEL( 200?, sc4ppcrtb   ,sc4ppcr,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge Top Box (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ppctc)
+void sc4_state::init_sc4ppctc()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ppctc ) // this structure is generated
@@ -40640,9 +40640,9 @@ GAMEL( 200?, sc4ppdymi   ,sc4ppdym,  sc4, sc4ppdym, sc4_state, sc4, ROT0, "Mazoo
 GAMEL( 200?, sc4ppdymtb  ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4ppdymtba ,sc4ppdym,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pony)
+void sc4_state::init_sc4pony()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pony ) // this structure is generated
@@ -40715,9 +40715,9 @@ GAMEL( 200?, sc4ponyd    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, RO
 GAMEL( 200?, sc4ponye    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4pony ) // incomplete pairing
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4popey)
+void sc4_state::init_sc4popey()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4popey ) // this structure is generated
@@ -40792,9 +40792,9 @@ GAMEL( 200?, sc4popeyd   ,sc4popey,  sc4_5reel_alt, sc4popey, sc4_state, sc4pope
 GAMEL( 200?, sc4popeye   ,sc4popey,  sc4_5reel_alt, sc4popey, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pwrbl)
+void sc4_state::init_sc4pwrbl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4pwrbl ) // this structure is generated
@@ -40874,9 +40874,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4pwrbl    ,0,         sc4_4reel, sc4pwrbl, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4pwrbla   ,sc4pwrbl,  sc4_4reel, sc4pwrbl, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4quidv)
+void sc4_state::init_sc4quidv()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4quidv ) // this structure is generated
@@ -40945,9 +40945,9 @@ GAMEL( 200?, sc4quidva   ,sc4quidv,  sc4_4reel_alt, sc4quidv, sc4_state, sc4quid
 GAMEL( 200?, sc4quidvb   ,sc4quidv,  sc4_4reel_alt, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4quidvc   ,sc4quidv,  sc4_4reel_alt, sc4quidv, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rhxcs)
+void sc4_state::init_sc4rhxcs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rhxcs ) // this structure is generated
@@ -41017,9 +41017,9 @@ GAMEL( 200?, sc4rhxcse   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4r
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4redsq)
+void sc4_state::init_sc4redsq()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4redsq ) // this structure is generated
@@ -41081,9 +41081,9 @@ GAMEL( 200?, sc4redsqc   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rosts)
+void sc4_state::init_sc4rosts()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4rosts ) // this structure is generated
@@ -41154,9 +41154,9 @@ GAMEL( 200?, sc4rostsf   ,sc4rosts,  sc4_5reel, sc4rosts, sc4_state, sc4rosts, R
 GAMEL( 200?, sc4rostsg   ,sc4rosts,  sc4_5reel, sc4rosts, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rovrt)
+void sc4_state::init_sc4rovrt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rovrt ) // this structure is generated
@@ -41234,9 +41234,9 @@ GAMEL( 200?, sc4rovrtc   ,sc4rovrt,  sc4_200_4ra, sc4rovrt, sc4_state, sc4rovrt,
 GAMEL( 200?, sc4rovrtd   ,sc4rovrt,  sc4_200_4ra, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4rovrte   ,sc4rovrt,  sc4_200_4ra, sc4rovrt, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4showt)
+void sc4_state::init_sc4showt()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4showt ) // this structure is generated
@@ -41314,9 +41314,9 @@ GAMEL( 200?, sc4showte   ,sc4showt,  sc4_200_5rc, sc4showt, sc4_state, sc4showt,
 GAMEL( 200?, sc4showtf   ,sc4showt,  sc4_200_5rc, sc4showt, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4spice)
+void sc4_state::init_sc4spice()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4spice ) // this structure is generated
@@ -41379,9 +41379,9 @@ GAMEL( 200?, sc4spicea   ,sc4spice,  sc4_4reel_alt, sc4spice, sc4_state, sc4spic
 GAMEL( 200?, sc4spiceb   ,sc4spice,  sc4_4reel_alt, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4spicec   ,sc4spice,  sc4_4reel_alt, sc4spice, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sus)
+void sc4_state::init_sc4sus()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4sus ) // this structure is generated
@@ -41455,9 +41455,9 @@ GAMEL( 200?, sc4susj     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, R
 GAMEL( 200?, sc4susk     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4susk )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sslam)
+void sc4_state::init_sc4sslam()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4sslam ) // this structure is generated
@@ -41519,9 +41519,9 @@ GAMEL( 200?, sc4sslama   ,sc4sslam,  sc4_5reel, sc4sslam, sc4_state, sc4sslam, R
 
 // reel setup NOT correct, this will spin forever on some things
 
-DRIVER_INIT_MEMBER(sc4_state,sc4swbak)
+void sc4_state::init_sc4swbak()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4swbak ) // this structure is generated
@@ -41591,9 +41591,9 @@ GAMEL( 200?, sc4swbakb   ,sc4swbak,  sc4_200_5ra, sc4swbak, sc4_state, sc4swbak,
 GAMEL( 200?, sc4swbakc   ,sc4swbak,  sc4_200_5ra, sc4swbak, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ttpie)
+void sc4_state::init_sc4ttpie()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4ttpie ) // this structure is generated
@@ -41668,9 +41668,9 @@ GAMEL( 200?, sc4ttpief   ,sc4ttpie,  sc4_5reel, sc4ttpie, sc4_state, sc4ttpie, R
 GAMEL( 200?, sc4ttpieg   ,sc4ttpie,  sc4_5reel, sc4ttpie, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4typ)
+void sc4_state::init_sc4typ()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4typ ) // this structure is generated
@@ -41743,9 +41743,9 @@ GAMEL( 200?, sc4typa     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM"
 GAMEL( 200?, sc4typb     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4typc     ,sc4typ,    sc4, sc4typ, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4trail)
+void sc4_state::init_sc4trail()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4trail ) // this structure is generated
@@ -41803,9 +41803,9 @@ GAMEL( 200?, sc4trailc   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trai
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bpb)
+void sc4_state::init_sc4bpb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bpb ) // this structure is generated
@@ -41879,9 +41879,9 @@ GAMEL( 200?, sc4bpbd     ,sc4bpb,    sc4_5reel, sc4bpb, sc4_state, sc4bpb, ROT0,
 GAMEL( 200?, sc4bpbe     ,sc4bpb,    sc4_5reel, sc4bpb, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bsp)
+void sc4_state::init_sc4bsp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bsp ) // this structure is generated
@@ -41958,9 +41958,9 @@ GAMEL( 200?, sc4bspe     ,sc4bsp,    sc4_200_5ra, sc4bsp, sc4_state, sc4bsp, ROT
 GAMEL( 200?, sc4bspf     ,sc4bsp,    sc4_200_5ra, sc4bsp, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4chain)
+void sc4_state::init_sc4chain()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4chain ) // this structure is generated
@@ -42038,9 +42038,9 @@ GAMEL( 200?, sc4chainb   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chai
 GAMEL( 200?, sc4chainc   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4chainb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4clown)
+void sc4_state::init_sc4clown()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4clown ) // this structure is generated
@@ -42180,9 +42180,9 @@ GAMEL( 200?, sc4mwwtbc   ,sc4mwwtb,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 GAMEL( 200?, sc4mwwtbd   ,sc4mwwtb,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bwow)
+void sc4_state::init_sc4bwow()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bwow ) // this structure is generated
@@ -42251,9 +42251,9 @@ GAMEL( 200?, sc4bwow   ,0,       sc4_200_5ra, sc4bwow, sc4_state, sc4bwow, ROT0,
 GAMEL( 200?, sc4bwowa  ,sc4bwow, sc4_200_5ra, sc4bwow, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // ^^
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4nunsm)
+void sc4_state::init_sc4nunsm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4nunsm ) // this structure is generated
@@ -42322,9 +42322,9 @@ GAMEL( 200?, sc4nunsmi   ,sc4nunsm,  sc4_200_4ra, sc4nunsm, sc4_state, sc4nunsm,
 GAMEL( 200?, sc4nunsmj   ,sc4nunsm,  sc4_200_4ra, sc4nunsm, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4acesh)
+void sc4_state::init_sc4acesh()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4acesh ) // this structure is generated
@@ -42377,9 +42377,9 @@ GAMEL( 200?, sc4aceshb   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh,
 GAMEL( 200?, sc4aceshc   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4acesh )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bed)
+void sc4_state::init_sc4bed()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bed ) // this structure is generated
@@ -42441,9 +42441,9 @@ GAMEL( 200?, sc4bedd     ,sc4bed,    sc4_4reel_alt, sc4bed, sc4_state, sc4bed, R
 GAMEL( 200?, sc4bede     ,sc4bed,    sc4_4reel_alt, sc4bed, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bedcl)
+void sc4_state::init_sc4bedcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bedcl ) // this structure is generated
@@ -42512,14 +42512,14 @@ GAMEL( 200?, sc4bedclb   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, R
 GAMEL( 200?, sc4bedclc   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4bedcl )
 GAMEL( 200?, sc4bedcld   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4bedcl )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bblas)
+void sc4_state::init_sc4bblas()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bblas_mbus)
+void sc4_state::init_sc4bblas_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bblas ) // this structure is generated
@@ -42575,9 +42575,9 @@ GAMEL( 200?, sc4bblasd   ,sc4bblas,  sc4_4reel_alt, sc4bblas, sc4_state, sc4bbla
 GAMEL( 200?, sc4bblase   ,sc4bblas,  sc4_4reel_alt, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4bblasf   ,sc4bblas,  sc4_4reel_alt, sc4bblas, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bankb)
+void sc4_state::init_sc4bankb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bankb ) // this structure is generated
@@ -42632,9 +42632,9 @@ GAMEL( 200?, sc4bankba   ,sc4bankb,  sc4_200_5r, sc4bankb, sc4_state, sc4bankb, 
 GAMEL( 200?, sc4bb       ,sc4bankb,  sc4_200_5r, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4bba      ,sc4bankb,  sc4_200_5r, sc4bankb, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bobcl)
+void sc4_state::init_sc4bobcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bobcl ) // this structure is generated
@@ -42703,9 +42703,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4bobcl    ,0,         sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4bobcl )
 GAMEL( 200?, sc4bobcla   ,sc4bobcl,  sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4bobcl )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4brksp)
+void sc4_state::init_sc4brksp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4brksp ) // this structure is generated
@@ -42759,9 +42759,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4brksp    ,0,         sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4brksp )
 GAMEL( 200?, sc4brkspa   ,sc4brksp,  sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4brksp )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bulcl)
+void sc4_state::init_sc4bulcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4bulcl ) // this structure is generated
@@ -42834,9 +42834,9 @@ GAMEL( 200?, sc4bulclg   ,sc4bulcl,  sc4_5reel, sc4bulcl, sc4_state, sc4bulcl, R
 GAMEL( 200?, sc4bulclh   ,sc4bulcl,  sc4_5reel, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4bulcli   ,sc4bulcl,  sc4_5reel, sc4bulcl, sc4_state, sc4bulcl, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4carry)
+void sc4_state::init_sc4carry()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4carry ) // this structure is generated
@@ -43109,9 +43109,9 @@ GAMEL( 200?, sc4cckeym   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "B
 GAMEL( 200?, sc4cckeyn   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4cckeyo   ,sc4cckey,  sc4, sc4cckey, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4clclo)
+void sc4_state::init_sc4clclo()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4clclo ) // this structure is generated
@@ -43176,9 +43176,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4clclo    ,0,         sc4_5reel, sc4clclo, sc4_state, sc4clclo, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cjcl)
+void sc4_state::init_sc4cjcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cjcl ) // this structure is generated
@@ -43409,9 +43409,9 @@ GAMEL( 2003, sc4crgcv    ,sc4crgc,   sc4, sc4crgc, sc4_state, sc4mbus, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfcla)
+void sc4_state::init_sc4cfcla()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cfcla ) // this structure is generated
@@ -43479,9 +43479,9 @@ GAMEL( 200?, sc4cfclae   ,sc4cfcla,  sc4_3reel, sc4cfcla, sc4_state, sc4cfcla, R
 GAMEL( 200?, sc4cfclaf   ,sc4cfcla,  sc4_3reel, sc4cfcla, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfdu)
+void sc4_state::init_sc4cfdu()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cfdu ) // this structure is generated
@@ -43547,9 +43547,9 @@ GAMEL( 200?, sc4cfdub    ,sc4cfdu,   sc4_4reel_alt, sc4cfdu, sc4_state, sc4cfdu,
 GAMEL( 200?, sc4cfduc    ,sc4cfdu,   sc4_4reel_alt, sc4cfdu, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfgcl)
+void sc4_state::init_sc4cfgcl()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4cfgcl ) // this structure is generated
@@ -43620,9 +43620,9 @@ GAMEL( 200?, sc4cfgclb   ,sc4cfgcl,  sc4_5reel, sc4cfgcl, sc4_state, sc4cfgcl, R
 GAMEL( 200?, sc4cfgclc   ,sc4cfgcl,  sc4_5reel, sc4cfgcl, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4derby)
+void sc4_state::init_sc4derby()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4derby ) // this structure is generated
@@ -43932,9 +43932,9 @@ GAMEL( 200?, sc4clbmnb   ,sc4clbmn,  sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "B
 GAMEL( 200?, sc4clbmnc   ,sc4clbmn,  sc4, sc4clbmn, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4boomb)
+void sc4_state::init_sc4boomb()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4boomb ) // this structure is generated
@@ -44005,9 +44005,9 @@ GAMEL( 200?, sc4boomb    ,0,         sc4_5reel_alt, sc4boomb, sc4_state, sc4boom
 GAMEL( 200?, sc4boomba   ,sc4boomb,  sc4_5reel_alt, sc4boomb, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fever)
+void sc4_state::init_sc4fever()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fever ) // this structure is generated
@@ -44094,9 +44094,9 @@ GAMEL( 200?, sc4feverk   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever
 /**********************************************************************************************************************************/
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4aztec)
+void sc4_state::init_sc4aztec()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4aztec ) // this structure is generated
@@ -44154,9 +44154,9 @@ GAMEL( 200?, sc4aztec    ,0,         sc4, sc4aztec, sc4_state, sc4aztec, ROT0, "
 GAMEL( 200?, sc4azteca   ,sc4aztec,  sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR1215 AZTEC EURO
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4helrd)
+void sc4_state::init_sc4helrd()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4helrd ) // this structure is generated
@@ -44218,9 +44218,9 @@ GAMEL( 200?, sc4helrd    ,0,         sc4_4reel, sc4helrd, sc4_state, sc4helrd, R
 GAMEL( 200?, sc4helrs    ,sc4helrd,  sc4_4reel, sc4helrd, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4heatw)
+void sc4_state::init_sc4heatw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4heatw ) // this structure is generated
@@ -44281,9 +44281,9 @@ GAMEL( 200?, sc4heatw    ,0,         sc4, sc4heatw, sc4_state, sc4heatw, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4colos)
+void sc4_state::init_sc4colos()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4colos ) // this structure is generated
@@ -44344,9 +44344,9 @@ INPUT_PORTS_END
 // PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
 GAMEL( 200?, sc4colos    ,0,         sc4, sc4colos, sc4_state, sc4colos, ROT0, "BFM","Colossus (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fevdt)
+void sc4_state::init_sc4fevdt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fevdt ) // this structure is generated
@@ -44408,9 +44408,9 @@ GAMEL( 200?, sc4fevdta   ,sc4fevdt,  sc4, sc4fevdt, sc4_state, sc4fevdt, ROT0, "
 GAMEL( 200?, sc4fevdtb   ,sc4fevdt,  sc4, sc4fevdt, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fevnx)
+void sc4_state::init_sc4fevnx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4fevnx ) // this structure is generated
@@ -44471,9 +44471,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4fevnx    ,0,         sc4, sc4fevnx, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4fevnxa   ,sc4fevnx,  sc4, sc4fevnx, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4game)
+void sc4_state::init_sc4game()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4gamcs ) // this structure is generated
@@ -44582,9 +44582,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4gamcs    ,0,         sc4_3reel, sc4gamcs, sc4_state, sc4game, ROT0, "BFM","The Game Casino (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
 GAMEL( 200?, sc4game     ,sc4gamcs,  sc4_3reel, sc4game,  sc4_state, sc4game, ROT0, "BFM","The Game (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR1213 THE GAME         95004285 THEGAME PR1153
 
-DRIVER_INIT_MEMBER(sc4_state,sc4goud)
+void sc4_state::init_sc4goud()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4goud ) // this structure is generated
@@ -44653,9 +44653,9 @@ INPUT_PORTS_END
 // PR1211 GOUDKOORTS         95004288 GOUDKOORTS PR1151
 GAMEL( 200?, sc4goud     ,0,         sc4_200_5r, sc4goud, sc4_state, sc4goud, ROT0, "BFM","Goudkoorts (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lasv)
+void sc4_state::init_sc4lasv()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4lasv ) // this structure is generated
@@ -44706,9 +44706,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4lasv     ,0,         sc4, sc4lasv, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4lasva    ,sc4lasv,   sc4, sc4lasv, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4miljo)
+void sc4_state::init_sc4miljo()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4miljo ) // this structure is generated
@@ -44821,9 +44821,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4miljo    ,0,         sc4, sc4miljo, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
 GAMEL( 200?, sc4milja    ,sc4miljo,  sc4, sc4milja, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
 
-DRIVER_INIT_MEMBER(sc4_state,sc4paytm)
+void sc4_state::init_sc4paytm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4paytm ) // this structure is generated
@@ -44884,9 +44884,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4paytm    ,0,         sc4, sc4paytm, sc4_state, sc4paytm, ROT0, "BFM","Pay Time (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pglcs)
+void sc4_state::init_sc4pglcs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4pglcs ) // this structure is generated
@@ -44944,9 +44944,9 @@ GAMEL( 200?, sc4pglcsa   ,sc4pglcs,  sc4_3reel, sc4pglcs, sc4_state, sc4pglcs, R
 GAMEL( 200?, sc4pglcsb   ,sc4pglcs,  sc4_3reel, sc4pglcs, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4redad)
+void sc4_state::init_sc4redad()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4redad ) // this structure is generated
@@ -45008,9 +45008,9 @@ GAMEL( 200?, sc4redad    ,0,         sc4, sc4redad, sc4_state, sc4redad, ROT0, "
 GAMEL( 200?, sc4redada   ,sc4redad,  sc4, sc4redad, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rvlnx)
+void sc4_state::init_sc4rvlnx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rvlnx ) // this structure is generated
@@ -45068,9 +45068,9 @@ INPUT_PORTS_END
 // PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
 GAMEL( 200?, sc4rvlnx    ,0,         sc4_200_5r, sc4rvlnx, sc4_state, sc4rvlnx, ROT0, "BFM","Revolution The Next (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rvl)
+void sc4_state::init_sc4rvl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rvl ) // this structure is generated
@@ -45131,9 +45131,9 @@ INPUT_PORTS_END
 // PR1203 REVOLUTION         95004259 REVOLUTION PR7158
 GAMEL( 200?, sc4rvl      ,0,         sc4_200_5r, sc4rvl, sc4_state, sc4rvl, ROT0, "BFM","Revolution (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rio)
+void sc4_state::init_sc4rio()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4rio ) // this structure is generated
@@ -45194,9 +45194,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4rio      ,0,         sc4, sc4rio, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4strbr)
+void sc4_state::init_sc4strbr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4strbr ) // this structure is generated
@@ -45317,9 +45317,9 @@ GAMEL( 200?, sc4strbrc   ,sc4strbr,  sc4, sc4strbra, sc4_state, sc4strbr, ROT0, 
 GAMEL( 200?, sc4strbrd   ,sc4strbr,  sc4, sc4strbra, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4twilt)
+void sc4_state::init_sc4twilt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -45381,9 +45381,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4twilt    ,0,         sc4_4reel, sc4twilt, sc4_state, sc4twilt, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4monsp)
+void sc4_state::init_sc4monsp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4monsp ) // this structure is generated
@@ -45445,9 +45445,9 @@ GAMEL( 200?, sc4monsp    ,0,         sc4_200_5r, sc4monsp, sc4_state, sc4monsp, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ivply)
+void sc4_state::init_sc4ivply()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ivply ) // this structure is generated
@@ -45510,9 +45510,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4ivply    ,0,         sc4_4reel, sc4ivply, sc4_state, sc4ivply, ROT0, "BFM","4 Play (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ccc)
+void sc4_state::init_sc4ccc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -45575,9 +45575,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4ccc      ,0,         sc4_4reel, sc4ccc, sc4_state, sc4ccc, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4valqp)
+void sc4_state::init_sc4valqp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4valqp ) // this structure is generated
@@ -45637,9 +45637,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4valqp    ,0,         sc4_3reel, sc4valqp, sc4_state, sc4valqp, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4winxp)
+void sc4_state::init_sc4winxp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4winxp ) // this structure is generated
@@ -45700,9 +45700,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4winxp    ,0,         sc4_4reel, sc4winxp, sc4_state, sc4winxp, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4xcash)
+void sc4_state::init_sc4xcash()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4xcash ) // this structure is generated
@@ -45757,9 +45757,9 @@ INPUT_PORTS_END
 // PR1264 XTRA CASH ART13 XTRA CASH CASINO (LOTECH) - ART13         95004321 XTRACASH PR1264
 GAMEL( 200?, sc4xcash    ,0,         sc4_3reel, sc4xcash, sc4_state, sc4xcash, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4helld)
+void sc4_state::init_sc4helld()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4helld ) // this structure is generated
@@ -45819,9 +45819,9 @@ INPUT_PORTS_END
 // PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
 GAMEL( 200?, sc4helld    ,0,         sc4_3reel, sc4helld, sc4_state, sc4helld, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cashn)
+void sc4_state::init_sc4cashn()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cashn ) // this structure is generated
@@ -45881,9 +45881,9 @@ INPUT_PORTS_END
 GAMEL( 200?, sc4cashn    ,0,         sc4_3reel, sc4cashn, sc4_state, sc4cashn, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4czfra)
+void sc4_state::init_sc4czfra()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4czfra ) // this structure is generated
@@ -46631,9 +46631,9 @@ GAMEL( 200?, sc4drubyd   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM",
 /****************************************************************************************************************************************************************************************************************/
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4abra)
+void sc4_state::init_sc4abra()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4abra ) // this structure is generated
@@ -46744,9 +46744,9 @@ GAMEL( 200?, sc4alada    ,sc4alad,   sc4, sc4alad, sc4_state, sc4, ROT0, "Mazoom
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bigdl)
+void sc4_state::init_sc4bigdl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bigdl ) // this structure is generated
@@ -46804,9 +46804,9 @@ GAMEL( 200?, sc4bigdla   ,sc4bigdl,  sc4_200_5r, sc4bigdl, sc4_state, sc4bigdl, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4brix)
+void sc4_state::init_sc4brix()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -46814,14 +46814,14 @@ DRIVER_INIT_MEMBER(sc4_state,sc4brix)
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cconx)
+void sc4_state::init_sc4cconx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cconxd)
+void sc4_state::init_sc4cconxd()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4cconxd ) // this structure is generated
@@ -46870,9 +46870,9 @@ GAMEL( 200?, sc4cconxb   ,sc4cconx,  sc4_4reel, sc4, sc4_state, sc4cconx, ROT0, 
 GAMEL( 200?, sc4cconxc   ,sc4cconx,  sc4_4reel, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 GAMEL( 200?, sc4cconxd   ,sc4cconx,  sc4_200_4r, sc4cconxd, sc4_state, sc4cconxd, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 ) // this one won't init without a 200 step reel
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ccrus)
+void sc4_state::init_sc4ccrus()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4ccrus ) // this structure is generated
@@ -46934,9 +46934,9 @@ GAMEL( 200?, sc4ccrusb   ,sc4ccrus,  sc4_4reel, sc4ccrus, sc4_state, sc4ccrus, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jjc)
+void sc4_state::init_sc4jjc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4jjc ) // this structure is generated
@@ -47064,14 +47064,14 @@ GAMEL( 200?, sc4kkongi   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazoo
 GAMEL( 200?, sc4kkongj   ,sc4kkong,  sc4, sc4kkong, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 11)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4knok)
+void sc4_state::init_sc4knok()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4knokb)
+void sc4_state::init_sc4knokb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4knok ) // this structure is generated
@@ -47171,9 +47171,9 @@ GAMEL( 200?, sc4knokb    ,0,         sc4_200_5r, sc4knokb, sc4_state, sc4knokb, 
 GAMEL( 200?, sc4knokc    ,sc4knokb,  sc4_200_5r, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4knokb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4maxcc)
+void sc4_state::init_sc4maxcc()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4maxcc ) // this structure is generated
@@ -47247,9 +47247,9 @@ GAMEL( 200?, sc4maxccb   ,sc4maxcc,  sc4_200_5r, sc4maxcc, sc4_state, sc4maxcc, 
 GAMEL( 200?, sc4maxccc   ,sc4maxcc,  sc4_200_5r, sc4maxcc, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4wadzl)
+void sc4_state::init_sc4wadzl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4wadzl ) // this structure is generated
@@ -47543,9 +47543,9 @@ GAMEL( 200?, sc4ducksa   ,sc4ducks,  sc4, sc4ducks, sc4_state, sc4, ROT0, "Mazoo
 GAMEL( 200?, sc4ducksb   ,sc4ducks,  sc4, sc4ducks, sc4_state, sc4, ROT0, "Mazooma","Ducks Of Hazzard (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 GAMEL( 200?, sc4ducksc   ,sc4ducks,  sc4, sc4ducks, sc4_state, sc4, ROT0, "Mazooma","Ducks Of Hazzard (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4glad)
+void sc4_state::init_sc4glad()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4glad ) // this structure is generated
@@ -47687,9 +47687,9 @@ GAMEL( 200?, sc4hotdga   ,sc4hotdg,  sc4, sc4hotdg, sc4_state, sc4mbus, ROT0, "B
 GAMEL( 200?, sc4hotdgb   ,sc4hotdg,  sc4, sc4hotdg, sc4_state, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 GAMEL( 200?, sc4hotdgc   ,sc4hotdg,  sc4, sc4hotdg, sc4_state, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pp)
+void sc4_state::init_sc4pp()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4pp ) // this structure is generated
@@ -47963,9 +47963,9 @@ GAMEL( 200?, sc4pwrplb   ,sc4pwrpl,  sc4, sc4pwrpl, sc4_state, sc4, ROT0, "Mazoo
 GAMEL( 200?, sc4pwrplc   ,sc4pwrpl,  sc4, sc4pwrpl, sc4_state, sc4, ROT0, "Mazooma","Power Play (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4swywm)
+void sc4_state::init_sc4swywm()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4swywm ) // this structure is generated
@@ -48026,9 +48026,9 @@ GAMEL( 200?, sc4swywme   ,sc4swywm,  sc4_200_5ra, sc4swywm, sc4_state, sc4swywm,
 GAMEL( 200?, sc4swywmf   ,sc4swywm,  sc4_200_5ra, sc4swywm, sc4_state, sc4swywm, ROT0, "Mazooma","Spin When Your Winning (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 GAMEL( 200?, sc4swywmg   ,sc4swywm,  sc4_200_5ra, sc4swywm, sc4_state, sc4swywm, ROT0, "Mazooma","Spin When Your Winning (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sumit)
+void sc4_state::init_sc4sumit()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 INPUT_PORTS_START( sc4sumit ) // this structure is generated
@@ -49283,9 +49283,9 @@ GAMEL( 200?, sc4gcbj     ,sc4gcb,    sc4, sc4gcb, sc4_state, sc4, ROT0, "Mazooma
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4spark)
+void sc4_state::init_sc4spark()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49299,9 +49299,9 @@ GAMEL( 200?, sc4sparke   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4brkfs)
+void sc4_state::init_sc4brkfs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49313,9 +49313,9 @@ GAMEL( 200?, sc4brkfsc   ,sc4brkfs,  sc4_4reel, sc4, sc4_state, sc4brkfs, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gslam)
+void sc4_state::init_sc4gslam()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6934 GRAND SLAM         PR6934 SLM2 SOUNDS11            GRAND SLAM
@@ -49331,9 +49331,9 @@ GAMEL( 200?, sc4gslamf   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM",
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4canca)
+void sc4_state::init_sc4canca()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7017CASINO CAN CAN CASH          PR7017,Casino CAN CAN CASH,         LINE SOUNDS         CAN CAN CASH
@@ -49344,9 +49344,9 @@ GAMEL( 200?, sc4cancac   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hotpr)
+void sc4_state::init_sc4hotpr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
@@ -49365,9 +49365,9 @@ GAMEL( 200?, sc4cburna   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cnfr)
+void sc4_state::init_sc4cnfr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49386,9 +49386,9 @@ GAMEL( 200?, sc4cnfri    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cla7)
+void sc4_state::init_sc4cla7()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR2111  CLASSIC 7'S         CLASS SOUNDS         CLASSIC 7'S
@@ -49398,14 +49398,14 @@ GAMEL( 200?, sc4cla7b    ,sc4cla7,   sc4_200_altb, sc4, sc4_state, sc4cla7, ROT0
 GAMEL( 200?, sc4cla7c    ,sc4cla7,   sc4_200_altb, sc4, sc4_state, sc4cla7, ROT0, "Mazooma","Classic 7s (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cclas)
+void sc4_state::init_sc4cclas()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cclas_mbus)
+void sc4_state::init_sc4cclas_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR7148 CLUB CLASS         PR7148 CLUB CLASS SOUNDS11            CLUB  CLASS
@@ -49445,9 +49445,9 @@ GAMEL( 200?, sc4cclash   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM",
 GAMEL( 200?, sc4cclasp   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cclasd )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4crcc)
+void sc4_state::init_sc4crcc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49462,9 +49462,9 @@ GAMEL( 200?, sc4crccc    ,sc4crcc,   sc4dmd, sc4, sc4_state, sc4crcc, ROT0, "BFM
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4czfr)
+void sc4_state::init_sc4czfr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // the unusual sound rom numbering suggests a non-English market version, although the startup messages are in English
@@ -49474,14 +49474,14 @@ GAMEL( 200?, sc4czfr     ,0,         sc4_4reel, sc4, sc4_state, sc4czfr, ROT0, "
 GAMEL( 200?, sc4czfrd    ,sc4czfr,   sc4_4reel, sc4, sc4_state, sc4czfr, ROT0, "BFM","Crazy Fruits (Germany?) (PR6982, GCRF) (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 ) // incomplete pairing (in 'up for it' set)
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfcas)
+void sc4_state::init_sc4cfcas()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfcas_mbus)
+void sc4_state::init_sc4cfcas_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR6923 CASINO CRAZY FRUITS         PR6923 CRAZY FRUITS SOUNDS11
@@ -49540,9 +49540,9 @@ GAMEL( 200?, sc4cfcasae  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cfclb)
+void sc4_state::init_sc4cfclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6931 CLUB CRAZY FRUITS         PR6931 CRZY SOUNDS11
@@ -49595,9 +49595,9 @@ GAMEL( 200?, sc4crzgn8   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Craz
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cccsh)
+void sc4_state::init_sc4cccsh()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49611,9 +49611,9 @@ GAMEL( 200?, sc4cccshd   ,sc4cccsh,  sc4_no_reels, sc4, sc4_state, sc4cccsh, ROT
 GAMEL( 200?, sc4cccshe   ,sc4cccsh,  sc4_no_reels, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4daylt)
+void sc4_state::init_sc4daylt()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49638,9 +49638,9 @@ GAMEL( 200?, sc4dayltm   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, RO
 
 
 // has unusual test, RL4 seems to pass neither 48 nor 200 step test?
-DRIVER_INIT_MEMBER(sc4_state,sc4disco)
+void sc4_state::init_sc4disco()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7048 DISCO INFERNO         DISCO SOUNDS         DISCO INFERNO
@@ -49652,9 +49652,9 @@ GAMEL( 200?, sc4discod   ,sc4disco,  sc4_200_4r, sc4, sc4_state, sc4disco, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sstep)
+void sc4_state::init_sc4sstep()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49665,9 +49665,9 @@ GAMEL( 200?, sc4sstepb   ,sc4sstep,  sc4, sc4, sc4_state, sc4sstep, ROT0, "Qps /
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fpitc)
+void sc4_state::init_sc4fpitc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7119 FEVER_PITCH         PR7119 FEVER PITCH SOUNDS11
@@ -49688,9 +49688,9 @@ GAMEL( 200?, sc4fpitcg   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fcc)
+void sc4_state::init_sc4fcc()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6835 FIRE CRACKER         PR6835 FIRE SOUNDS11
@@ -49702,9 +49702,9 @@ GAMEL( 200?, sc4fccc     ,sc4fcc,    sc4dmd, sc4, sc4_state, sc4fcc, ROT0, "BFM"
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fwp)
+void sc4_state::init_sc4fwp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49720,9 +49720,9 @@ GAMEL( 200?, sc4fwpcsb   ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "M
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4fd7th)
+void sc4_state::init_sc4fd7th()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49740,9 +49740,9 @@ GAMEL( 200?, sc4fd7thh   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, 
 GAMEL( 200?, sc4fd7thi   ,sc4fd7th,  sc4_4reel, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fd7tha )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4frsu)
+void sc4_state::init_sc4frsu()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6928 CASINO FRUIT N SUITS         PR6928 FRUIT N SUITS SOUNDS11
@@ -49758,9 +49758,9 @@ GAMEL( 200?, sc4frsug    ,sc4frsu,   sc4, sc4, sc4_state, sc4frsu, ROT0, "BFM","
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4goldo)
+void sc4_state::init_sc4goldo()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49774,14 +49774,14 @@ GAMEL( 200?, sc4gocasa   ,sc4goldo,  sc4_4reel, sc4, sc4_state, sc4goldo, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bonbxm)
+void sc4_state::init_sc4bonbxm()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bonbx)
+void sc4_state::init_sc4bonbx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 INPUT_PORTS_START( sc4bonbx4 )
@@ -49792,9 +49792,9 @@ INPUT_PORTS_START( sc4bonbx4 )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gx)
+void sc4_state::init_sc4gx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49830,9 +49830,9 @@ GAMEL( 200?, sc4gxb      ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gggtb)
+void sc4_state::init_sc4gggtb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49849,20 +49849,20 @@ GAMEL( 200?, sc4monoga   ,sc4ggtb,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggamem)
+void sc4_state::init_sc4ggamem()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggame)
+void sc4_state::init_sc4ggame()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gx3)
+void sc4_state::init_sc4gx3()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // GLDX
@@ -49943,9 +49943,9 @@ GAMEL( 200?, sc4gncd     ,sc4gnc,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 GAMEL( 200?, sc4gnce     ,sc4gnc,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ggg)
+void sc4_state::init_sc4ggg()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // do these sets have the wrong project name / ID strings? they boot at GGGB (Grand Golden Game) but their product ID in the header suggests standard Golden Game, looks like they forgot to update it at first, the topbox has the same issue
@@ -49976,9 +49976,9 @@ GAMEL( 200?, sc4gggtba   ,sc4ggg,    sc4_3reel_200, sc4, sc4_state, sc4gggtb, RO
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gag)
+void sc4_state::init_sc4gag()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -49992,9 +49992,9 @@ GAMEL( 200?, sc4gagc     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "M
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hfcl)
+void sc4_state::init_sc4hfcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50005,9 +50005,9 @@ GAMEL( 200?, sc4hfcla    ,sc4hfcl,   sc4_5reel, sc4, sc4_state, sc4hfcl, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4holyw)
+void sc4_state::init_sc4holyw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7115 HOLLYWOOD         PR7115 HOLLYWOOD SOUNDS11
@@ -50018,9 +50018,9 @@ GAMEL( 200?, sc4holywc   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4jjf)
+void sc4_state::init_sc4jjf()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50043,14 +50043,14 @@ GAMEL( 200?, sc4jjfm     ,sc4jjf,    sc4_4reel, sc4, sc4_state, sc4jjf, ROT0, "B
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lined)
+void sc4_state::init_sc4lined()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4lined_mbus)
+void sc4_state::init_sc4lined_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR7067CASINO LINE DANCER         LINE SOUNDS         LINE DANCER
@@ -50078,14 +50078,14 @@ GAMEL( 200?, sc4ldcase   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4luck7tb)
+void sc4_state::init_sc4luck7tb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4luck7)
+void sc4_state::init_sc4luck7()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50101,14 +50101,14 @@ GAMEL( 200?, sc4luck7d   ,sc4luck7,  sc4_3reel_200, sc4, sc4_state, sc4luck7, RO
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4luckb)
+void sc4_state::init_sc4luckb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4luckb_mbus)
+void sc4_state::init_sc4luckb_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR1033 CASINO LUCKY BALLS         PR1033 LUCKY BALLS SOUNDS11
@@ -50150,14 +50150,14 @@ GAMEL( 200?, sc4luckb0   ,sc4luckb,  sc4_200_4r, sc4, sc4_state, sc4luckb_mbus, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mgr)
+void sc4_state::init_sc4mgr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mgrm)
+void sc4_state::init_sc4mgrm()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11
@@ -50180,14 +50180,14 @@ GAMEL( 200?, sc4mgrm     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mspid)
+void sc4_state::init_sc4mspid()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mspid_mbus)
+void sc4_state::init_sc4mspid_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR1325 CASINO MONEY SPIDER         PR1325 MONEYSPIDER SOUNDS11
@@ -50209,9 +50209,9 @@ GAMEL( 200?, sc4mspidi   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid_mbus, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4msclb)
+void sc4_state::init_sc4msclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR1040 MONEY SPINNER         PR1040 MON S CLUB SOUNDS11
@@ -50227,9 +50227,9 @@ GAMEL( 200?, sc4msclbg   ,sc4msclb,  sc4_200_4r, sc4, sc4_state, sc4msclb, ROT0,
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mtb)
+void sc4_state::init_sc4mtb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6803 MONEY TO BURN         PR6803 BURN SOUNDS11
@@ -50247,9 +50247,9 @@ GAMEL( 200?, sc4mtbh     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "B
 GAMEL( 200?, sc4mtbi     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mtbb )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mtbcl)
+void sc4_state::init_sc4mtbcl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50275,9 +50275,9 @@ GAMEL( 200?, sc4mtbclo   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4mono5)
+void sc4_state::init_sc4mono5()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 GAMEL( 200?, sc4mono5    ,0,         sc4_3reel_200, sc4, sc4_state, sc4mono5, ROT0, "Mazooma","Monopoly 5 (PR7089, MONF) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
@@ -50287,14 +50287,14 @@ GAMEL( 200?, sc4mono5a   ,sc4mono5,  sc4_3reel_200, sc4, sc4_state, sc4mono5, RO
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4monoa)
+void sc4_state::init_sc4monoa()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4monoa_mbus)
+void sc4_state::init_sc4monoa_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 GAMEL( 200?, sc4monoa    ,0,         sc4_3reel_200, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR2122 MONOPOLY         MONOPOLY  TRIPLE  ARCADE  MONO SOUNDS             MONOPOLY
@@ -50319,9 +50319,9 @@ GAMEL( 200?, sc4monoap   ,sc4monoa,  sc4_3reel_200, sc4, sc4_state, sc4monoa, RO
 GAMEL( 200?, sc4monoaq   ,sc4monoa,  sc4_3reel_200, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4monop)
+void sc4_state::init_sc4monop()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 GAMEL( 200?, sc4monop    ,sc4monoa,  sc4_3reel, sc4, sc4_state, sc4monop, ROT0, "Mazooma","Monopoly Triple (PR2056, TBOX) (Mazooma) (Scorpion 4) (Top Box, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
@@ -50356,9 +50356,9 @@ GAMEL( 200?, sc4mcas4    ,sc4mcas,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pacqp)
+void sc4_state::init_sc4pacqp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50369,9 +50369,9 @@ GAMEL( 200?, sc4pacqpb   ,sc4pacqp,  sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pacmn)
+void sc4_state::init_sc4pacmn()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7026 PACMAN         PACMAN SOUNDS
@@ -50382,14 +50382,14 @@ GAMEL( 200?, sc4pacmnb   ,sc4pacmn,  sc4_4reel, sc4, sc4_state, sc4pacmn, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4paccs)
+void sc4_state::init_sc4paccs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4paccs_mbus)
+void sc4_state::init_sc4paccs_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR7049CASINO PACMAN         PACMAN SOUNDS
@@ -50410,9 +50410,9 @@ GAMEL( 200?, sc4paccsi   ,sc4paccs,  sc4_4reel, sc4, sc4_state, sc4paccs_mbus, R
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pacpl)
+void sc4_state::init_sc4pacpl()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7058 PACMAN         PACP SOUNDS         PACMAN PLUS
@@ -50429,9 +50429,9 @@ GAMEL( 200?, sc4pacplh   ,sc4pacpl,  sc4_5reel, sc4, sc4_state, sc4pacpl, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4party)
+void sc4_state::init_sc4party()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7151 PARTY TIME 1.02         95008113 G PARTYTIME SOUNDS11
@@ -50439,9 +50439,9 @@ GAMEL( 200?, sc4party    ,0,         sc4_4reel, sc4, sc4_state, sc4party, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4polem)
+void sc4_state::init_sc4polem()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50459,9 +50459,9 @@ GAMEL( 200?, sc4polemd   ,sc4polem,  sc4_4reel, sc4, sc4_state, sc4polem, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4pen1)
+void sc4_state::init_sc4pen1()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50473,9 +50473,9 @@ GAMEL( 200?, sc4pen1c    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "
 GAMEL( 200?, sc4pen1d    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4pen1c )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rich)
+void sc4_state::init_sc4rich()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7118 RICH GEEZER         PR7118 RICH GEEZER SOUNDS11
@@ -50495,14 +50495,14 @@ GAMEL( 200?, sc4richl    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4srrmz)
+void sc4_state::init_sc4srrmz()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4srrmz_mbus)
+void sc4_state::init_sc4srrmz_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR7141 SHAKE RATTLE ROLL         LINE SOUNDS         *  SHAKE RATT ROLL
@@ -50531,9 +50531,9 @@ GAMEL( 200?, sc4srrmzl   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, R
 GAMEL( 200?, sc4srrmzm   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4srrca )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4sirpz)
+void sc4_state::init_sc4sirpz()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50545,9 +50545,9 @@ GAMEL( 200?, sc4sirpzb   ,sc4sirpz,  sc4_3reel, sc4, sc4_state, sc4sirpz, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4smk7)
+void sc4_state::init_sc4smk7()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50557,9 +50557,9 @@ GAMEL( 200?, sc4smk7     ,0,         sc4_3reel, sc4, sc4_state, sc4smk7, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4starp)
+void sc4_state::init_sc4starp()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50580,9 +50580,9 @@ GAMEL( 200?, sc4starpk   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4strk)
+void sc4_state::init_sc4strk()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 //  PR2167CASINO THE STREAK         PR7017,CASINO STREAK,         STRK SOUNDS         THE STREAK
@@ -50601,14 +50601,14 @@ GAMEL( 200?, sc4strkk    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tristtb)
+void sc4_state::init_sc4tristtb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4trist)
+void sc4_state::init_sc4trist()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR2188 TRIPLE STREAK         STR3 SOUNDS         "  THE STREAK
@@ -50641,9 +50641,9 @@ GAMEL( 200?, sc4tristx   ,sc4trist,  sc4_3reel, sc4, sc4_state, sc4trist, ROT0, 
 GAMEL( 200?, sc4tristy   ,sc4trist,  sc4_3reel, sc4, sc4_state, sc4trist, ROT0, "Mazooma","Triple Streak (PR2167) (Mazooma) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4s6c)
+void sc4_state::init_sc4s6c()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6834 SUPER 6 FIXED 65%         PR6834 SSIX SOUNDS11
@@ -50660,14 +50660,14 @@ GAMEL( 200?, sc4s6cf     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","S
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tic2)
+void sc4_state::init_sc4tic2()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tic2_mbus)
+void sc4_state::init_sc4tic2_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 
@@ -50692,9 +50692,9 @@ GAMEL( 200?, sc4tic2m    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4ticlb)
+void sc4_state::init_sc4ticlb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR6832 TREASURE ISLAND FIXED 65%         PR6832 TRES SOUNDS11
@@ -50709,19 +50709,19 @@ GAMEL( 200?, sc4ticlbd   ,sc4ticlb,  sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tri7tb)
+void sc4_state::init_sc4tri7tb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tri7)
+void sc4_state::init_sc4tri7()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tri7_mbus)
+void sc4_state::init_sc4tri7_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 
@@ -50753,9 +50753,9 @@ GAMEL( 200?, sc4tri7d    ,sc4tri7,   sc4_3reel, sc4, sc4_state, sc4tri7_mbus, RO
 GAMEL( 200?, sc4tri7e    ,sc4tri7,   sc4_3reel, sc4, sc4_state, sc4tri7_mbus, ROT0, "BFM","Triple 7's Arcade (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4tub)
+void sc4_state::init_sc4tub()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50767,9 +50767,9 @@ GAMEL( 200?, sc4tubc     ,sc4tub,    sc4_200_4ra, sc4, sc4_state, sc4tub, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4vmclb)
+void sc4_state::init_sc4vmclb()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50780,9 +50780,9 @@ GAMEL( 200?, sc4vmclbb   ,sc4vmclb,  sc4_5reel, sc4, sc4_state, sc4vmclb, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4waw)
+void sc4_state::init_sc4waw()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // Reel 4 is strange ERR24
@@ -50796,9 +50796,9 @@ GAMEL( 200?, sc4wawe     ,sc4waw,    sc4_4reel, sc4, sc4_state, sc4waw, ROT0, "M
 GAMEL( 200?, sc4wawf     ,sc4waw,    sc4_4reel, sc4, sc4_state, sc4waw, ROT0, "Mazooma","Wet & Wild (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4clbtm)
+void sc4_state::init_sc4clbtm()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50814,9 +50814,9 @@ GAMEL( 200?, sc4clbtme   ,sc4clbtm,  sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BF
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4gbcas)
+void sc4_state::init_sc4gbcas()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // this one is a variation of lucky balls
@@ -50827,15 +50827,15 @@ GAMEL( 200?, sc4gbcasb   ,sc4gbcas,  sc4_200_4r, sc4, sc4_state, sc4gbcas, ROT0,
 GAMEL( 200?, sc4gbcasc   ,sc4gbcas,  sc4_200_4r, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hntcsm)
+void sc4_state::init_sc4hntcsm()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4hntcs)
+void sc4_state::init_sc4hntcs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR1327 CASINO HAPPY NOTES         HAPPY NOTES S.SITE  PR1327 CAS_HAPPY_NOTES SOUNDS11
@@ -50862,14 +50862,14 @@ GAMEL( 200?, sc4hntcsr   ,sc4hntcs,  sc4_4reel, sc4, sc4_state, sc4hntcs, ROT0, 
 GAMEL( 200?, sc4hntcss   ,sc4hntcs,  sc4_4reel, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rhx)
+void sc4_state::init_sc4rhx()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
-DRIVER_INIT_MEMBER(sc4_state,sc4rhx_mbus)
+void sc4_state::init_sc4rhx_mbus()
 {
-	DRIVER_INIT_CALL(sc4mbus);
+	init_sc4mbus();
 }
 
 // PR2077  RED HOT X         REDX SOUNDS         RED HOT X
@@ -50908,9 +50908,9 @@ GAMEL( 200?, sc4rhxclc   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4vivam)
+void sc4_state::init_sc4vivam()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50921,9 +50921,9 @@ GAMEL( 200?, sc4vivamb   ,sc4vivam,  sc4_4reel, sc4, sc4_state, sc4vivam, ROT0, 
 GAMEL( 200?, sc4vivamc   ,sc4vivam,  sc4_4reel, sc4, sc4_state, sc4vivam, ROT0, "BFM","Viva Mexico (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4vivcs)
+void sc4_state::init_sc4vivcs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50966,9 +50966,9 @@ GAMEL( 200?, sc4blued    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 GAMEL( 200?, sc4bluee    ,sc4blue,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4bugs)
+void sc4_state::init_sc4bugs()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -50986,9 +50986,9 @@ GAMEL( 200?, sc4m2ma     ,sc4m2m,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4chand)
+void sc4_state::init_sc4chand()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // no sound roms
@@ -51000,9 +51000,9 @@ GAMEL( 200?, sc4chandc   ,sc4chand,  sc4_4reel, sc4, sc4_state, sc4chand, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4cinv)
+void sc4_state::init_sc4cinv()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -51359,9 +51359,9 @@ GAMEL( 200?, sc4db       ,sc4gfev,   sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4polen)
+void sc4_state::init_sc4polen()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 // PR7012 GERMAN POLE POSITION         PR7012 SOUNDS
@@ -51369,9 +51369,9 @@ GAMEL( 200?, sc4polen    ,0,         sc4_4reel, sc4, sc4_state, sc4polen, ROT0, 
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4valnv)
+void sc4_state::init_sc4valnv()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 
@@ -51380,9 +51380,9 @@ GAMEL( 200?, sc4valnv    ,0,         sc4, sc4, sc4_state, sc4valnv, ROT0, "Nova"
 
 
 
-DRIVER_INIT_MEMBER(sc4_state,sc4wernr)
+void sc4_state::init_sc4wernr()
 {
-	DRIVER_INIT_CALL(sc4);
+	init_sc4();
 }
 
 //  PR7027 GERMAN WERNER         PR7027 SOUNDS V1

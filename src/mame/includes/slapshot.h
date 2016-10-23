@@ -78,7 +78,7 @@ public:
 	DECLARE_READ16_MEMBER(opwolf3_adc_r);
 	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
 
-	DECLARE_DRIVER_INIT(slapshot);
+	void init_slapshot();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

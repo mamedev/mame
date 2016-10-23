@@ -114,10 +114,10 @@ public:
 	DECLARE_READ8_MEMBER(bublbobl_68705_port_b_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_b_w);
-	DECLARE_DRIVER_INIT(tokiob);
-	DECLARE_DRIVER_INIT(tokio);
-	DECLARE_DRIVER_INIT(dland);
-	DECLARE_DRIVER_INIT(bublbobl);
+	void init_tokiob();
+	void init_tokio();
+	void init_dland();
+	void init_bublbobl();
 	void machine_start_tokio();
 	void machine_reset_tokio();
 	void machine_start_bublbobl();

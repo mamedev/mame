@@ -38,7 +38,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
 
-	DECLARE_DRIVER_INIT(firebatl);
+	void init_firebatl();
 	virtual void machine_reset() override;
 	void video_start_firebatl();
 	DECLARE_PALETTE_INIT(firebatl);

@@ -2118,7 +2118,7 @@ ROM_END
  * Initialization routines
  *********************************************************************/
 
-DRIVER_INIT_MEMBER(polepos_state,topracern)
+void polepos_state::init_topracern()
 {
 	/* extra direct mapped inputs read */
 	m_maincpu->space(AS_IO).install_read_port(0x02, 0x02, "STEER");
@@ -2126,7 +2126,7 @@ DRIVER_INIT_MEMBER(polepos_state,topracern)
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSWA");
 }
 
-DRIVER_INIT_MEMBER(polepos_state,polepos2)
+void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));

@@ -362,7 +362,7 @@ WRITE8_MEMBER( s11_state::pia40_pb_w )
 	m_pia34->portb_w(data);
 }
 
-DRIVER_INIT_MEMBER( s11_state, s11 )
+void s11_state::init_s11()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);

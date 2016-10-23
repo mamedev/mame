@@ -90,12 +90,12 @@ public:
 	DECLARE_WRITE16_MEMBER(gaiden_videoram3_w);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
-	DECLARE_DRIVER_INIT(raiga);
-	DECLARE_DRIVER_INIT(drgnbowl);
-	DECLARE_DRIVER_INIT(drgnbowla);
-	DECLARE_DRIVER_INIT(mastninj);
-	DECLARE_DRIVER_INIT(shadoww);
-	DECLARE_DRIVER_INIT(wildfang);
+	void init_raiga();
+	void init_drgnbowl();
+	void init_drgnbowla();
+	void init_mastninj();
+	void init_shadoww();
+	void init_wildfang();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);

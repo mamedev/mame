@@ -53,8 +53,8 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
 
-	DECLARE_DRIVER_INIT(twinbrat);
-	DECLARE_DRIVER_INIT(stlforce);
+	void init_twinbrat();
+	void init_stlforce();
 
 	TILE_GET_INFO_MEMBER(get_stlforce_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_mlow_tile_info);

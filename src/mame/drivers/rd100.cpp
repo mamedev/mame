@@ -24,7 +24,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(rd100);
+	void init_rd100();
 	void machine_reset_rd100();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -77,7 +77,7 @@ uint32_t rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( rd100_state, rd100 )
+void rd100_state::init_rd100()
 {
 }
 

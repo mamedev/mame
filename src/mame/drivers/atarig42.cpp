@@ -822,7 +822,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig42_state,roadriot)
+void atarig42_state::init_roadriot()
 {
 	m_playfield_base = 0x400;
 
@@ -853,7 +853,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 }
 
 
-DRIVER_INIT_MEMBER(atarig42_state,guardian)
+void atarig42_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 

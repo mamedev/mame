@@ -90,7 +90,7 @@ public:
 		, m_switches(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(gts1);
+	void init_gts1();
 
 	DECLARE_READ8_MEMBER (gts1_solenoid_r);
 	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
@@ -336,7 +336,7 @@ void gts1_state::machine_reset()
 	m_z30_out = 0;
 }
 
-DRIVER_INIT_MEMBER(gts1_state,gts1)
+void gts1_state::init_gts1()
 {
 }
 

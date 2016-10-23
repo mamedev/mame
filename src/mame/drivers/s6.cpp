@@ -93,7 +93,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	void machine_reset_s6();
-	DECLARE_DRIVER_INIT(s6);
+	void init_s6();
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -387,7 +387,7 @@ void s6_state::machine_reset_s6()
 {
 }
 
-DRIVER_INIT_MEMBER( s6_state, s6 )
+void s6_state::init_s6()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);

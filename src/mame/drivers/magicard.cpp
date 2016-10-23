@@ -221,7 +221,7 @@ public:
 	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
-	DECLARE_DRIVER_INIT(magicard);
+	void init_magicard();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -890,7 +890,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(magicard_state, magicard)
+void magicard_state::init_magicard()
 {
 	//...
 }

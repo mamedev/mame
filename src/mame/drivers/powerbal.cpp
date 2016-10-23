@@ -34,8 +34,8 @@ public:
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
+	void init_powerbal();
+	void init_magicstk();
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
 	void machine_start_powerbal();
 	void machine_reset_powerbal();
@@ -685,13 +685,13 @@ ROM_START( hotminda )
 	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(powerbal_state,powerbal)
+void powerbal_state::init_powerbal()
 {
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
-DRIVER_INIT_MEMBER(powerbal_state,magicstk)
+void powerbal_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;

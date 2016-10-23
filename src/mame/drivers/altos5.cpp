@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_DRIVER_INIT(altos5);
+	void init_altos5();
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
@@ -328,7 +328,7 @@ WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 	m_pio0->port_a_write(data);
 }
 
-DRIVER_INIT_MEMBER( altos5_state, altos5 )
+void altos5_state::init_altos5()
 {
 	m_p_prom =  memregion("proms")->base();
 

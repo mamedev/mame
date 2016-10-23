@@ -142,7 +142,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
-	DECLARE_DRIVER_INIT(bbc);
+	void init_bbc();
 	void video_start_bbc();
 
 	void machine_start_bbca();

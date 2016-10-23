@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
 	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
 
-	DECLARE_DRIVER_INIT(upscope);
+	void init_upscope();
 
 protected:
 	virtual void machine_reset() override;
@@ -344,7 +344,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state, upscope)
+void upscope_state::init_upscope()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;

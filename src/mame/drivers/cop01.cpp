@@ -642,7 +642,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cop01_state,mightguy)
+void cop01_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working

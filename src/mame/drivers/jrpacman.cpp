@@ -112,7 +112,7 @@ public:
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(jrpacman);
+	void init_jrpacman();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
@@ -363,7 +363,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
+void jrpacman_state::init_jrpacman()
 {
 	/* The encryption PALs garble bits 0, 2 and 7 of the ROMs. The encryption */
 	/* scheme is complex (basically it's a state machine) and can only be */

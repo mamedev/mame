@@ -121,9 +121,9 @@ public:
 	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
 
-	DECLARE_DRIVER_INIT(toaplan1);
-	DECLARE_DRIVER_INIT(demonwld);
-	DECLARE_DRIVER_INIT(vimana);
+	void init_toaplan1();
+	void init_demonwld();
+	void init_vimana();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);

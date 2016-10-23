@@ -1663,13 +1663,13 @@ void gauntlet_state::common_init(int vindctr2)
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::init_gauntlet()
 {
 	common_init(0);
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
+void gauntlet_state::init_vindctr2()
 {
 	uint8_t *gfx2_base = memregion("gfx2")->base();
 	std::vector<uint8_t> data(0x8000);

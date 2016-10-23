@@ -63,8 +63,8 @@ public:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	int m_keyboard_mask;
 	int m_lcd_digit[6];
-	DECLARE_DRIVER_INIT(ut88);
-	DECLARE_DRIVER_INIT(ut88mini);
+	void init_ut88();
+	void init_ut88mini();
 	void machine_reset_ut88();
 	void video_start_ut88();
 	void machine_start_ut88mini();

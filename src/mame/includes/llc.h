@@ -49,8 +49,8 @@ private:
 	uint8_t m_porta;
 	uint8_t m_term_data;
 public:
-	DECLARE_DRIVER_INIT(llc2);
-	DECLARE_DRIVER_INIT(llc1);
+	void init_llc2();
+	void init_llc1();
 	virtual void video_start() override;
 	void machine_start_llc1();
 	void machine_reset_llc1();

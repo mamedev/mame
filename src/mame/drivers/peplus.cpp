@@ -320,11 +320,11 @@ public:
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
 	DECLARE_READ8_MEMBER(peplus_input0_r);
-	DECLARE_DRIVER_INIT(nonplus);
-	DECLARE_DRIVER_INIT(peplus);
-	DECLARE_DRIVER_INIT(peplussb);
-	DECLARE_DRIVER_INIT(pepluss64);
-	DECLARE_DRIVER_INIT(peplussbw);
+	void init_nonplus();
+	void init_peplus();
+	void init_peplussb();
+	void init_pepluss64();
+	void init_peplussbw();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_END
 *************************/
 
 /* Non Plus board */
-DRIVER_INIT_MEMBER(peplus_state,nonplus)
+void peplus_state::init_nonplus()
 {
 	door_wait = 500;
 	m_doorcycle = false;
@@ -1373,7 +1373,7 @@ DRIVER_INIT_MEMBER(peplus_state,nonplus)
 }
 
 /* Normal board */
-DRIVER_INIT_MEMBER(peplus_state,peplus)
+void peplus_state::init_peplus()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1382,7 +1382,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplus)
 }
 
 /* Superboard */
-DRIVER_INIT_MEMBER(peplus_state,peplussb)
+void peplus_state::init_peplussb()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 }
 
 /* Superboard with 64K CG rom set */
-DRIVER_INIT_MEMBER(peplus_state,pepluss64)
+void peplus_state::init_pepluss64()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1402,7 +1402,7 @@ DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 }
 
 /* Superboard with Attached Wingboard */
-DRIVER_INIT_MEMBER(peplus_state,peplussbw)
+void peplus_state::init_peplussbw()
 {
 	door_wait = 12345;
 	m_doorcycle = true;

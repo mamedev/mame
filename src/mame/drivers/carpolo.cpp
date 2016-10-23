@@ -341,7 +341,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(carpolo_state,carpolo)
+void carpolo_state::init_carpolo()
 {
 	size_t i, len;
 	uint8_t *ROM;

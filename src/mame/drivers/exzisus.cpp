@@ -78,7 +78,7 @@ WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 #if 0
 // without cpub_reset_w, the following patch would be needed for
 // the RAM check to work
-DRIVER_INIT_MEMBER(exzisus_state,exzisus)
+void exzisus_state::init_exzisus()
 {
 	uint8_t *RAM = memregion("cpua")->base();
 

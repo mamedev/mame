@@ -58,9 +58,9 @@ protected:
 
 	virtual void video_start() override;
 public:
-	DECLARE_DRIVER_INIT(chsuper3);
-	DECLARE_DRIVER_INIT(chmpnum);
-	DECLARE_DRIVER_INIT(chsuper2);
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
 };
 
 
@@ -464,7 +464,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
+void chsuper_state::init_chsuper2()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
@@ -486,7 +486,7 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
+void chsuper_state::init_chsuper3()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
@@ -508,7 +508,7 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
+void chsuper_state::init_chmpnum()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();

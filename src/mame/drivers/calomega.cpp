@@ -3641,25 +3641,25 @@ ROM_END
 *                  Driver Init                   *
 *************************************************/
 
-DRIVER_INIT_MEMBER(calomega_state,sys903)
+void calomega_state::init_sys903()
 {
 	save_item(NAME(m_tx_line));
 	save_item(NAME(m_s903_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,s903mod)
+void calomega_state::init_s903mod()
 {
 	save_item(NAME(m_s903_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,sys905)
+void calomega_state::init_sys905()
 {
 	save_item(NAME(m_s905_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,comg080)
+void calomega_state::init_comg080()
 {
-	DRIVER_INIT_CALL(sys903);
+	init_sys903();
 
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;

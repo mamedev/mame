@@ -129,10 +129,10 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_default);
 	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_nmi_delay_count);
 	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_reset_delay_count);
-	DECLARE_DRIVER_INIT(z80netf);
-	DECLARE_DRIVER_INIT(z80net);
-	DECLARE_DRIVER_INIT(z80netb);
-	DECLARE_DRIVER_INIT(z80ne);
+	void init_z80netf();
+	void init_z80net();
+	void init_z80netb();
+	void init_z80ne();
 	void machine_start_z80ne();
 	void machine_reset_z80ne();
 	void machine_start_z80netb();

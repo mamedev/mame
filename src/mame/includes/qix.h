@@ -110,9 +110,9 @@ public:
 	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
 	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
 	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
-	DECLARE_DRIVER_INIT(slither);
-	DECLARE_DRIVER_INIT(zookeep);
-	DECLARE_DRIVER_INIT(kram3);
+	void init_slither();
+	void init_zookeep();
+	void init_kram3();
 	virtual void machine_reset() override;
 	void machine_start_qixmcu();
 	void video_start_qix();

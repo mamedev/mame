@@ -135,7 +135,7 @@ void s11c_state::machine_reset_s11c()
 //  m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER(s11c_state,s11c)
+void s11c_state::init_s11c()
 {
 	emu_timer* timer = timer_alloc(TIMER_IRQ);
 //  uint8_t *BGROM = memregion("bgcpu")->base();

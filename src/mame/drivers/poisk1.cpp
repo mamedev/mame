@@ -72,7 +72,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	void init_poisk1();
 	void machine_start_poisk1();
 	void machine_reset_poisk1();
 
@@ -561,7 +561,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER( p1_state, poisk1 )
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

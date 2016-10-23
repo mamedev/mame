@@ -879,7 +879,7 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 	return a;
 }
 
-DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
+void deco_mlc_state::init_avengrgs()
 {
 	// init options
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -898,7 +898,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 	descramble_sound();
 }
 
-DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::init_mlc()
 {
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
 	    effective clock rate here to compensate otherwise we have slowdowns in

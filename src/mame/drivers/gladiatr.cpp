@@ -961,7 +961,7 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 	}
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::init_gladiatr()
 {
 	uint8_t *rom;
 	int i,j;
@@ -1012,7 +1012,7 @@ READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
 	return m_nvram[0x6a3];
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,ppking)
+void gladiatr_state::init_ppking()
 {
 	uint8_t *rom;
 	int i,j;

@@ -60,7 +60,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(craft);
+	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -225,7 +225,7 @@ uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &b
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(craft_state,craft)
+void craft_state::init_craft()
 {
 }
 

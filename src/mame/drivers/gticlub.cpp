@@ -313,9 +313,9 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
 	void init_hangplt_common();
-	DECLARE_DRIVER_INIT(hangplt);
-	DECLARE_DRIVER_INIT(hangpltu);
-	DECLARE_DRIVER_INIT(gticlub);
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
 	void machine_start_gticlub();
 	void machine_reset_gticlub();
 	void machine_reset_hangplt();
@@ -1398,7 +1398,7 @@ ROM_START( hangpltu ) /* USA version UAA */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gticlub_state,gticlub)
+void gticlub_state::init_gticlub()
 {
 	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
 
@@ -1413,7 +1413,7 @@ void gticlub_state::init_hangplt_common()
 	m_sharc_dataram_1 = std::make_unique<uint32_t[]>(0x100000/4);
 }
 
-DRIVER_INIT_MEMBER(gticlub_state,hangplt)
+void gticlub_state::init_hangplt()
 {
 	init_hangplt_common();
 
@@ -1423,7 +1423,7 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
 
-DRIVER_INIT_MEMBER(gticlub_state,hangpltu)
+void gticlub_state::init_hangpltu()
 {
 	init_hangplt_common();
 

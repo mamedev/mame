@@ -393,7 +393,7 @@ ROM_START( sdgndmps )
 ROM_END
 
 /***************************************************************************/
-DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
+void dcon_state::init_sdgndmps()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[0x1356/2] = 0x4e71; /* beq -> nop */

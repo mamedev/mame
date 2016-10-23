@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
-	DECLARE_DRIVER_INIT(fc100);
+	void init_fc100();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -499,7 +499,7 @@ WRITE8_MEMBER( fc100_state::port70_w )
 	m_banksw_unlocked = (bool)offset;
 }
 
-DRIVER_INIT_MEMBER( fc100_state, fc100 )
+void fc100_state::init_fc100()
 {
 	uint8_t *ram = memregion("ram")->base();
 	uint8_t *cgen = memregion("chargen")->base()+0x800;

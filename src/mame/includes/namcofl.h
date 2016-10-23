@@ -71,8 +71,8 @@ public:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
-	DECLARE_DRIVER_INIT(speedrcr);
-	DECLARE_DRIVER_INIT(finalapr);
+	void init_speedrcr();
+	void init_finalapr();
 	void machine_start_namcofl();
 	void machine_reset_namcofl();
 	void video_start_namcofl();

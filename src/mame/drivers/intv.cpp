@@ -621,14 +621,14 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
-DRIVER_INIT_MEMBER(intv_state,intv)
+void intv_state::init_intv()
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
 	m_is_keybd = 0;
 }
 
-DRIVER_INIT_MEMBER(intv_state,intvkbd)
+void intv_state::init_intvkbd()
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);

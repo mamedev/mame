@@ -465,7 +465,7 @@ public:
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_READ8_MEMBER(chesster_input_r);
-	DECLARE_DRIVER_INIT(chesster);
+	void init_chesster();
 };
 
 
@@ -892,7 +892,7 @@ READ8_MEMBER(fidel6502_state::chesster_input_r)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, chesster)
+void fidel6502_state::init_chesster()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("speech")->base(), 0x4000);
 }

@@ -126,7 +126,7 @@ public:
 	DECLARE_READ8_MEMBER(supertnk_videoram_r);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
-	DECLARE_DRIVER_INIT(supertnk);
+	void init_supertnk();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -478,7 +478,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(supertnk_state,supertnk)
+void supertnk_state::init_supertnk()
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;

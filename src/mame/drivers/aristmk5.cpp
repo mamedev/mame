@@ -191,7 +191,7 @@ public:
 	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
 	DECLARE_READ32_MEMBER(Ns5r50);
 	DECLARE_WRITE32_MEMBER(sram_banksel_w);
-	DECLARE_DRIVER_INIT(aristmk5);
+	void init_aristmk5();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
@@ -470,7 +470,7 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_CONFSETTING(    0x03, "Game Mode" )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
+void aristmk5_state::init_aristmk5()
 {
 	uint8_t *SRAM    = memregion("sram")->base();
 	uint8_t *SRAM_NZ = memregion("sram")->base();

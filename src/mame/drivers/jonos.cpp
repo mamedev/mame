@@ -30,7 +30,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(jonos);
+	void init_jonos();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 private:
@@ -138,7 +138,7 @@ static MACHINE_CONFIG_START( jonos, jonos_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(jonos_state,jonos)
+void jonos_state::init_jonos()
 {
 }
 

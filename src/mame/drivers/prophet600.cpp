@@ -88,7 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 
-	DECLARE_DRIVER_INIT(prophet600);
+	void init_prophet600();
 
 	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, prophet600_state )
 	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_WRITE(mask_w)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER(prophet600_state, prophet600)
+void prophet600_state::init_prophet600()
 {
 }
 

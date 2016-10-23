@@ -105,8 +105,8 @@ public:
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	int m_drive;
-	DECLARE_DRIVER_INIT(erik);
-	DECLARE_DRIVER_INIT(special);
+	void init_erik();
+	void init_special();
 	void machine_reset_special();
 	void video_start_special();
 	void machine_reset_erik();

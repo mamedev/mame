@@ -550,7 +550,7 @@ ROM_START( roadf2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
+void hyperspt_state::init_hyperspt()
 {
 }
 

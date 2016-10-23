@@ -52,8 +52,8 @@ public:
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);
 	INTERRUPT_GEN_MEMBER(llander_interrupt);
 
-	DECLARE_DRIVER_INIT(asterock);
-	DECLARE_DRIVER_INIT(asteroidb);
+	void init_asterock();
+	void init_asteroidb();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

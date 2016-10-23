@@ -570,7 +570,7 @@ READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(fortyl_state,undoukai)
+void fortyl_state::init_undoukai()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
@@ -581,7 +581,7 @@ DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 	m_pix_color[3] = 0x1ec;
 }
 
-DRIVER_INIT_MEMBER(fortyl_state,40love)
+void fortyl_state::init_40love()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);

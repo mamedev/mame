@@ -1210,22 +1210,22 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sidearms_state,sidearms)
+void sidearms_state::init_sidearms()
 {
 	m_gameid = 0;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,turtship)
+void sidearms_state::init_turtship()
 {
 	m_gameid = 1;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,dyger)
+void sidearms_state::init_dyger()
 {
 	m_gameid = 2;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,whizz)
+void sidearms_state::init_whizz()
 {
 	m_gameid = 3;
 }

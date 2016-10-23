@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
 	DECLARE_READ8_MEMBER(gmaster_port_r);
 	DECLARE_WRITE8_MEMBER(gmaster_port_w);
-	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:

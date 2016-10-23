@@ -339,15 +339,15 @@ public:
 
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
-	DECLARE_DRIVER_INIT(cubo);
-	DECLARE_DRIVER_INIT(mgprem11);
-	DECLARE_DRIVER_INIT(odeontw2);
-	DECLARE_DRIVER_INIT(cndypuzl);
-	DECLARE_DRIVER_INIT(haremchl);
-	DECLARE_DRIVER_INIT(mgnumber);
-	DECLARE_DRIVER_INIT(lsrquiz2);
-	DECLARE_DRIVER_INIT(lasstixx);
-	DECLARE_DRIVER_INIT(lsrquiz);
+	void init_cubo();
+	void init_mgprem11();
+	void init_odeontw2();
+	void init_cndypuzl();
+	void init_haremchl();
+	void init_mgnumber();
+	void init_lsrquiz2();
+	void init_lasstixx();
+	void init_lsrquiz();
 
 	optional_ioport_array<2> m_player_ports;
 
@@ -1093,7 +1093,7 @@ ROM_END
 
 /***************************************************************************************************/
 
-DRIVER_INIT_MEMBER( cubo_state, cubo )
+void cubo_state::init_cubo()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
@@ -1187,9 +1187,9 @@ void cubo_state::cndypuzl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, cndypuzl )
+void cubo_state::init_cndypuzl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::cndypuzl_input_hack;
 }
 
@@ -1203,9 +1203,9 @@ void cubo_state::haremchl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, haremchl )
+void cubo_state::init_haremchl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::haremchl_input_hack;
 }
 
@@ -1219,9 +1219,9 @@ void cubo_state::lsrquiz_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz )
+void cubo_state::init_lsrquiz()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz_input_hack;
 }
 
@@ -1236,9 +1236,9 @@ void cubo_state::lsrquiz2_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz2 )
+void cubo_state::init_lsrquiz2()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz2_input_hack;
 }
 
@@ -1252,9 +1252,9 @@ void cubo_state::lasstixx_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER(cubo_state, lasstixx)
+void cubo_state::init_lasstixx()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lasstixx_input_hack;
 }
 
@@ -1267,9 +1267,9 @@ void cubo_state::mgnumber_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgnumber )
+void cubo_state::init_mgnumber()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgnumber_input_hack;
 }
 
@@ -1282,9 +1282,9 @@ void cubo_state::mgprem11_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgprem11 )
+void cubo_state::init_mgprem11()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
 

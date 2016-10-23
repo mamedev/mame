@@ -58,7 +58,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	DECLARE_DRIVER_INIT(blmbycar);
+	void init_blmbycar();
 	virtual void video_start() override;
 	void machine_start_blmbycar();
 	void machine_reset_blmbycar();

@@ -29,7 +29,7 @@ public:
 
 	uint8_t m_vga_address;
 
-	DECLARE_DRIVER_INIT(photoply);
+	void init_photoply();
 	virtual void machine_start() override;
 };
 
@@ -149,7 +149,7 @@ ROM_START(photoply)
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(photoply_state,photoply)
+void photoply_state::init_photoply()
 {
 }
 

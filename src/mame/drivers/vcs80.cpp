@@ -245,7 +245,7 @@ DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(vcs80_state,vcs80)
+void vcs80_state::init_vcs80()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));
 	m_maincpu->space(AS_IO).set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));

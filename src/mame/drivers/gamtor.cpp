@@ -39,7 +39,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
-	DECLARE_DRIVER_INIT(gaminator);
+	void init_gaminator();
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -1257,7 +1257,7 @@ ROM_START( llcharma )
 	ROM_LOAD( "llc_92_5.6-0", 0x0000, 0x2000000, CRC(c8c2a5d3) SHA1(ec23eff63871cc515ec58a894446d4d639d864e4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(gaminator_state,gaminator)
+void gaminator_state::init_gaminator()
 {
 }
 

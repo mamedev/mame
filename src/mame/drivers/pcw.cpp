@@ -1040,7 +1040,7 @@ void pcw_state::machine_reset()
 	m_printer_shift_output = 0;
 }
 
-DRIVER_INIT_MEMBER(pcw_state,pcw)
+void pcw_state::init_pcw()
 {
 	m_maincpu->set_input_line_vector(0, 0x0ff);
 

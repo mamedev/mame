@@ -188,7 +188,7 @@ public:
 	_4roses_state(const machine_config &mconfig, device_type type, const char *tag)
 		: funworld_state(mconfig, type, tag) { }
 
-	DECLARE_DRIVER_INIT(4roses);
+	void init_4roses();
 };
 
 
@@ -452,7 +452,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(_4roses_state,4roses)
+void _4roses_state::init_4roses()
 {
 }
 

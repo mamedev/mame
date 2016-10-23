@@ -88,7 +88,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(wmg_rombank_w);
 	void machine_reset_wmg();
-	DECLARE_DRIVER_INIT(wmg);
+	void init_wmg();
 	uint8_t m_wmg_bank;
 	uint8_t m_wmg_def_bank;
 	uint8_t m_wmg_port_select;
@@ -508,7 +508,7 @@ MACHINE_CONFIG_END
  *  Driver Initialisation
  *
  *************************************/
-DRIVER_INIT_MEMBER( wmg_state, wmg )
+void wmg_state::init_wmg()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	uint8_t *ROM = memregion("soundcpu")->base();

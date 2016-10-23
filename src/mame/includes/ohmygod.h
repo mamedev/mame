@@ -36,8 +36,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
-	DECLARE_DRIVER_INIT(ohmygod);
-	DECLARE_DRIVER_INIT(naname);
+	void init_ohmygod();
+	void init_naname();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -623,7 +623,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(skykid_state,skykid)
+void skykid_state::init_skykid()
 {
 	uint8_t *rom;
 	int i;

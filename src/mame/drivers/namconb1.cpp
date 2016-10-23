@@ -1006,52 +1006,52 @@ INPUT_PORTS_END
 
 /****************************************************************************/
 
-DRIVER_INIT_MEMBER(namconb1_state,nebulray)
+void namconb1_state::init_nebulray()
 {
 	m_gametype = NAMCONB1_NEBULRAY;
 } /* nebulray */
 
-DRIVER_INIT_MEMBER(namconb1_state,gslgr94u)
+void namconb1_state::init_gslgr94u()
 {
 	m_gametype = NAMCONB1_GSLGR94U;
 } /* gslgr94u */
 
-DRIVER_INIT_MEMBER(namconb1_state,gslgr94j)
+void namconb1_state::init_gslgr94j()
 {
 	m_gametype = NAMCONB1_GSLGR94J;
 } /* gslgr94j */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws95)
+void namconb1_state::init_sws95()
 {
 	m_gametype = NAMCONB1_SWS95;
 } /* sws95 */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws96)
+void namconb1_state::init_sws96()
 {
 	m_gametype = NAMCONB1_SWS96;
 } /* sws96 */
 
-DRIVER_INIT_MEMBER(namconb1_state,sws97)
+void namconb1_state::init_sws97()
 {
 	m_gametype = NAMCONB1_SWS97;
 } /* sws97 */
 
-DRIVER_INIT_MEMBER(namconb1_state,gunbulet)
+void namconb1_state::init_gunbulet()
 {
 	m_gametype = NAMCONB1_GUNBULET;
 } /* gunbulet */
 
-DRIVER_INIT_MEMBER(namconb1_state,vshoot)
+void namconb1_state::init_vshoot()
 {
 	m_gametype = NAMCONB1_VSHOOT;
 } /* vshoot */
 
-DRIVER_INIT_MEMBER(namconb1_state,machbrkr)
+void namconb1_state::init_machbrkr()
 {
 	m_gametype = NAMCONB2_MACH_BREAKERS;
 }
 
-DRIVER_INIT_MEMBER(namconb1_state,outfxies)
+void namconb1_state::init_outfxies()
 {
 	m_gametype = NAMCONB2_OUTFOXIES;
 }

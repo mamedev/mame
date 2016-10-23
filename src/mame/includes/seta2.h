@@ -99,10 +99,10 @@ public:
 	DECLARE_READ16_MEMBER(staraudi_tileram_r);
 	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
 
-	DECLARE_DRIVER_INIT(funcube3);
-	DECLARE_DRIVER_INIT(funcube);
-	DECLARE_DRIVER_INIT(funcube2);
-	DECLARE_DRIVER_INIT(staraudi);
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
+	void init_staraudi();
 
 	void machine_start_mj4simai();
 	void machine_start_funcube();

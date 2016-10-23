@@ -1243,14 +1243,14 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(twin16_state,twin16)
+void twin16_state::init_twin16()
 {
 	m_is_fround = false;
 	m_gfxrombank->configure_entries(0, 2, memregion("gfxrom")->base() + 0x100000, 0x80000);
 	m_gfxrombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(fround_state,fround)
+void fround_state::init_fround()
 {
 	m_is_fround = true;
 }
@@ -1260,9 +1260,9 @@ WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
 	membank("nvrambank")->set_entry(data);
 }
 
-DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
+void cuebrickj_state::init_cuebrickj()
 {
-	DRIVER_INIT_CALL(twin16);
+	init_twin16();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

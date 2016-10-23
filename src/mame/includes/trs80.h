@@ -147,11 +147,11 @@ public:
 	uint16_t m_start_address;
 	uint8_t m_crtc_reg;
 	uint8_t m_size_store;
-	DECLARE_DRIVER_INIT(trs80m4);
-	DECLARE_DRIVER_INIT(trs80l2);
-	DECLARE_DRIVER_INIT(trs80m4p);
-	DECLARE_DRIVER_INIT(lnw80);
-	DECLARE_DRIVER_INIT(trs80);
+	void init_trs80m4();
+	void init_trs80l2();
+	void init_trs80m4p();
+	void init_lnw80();
+	void init_trs80();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

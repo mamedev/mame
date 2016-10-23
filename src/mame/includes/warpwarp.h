@@ -66,13 +66,13 @@ public:
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(navarone);
-	DECLARE_DRIVER_INIT(geebee);
-	DECLARE_DRIVER_INIT(kaitein);
-	DECLARE_DRIVER_INIT(warpwarp);
-	DECLARE_DRIVER_INIT(sos);
-	DECLARE_DRIVER_INIT(kaitei);
-	DECLARE_DRIVER_INIT(bombbee);
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
 	void video_start_geebee();
 	DECLARE_PALETTE_INIT(geebee);
 	void video_start_warpwarp();

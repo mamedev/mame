@@ -165,7 +165,7 @@ public:
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_DRIVER_INIT(coinmstr);
+	void init_coinmstr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1526,7 +1526,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
+void coinmstr_state::init_coinmstr()
 {
 	uint8_t *rom = memregion("user1")->base();
 	int length = memregion("user1")->bytes();

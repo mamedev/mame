@@ -107,9 +107,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	DECLARE_DRIVER_INIT(rdx_v33);
-	DECLARE_DRIVER_INIT(nzerotea);
-	DECLARE_DRIVER_INIT(zerotm2k);
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_DERIVED( zerotm2k, nzerotea )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
+void r2dx_v33_state::init_rdx_v33()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -863,7 +863,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
+void r2dx_v33_state::init_nzerotea()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -872,7 +872,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	zeroteam_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
+void r2dx_v33_state::init_zerotm2k()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };

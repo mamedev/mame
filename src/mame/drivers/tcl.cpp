@@ -53,7 +53,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(tcl);
+	void init_tcl();
 	virtual void video_start() override;
 	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -167,7 +167,7 @@ ROM_END
 		dest[idx+0x10000]=(n)^0xff; \
 		idx++;
 
-DRIVER_INIT_MEMBER(tcl_state,tcl)
+void tcl_state::init_tcl()
 {
 	/* only the first part is decrypted (and verified)*/
 

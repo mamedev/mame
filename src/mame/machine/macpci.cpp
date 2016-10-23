@@ -142,13 +142,7 @@ void macpci_state::mac_driver_init(model_t model)
 	memset(m_ram->pointer(), 0, m_ram->size());
 }
 
-#define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(macpci_state,label)  \
-{   \
-	mac_driver_init(model ); \
-}
-
-MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)
+void macpci_state::init_pippin() { mac_driver_init(PCIMODEL_MAC_PIPPIN ); }
 
 READ32_MEMBER(macpci_state::mac_read_id)
 {

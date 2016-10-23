@@ -2292,23 +2292,23 @@ ROM_END
 
 /**********************************************************************************/
 
-DRIVER_INIT_MEMBER(cninja_state,cninja)
+void cninja_state::init_cninja()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
 }
 
-DRIVER_INIT_MEMBER(cninja_state,stoneage)
+void cninja_state::init_stoneage()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
 }
 
-DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
+void cninja_state::init_cninjabl2()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
 }
 
-DRIVER_INIT_MEMBER(cninja_state,mutantf)
+void cninja_state::init_mutantf()
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();

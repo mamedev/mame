@@ -75,12 +75,12 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	DECLARE_DRIVER_INIT(mktunit);
-	DECLARE_DRIVER_INIT(mkturbo);
-	DECLARE_DRIVER_INIT(nbajamte);
-	DECLARE_DRIVER_INIT(nbajam);
-	DECLARE_DRIVER_INIT(jdreddp);
-	DECLARE_DRIVER_INIT(mk2);
+	void init_mktunit();
+	void init_mkturbo();
+	void init_nbajamte();
+	void init_nbajam();
+	void init_jdreddp();
+	void init_mk2();
 
 	void machine_reset_midtunit();
 	void video_start_midtunit();

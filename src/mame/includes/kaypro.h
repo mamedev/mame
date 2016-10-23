@@ -59,7 +59,7 @@ public:
 	void video_start_kaypro();
 	DECLARE_PALETTE_INIT(kaypro);
 	void machine_reset_kay_kbd();
-	DECLARE_DRIVER_INIT(kaypro);
+	void init_kaypro();
 	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
 	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

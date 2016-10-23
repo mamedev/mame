@@ -103,11 +103,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_DRIVER_INIT(ssprint);
-	DECLARE_DRIVER_INIT(apb);
-	DECLARE_DRIVER_INIT(csprint);
-	DECLARE_DRIVER_INIT(paperboy);
-	DECLARE_DRIVER_INIT(720);
+	void init_ssprint();
+	void init_apb();
+	void init_csprint();
+	void init_paperboy();
+	void init_720();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	void machine_start_atarisy2();

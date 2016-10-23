@@ -9,9 +9,9 @@ INPUT_PORTS_EXTERN( mpu4 );
 #include "gamball.lh"
 
 
-DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
+void mpu4_state::init_m4_debug_mod4yam()
 {
-	DRIVER_INIT_CALL( m4default );
+	init_m4default();
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
@@ -35,10 +35,10 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
 	}
 }
 
-DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod4yam )
+void mpu4_state::init_m4_showstring_mod4yam()
 {
-	DRIVER_INIT_CALL( m4_debug_mod4yam );
-	DRIVER_INIT_CALL( m4debug );
+	init_m4_debug_mod4yam();
+	init_m4debug();
 }
 
 

@@ -763,7 +763,7 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::init_kickgoal()
 {
 #if 0 /* we should find a real fix instead  */
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();

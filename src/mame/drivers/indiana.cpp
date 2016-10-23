@@ -30,7 +30,7 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
-	DECLARE_DRIVER_INIT(indiana);
+	void init_indiana();
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -59,7 +59,7 @@ void indiana_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(indiana_state,indiana)
+void indiana_state::init_indiana()
 {
 }
 

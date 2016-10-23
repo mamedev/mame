@@ -194,12 +194,12 @@ public:
 	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
 	DECLARE_READ16_MEMBER(kakumei_mcu_r);
 	DECLARE_READ16_MEMBER(suchipi_mcu_r);
-	DECLARE_DRIVER_INIT(suchipi);
-	DECLARE_DRIVER_INIT(kakumei);
-	DECLARE_DRIVER_INIT(urashima);
-	DECLARE_DRIVER_INIT(kakumei2);
-	DECLARE_DRIVER_INIT(daireika);
-	DECLARE_DRIVER_INIT(mjzoomin);
+	void init_suchipi();
+	void init_kakumei();
+	void init_urashima();
+	void init_kakumei2();
+	void init_daireika();
+	void init_mjzoomin();
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
 	TILEMAP_MAPPER_MEMBER(range1_16x16);
 	TILEMAP_MAPPER_MEMBER(range2_16x16);
@@ -2428,7 +2428,7 @@ READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,urashima)
+void jalmah_state::init_urashima()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
@@ -2436,7 +2436,7 @@ DRIVER_INIT_MEMBER(jalmah_state,urashima)
 	m_mcu_prg = 0x12;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,daireika)
+void jalmah_state::init_daireika()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
@@ -2444,7 +2444,7 @@ DRIVER_INIT_MEMBER(jalmah_state,daireika)
 	m_mcu_prg = 0x11;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,mjzoomin)
+void jalmah_state::init_mjzoomin()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
@@ -2452,20 +2452,20 @@ DRIVER_INIT_MEMBER(jalmah_state,mjzoomin)
 	m_mcu_prg = 0x13;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,kakumei)
+void jalmah_state::init_kakumei()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 	m_mcu_prg = 0x21;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,kakumei2)
+void jalmah_state::init_kakumei2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 
 	m_mcu_prg = 0x22;
 }
 
-DRIVER_INIT_MEMBER(jalmah_state,suchipi)
+void jalmah_state::init_suchipi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchipi_mcu_r), this));
 

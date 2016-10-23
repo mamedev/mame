@@ -231,7 +231,7 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.b6",0x0300, 0x1000, CRC(5f83fa35) SHA1(cb13e63577762d818e5dcbb52b8a53f66e284e8f) ) /* 63S281N near SEI0070BU */
 ROM_END
 
-DRIVER_INIT_MEMBER(mustache_state,mustache)
+void mustache_state::init_mustache()
 {
 	int i;
 

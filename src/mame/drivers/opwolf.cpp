@@ -1065,7 +1065,7 @@ ROM_START( opwolfb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolf)
+void opwolf_state::init_opwolf()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1081,7 +1081,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 }
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
+void opwolf_state::init_opwolfb()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1094,7 +1094,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
+void opwolf_state::init_opwolfp()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 

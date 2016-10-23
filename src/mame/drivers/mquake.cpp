@@ -51,7 +51,7 @@ public:
 	m_es5503_rom(*this, "es5503")
 	{ }
 
-	DECLARE_DRIVER_INIT(mquake);
+	void init_mquake();
 
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
@@ -397,7 +397,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( mquake_state, mquake )
+void mquake_state::init_mquake()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;

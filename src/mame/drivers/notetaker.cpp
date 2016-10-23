@@ -141,7 +141,7 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iocpu_r);
 	DECLARE_WRITE16_MEMBER(iocpu_w);
-	DECLARE_DRIVER_INIT(notetakr);
+	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(notetaker_state,notetakr)
+void notetaker_state::init_notetakr()
 {
 	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits

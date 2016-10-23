@@ -84,9 +84,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
-	DECLARE_DRIVER_INIT(spkleftover);
-	DECLARE_DRIVER_INIT(spk116it);
-	DECLARE_DRIVER_INIT(3super8);
+	void init_spkleftover();
+	void init_spk116it();
+	void init_3super8();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -846,7 +846,7 @@ ROM_END
                               Driver Init
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(spoker_state, spkleftover)
+void spoker_state::init_spkleftover()
 {
 /*  The last 4K have the scheme/table for the whole encryption.
     Maybe a leftover...
@@ -861,7 +861,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, spk116it)
+void spoker_state::init_spk116it()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -876,7 +876,7 @@ DRIVER_INIT_MEMBER(spoker_state, spk116it)
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, 3super8)
+void spoker_state::init_3super8()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;

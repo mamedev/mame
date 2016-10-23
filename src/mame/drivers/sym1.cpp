@@ -57,7 +57,7 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
+	void init_sym1();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
@@ -255,7 +255,7 @@ WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)

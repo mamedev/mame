@@ -833,7 +833,7 @@ ROM_END
 //-------------------------------------------------
 
 
-DRIVER_INIT_MEMBER(vixen_state,vixen)
+void vixen_state::init_vixen()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }

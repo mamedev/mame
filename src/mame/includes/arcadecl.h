@@ -26,7 +26,7 @@ public:
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_DRIVER_INIT(sparkz);
+	void init_sparkz();
 	void machine_start_arcadecl();
 	void machine_reset_arcadecl();
 	void video_start_arcadecl();

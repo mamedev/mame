@@ -36,7 +36,7 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	DECLARE_DRIVER_INIT(micral);
+	void init_micral();
 	void machine_reset_micral();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -229,7 +229,7 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( micral_state, micral )
+void micral_state::init_micral()
 {
 	//uint8_t *main = memregion("maincpu")->base();
 

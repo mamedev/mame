@@ -19,7 +19,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(partner_state,partner)
+void partner_state::init_partner()
 {
 	m_tape_value = 0x80;
 }

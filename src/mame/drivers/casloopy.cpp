@@ -180,7 +180,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
 	uint16_t sh7021_regs[0x100];
 	int m_gfx_index;
-	DECLARE_DRIVER_INIT(casloopy);
+	void init_casloopy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -553,7 +553,7 @@ ROM_START( casloopy )
 	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
 ROM_END
 
-DRIVER_INIT_MEMBER(casloopy_state,casloopy)
+void casloopy_state::init_casloopy()
 {
 	/* load hand made bios data*/
 	m_bios_rom[0/4] = 0x6000480;//0x600af3c;//0x6000964; //SPC

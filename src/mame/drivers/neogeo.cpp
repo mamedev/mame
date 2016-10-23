@@ -2024,7 +2024,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(neogeo_state, neogeo)
+void neogeo_state::init_neogeo()
 {
 	// install controllers
 	if (m_ctrl1)

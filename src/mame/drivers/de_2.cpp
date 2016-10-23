@@ -55,7 +55,7 @@ protected:
 	required_device<ym2151_device> m_ym2151;
 
 public:
-	DECLARE_DRIVER_INIT(de_2);
+	void init_de_2();
 	void machine_reset_de_2();
 	void machine_reset_de_2_alpha3();
 	DECLARE_WRITE8_MEMBER(sample_w);
@@ -216,7 +216,7 @@ void de_2_state::machine_reset_de_2()
 	m_more_data = false;
 }
 
-DRIVER_INIT_MEMBER(de_2_state, de_2)
+void de_2_state::init_de_2()
 {
 	uint8_t *ROM = memregion("sound1")->base();
 	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);

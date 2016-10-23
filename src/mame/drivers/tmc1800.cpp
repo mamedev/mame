@@ -860,7 +860,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
+void tmc1800_state::init_tmc1800()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }

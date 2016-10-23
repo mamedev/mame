@@ -76,7 +76,7 @@ public:
 		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(penta);
+	void init_penta();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -652,7 +652,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pengo_state,penta)
+void pengo_state::init_penta()
 {
 /*
     the values vary, but the translation mask is always laid out like this:

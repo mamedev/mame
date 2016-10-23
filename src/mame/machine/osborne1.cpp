@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
 }
 
 
-DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
+void osborne1_state::init_osborne1()
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
 	m_bank_0xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);

@@ -60,8 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(meadows_videoram_w);
 	DECLARE_WRITE8_MEMBER(meadows_spriteram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(minferno);
-	DECLARE_DRIVER_INIT(gypsyjug);
+	void init_minferno();
+	void init_gypsyjug();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

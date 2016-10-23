@@ -90,7 +90,7 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(llc_state,llc1)
+void llc_state::init_llc1()
 {
 }
 
@@ -105,7 +105,7 @@ void llc_state::machine_start_llc1()
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(llc_state,llc2)
+void llc_state::init_llc2()
 {
 	m_p_videoram.set_target( m_ram->pointer() + 0xc000,m_p_videoram.bytes());
 }

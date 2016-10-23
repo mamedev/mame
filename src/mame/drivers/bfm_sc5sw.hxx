@@ -13114,7 +13114,7 @@ ROM_END
 extern int find_project_string(running_machine &machine, int addrxor, int mode);
 
 
-DRIVER_INIT_MEMBER(bfm_sc5_state,sc5)
+void bfm_sc5_state::init_sc5()
 {
 	// sc5 roms always start with SC5
 	uint8_t *src = memregion( "maincpu" )->base();

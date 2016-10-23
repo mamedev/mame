@@ -76,7 +76,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_DRIVER_INIT(i7000);
+	void init_i7000();
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( i7000 )
 		PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::init_i7000()
 {
 }
 

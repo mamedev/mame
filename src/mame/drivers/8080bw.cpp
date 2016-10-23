@@ -800,7 +800,7 @@ MACHINE_CONFIG_START( spacecom, _8080bw_state )
 	MCFG_FRAGMENT_ADD(invaders_audio)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
+void _8080bw_state::init_spacecom()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2829,7 +2829,7 @@ MACHINE_CONFIG_DERIVED_CLASS( vortex, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 /* decrypt function for vortex */
-DRIVER_INIT_MEMBER(_8080bw_state,vortex)
+void _8080bw_state::init_vortex()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
@@ -3243,7 +3243,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( attackfc, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
+void _8080bw_state::init_attackfc()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	uint32_t len = memregion("maincpu")->bytes();
@@ -3378,7 +3378,7 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
+void _8080bw_state::init_invmulti()
 {
 	uint8_t *src = memregion("user1")->base();
 	int len = memregion("user1")->bytes();

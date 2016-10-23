@@ -480,22 +480,22 @@ WRITE8_MEMBER(tnzs_state::tnzs_sync_kludge_w)
 
 
 
-DRIVER_INIT_MEMBER(tnzs_state,plumpop)
+void tnzs_state::init_plumpop()
 {
 	m_mcu_type = MCU_PLUMPOP;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,extrmatn)
+void tnzs_state::init_extrmatn()
 {
 	m_mcu_type = MCU_EXTRMATN;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,arknoid2)
+void tnzs_state::init_arknoid2()
 {
 	m_mcu_type = MCU_ARKANOID;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
+void tnzs_state::init_drtoppel()
 {
 	m_mcu_type = MCU_DRTOPPEL;
 
@@ -503,19 +503,19 @@ DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
 	m_maincpu->space(AS_PROGRAM).nop_write(0xf800, 0xfbff);
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,chukatai)
+void tnzs_state::init_chukatai()
 {
 	m_mcu_type = MCU_CHUKATAI;
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,tnzs)
+void tnzs_state::init_tnzs()
 {
 	m_mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
+void tnzs_state::init_tnzsb()
 {
 	m_mcu_type = MCU_NONE_TNZSB;
 
@@ -523,7 +523,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
+void tnzs_state::init_kabukiz()
 {
 	uint8_t *SOUND = memregion("audiocpu")->base();
 	m_mcu_type = MCU_NONE_KABUKIZ;
@@ -531,7 +531,7 @@ DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
 	m_audiobank->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,insectx)
+void tnzs_state::init_insectx()
 {
 	m_mcu_type = MCU_NONE_INSECTX;
 
@@ -541,7 +541,7 @@ DRIVER_INIT_MEMBER(tnzs_state,insectx)
 	m_subcpu->space(AS_PROGRAM).install_read_port(0xc002, 0xc002, "IN2" );
 }
 
-DRIVER_INIT_MEMBER(tnzs_state,kageki)
+void tnzs_state::init_kageki()
 {
 	m_mcu_type = MCU_NONE_KAGEKI;
 }

@@ -488,7 +488,7 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::init_blmbycar()
 {
 	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;

@@ -461,7 +461,7 @@ READ8_MEMBER(m72_state::snd_cpu_sample_r)
 	return m_mcu_sample_latch;
 }
 
-DRIVER_INIT_MEMBER(m72_state,m72_8751)
+void m72_state::init_m72_8751()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	address_space &io = m_maincpu->space(AS_IO);
@@ -823,26 +823,26 @@ void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *cr
 	save_pointer(NAME(m_protection_ram.get()), 0x1000/2);
 }
 
-DRIVER_INIT_MEMBER(m72_state,bchopper)
+void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,nspirit)
+void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,imgfight)
+void m72_state::init_imgfight()
 {
 	install_protection_handler(imgfight_code,imgfightj_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,loht)
+void m72_state::init_loht()
 {
 	install_protection_handler(loht_code,loht_crc);
 
@@ -853,25 +853,25 @@ DRIVER_INIT_MEMBER(m72_state,loht)
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,dbreedm72)
+void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,airduelm72)
+void m72_state::init_airduelm72()
 {
 	install_protection_handler(airduelm72_code,airduelm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduelm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,dkgenm72)
+void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,gallop)
+void m72_state::init_gallop()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
 }

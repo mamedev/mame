@@ -34,7 +34,7 @@ public:
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
-	DECLARE_DRIVER_INIT(blstroid);
+	void init_blstroid();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	void machine_start_blstroid();
 	void machine_reset_blstroid();

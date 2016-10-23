@@ -65,8 +65,8 @@ public:
 	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
 	DECLARE_READ8_MEMBER(namco_52xx_si_r);
 	DECLARE_READ8_MEMBER(custom_mod_r);
-	DECLARE_DRIVER_INIT(galaga);
-	DECLARE_DRIVER_INIT(gatsbee);
+	void init_galaga();
+	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void machine_start_galaga();

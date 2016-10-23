@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DRIVER_INIT(esb);
-	DECLARE_DRIVER_INIT(starwars);
+	void init_esb();
+	void init_starwars();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	TIMER_CALLBACK_MEMBER(main_callback);

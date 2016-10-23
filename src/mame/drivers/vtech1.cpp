@@ -72,8 +72,8 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(vtech1);
-	DECLARE_DRIVER_INIT(vtech1h);
+	void init_vtech1();
+	void init_vtech1h();
 
 	DECLARE_READ8_MEMBER(vtech1_lightpen_r);
 	DECLARE_READ8_MEMBER(vtech1_keyboard_r);
@@ -263,7 +263,7 @@ READ8_MEMBER( vtech1_state::mc6847_videoram_r )
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER( vtech1_state, vtech1 )
+void vtech1_state::init_vtech1()
 {
 	// setup expansion slots
 	m_ioexp->set_io_space(&m_maincpu->space(AS_IO));
@@ -271,9 +271,9 @@ DRIVER_INIT_MEMBER( vtech1_state, vtech1 )
 	m_memexp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
-DRIVER_INIT_MEMBER( vtech1_state, vtech1h )
+void vtech1_state::init_vtech1h()
 {
-	DRIVER_INIT_CALL(vtech1);
+	init_vtech1();
 
 	// the SHRG mod replaces the standard videoram chip with an 8k chip
 	m_videoram.allocate(0x2000);

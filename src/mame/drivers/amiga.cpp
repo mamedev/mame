@@ -38,8 +38,8 @@ public:
 	m_wom(*this, "wom")
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
@@ -64,8 +64,8 @@ public:
 	m_zorro2_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
@@ -100,8 +100,8 @@ public:
 	m_side_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
@@ -135,8 +135,8 @@ public:
 	m_tpi_irq(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
@@ -182,8 +182,8 @@ public:
 	DECLARE_READ32_MEMBER( motherboard_r );
 	DECLARE_WRITE32_MEMBER( motherboard_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 
@@ -204,8 +204,8 @@ public:
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 	virtual void machine_reset() override;
@@ -234,8 +234,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd0;
 
@@ -256,8 +256,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd1;
 
@@ -289,8 +289,8 @@ public:
 	DECLARE_READ32_MEMBER( motherboard_r );
 	DECLARE_WRITE32_MEMBER( motherboard_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 
@@ -321,8 +321,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	required_ioport_array<2> m_player_ports;
 
@@ -426,123 +426,123 @@ WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
 //**************************************************************************
 
 // ocs chipset (agnus with support for 512k or 1mb chip ram, denise)
-DRIVER_INIT_MEMBER( a1000_state, pal )
+void a1000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8367
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a1000_state, ntsc )
+void a1000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8361
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, pal )
+void a2000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, ntsc )
+void a2000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, pal )
+void a500_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, ntsc )
+void a500_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, pal )
+void cdtv_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, ntsc )
+void cdtv_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
 // ecs chipset (agnus with support for 2mb chip ram, super denise)
-DRIVER_INIT_MEMBER( a3000_state, pal )
+void a3000_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL_NEW;  // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a3000_state, ntsc )
+void a3000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC_NEW; // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, pal )
+void a500p_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, ntsc )
+void a500p_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, pal )
+void a600_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, ntsc )
+void a600_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
 // aga chipset (alice and lisa)
-DRIVER_INIT_MEMBER( a1200_state, pal )
+void a1200_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a1200_state, ntsc )
+void a1200_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, pal )
+void a4000_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, ntsc )
+void a4000_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, pal )
+void cd32_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, ntsc )
+void cd32_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;

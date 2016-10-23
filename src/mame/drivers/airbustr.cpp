@@ -729,7 +729,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(airbustr_state,airbustr)
+void airbustr_state::init_airbustr()
 {
 	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }

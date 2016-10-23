@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ct_io_w);
 	DECLARE_READ8_MEMBER(rrowx_r);
 
-	DECLARE_DRIVER_INIT(laserbat);
+	void init_laserbat();
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
 
 	// video memory and control ports

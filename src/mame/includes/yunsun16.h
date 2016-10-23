@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
 	DECLARE_WRITE16_MEMBER(vram_0_w);
 	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_DRIVER_INIT(magicbub);
+	void init_magicbub();
 	void machine_start_shocking();
 	void machine_reset_shocking();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);

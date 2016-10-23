@@ -242,7 +242,7 @@ static const gfx_layout tilelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-DRIVER_INIT_MEMBER(aquarium_state,aquarium)
+void aquarium_state::init_aquarium()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 

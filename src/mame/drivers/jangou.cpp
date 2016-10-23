@@ -90,8 +90,8 @@ public:
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
 	DECLARE_READ8_MEMBER(input_mux_r);
 	DECLARE_READ8_MEMBER(input_system_r);
-	DECLARE_DRIVER_INIT(jngolady);
-	DECLARE_DRIVER_INIT(luckygrl);
+	void init_jngolady();
+	void init_luckygrl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1210,12 +1210,12 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 	return machine().rand();
 }
 
-DRIVER_INIT_MEMBER(jangou_state,jngolady)
+void jangou_state::init_jngolady()
 {
 	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
 }
 
-DRIVER_INIT_MEMBER(jangou_state,luckygrl)
+void jangou_state::init_luckygrl()
 {
 	// this is WRONG
 	int A;

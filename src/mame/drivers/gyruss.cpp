@@ -683,7 +683,7 @@ ROM_START( venus )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gyruss_state,gyruss)
+void gyruss_state::init_gyruss()
 {
 }
 

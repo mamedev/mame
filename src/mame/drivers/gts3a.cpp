@@ -36,7 +36,7 @@ public:
 		, m_switches(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(gts3a);
+	void init_gts3a();
 	DECLARE_WRITE8_MEMBER(segbank_w);
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
@@ -278,7 +278,7 @@ void gts3a_state::machine_reset()
 	m_dispclk = 0;
 }
 
-DRIVER_INIT_MEMBER( gts3a_state, gts3a )
+void gts3a_state::init_gts3a()
 {
 	uint8_t *dmd = memregion("dmdcpu")->base();
 

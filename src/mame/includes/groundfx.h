@@ -59,7 +59,7 @@ public:
 	DECLARE_READ32_MEMBER(irq_speedup_r_groundfx);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
-	DECLARE_DRIVER_INIT(groundfx);
+	void init_groundfx();
 	virtual void video_start() override;
 	uint32_t screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(groundfx_interrupt);

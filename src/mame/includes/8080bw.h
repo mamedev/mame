@@ -117,10 +117,10 @@ public:
 	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
 
-	DECLARE_DRIVER_INIT(invmulti);
-	DECLARE_DRIVER_INIT(spacecom);
-	DECLARE_DRIVER_INIT(vortex);
-	DECLARE_DRIVER_INIT(attackfc);
+	void init_invmulti();
+	void init_spacecom();
+	void init_vortex();
+	void init_attackfc();
 
 	void machine_start_extra_8080bw();
 	void machine_start_rollingc();

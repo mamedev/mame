@@ -177,8 +177,8 @@ public:
 	DECLARE_READ16_MEMBER(dummy_read_01);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
-	DECLARE_DRIVER_INIT(galgames);
-	DECLARE_DRIVER_INIT(galgame2);
+	void init_galgames();
+	void init_galgame2();
 	void machine_reset_tmaster();
 	void video_start_tmaster();
 	void machine_reset_galgames();
@@ -1785,7 +1785,7 @@ ROM_START( galgame2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tmaster_state,galgames)
+void tmaster_state::init_galgames()
 {
 	uint8_t *ROM  =   memregion("maincpu")->base();
 	int cart;
@@ -1819,7 +1819,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmaster_state,galgame2)
+void tmaster_state::init_galgame2()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -1836,7 +1836,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 	// Cartdridge check on game selection screen
 	ROM[0x12da0/2] = 0x4e71;
 
-	DRIVER_INIT_CALL(galgames);
+	init_galgames();
 }
 
 GAME( 1996, tm,       0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )

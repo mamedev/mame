@@ -2106,7 +2106,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(armedf_state,terraf)
+void armedf_state::init_terraf()
 {
 	m_scroll_type = 0;
 
@@ -2116,27 +2116,27 @@ DRIVER_INIT_MEMBER(armedf_state,terraf)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafu)
+void armedf_state::init_terrafu()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafjb)
+void armedf_state::init_terrafjb()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,armedf)
+void armedf_state::init_armedf()
 {
 	m_scroll_type = 1;
 }
 
 
-DRIVER_INIT_MEMBER(armedf_state,kozure)
+void armedf_state::init_kozure()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2150,7 +2150,7 @@ DRIVER_INIT_MEMBER(armedf_state,kozure)
 
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legion)
+void armedf_state::init_legion()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2166,7 +2166,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 	m_scroll_type = 2;
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legionjb)
+void armedf_state::init_legionjb()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2183,14 +2183,14 @@ DRIVER_INIT_MEMBER(armedf_state,legionjb)
 	save_item(NAME(m_legion_cmd));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
+void armedf_state::init_cclimbr2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 	m_scroll_type = 3;
 }
 
-DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::init_bigfghtr()
 {
 	m_scroll_type = 1;
 }

@@ -192,7 +192,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(trucocl_state,trucocl)
+void trucocl_state::init_trucocl()
 {
 	m_cur_dac_address = -1;
 	m_cur_dac_address_index = 0;

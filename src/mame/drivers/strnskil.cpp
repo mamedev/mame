@@ -524,7 +524,7 @@ ROM_START( banbam )
 	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
-DRIVER_INIT_MEMBER(strnskil_state,pettanp)
+void strnskil_state::init_pettanp()
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
@@ -536,7 +536,7 @@ DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 
 }
 
-DRIVER_INIT_MEMBER(strnskil_state,banbam)
+void strnskil_state::init_banbam()
 {
 	/* Fujitsu MB8841 4-Bit MCU */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));

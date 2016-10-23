@@ -79,17 +79,17 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 
 
-DRIVER_INIT_MEMBER(pce_state,mess_pce)
+void pce_state::init_mess_pce()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,tg16)
+void pce_state::init_tg16()
 {
 	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,sgx)
+void pce_state::init_sgx()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }

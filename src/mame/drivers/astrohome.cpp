@@ -245,7 +245,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrocde_state,astrocde)
+void astrocde_state::init_astrocde()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }

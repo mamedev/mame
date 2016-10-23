@@ -694,7 +694,7 @@ ROM_START( skysmash )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(bloodbro_state,weststry)
+void bloodbro_state::init_weststry()
 {
 	// Patch out jp nz,$3000; no code known to exist at that address
 	memory_region *z80_rom = memregion("audiocpu");

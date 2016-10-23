@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(jupiter);
+	void init_jupiter();
 };
 
 class jupiter3_state : public driver_device
@@ -53,7 +53,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(jupiter3);
+	void init_jupiter3();
 };
 
 #endif

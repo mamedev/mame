@@ -1041,7 +1041,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(lordgun_state, lordgun)
+void lordgun_state::init_lordgun()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
@@ -1067,7 +1067,7 @@ DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 	}
 }
 
-DRIVER_INIT_MEMBER(lordgun_state, aliencha)
+void lordgun_state::init_aliencha()
 {
 	save_item(NAME(m_aliencha_dip_sel));
 }

@@ -54,10 +54,10 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
-	DECLARE_DRIVER_INIT(atla_ltd);
-	DECLARE_DRIVER_INIT(bhol_ltd);
-	DECLARE_DRIVER_INIT(zephy);
-	DECLARE_DRIVER_INIT(ltd);
+	void init_atla_ltd();
+	void init_bhol_ltd();
+	void init_zephy();
+	void init_ltd();
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -362,24 +362,24 @@ void ltd_state::machine_reset()
 	m_timer_r = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, ltd )
+void ltd_state::init_ltd()
 {
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+void ltd_state::init_atla_ltd()
 {
 	m_game = 1;
 	output().set_digit_value(0, 0x3f);
 	output().set_digit_value(10, 0x3f);
 }
 
-DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+void ltd_state::init_bhol_ltd()
 {
 	m_game = 2;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, zephy )
+void ltd_state::init_zephy()
 {
 	m_game = 3;
 }

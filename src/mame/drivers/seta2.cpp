@@ -2791,7 +2791,7 @@ ROM_START( funcube5 )
 	ROM_LOAD( "fc51_snd-0.u47", 0x000000, 0x200000, CRC(2a504fe1) SHA1(911ad650bf48aa78d9cb3c64284aa526ceb519ba) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seta2_state,funcube)
+void seta2_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -2802,7 +2802,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube)
 	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube2)
+void seta2_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -2815,7 +2815,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube2)
 	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube3)
+void seta2_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3524,7 +3524,7 @@ ROM_START( staraudi )
 	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
-DRIVER_INIT_MEMBER(seta2_state,staraudi)
+void seta2_state::init_staraudi()
 {
 	// bad sound rom: replace the missing (zero) sample with the previous one
 	uint8_t *samples = memregion("x1snd")->base() + 0x100000;

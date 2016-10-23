@@ -1724,7 +1724,7 @@ ROM_START( buraikenb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lwings_state, avengersb)
+void lwings_state::init_avengersb()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));

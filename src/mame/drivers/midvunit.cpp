@@ -1853,9 +1853,9 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 	m_generic_speedup = m_ram_base + speedup;
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnusa)  { init_crusnusa_common(0xc93e); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu40)  { init_crusnusa_common(0xc957); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnu21)  { init_crusnusa_common(0xc051); }
+void midvunit_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
+void midvunit_state::init_crusnu40()  { init_crusnusa_common(0xc957); }
+void midvunit_state::init_crusnu21()  { init_crusnusa_common(0xc051); }
 
 
 void midvunit_state::init_crusnwld_common(offs_t speedup)
@@ -1879,13 +1879,13 @@ void midvunit_state::init_crusnwld_common(offs_t speedup)
 		m_generic_speedup = m_ram_base + speedup;
 	}
 }
-DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0); }
+void midvunit_state::init_crusnwld()  { init_crusnwld_common(0xd4c0); }
 #if 0
-DRIVER_INIT_MEMBER(midvunit_state,crusnw20)  { init_crusnwld_common(0xd49c); }
-DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0); }
+void midvunit_state::init_crusnw20()  { init_crusnwld_common(0xd49c); }
+void midvunit_state::init_crusnw13()  { init_crusnwld_common(0); }
 #endif
 
-DRIVER_INIT_MEMBER(midvunit_state,offroadc)
+void midvunit_state::init_offroadc()
 {
 	m_adc_shift = 16;
 
@@ -1901,7 +1901,7 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 }
 
 
-DRIVER_INIT_MEMBER(midvunit_state,wargods)
+void midvunit_state::init_wargods()
 {
 	uint8_t default_nvram[256];
 

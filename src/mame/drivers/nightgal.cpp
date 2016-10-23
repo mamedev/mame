@@ -83,8 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_DRIVER_INIT(ngalsumr);
-	DECLARE_DRIVER_INIT(royalqn);
+	void init_ngalsumr();
+	void init_royalqn();
 	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1032,7 +1032,7 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nightgal_state,royalqn)
+void nightgal_state::init_royalqn()
 {
 	uint8_t *ROM = memregion("subrom")->base();
 
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
 	//m_z80_latch = data;
 }
 
-DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
+void nightgal_state::init_ngalsumr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_unk_w), this) );
 	// 0x6003 some kind of f/f state

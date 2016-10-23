@@ -25,7 +25,7 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(ut88_state,ut88)
+void ut88_state::init_ut88()
 {
 	/* set initially ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -161,7 +161,7 @@ WRITE8_MEMBER( ut88_state::ut88mini_write_led )
 		}
 }
 
-DRIVER_INIT_MEMBER(ut88_state,ut88mini)
+void ut88_state::init_ut88mini()
 {
 }
 

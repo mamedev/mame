@@ -58,7 +58,7 @@ public:
 		, m_io_xb(*this, "XB")
 	{ }
 
-	DECLARE_DRIVER_INIT(gp_2);
+	void init_gp_2();
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);

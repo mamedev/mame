@@ -718,7 +718,7 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_counter = 0;

@@ -926,7 +926,7 @@ ROM_START( sraider )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(redclash_state,redclash)
+void redclash_state::init_redclash()
 {
 	int i,j;
 	const uint8_t *src = memregion("gfx2")->base();

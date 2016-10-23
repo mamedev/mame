@@ -37,7 +37,7 @@
     INITIALIZATION
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mz_state,mz700)
+void mz_state::init_mz700()
 {
 	m_mz700 = true;
 	m_mz700_mode = true;
@@ -56,7 +56,7 @@ DRIVER_INIT_MEMBER(mz_state,mz700)
 	membank("bankd")->configure_entry(1, m_videoram.get()); // vram
 }
 
-DRIVER_INIT_MEMBER(mz_state,mz800)
+void mz_state::init_mz800()
 {
 	m_mz700 = false;
 	m_mz700_mode = true;//false;

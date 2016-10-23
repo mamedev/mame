@@ -626,7 +626,7 @@ ROM_START( beastf )
 	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) ) // not dumped, taken from suprglob
 ROM_END
 
-DRIVER_INIT_MEMBER(epos_state,dealer)
+void epos_state::init_dealer()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int A;

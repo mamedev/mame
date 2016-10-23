@@ -249,7 +249,7 @@ void tsispch_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
-DRIVER_INIT_MEMBER(tsispch_state,prose2k)
+void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());

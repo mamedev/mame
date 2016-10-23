@@ -90,7 +90,7 @@ public:
 
 
 
-	DECLARE_DRIVER_INIT(megaphx);
+	void init_megaphx();
 
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(megaphx_state,megaphx)
+void megaphx_state::init_megaphx()
 {
 	uint16_t *src = (uint16_t*)memregion( "roms67" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..

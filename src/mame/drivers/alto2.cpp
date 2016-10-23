@@ -29,7 +29,7 @@ public:
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	DECLARE_DRIVER_INIT(alto2);
+	void init_alto2();
 	void machine_reset_alto2();
 
 protected:
@@ -304,7 +304,7 @@ MACHINE_CONFIG_END
 
 /* Driver Init */
 
-DRIVER_INIT_MEMBER( alto2_state, alto2 )
+void alto2_state::init_alto2()
 {
 	// Make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());

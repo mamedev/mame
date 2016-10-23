@@ -36,9 +36,9 @@ public:
 	DECLARE_WRITE8_MEMBER(speakres_out2_w);
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
 
-	DECLARE_DRIVER_INIT(route16);
-	DECLARE_DRIVER_INIT(route16a);
-	DECLARE_DRIVER_INIT(route16c);
+	void init_route16();
+	void init_route16a();
+	void init_route16c();
 	void machine_start_speakres();
 	void machine_start_ttmahjng();
 	virtual void video_start() override;

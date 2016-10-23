@@ -917,7 +917,7 @@ MACHINE_CONFIG_END
  * Hacks to work around missing roms to get at least some
  * video output
  */
-DRIVER_INIT_MEMBER(m10_state,andromed)
+void m10_state::init_andromed()
 {
 	int i;
 
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(m10_state,andromed)
 		m_rom[i] = 0x60;
 }
 
-DRIVER_INIT_MEMBER(m10_state,ipminva1)
+void m10_state::init_ipminva1()
 {
 	int i;
 

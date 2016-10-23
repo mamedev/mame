@@ -3139,22 +3139,22 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas18_state,generic_shad)
+void segas18_state::init_generic_shad()
 {
 	init_generic(ROM_BOARD_171_SHADOW);
 }
 
-DRIVER_INIT_MEMBER(segas18_state,generic_5874)
+void segas18_state::init_generic_5874()
 {
 	init_generic(ROM_BOARD_171_5874);
 }
 
-DRIVER_INIT_MEMBER(segas18_state,generic_5987)
+void segas18_state::init_generic_5987()
 {
 	init_generic(ROM_BOARD_171_5987);
 }
 
-DRIVER_INIT_MEMBER(segas18_state,hamaway)
+void segas18_state::init_hamaway()
 {
 	init_generic(ROM_BOARD_837_7525);
 }
@@ -3166,20 +3166,20 @@ DRIVER_INIT_MEMBER(segas18_state,hamaway)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas18_state,ddcrew)
+void segas18_state::init_ddcrew()
 {
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::ddcrew_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas18_state,lghost)
+void segas18_state::init_lghost()
 {
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::lghost_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas18_state::lghost_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas18_state,wwally)
+void segas18_state::init_wwally()
 {
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::wwally_custom_io_r), this);
